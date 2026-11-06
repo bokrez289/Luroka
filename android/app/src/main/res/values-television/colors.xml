@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- TV (Android TV / Google TV / Fire TV) launch + window background.
+         The television UI-mode qualifier outranks night/notnight, so this wins
+         even on TVs that report notnight (most do) where values/ would resolve
+         the phone near-black #0E0F12. Black matches the OLED default theme on
+         TV, the tvOS launch screen, and the Flutter launch splash, which uses
+         black on TV too — the launch look is theme-independent by design. -->
+    <color name="splash_background">#000000</color>
+    <color name="splash_dark">#000000</color>
+    <color name="splash_oled">#000000</color>
+    <color name="splash_light">#000000</color>
+</resources>

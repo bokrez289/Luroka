@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from assets/branding/lumora-symbol.svg. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp" android:viewportWidth="1024" android:viewportHeight="1024">
+  <group android:scaleX="0.8" android:scaleY="0.8" android:translateX="102.4" android:translateY="102.4">
+    <path android:fillColor="#FFFFFF" android:pathData="M318 228 C300 228 286 242 286 260 L286 630 C286 726 342 782 438 782 L706 782 C728 782 746 764 746 742 L746 698 C746 676 728 658 706 658 L446 658 C424 658 410 644 410 622 L410 260 C410 242 396 228 378 228 Z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M506 244 C494 236 480 244 480 258 L480 366 C480 374 484 382 492 386 L642 476 L492 566 C484 570 480 578 480 586 L480 618 C480 634 498 642 510 632 L760 492 C772 484 772 468 760 460 Z" />
+  </group>
+</vector>

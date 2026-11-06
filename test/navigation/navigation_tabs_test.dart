@@ -1,0 +1,116 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:luroka/navigation/navigation_tabs.dart';
+
+void main() {
+  group('NavigationTab.resolveDefaultTab', () {
+    test('offline prefers Downloads when available', () {
+      expect(
+        NavigationTab.resolveDefaultTab(isOffline: true, hasLiveTv: false, preferredStartup: null),
+        NavigationTabId.downloads,
+      );
+    });
+
+    test('offline ignores an online-only preferred section', () {
+      expect(
+        NavigationTab.resolveDefaultTab(isOffline: true, hasLiveTv: true, preferredStartup: NavigationTabId.liveTv),
+        NavigationTabId.downloads,
+      );
+    });
+
+    test('online honours the preferred section when it is visible', () {
+      expect(
+        NavigationTab.resolveDefaultTab(isOffline: false, hasLiveTv: true, preferredStartup: NavigationTabId.liveTv),
+        NavigationTabId.liveTv,
+      );
+      expect(
+        NavigationTab.resolveDefaultTab(isOffline: false, hasLiveTv: false, preferredStartup: NavigationTabId.search),
+        NavigationTabId.search,
+      );
+    });
+
+    test('online falls back to Home when preferred Live TV is unavailable', () {
+      expect(
+        NavigationTab.resolveDefaultTab(isOffline: false, hasLiveTv: false, preferredStartup: NavigationTabId.liveTv),
+        NavigationTabId.discover,
+      );
+    });
+
+    test('online defaults to Home when no preference is set', () {
+      expect(
+        NavigationTab.resolveDefaultTab(isOffline: false, hasLiveTv: true, preferredStartup: null),
+        NavigationTabId.discover,
+      );
+    });
+
+    test('online falls back to Home when preferred Explore is unavailable', () {
+      expect(
+        NavigationTab.resolveDefaultTab(isOffline: false, hasLiveTv: false, preferredStartup: NavigationTabId.explore),
+        NavigationTabId.discover,
+      );
+      expect(
+        NavigationTab.resolveDefaultTab(
+          isOffline: false,
+          hasLiveTv: false,
+          hasExplore: true,
+          preferredStartup: NavigationTabId.explore,
+        ),
+        NavigationTabId.explore,
+      );
+    });
+
+    test('Favorites requires capability before it can become the startup section', () {
+      expect(
+        NavigationTab.resolveDefaultTab(
+          isOffline: false,
+          hasLiveTv: false,
+          preferredStartup: NavigationTabId.favorites,
+        ),
+        NavigationTabId.discover,
+      );
+      expect(
+        NavigationTab.resolveDefaultTab(
+          isOffline: false,
+          hasLiveTv: false,
+          hasFavorites: true,
+          preferredStartup: NavigationTabId.favorites,
+        ),
+        NavigationTabId.favorites,
+      );
+    });
+  });
+
+  group('NavigationTab.getVisibleTabs', () {
+    test('hides Explore until a catalog source is connected', () {
+      final without = NavigationTab.getVisibleTabs(isOffline: false);
+      expect(without.map((tab) => tab.id), isNot(contains(NavigationTabId.explore)));
+
+      final with_ = NavigationTab.getVisibleTabs(isOffline: false, hasExplore: true, hasLiveTv: true);
+      final ids = with_.map((tab) => tab.id).toList();
+      expect(ids, contains(NavigationTabId.explore));
+      // Explore sits after Live TV, directly before Search.
+      expect(ids.indexOf(NavigationTabId.explore), ids.indexOf(NavigationTabId.liveTv) + 1);
+      expect(ids.indexOf(NavigationTabId.explore), ids.indexOf(NavigationTabId.search) - 1);
+    });
+
+    test('Explore is online-only', () {
+      final offline = NavigationTab.getVisibleTabs(isOffline: true, hasExplore: true);
+      expect(offline.map((tab) => tab.id), isNot(contains(NavigationTabId.explore)));
+    });
+
+    test('Favorites sits after Home and only appears when a server supports it', () {
+      final without = NavigationTab.getVisibleTabs(isOffline: false, hasFavorites: false);
+      expect(without.map((tab) => tab.id), isNot(contains(NavigationTabId.favorites)));
+
+      final with_ = NavigationTab.getVisibleTabs(isOffline: false, hasFavorites: true);
+      final ids = with_.map((tab) => tab.id).toList();
+      expect(ids, contains(NavigationTabId.favorites));
+      expect(ids.indexOf(NavigationTabId.favorites), ids.indexOf(NavigationTabId.discover) + 1);
+      expect(ids.indexOf(NavigationTabId.favorites), ids.indexOf(NavigationTabId.libraries) - 1);
+    });
+
+    test('Favorites is online-only', () {
+      final offline = NavigationTab.getVisibleTabs(isOffline: true, hasFavorites: true);
+      expect(offline.map((tab) => tab.id), isNot(contains(NavigationTabId.favorites)));
+    });
+  });
+}

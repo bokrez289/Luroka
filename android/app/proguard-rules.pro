@@ -1,0 +1,63 @@
+# Flutter turns minification on for every release build (FlutterPlugin sets
+# releaseBuildType.isMinifyEnabled), and appends this file when it exists. Anything the
+# app reaches only by name — reflection or JNI — therefore needs an explicit keep here.
+
+# The bundled Media3 FFmpeg audio decoder (ALAC, DTS, DTS-HD, TrueHD, ...).
+#
+# DefaultRenderersFactory instantiates FfmpegAudioRenderer through Class.forName and no
+# app code references it, so R8 shrinks the class away; media3's own consumer rules only
+# -keepclassmembers its constructor, which neither keeps the class nor pins its name.
+# ffmpeg_jni.cc separately resolves FfmpegAudioDecoder and its growOutputBuffer callback
+# by name in JNI_OnLoad, and returns JNI_ERR when either is missing, which fails the whole
+# System.loadLibrary("ffmpegJNI") call.
+#
+# Without these keeps a release build silently loses every codec this decoder adds:
+# TrueHD/DTS-HD land on MediaCodecAudioRenderer, which has no decoder for them, and
+# playback bails to the mpv fallback and loses ExoPlayer's Dolby Vision handling (#1703).
+-keep class androidx.media3.decoder.ffmpeg.** { *; }
+
+# growOutputBuffer's JNI descriptor names this type, so it may not be renamed either.
+-keep class androidx.media3.decoder.SimpleDecoderOutputBuffer { *; }
+
+# MatroskaExtractor.init is final and its ExtractorOutput / subtitle scratch buffer live
+# in private fields, so the extractor wrappers reach both by name: AssMatroskaExtractor
+# (android/libass/.../media/extractor/AssMatroskaExtractor.kt) resolves extractorOutput
+# and subtitleSample with getDeclaredField to redirect ASS subtitle samples, and
+# MatroskaLatmSupport (android/app/.../exoplayer/MatroskaLatmSupport.kt) resolves
+# extractorOutput the same way to wrap LATM tracks.
+#
+# R8 renaming either field makes getDeclaredField throw; AssMatroskaExtractor resolves
+# them in its companion object, so the throw surfaces as ExceptionInInitializerError
+# while constructing the extractor — every MKV direct-play, release builds only. Only
+# the *names* need pinning: MatroskaExtractor uses both fields itself, so they survive
+# shrinking through the compile-time subclass references.
+-keepclassmembernames class androidx.media3.extractor.mkv.MatroskaExtractor {
+  private androidx.media3.extractor.ExtractorOutput extractorOutput;
+  private androidx.media3.common.util.ParsableByteArray subtitleSample;
+}
+
+# NewPipe's localized time-ago patterns and Rhino's JavaScript bridge are
+# reached reflectively. Keep their names in the sideload release too.
+-keep class org.schabi.newpipe.extractor.timeago.patterns.** { *; }
+-keep class org.mozilla.javascript.** { *; }
+-keep class org.mozilla.classfile.** { *; }
+# Rhino ships optional desktop JavaBean/JSR-223 adapters. Android preview
+# extraction uses the core interpreter, never these desktop-only adapters.
+-dontwarn java.beans.BeanDescriptor
+-dontwarn java.beans.BeanInfo
+-dontwarn java.beans.IntrospectionException
+-dontwarn java.beans.Introspector
+-dontwarn java.beans.PropertyDescriptor
+-dontwarn javax.script.**
+# Rhino's optional JVM optimizer uses Dynalink; NewPipe runs its interpreter
+# on Android. These desktop classes are also excluded by NewPipe's own rules.
+-dontwarn jdk.dynalink.**
+
+# The official iframe invokes only this deliberately small native bridge.
+-keepclassmembers class com.bokrez.luroka.TrailerEmbedActivity$Bridge {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+# Native exports resolve these two app-owned classes by their JVM names.
+-keep class com.bokrez.luroka.exoplayer.DoviBridge { *; }
+-keep class com.bokrez.luroka.exoplayer.SurfaceTxProbe { *; }

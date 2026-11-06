@@ -1,0 +1,197 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:luroka/i18n/strings.g.dart';
+import 'package:luroka/main.dart' as app;
+import 'package:luroka/services/settings_service.dart';
+import 'package:luroka/utils/platform_detector.dart';
+import 'package:luroka/widgets/focusable_list_tile.dart';
+
+import '../test_helpers/prefs.dart';
+import '../test_helpers/theme.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() {
+    LocaleSettings.setLocaleSync(AppLocale.en);
+  });
+
+  setUp(() async {
+    resetSharedPreferencesForTest();
+    SettingsService.resetForTesting();
+    TvDetectionService.debugSetAppleTVOverride(false);
+    TvDetectionService.debugSetAutomotiveOverride(false);
+    await SettingsService.getInstance();
+  });
+
+  tearDown(() {
+    TvDetectionService.debugSetAppleTVOverride(null);
+    TvDetectionService.debugSetAutomotiveOverride(null);
+    SettingsService.resetForTesting();
+  });
+
+  test('automotive UI scale defaults by form factor and honors a stored value', () async {
+    final settings = SettingsService.instance;
+
+    expect(settings.read(SettingsService.automotiveUiScale), 1.0);
+
+    TvDetectionService.debugSetAutomotiveOverride(true);
+    expect(settings.read(SettingsService.automotiveUiScale), AutomotiveUiScale.defaultValue);
+
+    await settings.write(SettingsService.automotiveUiScale, 1.6);
+    expect(settings.read(SettingsService.automotiveUiScale), 1.6);
+
+    TvDetectionService.debugSetAutomotiveOverride(false);
+    expect(settings.read(SettingsService.automotiveUiScale), 1.6);
+
+    await settings.write(SettingsService.automotiveUiScale, 0.5);
+    expect(settings.read(SettingsService.automotiveUiScale), AutomotiveUiScale.min);
+
+    await settings.write(SettingsService.automotiveUiScale, 2.5);
+    expect(settings.read(SettingsService.automotiveUiScale), AutomotiveUiScale.max);
+  });
+
+  testWidgets('automotive root scale rewrites MediaQuery and updates reactively', (tester) async {
+    _configureCarViewport(tester);
+    TvDetectionService.debugSetAutomotiveOverride(true);
+
+    var effectiveSize = Size.zero;
+    var effectiveDevicePixelRatio = 0.0;
+    await _pumpScaleHarness(
+      tester,
+      onMediaQuery: (data) {
+        effectiveSize = data.size;
+        effectiveDevicePixelRatio = data.devicePixelRatio;
+      },
+    );
+
+    expect(effectiveSize.width, closeTo(1440 / AutomotiveUiScale.defaultValue, 0.001));
+    expect(effectiveSize.height, closeTo(800 / AutomotiveUiScale.defaultValue, 0.001));
+    expect(effectiveDevicePixelRatio, closeTo(0.75 * AutomotiveUiScale.defaultValue, 0.001));
+
+    await SettingsService.instance.write(SettingsService.automotiveUiScale, 1.5);
+    await tester.pump();
+
+    expect(effectiveSize, const Size(960, 800 / 1.5));
+    expect(effectiveDevicePixelRatio, 1.125);
+  });
+
+  testWidgets('non-automotive root leaves MediaQuery unchanged', (tester) async {
+    _configureCarViewport(tester);
+
+    var effectiveSize = Size.zero;
+    var effectiveDevicePixelRatio = 0.0;
+    await _pumpScaleHarness(
+      tester,
+      onMediaQuery: (data) {
+        effectiveSize = data.size;
+        effectiveDevicePixelRatio = data.devicePixelRatio;
+      },
+    );
+
+    expect(effectiveSize, const Size(1440, 800));
+    expect(effectiveDevicePixelRatio, 0.75);
+  });
+
+  testWidgets('automotive root keeps every route beside a side system bar', (tester) async {
+    _configureCarViewport(tester);
+    // A 72px car system bar on the left, as CarSystemUI's left bar provides it.
+    tester.view.padding = const FakeViewPadding(left: 72);
+    addTearDown(tester.view.resetPadding);
+    TvDetectionService.debugSetAutomotiveOverride(true);
+    await SettingsService.instance.write(SettingsService.automotiveUiScale, 1.0);
+
+    var effectivePadding = EdgeInsets.zero;
+    await _pumpScaleHarness(tester, onMediaQuery: (data) => effectivePadding = data.padding);
+
+    // Consumed at the root: screens that only honour top/bottom insets no
+    // longer need to know the bar exists...
+    expect(effectivePadding, EdgeInsets.zero);
+    // ...because the whole surface already starts after it (72px at 0.75 dpr).
+    expect(tester.getTopLeft(find.byType(SizedBox).last).dx, closeTo(96, 0.001));
+  });
+
+  testWidgets('non-automotive root leaves horizontal insets to the screens', (tester) async {
+    _configureCarViewport(tester);
+    tester.view.padding = const FakeViewPadding(left: 72);
+    addTearDown(tester.view.resetPadding);
+
+    var effectivePadding = EdgeInsets.zero;
+    await _pumpScaleHarness(tester, onMediaQuery: (data) => effectivePadding = data.padding);
+
+    expect(effectivePadding.left, closeTo(96, 0.001));
+    expect(tester.getTopLeft(find.byType(SizedBox).last).dx, 0);
+  });
+
+  testWidgets('focusable list tile variants use standard density only on automotive', (tester) async {
+    await _pumpListTiles(tester, automotive: false);
+    _expectListTileDensities(tester, dense: true, visualDensity: const VisualDensity(vertical: -3));
+
+    await _pumpListTiles(tester, automotive: true);
+    _expectListTileDensities(tester, dense: false, visualDensity: VisualDensity.standard);
+  });
+}
+
+void _configureCarViewport(WidgetTester tester) {
+  tester.view.physicalSize = const Size(1080, 600);
+  tester.view.devicePixelRatio = 0.75;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+}
+
+Future<void> _pumpScaleHarness(WidgetTester tester, {required ValueChanged<MediaQueryData> onMediaQuery}) async {
+  await tester.pumpWidget(
+    TranslationProvider(
+      child: MaterialApp(
+        theme: ThemeData(extensions: const [testMonoTokens]),
+        home: app.FormFactorScale(
+          child: Builder(
+            builder: (context) {
+              onMediaQuery(MediaQuery.of(context));
+              return const SizedBox.expand();
+            },
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Future<void> _pumpListTiles(WidgetTester tester, {required bool automotive}) async {
+  TvDetectionService.debugSetAutomotiveOverride(automotive);
+  // Unmount first: the tiles below are `const`, so pumping the same tree twice
+  // hands the framework identical widget instances and the subtree is never
+  // rebuilt — it would keep the density of the previous form factor.
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pumpWidget(
+    TranslationProvider(
+      child: MaterialApp(
+        theme: ThemeData(extensions: const [testMonoTokens]),
+        home: Scaffold(
+          body: Column(
+            children: [
+              const FocusableListTile(title: Text('List')),
+              FocusableSwitchListTile(value: true, onChanged: (_) {}, title: const Text('Switch')),
+              FocusableCheckboxListTile(value: true, onChanged: (_) {}, title: const Text('Checkbox')),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+void _expectListTileDensities(WidgetTester tester, {required bool dense, required VisualDensity visualDensity}) {
+  final listTile = tester.widget<ListTile>(
+    find.descendant(of: find.byType(FocusableListTile), matching: find.byType(ListTile)),
+  );
+  final switchTile = tester.widget<SwitchListTile>(find.byType(SwitchListTile));
+  final checkboxTile = tester.widget<CheckboxListTile>(find.byType(CheckboxListTile));
+
+  expect(listTile.dense, dense);
+  expect(listTile.visualDensity, visualDensity);
+  expect(switchTile.dense, dense);
+  expect(switchTile.visualDensity, visualDensity);
+  expect(checkboxTile.dense, dense);
+  expect(checkboxTile.visualDensity, visualDensity);
+}
