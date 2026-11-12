@@ -18,12 +18,13 @@ All notable changes to Luroka are documented here.
 - Person spotlight — filmography pages with posters and biography
 - Advanced library filters — blacklist/whitelist per tracker, per library
 - Companion remote — phone as remote control for your TV
+- Discord Rich Presence integration
 - Full Croatian translation
 - Full Japanese translation
 - Intro and credits skip with auto-detection
 - Offline downloads with quality picker and transcoding support
 - Live TV with DVR recording management
-- Picture-in-Picture on supported mobile devices
+- Picture-in-Picture on mobile and desktop
 - Ambient lighting synced to on-screen content
 - Extended library filters per tracker service
 - Multi-version playback with per-version file details
@@ -39,3 +40,4 @@ All notable changes to Luroka are documented here.
 
 - Legacy classic home design (replaced by cinematic home)
 - Snackbars — success is silent, failures show as dialogs
+- Issue-number comments from the upstream codebase

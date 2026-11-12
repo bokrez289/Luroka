@@ -18,6 +18,12 @@ void main() {
     expect(notice('Luroka'), contains('https://github.com/edde746/plezy'));
     expect(notice('Plezy'), contains('Copyright (C) 2024–2026 edde746 and contributors.'));
     expect(notice('Plezy'), contains('GNU GENERAL PUBLIC LICENSE'));
+    expect(notice('ZXing / ZXing Android Embedded'), contains('ZXing core 3.5.2'));
+    expect(notice('ZXing / ZXing Android Embedded'), contains('Apache License'));
+    expect(
+      notice('Android runtime embedded notices'),
+      contains('Embedded notices from the Android runtime Maven artifacts'),
+    );
     expect(notice('ArtCNN'), contains('Copyright (c) 2024 Joao Chrisostomo, Kacper Michajłow'));
     expect(notice('ArtCNN'), contains('Permission is hereby granted, free of charge'));
     expect(notice('Go Noto Current'), contains('Copyright 2022 The Noto Project Authors'));
@@ -44,11 +50,26 @@ void main() {
     expect(notice('Apple media dependencies (partial source notices)'), contains('===== OpenSSL 3.3.5 license ====='));
     expect(notice('Apple media dependencies (partial source notices)'), contains('===== FreeType 2.12.1 FTL ====='));
     expect(notice('Apple media dependencies (partial source notices)'), contains('===== FriBidi 1.0.12 license ====='));
-    expect(notice('Apple media dependencies (partial source notices)'), contains('===== shaderc v2025.5 license ====='));
-    expect(notice('Apple media dependencies (partial source notices)'), contains('===== uchardet 0.0.8 licenses ====='));
-    expect(notice('Apple media dependencies (partial source notices)'), contains('===== libunibreak 6.1 candidate license ====='));
-    expect(notice('Apple media dependencies (partial source notices)'), contains('===== uavs3d candidate license ====='));
-    expect(notice('Apple media dependencies (partial source notices)'), contains('based in part on the work of the Independent JPEG Group'));
+    expect(
+      notice('Apple media dependencies (partial source notices)'),
+      contains('===== shaderc v2025.5 license ====='),
+    );
+    expect(
+      notice('Apple media dependencies (partial source notices)'),
+      contains('===== uchardet 0.0.8 licenses ====='),
+    );
+    expect(
+      notice('Apple media dependencies (partial source notices)'),
+      contains('===== libunibreak 6.1 candidate license ====='),
+    );
+    expect(
+      notice('Apple media dependencies (partial source notices)'),
+      contains('===== uavs3d candidate license ====='),
+    );
+    expect(
+      notice('Apple media dependencies (partial source notices)'),
+      contains('based in part on the work of the Independent JPEG Group'),
+    );
     expect(notice('iOS Swift packages (selected notices)'), contains('===== DKCamera ====='));
     expect(notice('iOS Swift packages (selected notices)'), contains('Copyright (c) 2015-2024 Tim Oliver'));
     expect(notice('iOS Swift packages (selected notices)'), contains('Copyright (c) 2015 Sentry'));

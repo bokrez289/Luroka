@@ -10,6 +10,7 @@ review is ongoing; this index is not a complete release inventory.
 | --- | --- |
 | Apple media dependencies | [Selected source notices](assets/licenses/apple-media-source-notices.txt), including candidate libunibreak, uchardet and libbluray texts; exact prebuilt provenance is still being verified |
 | Apache Commons IO, Apache Tika and SLF4J | [Notices from selected Android Maven artifacts](assets/licenses/android-maven-selected-notices.txt) |
+| Android runtime artifacts | [Embedded notices from verified Maven artifacts](assets/licenses/android-runtime-embedded-notices.txt), including nested classes.jar notices; supplements the selected source notices and is not a complete transitive inventory |
 | ArtCNN | [MIT notice](assets/licenses/ArtCNN-MIT.txt) |
 | Chromium / Cronet | [Cronet 143.7445.0 upstream third-party notices](assets/licenses/cronet-143.7445.0-notices.txt); [Chromium BSD notice](assets/licenses/chromium-BSD.txt) |
 | dav1d | [BSD notice](assets/licenses/dav1d-BSD.txt) |
@@ -25,6 +26,7 @@ review is ongoing; this index is not a complete release inventory.
 | Plezy | Upstream project by edde746 and contributors; [copyright, modification notice and GPLv3](LICENSE); [upstream source](https://github.com/edde746/plezy) |
 | Sentry Android | [Sentry Java SDK 8.56.0 third-party notices](assets/licenses/sentry-android-8.56.0-notices.txt) |
 | SpatialAudioBridge | [Bundled notices](assets/licenses/SpatialAudioBridge.txt) |
+| ZXing / ZXing Android Embedded | [Android scanner notices](assets/licenses/zxing-scanner-notices.txt); [pinned scanner source inputs](docs/scanner-source-inputs-20261112.json). The qr_code_scanner_plus wrapper's BSD notice is included in Flutter package licenses. |
 
 For artifact-specific evidence and unresolved source and notice requirements,
 see [the release preservation and license audit](docs/release-preservation-license-audit-20261105.md).

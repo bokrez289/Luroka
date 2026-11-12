@@ -1,0 +1,302 @@
+[
+  {
+    "artifact": "luroka-1.0.8-2039-arm32.apk",
+    "sha256": "dc1575c6e1c2af1ea1abd682dc6544b5764417553a3cd6b01c9f918990606399",
+    "notice_assets": [
+      {
+        "path": "LICENSE",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "4fc02de215db865fe0e07144937d87b1400c4bb1ee90aa40552e467fed2b0b2c"
+      },
+      {
+        "path": "assets/licenses/ArtCNN-MIT.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "e784369731c39a00c9696952f7cbbfd7fc815b34a41298c254cbae20fdeb4912"
+      },
+      {
+        "path": "assets/licenses/Inter-OFL.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57"
+      },
+      {
+        "path": "assets/licenses/SpatialAudioBridge.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "bf557be972cf32b2debbfe2b8d2efb91befee09367a7ac92163581b7f132c17f"
+      },
+      {
+        "path": "assets/licenses/android-maven-selected-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "75a3286a3944cebbab246b76f6b9cc5cba07644596988e27090295ab1705900f"
+      },
+      {
+        "path": "assets/licenses/apple-media-source-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "78789982d4570552607dd988335f7561d4649de48039ed0159c8a39637b0cf3d"
+      },
+      {
+        "path": "assets/licenses/chromium-BSD.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "8c19aaf4ec1d6a59bb2c946461110cc5aac2bdc5b9d2d79336e46354fc9f1d8a"
+      },
+      {
+        "path": "assets/licenses/cronet-143.7445.0-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "be9838eb10695d40d337a442d1c1921bdfe2d3df44f3827c350e810bb0670e65"
+      },
+      {
+        "path": "assets/licenses/dav1d-BSD.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "dd92c3c2247c5651606fc23a5e2d6a1ebc5ace9a3e49cbde0e12f05ad1cb1ee5"
+      },
+      {
+        "path": "assets/licenses/ios-swift-package-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "3ca44e6c3e5215edc2dc7fa37ea06ebd1eae7890f0b412da4359617f78e3e009"
+      },
+      {
+        "path": "assets/licenses/libass-ISC.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "f7e30699d02798351e7f839e3d3bfeb29ce65e44efa7735c225464c4fd7dfe9c"
+      },
+      {
+        "path": "assets/licenses/libass-android-0.18.3-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "52050d5fc190be6845b2e6239db35677c49a4d7ea4a00bb8a2358d403e42be15"
+      },
+      {
+        "path": "assets/licenses/libdovi-MIT.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "f35d4515dd8d81c7996af2b20e9605561d1af0c21bc12ba7cc4fa4c60aed2178"
+      },
+      {
+        "path": "assets/licenses/libdovi-rust-candidate-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "6d29a61ddbd66de48847ab94fa4f1dc68222ff91f845157fdeac2e2aba961b00"
+      },
+      {
+        "path": "assets/licenses/lua-5.2.4-MIT.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "0b828b09832b459b20e1501d36f777eff49b2ebb2ca1bd0da6b20975350a0301"
+      },
+      {
+        "path": "assets/licenses/mpv-android-NOTICE.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "940519cceef859d4d6c398b53ec1fc8ec812b6bdfaad6114a6e638aa59e161c5"
+      },
+      {
+        "path": "assets/licenses/mpv-native-source-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "cb75d23e2830c574c6338b742239874c330b280301e67e58c673e4fa33d3b544"
+      },
+      {
+        "path": "assets/licenses/sentry-android-8.56.0-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "a2ea6ba8658edd12f4601e7351c2e6fc9eb85f7c1a234b04945ca4fa194a395e"
+      }
+    ],
+    "flutter_notices_present": true,
+    "flutter_notices_contains_mobile_scanner": true,
+    "native_libraries": [
+      "lib/armeabi-v7a/libapp.so",
+      "lib/armeabi-v7a/libasskt.so",
+      "lib/armeabi-v7a/libavcodec.so",
+      "lib/armeabi-v7a/libavdevice.so",
+      "lib/armeabi-v7a/libavfilter.so",
+      "lib/armeabi-v7a/libavformat.so",
+      "lib/armeabi-v7a/libavutil.so",
+      "lib/armeabi-v7a/libbarhopper_v3.so",
+      "lib/armeabi-v7a/libc++_shared.so",
+      "lib/armeabi-v7a/libcronet.143.0.7445.0.so",
+      "lib/armeabi-v7a/libdartjni.so",
+      "lib/armeabi-v7a/libdatastore_shared_counter.so",
+      "lib/armeabi-v7a/libdovi_bridge.so",
+      "lib/armeabi-v7a/libffmpegJNI.so",
+      "lib/armeabi-v7a/libflutter.so",
+      "lib/armeabi-v7a/libimage_processing_util_jni.so",
+      "lib/armeabi-v7a/libmpv.so",
+      "lib/armeabi-v7a/libplayer.so",
+      "lib/armeabi-v7a/libsentry-android.so",
+      "lib/armeabi-v7a/libsentry.so",
+      "lib/armeabi-v7a/libsqlite3.so",
+      "lib/armeabi-v7a/libsurface_util_jni.so",
+      "lib/armeabi-v7a/libswresample.so",
+      "lib/armeabi-v7a/libswscale.so"
+    ],
+    "scanner_entries": [
+      "assets/mlkit_barcode_models/barcode_ssd_mobilenet_v1_dmp25_quant.tflite",
+      "assets/mlkit_barcode_models/oned_auto_regressor_mobile.tflite",
+      "assets/mlkit_barcode_models/oned_feature_extractor_mobile.tflite",
+      "barcode-scanning-common.properties",
+      "barcode-scanning.properties",
+      "play-services-mlkit-barcode-scanning.properties"
+    ]
+  },
+  {
+    "artifact": "luroka-1.0.8-2039-arm64.apk",
+    "sha256": "03de91aa9c0d9ff74204fa29a56fc022f5bcf042e36440e7dca38b58d1b2656d",
+    "notice_assets": [
+      {
+        "path": "LICENSE",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "4fc02de215db865fe0e07144937d87b1400c4bb1ee90aa40552e467fed2b0b2c"
+      },
+      {
+        "path": "assets/licenses/ArtCNN-MIT.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "e784369731c39a00c9696952f7cbbfd7fc815b34a41298c254cbae20fdeb4912"
+      },
+      {
+        "path": "assets/licenses/Inter-OFL.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57"
+      },
+      {
+        "path": "assets/licenses/SpatialAudioBridge.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "bf557be972cf32b2debbfe2b8d2efb91befee09367a7ac92163581b7f132c17f"
+      },
+      {
+        "path": "assets/licenses/android-maven-selected-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "75a3286a3944cebbab246b76f6b9cc5cba07644596988e27090295ab1705900f"
+      },
+      {
+        "path": "assets/licenses/apple-media-source-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "78789982d4570552607dd988335f7561d4649de48039ed0159c8a39637b0cf3d"
+      },
+      {
+        "path": "assets/licenses/chromium-BSD.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "8c19aaf4ec1d6a59bb2c946461110cc5aac2bdc5b9d2d79336e46354fc9f1d8a"
+      },
+      {
+        "path": "assets/licenses/cronet-143.7445.0-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "be9838eb10695d40d337a442d1c1921bdfe2d3df44f3827c350e810bb0670e65"
+      },
+      {
+        "path": "assets/licenses/dav1d-BSD.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "dd92c3c2247c5651606fc23a5e2d6a1ebc5ace9a3e49cbde0e12f05ad1cb1ee5"
+      },
+      {
+        "path": "assets/licenses/ios-swift-package-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "3ca44e6c3e5215edc2dc7fa37ea06ebd1eae7890f0b412da4359617f78e3e009"
+      },
+      {
+        "path": "assets/licenses/libass-ISC.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "f7e30699d02798351e7f839e3d3bfeb29ce65e44efa7735c225464c4fd7dfe9c"
+      },
+      {
+        "path": "assets/licenses/libass-android-0.18.3-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "52050d5fc190be6845b2e6239db35677c49a4d7ea4a00bb8a2358d403e42be15"
+      },
+      {
+        "path": "assets/licenses/libdovi-MIT.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "f35d4515dd8d81c7996af2b20e9605561d1af0c21bc12ba7cc4fa4c60aed2178"
+      },
+      {
+        "path": "assets/licenses/libdovi-rust-candidate-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "6d29a61ddbd66de48847ab94fa4f1dc68222ff91f845157fdeac2e2aba961b00"
+      },
+      {
+        "path": "assets/licenses/lua-5.2.4-MIT.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "0b828b09832b459b20e1501d36f777eff49b2ebb2ca1bd0da6b20975350a0301"
+      },
+      {
+        "path": "assets/licenses/mpv-android-NOTICE.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "940519cceef859d4d6c398b53ec1fc8ec812b6bdfaad6114a6e638aa59e161c5"
+      },
+      {
+        "path": "assets/licenses/mpv-native-source-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "cb75d23e2830c574c6338b742239874c330b280301e67e58c673e4fa33d3b544"
+      },
+      {
+        "path": "assets/licenses/sentry-android-8.56.0-notices.txt",
+        "present": true,
+        "matches_current_source": true,
+        "sha256": "a2ea6ba8658edd12f4601e7351c2e6fc9eb85f7c1a234b04945ca4fa194a395e"
+      }
+    ],
+    "flutter_notices_present": true,
+    "flutter_notices_contains_mobile_scanner": true,
+    "native_libraries": [
+      "lib/arm64-v8a/libapp.so",
+      "lib/arm64-v8a/libasskt.so",
+      "lib/arm64-v8a/libavcodec.so",
+      "lib/arm64-v8a/libavdevice.so",
+      "lib/arm64-v8a/libavfilter.so",
+      "lib/arm64-v8a/libavformat.so",
+      "lib/arm64-v8a/libavutil.so",
+      "lib/arm64-v8a/libbarhopper_v3.so",
+      "lib/arm64-v8a/libc++_shared.so",
+      "lib/arm64-v8a/libcronet.143.0.7445.0.so",
+      "lib/arm64-v8a/libdartjni.so",
+      "lib/arm64-v8a/libdatastore_shared_counter.so",
+      "lib/arm64-v8a/libdovi_bridge.so",
+      "lib/arm64-v8a/libffmpegJNI.so",
+      "lib/arm64-v8a/libflutter.so",
+      "lib/arm64-v8a/libimage_processing_util_jni.so",
+      "lib/arm64-v8a/libmpv.so",
+      "lib/arm64-v8a/libplayer.so",
+      "lib/arm64-v8a/libsentry-android.so",
+      "lib/arm64-v8a/libsentry.so",
+      "lib/arm64-v8a/libsqlite3.so",
+      "lib/arm64-v8a/libsurface_util_jni.so",
+      "lib/arm64-v8a/libswresample.so",
+      "lib/arm64-v8a/libswscale.so"
+    ],
+    "scanner_entries": [
+      "assets/mlkit_barcode_models/barcode_ssd_mobilenet_v1_dmp25_quant.tflite",
+      "assets/mlkit_barcode_models/oned_auto_regressor_mobile.tflite",
+      "assets/mlkit_barcode_models/oned_feature_extractor_mobile.tflite",
+      "barcode-scanning-common.properties",
+      "barcode-scanning.properties",
+      "play-services-mlkit-barcode-scanning.properties"
+    ]
+  }
+]

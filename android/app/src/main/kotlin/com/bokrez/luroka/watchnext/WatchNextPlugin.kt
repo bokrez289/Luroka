@@ -29,7 +29,7 @@ class WatchNextPlugin() :
 
     /**
      * Returns the payload to forward to Dart: the `content_id` of a
-     * `plezy://play` shelf link, or the whole URI of a `plezy://live` link
+     * `luroka://play` shelf link, or the whole URI of a `luroka://live` link
      * (parsed by `LiveTvDeepLink` on the Dart side).
      */
     fun handleIntent(intent: Intent?): String? {

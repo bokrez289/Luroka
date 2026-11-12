@@ -111,6 +111,10 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
     final discover = context.read<DiscoverProvider?>();
     final servers = context.read<MultiServerProvider?>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _pageStart.requestFocus();
+        if (_formScroll.hasClients) _formScroll.jumpTo(0);
+      }
       unawaited(() async {
         if (_active.isBinding) await _active.awaitBindingSettle();
         if (!_isCurrent || discover == null || servers == null) return;
@@ -228,7 +232,6 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
                           key: const ValueKey('profile-guide-next'),
                           label: _page == 0 ? t.profileSetupGuide.kContinue : t.profileSetupGuide.finish,
                           primary: true,
-                          autofocus: true,
                           onPressed: _page == 0 ? () => _showPage(1) : () => _finish(useDefaults: false),
                         ),
                         _button(

@@ -5,6 +5,7 @@ import 'package:luroka/media/media_item.dart';
 import 'package:luroka/media/media_kind.dart';
 import 'package:luroka/navigation/navigation_tabs.dart';
 import 'package:luroka/services/kids_profile_service.dart';
+import 'package:luroka/services/base_shared_preferences_service.dart';
 import 'package:luroka/models/kids_avatar.dart';
 
 import '../test_helpers/prefs.dart';
@@ -35,6 +36,18 @@ void main() {
     service.selectProfile('child');
   });
   tearDown(service.resetForTesting);
+
+  test('restored parental policy is reloaded before selecting a profile', () async {
+    final prefs = await BaseSharedPreferencesService.sharedCache();
+    await prefs.setString('luroka_kids_profiles_v1', '{"children":{"restored-child":{"parentId":"adult","maxAge":5}}}');
+    expect(service.isKids('restored-child'), isFalse);
+    await service.reloadAfterBackupRestore();
+    expect(service.activeId, isNull);
+    expect(service.isKids('restored-child'), isTrue);
+    service.selectProfile('restored-child');
+    expect(service.isActiveKids, isTrue);
+    expect(service.ageFor('restored-child'), 5);
+  });
 
   test('a permissive episode or season rating never overrides a mature series', () {
     service.allows(_item('mature-series', rating: 'TV-MA', kind: MediaKind.show));

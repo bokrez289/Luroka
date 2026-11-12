@@ -77,8 +77,8 @@ enum ShelfSourceStore {
   /// into RunnerTests without TopShelfProvider.swift).
   static let schemaVersion = 3
   static let appGroupIdentifier = "group.com.bokrez.luroka"
-  static let sourcesKey = "LurokaSystemShelfSources"
-  static let tokenKeychainService = "com.bokrez.luroka.systemshelf.tokens"
+  static let sourcesKey = "PlezySystemShelfSources"
+  static let tokenKeychainService = "com.edde746.plezy.systemshelf.tokens"
   static let defaultMaxItems = 20
   static let maxItemsLimit = 20
 

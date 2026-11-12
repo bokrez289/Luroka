@@ -1,4 +1,4 @@
-package com.bokrez.lumora.mpv
+package com.bokrez.luroka.mpv
 
 import android.app.Activity
 import android.os.Bundle

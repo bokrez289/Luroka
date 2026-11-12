@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * playback in the loudest possible way.
  *
  * [carrierSink] must therefore be built with no audio processors and with an output provider whose
- * `AudioTrack` is forced to `ENCODING_IEC61937`; see [PlezyRenderersFactory].
+ * `AudioTrack` is forced to `ENCODING_IEC61937`; see [LurokaRenderersFactory].
  *
  * Selection happens only in [configure]. Persistent controls and the listener are mirrored to both
  * delegates so either can be activated later; per-stream calls go to the active one alone.

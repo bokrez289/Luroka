@@ -5,7 +5,7 @@ import TVServices
 private enum TopShelfShared {
   static let schemaVersion = 3
   static let appGroupIdentifier = "group.com.bokrez.luroka"
-  static let cacheDataKey = "LurokaSystemShelfCacheData"
+  static let cacheDataKey = "PlezySystemShelfCacheData"
   static let artworkDirectoryName = "SystemShelfArtwork"
   /// English fallback for sources persisted before the localized title existed.
   static let fallbackSectionTitle = "Continue Watching"

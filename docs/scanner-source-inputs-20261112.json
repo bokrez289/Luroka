@@ -1,0 +1,22 @@
+[
+  {
+    "url": "https://pub.dev/api/archives/qr_code_scanner_plus-2.3.2.tar.gz",
+    "sha256": "a49eb677d59becaab21a27bf908f860fd033987777cdc04e621e4b75f97531fa"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/com/journeyapps/zxing-android-embedded/4.3.0/zxing-android-embedded-4.3.0-sources.jar",
+    "sha256": "44b968f9b3a4eab3a463c36eac7a80fc5457695f55fc37a95e4975b7da2c3b54"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/com/google/zxing/core/3.5.2/core-3.5.2-sources.jar",
+    "sha256": "35a80b3ac28d7d71d1a0df0838bd8b6dae9565ee57f22f1d3e74357a6e4caa28"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/journeyapps/zxing-android-embedded/v4.3.0/COPYING",
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/zxing/zxing/zxing-3.5.2/LICENSE",
+    "sha256": "3f62881f0566227a24b12e5a754cc79f39aaa94883038e95c94812e1f50af42f"
+  }
+]

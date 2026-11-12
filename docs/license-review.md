@@ -2,6 +2,141 @@
 
 Status: **incomplete release audit**, not a legal determination. Recheck the
 exact dependencies and notices for every Android, iOS, and tvOS release.
+
+## Current review: 2026-11-12
+
+**Technical recheck completed for the two local Android 1.0.8 (2039) APKs;
+distribution clearance remains open.** Historical findings below must not be
+read as current build verification. No source publication, APK rebuild, service
+change or store submission was performed in this review.
+
+### Follow-up implementation, 2026-11-12
+
+The current source replaces mobile_scanner/ML Kit with pinned
+qr_code_scanner_plus 2.3.2 (ZXing Android Embedded 4.3.0 and ZXing core 3.5.2;
+AVFoundation on iOS). Android compilation passed. The refreshed release
+runtime graph has 146 unique external Maven artifacts and no ML Kit modules;
+see `android-runtime-artifacts-zxing-20261112.json`. Scanner source/license
+inputs are pinned in `scanner-source-inputs-20261112.json`. ZXing notices and
+25 embedded runtime notices, including nested classes.jar notices, are bundled
+and registered. The generator verifies artifact hashes before extraction.
+The wrapper is maintenance-only; physical camera/permission/lifecycle checks
+and inspection of the next packaged release remain required. No APK was built
+for this change at the owner's request.
+
+The live privacy policy was updated and verified over HTTPS on 2026-11-12,
+including disclosure for existing ML Kit builds. The repository's offline
+policy is regenerated from that published page. Older APKs are unchanged.
+
+Seven focused scanner, notice and recovery tests pass with a two-minute timeout;
+the existing crypto test exceeded the initial 30-second limit. Three pairing
+client tests also passed. Scanner static analysis reported no issues.
+
+The preserved 1.0.8 (2038) iOS/tvOS xcarchive ZIPs were inspected: 29/30
+framework bundles respectively and all five selected Apple notice assets match
+current files. Evidence is in `ios-license-artifact-evidence-20261112.json`
+and `tvos-license-artifact-evidence-20261112.json`. These retained archives are
+not the separately signed streams sent to Apple, and predate the scanner change.
+
+The Hangul subtitle companion was regenerated with fontTools 4.63.0 from the
+preserved upstream GoNotoKurrent v7.0 input. Both regenerated and shipped files
+hash to `1eb9901df47c22443e93526b14efb949757b40d024a0eb19146eee3c40ea83c5`.
+This closes subset reproduction, not complete constituent-font attribution.
+
+`capture_release_source_manifest.py` now supports pre-build fingerprints and
+post-build comparison. It does not package corresponding source or establish
+historical build provenance. Full native source mapping, recipient source access,
+final-device checks and distribution-agreement review remain unresolved.
+
+The observations below describe the earlier build-2039 audit, before these fixes.
+
+### Verified now
+
+- `aapt dump badging` identifies both `luroka-1.0.8-2039-arm32.apk` and
+  `luroka-1.0.8-2039-arm64.apk` as `com.bokrez.luroka`, version 1.0.8, code
+  2039. Their SHA-256 values, 24 native library paths per APK and notice
+  comparisons are recorded in
+  [artifact evidence](android-license-artifact-evidence-20261112.json).
+- Both APKs contain all 18 current root/supplemental license files, matching
+  the checkout byte-for-byte. Both contain Flutter `NOTICES.Z` with a literal
+  `mobile_scanner` entry. This verifies presence, not completeness or device UI.
+  Repeat with `python3 scripts/checks/inspect_android_license_artifact.py APK`.
+- The existing `test/services/app_license_registry_test.dart` passed using
+  Flutter 3.47.1 with `--no-pub`. It exercises loading the supplemental texts
+  and Plezy credit. Current startup calls the registration function. A physical
+  phone/TV license-screen navigation check is still required.
+- Offline Gradle `releaseRuntimeClasspath` resolution succeeded: 169 entries,
+  163 distinct artifacts, versus 141 distinct artifacts in the November 6
+  inventory. See [current inventory](android-runtime-artifacts-20261112.json).
+  This covers external Maven modules, not project modules or all nested native
+  dependencies, and is not proof of the historical build graph. Each resolved
+  file was SHA-256 hashed; identifiable top-level embedded notice paths were
+  recorded. Absence of a filename is not evidence of an absent license grant.
+- 17 of 24 native files in each APK byte-match a current resolved Maven AAR.
+  See [native comparisons](android-native-match-evidence-20261112.json).
+  The remaining seven include app/project-built libraries, Flutter and SQLite;
+  unmatched does not imply a violation. Matching a prebuilt proves binary
+  identity, not exact source provenance or complete transitive notices.
+- The local README credits Plezy and the root license preserves its project
+  attribution and a 2026 modification notice. This is not a file-by-file
+  verification of all inherited copyright and modification notices.
+
+### Newly confirmed scanner issue
+
+`mobile_scanner` 7.5.0 uses bundled `com.google.mlkit:barcode-scanning:17.3.0`
+by default on Android. The current resolved graph also includes
+`play-services-mlkit-barcode-scanning:18.3.1`, ML Kit common/vision components,
+CameraX and other transitive additions. Both APKs contain the barcode models;
+the plugin's own license does not establish licensing of these SDKs/models.
+
+Google's [ML Kit terms](https://developers.google.com/ml-kit/terms), checked
+2026-11-12, incorporate Google API terms, restrict reverse engineering/source
+extraction subject to applicable law, and describe performance/usage metrics
+sent to Google. Google requires informing users about that metrics processing.
+The live `https://luroka.app/privacy.html` fetched in this review contains no
+specific ML Kit/scanner metrics disclosure. Its general store diagnostics
+paragraph does not explicitly describe this dependency. This review does not
+measure the exact runtime traffic or determine consent requirements.
+
+**Action:** review ML Kit's compatibility with this GPLv3 combined application
+and the exact Google terms, and resolve disclosure requirements. An engineering
+alternative is a scanner with a verified GPL-compatible implementation and
+dependency graph. Simply adding an attribution, changing to the unbundled
+model, or hiding the scanner behind a feature flag does not establish clearance.
+The iOS plugin podspec uses Apple's Vision API and does not declare this Android
+ML Kit dependency; verify the actual Apple archive separately.
+
+### Remaining-check disposition
+
+| Earlier outstanding check | Current disposition and evidence needed to close |
+| --- | --- |
+| Android native and Gradle notices | Current inventory and APK inclusion checked above; review all new SDK terms, nested AAR/JAR/native notices and seven unmatched native outputs. Do not treat POM declarations or selected notices as complete. |
+| Apple archive inventory | Not closed by Android evidence. Inspect the exact intended IPA/archive, link maps, source inputs and notices; the November 6 records cover older 1.0.3 exports only. |
+| Rust/native prebuilt provenance | Still open: candidate libdovi lockfiles do not prove compiled features/revisions. Obtain builder attestations/source inputs or rebuild from a preserved pinned graph. |
+| Go Noto/font and artwork provenance | Earlier matching upstream font hashes remain useful; complete constituent font notices and subset reproduction are still unproven. Audit the actual release assets and screenshot rights separately. |
+| Complete corresponding source | Still open: bind each release hash to its exact app source, dependency sources, patches, native build scripts and build configuration. A current checkout or a checksum-pinned prebuilt alone is insufficient. Do not distribute signing secrets. |
+| Recipient source access | No recipient-accessible complete release source package was established here. Choose and verify source delivery next to the binary download; a private repository without recipient access does not satisfy that route. Publishing needs owner authorization and a secret scan. |
+| Store agreements | Re-read current public Apple Standard EULA and TestFlight terms; the restrictions flagged in the earlier review remain. Qualified review of the actual accepted Apple/Google agreements, distribution arrangement and any permissions is still required. |
+| License-screen device checks | Registry test passes; touch and D-pad scrolling/navigation on final Android/iOS/tvOS builds still need device verification. |
+| Past release remediation | Current assets do not alter earlier binaries. Retain historical unknowns and assess actual recipients/source availability with the licensing reviewer. |
+
+The [Apple Standard EULA](https://www.apple.com/legal/internet-services/itunes/dev/stdeula/)
+and [TestFlight terms](https://www.apple.com/legal/internet-services/itunes/testflight/)
+were checked on 2026-11-12. A custom EULA is not by itself proof that all
+distribution restrictions have been resolved. For corresponding source and
+modified-work conditions see [GPLv3 sections 1, 4–6 and 10](https://www.gnu.org/licenses/gpl-3.0.html).
+
+### Recommended closure order
+
+1. Resolve the Android scanner SDK compatibility/disclosure question first.
+2. Complete native dependency provenance and notices; preserve a reproducible
+   source manifest before building the next release.
+3. Prepare and verify recipient-accessible corresponding source for that build.
+4. Inspect final artifacts and exercise the license UI on physical devices.
+5. Obtain the platform-terms determination for the intended store distribution.
+
+## Historical review references
+
 See [license-source-review-20261106.md](license-source-review-20261106.md)
 for the current 1.0.3 artifact findings and platform-terms review; the 2026-11-05
 status section below is historical.

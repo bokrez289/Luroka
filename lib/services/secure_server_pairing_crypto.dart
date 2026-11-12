@@ -6,9 +6,8 @@ import 'package:cryptography/cryptography.dart';
 
 /// Ephemeral, end-to-end encryption for phone-to-TV connection setup.
 ///
-/// Both devices must show and explicitly confirm [PairingSession.checkCode]
-/// before accepting credentials. This primitive is not yet wired to a relay or
-/// UI; a public key or six-digit check code alone is not an authentication key.
+/// The phone user compares [PairingSession.checkCode] with the TV and confirms
+/// before sending credentials. A check code alone is not an authentication key.
 final class ServerPairingKeyPair {
   ServerPairingKeyPair._(this._keyPair, this.publicKey, this.sessionId, this.isTv);
 
@@ -30,14 +29,18 @@ final class ServerPairingKeyPair {
     return ServerPairingKeyPair._(keyPair, _encode(public.bytes), sessionId, isTv);
   }
 
-  Future<PairingSession> connect(String remotePublicKey) async {
+  Future<PairingSession> connect(String remotePublicKey, {String? invitationSecret}) async {
     final remote = _decode32(remotePublicKey);
     if (remotePublicKey == publicKey || remote.every((byte) => byte == 0)) {
       throw const FormatException('Invalid pairing public key');
     }
     final tvKey = isTv ? publicKey : remotePublicKey;
     final phoneKey = isTv ? remotePublicKey : publicKey;
-    final transcript = utf8.encode('luroka-server-pair-v1|$sessionId|$tvKey|$phoneKey');
+    if (invitationSecret != null) _decode32(invitationSecret);
+    final transcript = utf8.encode(
+      'luroka-server-pair-v1|$sessionId|$tvKey|$phoneKey'
+      '${invitationSecret == null ? '' : '|qr-secret|$invitationSecret'}',
+    );
     final shared = await _exchange.sharedSecretKey(
       keyPair: _keyPair,
       remotePublicKey: SimplePublicKey(remote, type: KeyPairType.x25519),
@@ -73,7 +76,7 @@ final class PairingSession {
   static final _cipher = AesGcm.with256bits();
   static const _maxPayloadBytes = 32 * 1024;
 
-  /// Call only after the user has compared the code on both devices.
+  /// Authorize this endpoint after the phone user has compared both codes.
   bool confirm(String code) => _confirmed = code == checkCode;
 
   /// One phone-to-TV payload, after explicit matching-code confirmation.

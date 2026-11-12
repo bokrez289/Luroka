@@ -66,7 +66,7 @@ class LurokaActivity : FlutterActivity() {
     // another mid-bind.
     private const val IME_LEAK_RESTART_BUDGET = 2
     private const val IME_LEAK_RESTART_MIN_INTERVAL_MS = 1000L
-    private const val EXIT_DIAGNOSTICS_PREFS = "luroka_exit_diagnostics"
+    private const val EXIT_DIAGNOSTICS_PREFS = "plezy_exit_diagnostics"
     private const val LAST_EXIT_DEDUPE_KEY = "last_reported_exit"
     private const val LAST_STARTUP_PHASE_KEY = "last_startup_phase"
     private val startupPhaseLock = Any()
@@ -498,7 +498,7 @@ class LurokaActivity : FlutterActivity() {
     // Apply persisted theme color to the window background before anything
     // else renders.  This prevents a white flash between the native splash
     // screen and Flutter's first frame for non-default themes (e.g. OLED).
-    val prefs = getSharedPreferences("luroka_prefs", Context.MODE_PRIVATE)
+    val prefs = getSharedPreferences("plezy_prefs", Context.MODE_PRIVATE)
     val savedTheme = prefs.getString("splash_theme", null)
     ThemeHelper.themeColor(savedTheme)?.let { window.decorView.setBackgroundColor(it) }
 
@@ -649,10 +649,11 @@ class LurokaActivity : FlutterActivity() {
 
   private fun handlePairingIntent(intent: Intent?) {
     val uri = intent?.data ?: return
+    // Cap and validate the entire invitation. Do not log it or persist it.
     if (intent.action != Intent.ACTION_VIEW || uri.scheme != "luroka" || uri.host != "pair" ||
         !uri.path.isNullOrEmpty() || uri.query != null || uri.userInfo != null || uri.port != -1) return
     val fragment = uri.fragment ?: return
-    if (!Regex("^v1\\.[A-Za-z0-9_-]{43}\\.[A-Za-z0-9_-]{43}$").matches(fragment)) return
+    if (!Regex("^(?:v[12]\\.[A-Za-z0-9_-]{43}\\.[A-Za-z0-9_-]{43}|v3\\.[rs]\\.[A-Za-z0-9_-]{43}\\.[A-Za-z0-9_-]{43}\\.[A-Za-z0-9_-]{43})$").matches(fragment)) return
     val link = uri.toString()
     pendingPairingLink = link
     pairingLinkChannel?.invokeMethod("onInvitation", link, object : MethodChannel.Result {
@@ -887,7 +888,7 @@ class LurokaActivity : FlutterActivity() {
   // Flutter's supported surface-swap path: resume() after pause() hands the engine a new
   // Surface for the same SurfaceTexture, which rebuilds the onscreen surface at the window's
   // current size and schedules a frame. Flutter itself pauses this view only while a
-  // hybrid-composition platform view renders through an image view; this app has none, so
+  // hybrid-composition platform view renders through an image view; Luroka has none, so
   // resume() never revives a surface Flutter meant to keep paused.
   private fun swapFlutterSurface(textureView: FlutterTextureView) {
     textureView.pause()
@@ -1020,7 +1021,7 @@ class LurokaActivity : FlutterActivity() {
           val mode = call.argument<String>("mode")
 
           // Persist for next cold start & update window background now
-          getSharedPreferences("luroka_prefs", Context.MODE_PRIVATE)
+          getSharedPreferences("plezy_prefs", Context.MODE_PRIVATE)
             .edit().putString("splash_theme", mode).apply()
           ThemeHelper.themeColor(mode)?.let { window.decorView.setBackgroundColor(it) }
 

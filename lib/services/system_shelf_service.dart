@@ -340,8 +340,12 @@ class SystemShelfService {
 
   /// Parse a content ID back to (serverId, ratingKey), or null if invalid.
   static (ServerId serverId, String ratingKey)? parseContentId(String contentId) {
-    const prefix = 'luroka_';
-    if (!contentId.startsWith(prefix)) return null;
+    final prefix = contentId.startsWith('luroka_')
+        ? 'luroka_'
+        : contentId.startsWith('plezy_')
+        ? 'plezy_'
+        : null;
+    if (prefix == null) return null;
     final parts = contentId.substring(prefix.length).split('_');
     if (parts.length < 2 || parts.first.isEmpty || parts.skip(1).join('_').isEmpty) return null;
     return (ServerId(parts.first), parts.sublist(1).join('_'));

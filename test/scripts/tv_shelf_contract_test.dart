@@ -12,7 +12,7 @@ void main() {
     expect(value(runner, 'sourcesKey'), value(sources, 'sourcesKey'));
     expect(value(runner, 'tokenKeychainService'), value(sources, 'tokenKeychainService'));
     expect(value(runner, 'cacheDataKey'), value(provider, 'cacheDataKey'));
-    expect(value(runner, 'sourcesKey'), startsWith('Luroka'));
-    expect(value(runner, 'tokenKeychainService'), startsWith('com.bokrez.luroka.'));
+    expect(value(runner, 'sourcesKey'), equals('PlezySystemShelfSources'));
+    expect(value(runner, 'tokenKeychainService'), equals('com.edde746.plezy.systemshelf.tokens'));
   });
 }

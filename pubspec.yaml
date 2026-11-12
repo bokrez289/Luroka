@@ -1,7 +1,7 @@
 name: luroka
 description: "Luroka, a cinematic media client for Plex, Jellyfin, and Emby"
 publish_to: "none"
-version: 1.0.7+2033
+version: 1.0.8+2038
 
 environment:
   # Dart floor stays 3.12: freezed 3.x emits `final` constructor parameters,
@@ -29,7 +29,8 @@ dependencies:
   provider: ^6.1.2
   flex_color_picker: ^3.8.0
   qr_flutter: ^4.1.0
-  mobile_scanner: 7.5.0
+  # ZXing / AVFoundation: no bundled Google ML Kit SDK or models.
+  qr_code_scanner_plus: 2.3.2
   slang: ^4.14.0
   slang_flutter: ^4.14.0
   duration: ^4.0.3
@@ -115,6 +116,12 @@ dev_dependencies:
   shared_preferences_platform_interface: ^2.4.0
   path_provider_platform_interface: ^2.1.0
   connectivity_plus_platform_interface: ^2.1.0
+  # Exercise vendored desktop preference stores against real file I/O,
+  # including #1732 repair and atomic writes.
+  shared_preferences_linux: ^2.4.1
+  shared_preferences_windows: ^2.4.1
+  path_provider_linux: ^2.2.1
+  path_provider_windows: ^2.3.0
   plugin_platform_interface: ^2.1.0
   freezed: ^3.2.5
   analyzer: 10.2.0
@@ -143,6 +150,11 @@ dependency_overrides:
       url: https://github.com/edde746/auto_updater
       ref: 9e150f7
       path: packages/auto_updater_windows
+  # Vendored 2.4.1: atomic replacement prevents upstream #1732 corruption.
+  shared_preferences_windows:
+    path: packages/shared_preferences_windows
+  shared_preferences_linux:
+    path: packages/shared_preferences_linux
 flutter:
   uses-material-design: true
   assets:
@@ -159,6 +171,8 @@ flutter:
     - assets/licenses/cronet-143.7445.0-notices.txt
     - assets/licenses/sentry-android-8.56.0-notices.txt
     - assets/licenses/android-maven-selected-notices.txt
+    - assets/licenses/android-runtime-embedded-notices.txt
+    - assets/licenses/zxing-scanner-notices.txt
     - assets/licenses/lua-5.2.4-MIT.txt
     - assets/licenses/mpv-native-source-notices.txt
     - assets/licenses/apple-media-source-notices.txt

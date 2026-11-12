@@ -3,6 +3,14 @@ import '../services/kids_profile_service.dart';
 import 'active_profile_provider.dart';
 
 extension ProfileSelectionPolicy on ActiveProfileProvider {
+  /// After restoring a household, ask which person is using this device. Clear
+  /// the persisted choice before the binder starts so a restart during the
+  /// picker cannot silently resume a profile from the backup.
+  Future<void> prepareSelectionAfterRestore() async {
+    await reloadFromStorage();
+    if (hasMultipleProfiles) await clearActiveProfile();
+  }
+
   /// Fresh-launch selection: explicit preference or a household with children,
   /// only when there is more than one profile to pick from. Returning to an
   /// existing foreground session retains its selected profile.

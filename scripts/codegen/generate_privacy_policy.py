@@ -38,6 +38,8 @@ class PolicyParser(HTMLParser):
         if tag == 'a' and self.tag:
             if self.link == '/delete-data.html':
                 self.parts.append(' (https://luroka.app/delete-data.html)')
+            elif self.link and self.link.startswith('https://'):
+                self.parts.append(f' ({self.link})')
             self.link = None
         elif tag == self.tag:
             text = ' '.join(''.join(self.parts).split())
@@ -59,7 +61,7 @@ def main():
     args = parser.parse_args()
     policy = PolicyParser()
     policy.feed(args.source.read_text(encoding='utf-8'))
-    if len(policy.introduction) != 2 or len(policy.sections) != 10:
+    if len(policy.introduction) != 2 or len(policy.sections) != 12:
         raise SystemExit('Unexpected privacy policy layout; review the source before updating the app')
     data = {'introduction': policy.introduction, 'sections': policy.sections}
     output = (json.dumps(data, ensure_ascii=False, indent=2) + '\n').encode('utf-8')

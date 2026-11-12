@@ -64,6 +64,17 @@ void main() {
     messenger.setMockMethodCallHandler(channel, null);
   });
 
+  test('shelf content IDs resolve both current and existing legacy entries', () {
+    for (final id in ['luroka_server-a_item-1', 'plezy_server-a_item-1']) {
+      final parsed = SystemShelfService.parseContentId(id);
+      expect(parsed?.$1, ServerId('server-a'));
+      expect(parsed?.$2, 'item-1');
+    }
+    for (final id in ['luroka__item', 'luroka_server_', 'unknown_server_item']) {
+      expect(SystemShelfService.parseContentId(id), isNull);
+    }
+  });
+
   test('live shelf tap acknowledges only an attached consumer', () async {
     final service = SystemShelfService.forTesting(channel: channel);
     const call = MethodCall('onShelfItemTap', {'contentId': 'server:item'});

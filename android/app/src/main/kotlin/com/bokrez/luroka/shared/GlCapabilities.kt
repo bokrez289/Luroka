@@ -23,7 +23,7 @@ internal object GlCapabilities {
    * Whether the GLES driver exposes `GL_EXT_texture_norm16`. Without it mpv
    * cannot upload >8-bit planes as filterable textures, and the GPUs that
    * lack it are the ones that cannot afford mpv's default scalers either
-   * (see [com.bokrez.lumora.mpv.GpuVoPolicy.needsCheapRenderTier]).
+   * (see [com.bokrez.luroka.mpv.GpuVoPolicy.needsCheapRenderTier]).
    *
    * A probe failure reports `true`: the default render path is the safe
    * answer for an unknown GPU, not the cheap tier.

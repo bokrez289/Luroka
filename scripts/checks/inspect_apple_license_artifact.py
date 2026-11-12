@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Inventory a local IPA's bundled notices and frameworks without extracting it.
+"""Inventory an IPA or zipped xcarchive without extracting private contents.
 
 This is an evidence-gathering tool, not a license-compliance determination.
 The IPA may be a separate export rather than the byte stream uploaded to Apple.
@@ -21,7 +21,7 @@ ASSETS = (
     'assets/licenses/SpatialAudioBridge.txt',
     'assets/licenses/libdovi-rust-candidate-notices.txt',
 )
-FRAMEWORK_PATH = re.compile(r'^Payload/[^/]+\.app/Frameworks/([^/]+\.framework)/')
+APP_PLIST = re.compile(r'^(?:Payload/|(?:[^/]+\.xcarchive/)?Products/Applications/)[^/]+\.app/Info\.plist$')
 
 
 def sha256_file(path):
@@ -35,23 +35,26 @@ def sha256_file(path):
 def inspect(ipa):
     with zipfile.ZipFile(ipa) as archive:
         names = archive.namelist()
-        plists = [name for name in names if re.fullmatch(r'Payload/[^/]+\.app/Info\.plist', name)]
+        plists = [name for name in names if APP_PLIST.fullmatch(name)]
         if len(plists) != 1:
             raise ValueError('Expected one top-level application Info.plist')
         info = plistlib.loads(archive.read(plists[0]))
-        frameworks = sorted({match.group(1) for name in names if (match := FRAMEWORK_PATH.match(name))})
+        app_prefix = plists[0].removesuffix('Info.plist')
+        framework_path = re.compile(re.escape(app_prefix) + r'Frameworks/([^/]+\.framework)/')
+        frameworks = sorted({match.group(1) for name in names if (match := framework_path.match(name))})
         assets = {}
         for asset in ASSETS:
-            matches = [name for name in names if name.endswith('/flutter_assets/' + asset)]
+            matches = [name for name in names if name.startswith(app_prefix) and name.endswith('/flutter_assets/' + asset)]
             if len(matches) > 1:
                 raise ValueError(f'Multiple copies of {asset}')
             assets[asset] = hashlib.sha256(archive.read(matches[0])).hexdigest() if matches else None
-        notices = [name for name in names if name.endswith('/flutter_assets/NOTICES.Z')]
+        notices = [name for name in names if name.startswith(app_prefix) and name.endswith('/flutter_assets/NOTICES.Z')]
         if len(notices) != 1:
             raise ValueError('Expected one Flutter NOTICES.Z')
         notice_text = gzip.decompress(archive.read(notices[0])).decode('utf-8')
         return {
-            'ipa_sha256': sha256_file(ipa),
+            'artifact_sha256': sha256_file(ipa),
+            'artifact_kind': 'ipa' if plists[0].startswith('Payload/') else 'xcarchive_zip',
             'bundle_id': info.get('CFBundleIdentifier'),
             'version': info.get('CFBundleShortVersionString'),
             'build': info.get('CFBundleVersion'),

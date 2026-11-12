@@ -238,7 +238,7 @@ private final class PairingLinkPlugin: NSObject, FlutterPlugin, FlutterSceneLife
           parts.scheme == "luroka", parts.host == "pair", parts.path.isEmpty,
           parts.user == nil, parts.password == nil, parts.port == nil, parts.query == nil,
           let fragment = parts.fragment,
-          fragment.range(of: #"^v1\.[A-Za-z0-9_-]{43}\.[A-Za-z0-9_-]{43}$"#,
+          fragment.range(of: #"^(?:v[12]\.[A-Za-z0-9_-]{43}\.[A-Za-z0-9_-]{43}|v3\.[rs]\.[A-Za-z0-9_-]{43}\.[A-Za-z0-9_-]{43}\.[A-Za-z0-9_-]{43})$"#,
                          options: .regularExpression) != nil else { return false }
     let value = url.absoluteString
     pending = value

@@ -24,25 +24,27 @@ void registerAppLicenseAssets({bool? includeAndroidNotices, bool? includeAppleNo
   });
   if (includeAppleNotices ?? Platform.isIOS) {
     LicenseRegistry.addLicense(() async* {
-      yield LicenseEntryWithLineBreaks(
-        const ['Apple media dependencies (partial source notices)'],
-        await rootBundle.loadString('assets/licenses/apple-media-source-notices.txt'),
-      );
-      yield LicenseEntryWithLineBreaks(
-        const ['iOS Swift packages (selected notices)'],
-        await rootBundle.loadString('assets/licenses/ios-swift-package-notices.txt'),
-      );
+      yield LicenseEntryWithLineBreaks(const [
+        'Apple media dependencies (partial source notices)',
+      ], await rootBundle.loadString('assets/licenses/apple-media-source-notices.txt'));
+      yield LicenseEntryWithLineBreaks(const [
+        'iOS Swift packages (selected notices)',
+      ], await rootBundle.loadString('assets/licenses/ios-swift-package-notices.txt'));
     });
   }
   if ((includeAppleNotices ?? Platform.isIOS) || (includeAndroidNotices ?? Platform.isAndroid)) {
     LicenseRegistry.addLicense(() async* {
-      yield LicenseEntryWithLineBreaks(
-        const ['libdovi Rust dependencies (candidate notices)'],
-        await rootBundle.loadString('assets/licenses/libdovi-rust-candidate-notices.txt'),
-      );
+      yield LicenseEntryWithLineBreaks(const [
+        'libdovi Rust dependencies (candidate notices)',
+      ], await rootBundle.loadString('assets/licenses/libdovi-rust-candidate-notices.txt'));
     });
   }
   if (includeAndroidNotices ?? Platform.isAndroid) {
+    LicenseRegistry.addLicense(() async* {
+      yield LicenseEntryWithLineBreaks(const [
+        'ZXing / ZXing Android Embedded',
+      ], await rootBundle.loadString('assets/licenses/zxing-scanner-notices.txt'));
+    });
     LicenseRegistry.addLicense(() async* {
       yield LicenseEntryWithLineBreaks(const [
         'mpv-android',
@@ -72,10 +74,12 @@ void registerAppLicenseAssets({bool? includeAndroidNotices, bool? includeAppleNo
       yield LicenseEntryWithLineBreaks(const [
         'Sentry Android third-party notices',
       ], await rootBundle.loadString('assets/licenses/sentry-android-8.56.0-notices.txt'));
-      yield LicenseEntryWithLineBreaks(
-        const ['Selected Android Maven dependency notices'],
-        await rootBundle.loadString('assets/licenses/android-maven-selected-notices.txt'),
-      );
+      yield LicenseEntryWithLineBreaks(const [
+        'Selected Android Maven dependency notices',
+      ], await rootBundle.loadString('assets/licenses/android-maven-selected-notices.txt'));
+      yield LicenseEntryWithLineBreaks(const [
+        'Android runtime embedded notices',
+      ], await rootBundle.loadString('assets/licenses/android-runtime-embedded-notices.txt'));
     });
   }
 }

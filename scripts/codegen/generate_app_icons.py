@@ -18,7 +18,7 @@ Outputs, all committed:
 
 * ios/Runner/AlternateAppIcons.xcassets: one single-size 1024 AppIcon-<id>.appiconset per icon. The
   Runner target compiles every app icon set in it as an alternate
-  (ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS); luroka.icon stays the primary.
+  (ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS); luroka.icon stays the iOS primary.
 * tvos/Runner/AlternateAppIcons.xcassets: one AppIcon-<id>.imagestack per icon, a Front (foreground)
   and Back layer at 400x240 and 800x480.
 * android/app/src/main/res: an adaptive icon (background, foreground and monochrome layers), a

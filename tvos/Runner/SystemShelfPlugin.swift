@@ -267,9 +267,10 @@ import TVServices
   final class SystemShelfPlugin: NSObject, FlutterPlugin, FlutterSceneLifeCycleDelegate {
     static let schemaVersion = 3
     static let appGroupIdentifier = "group.com.bokrez.luroka"
-    static let cacheDataKey = "LurokaSystemShelfCacheData"
-    static let sourcesKey = "LurokaSystemShelfSources"
-    static let tokenKeychainService = "com.bokrez.luroka.systemshelf.tokens"
+    // Stored keys and Keychain service remain readable by existing installs.
+    static let cacheDataKey = "PlezySystemShelfCacheData"
+    static let sourcesKey = "PlezySystemShelfSources"
+    static let tokenKeychainService = "com.edde746.plezy.systemshelf.tokens"
     static let artworkDirectoryName = "SystemShelfArtwork"
     private static let maxItems = 20
     /// English fallback for caches written before the localized title existed.
@@ -279,7 +280,7 @@ import TVServices
     private static let syncTimeout: TimeInterval = 8
     private static let imageTimeout: TimeInterval = 2.5
     private static let staleArtworkGracePeriod: TimeInterval = 60
-    private static let mutationQueue = DispatchQueue(label: "com.bokrez.luroka.system-shelf", qos: .utility)
+    private static let mutationQueue = DispatchQueue(label: "com.luroka.system-shelf", qos: .utility)
     private static let deepLinkDelivery = TvosDeepLinkDeliveryCoordinator()
     private static var methodChannel: FlutterMethodChannel?
     private static var mutationState = SystemShelfMutationState()
@@ -343,7 +344,7 @@ import TVServices
     }
 
     static func contentId(from url: URL) -> String? {
-      guard url.scheme == "luroka", url.host == "play" else { return nil }
+      guard let scheme = url.scheme, ["luroka", "plezy"].contains(scheme), url.host == "play" else { return nil }
       return URLComponents(url: url, resolvingAgainstBaseURL: false)?
         .queryItems?.first { $0.name == "content_id" }?.value
     }

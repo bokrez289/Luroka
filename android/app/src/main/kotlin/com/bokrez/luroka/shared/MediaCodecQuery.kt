@@ -66,7 +66,7 @@ internal object MediaCodecQuery {
    * Whether the hardware AV1 decoder is Tensor's BigOcean block
    * (`c2.google.av1.decoder`, Pixel 6+). Its vendor service dies when a new
    * instance starts while the previous one is still being torn down (#2272);
-   * [com.bokrez.lumora.mpv.GpuVoPolicy.needsParkedRebuild] keeps the two apart.
+   * [com.bokrez.luroka.mpv.GpuVoPolicy.needsParkedRebuild] keeps the two apart.
    */
   fun hardwareAv1IsBigOcean(): Boolean = bigOceanAv1.value
 

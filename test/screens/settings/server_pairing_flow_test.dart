@@ -52,7 +52,7 @@ void main() {
         tester.view.physicalSize = const Size(1600, 900);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
-        String? session, tvAuth, phoneAuth, phonePublic, tvPublic;
+        String? session, tvAuth, phoneAuth, phonePublic;
         Map<String, dynamic>? ciphertext;
         final relayTraffic = <String>[];
         final relayHttp = MockClient((request) async {
@@ -61,7 +61,6 @@ void main() {
           final auth = request.headers['X-Luroka-Pair-Auth'];
           if (request.method == 'POST' && request.url.path == '/v1/pairings') {
             session = id;
-            tvPublic = (jsonDecode(request.body) as Map)['publicKey'] as String;
             tvAuth = auth;
             return http.Response('', 201);
           }
@@ -120,6 +119,7 @@ void main() {
                               MediaBrowserDialect.jellyfin,
                               relay: relay,
                               validationClient: serverHttp,
+                              onInvitation: (value) => invitation.value = value.toBrowserUri(),
                             );
                           },
                           child: const Text('Start TV pairing'),
@@ -144,7 +144,6 @@ void main() {
         );
         await tester.tap(find.text('Start TV pairing'));
         await _pumpUi(tester);
-        invitation.value = ServerPairingInvite(sessionId: session!, tvPublicKey: tvPublic!).toBrowserUri();
         expect(find.byKey(const ValueKey('server-pairing-invitation')), findsNothing);
         expect(invitation.value!.scheme, 'https');
         expect(invitation.value!.host, 'connect.luroka.app');
@@ -155,9 +154,8 @@ void main() {
         }
         await tester.pump(const Duration(seconds: 2));
         await _pumpUi(tester);
-        expect(find.text('Codes match'), findsNWidgets(2));
-        await tester.tap(find.text('Codes match').first);
-        await tester.tap(find.text('Codes match').last);
+        expect(find.text('Codes match'), findsOneWidget);
+        await tester.tap(find.text('Codes match'));
         await _pumpUi(tester);
         await tester.enterText(find.widgetWithText(TextField, 'Server URL'), 'https://media.example');
         await tester.enterText(find.widgetWithText(TextField, 'Username'), 'Alice');

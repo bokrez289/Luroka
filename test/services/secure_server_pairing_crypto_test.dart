@@ -4,6 +4,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/services/secure_server_pairing_crypto.dart';
 
 void main() {
+  test('relay peer without the QR secret cannot create an accepted payload', () async {
+    final id = ServerPairingKeyPair.newSessionId();
+    final secret = ServerPairingKeyPair.newSessionId();
+    final tv = await ServerPairingKeyPair.create(sessionId: id, isTv: true);
+    final attacker = await ServerPairingKeyPair.create(sessionId: id, isTv: false);
+    final receiver = await tv.connect(attacker.publicKey, invitationSecret: secret);
+    final sender = await attacker.connect(tv.publicKey);
+    receiver.confirm(receiver.checkCode);
+    sender.confirm(sender.checkCode);
+    final payload = await sender.encrypt({'token': 'injected'});
+    await expectLater(receiver.decrypt(payload), throwsA(anything));
+  });
   test('phone and TV agree on a confirmation code and keep connection data encrypted', () async {
     final id = ServerPairingKeyPair.newSessionId();
     final tv = await ServerPairingKeyPair.create(sessionId: id, isTv: true);

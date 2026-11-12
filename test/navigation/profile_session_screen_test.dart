@@ -1,6 +1,5 @@
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/connection/connection_registry.dart';
 import 'package:luroka/database/app_database.dart';
@@ -119,6 +118,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(t.profileSetupGuide.title), findsOneWidget);
     expect(ProfileAppearanceService.instance.personalizationPendingFor('second'), isTrue);
+    expect(
+      tester.widget<SingleChildScrollView>(find.byKey(const ValueKey('profile-guide-form'))).controller!.offset,
+      0,
+    );
 
     await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-theme-dark')));
     await tester.tap(find.byKey(const ValueKey('profile-guide-theme-dark')));
@@ -129,6 +132,10 @@ void main() {
     await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-next')));
     await tester.tap(find.byKey(const ValueKey('profile-guide-next')));
     await tester.pumpAndSettle();
+    expect(
+      tester.widget<SingleChildScrollView>(find.byKey(const ValueKey('profile-guide-form'))).controller!.offset,
+      0,
+    );
     await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-show-spotlight')));
     await tester.tap(find.byKey(const ValueKey('profile-guide-show-spotlight')));
     await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-spotlight-trending')));
@@ -303,14 +310,13 @@ void main() {
       );
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-next')));
-      if (size.width >= 900) {
-        await tester.sendKeyEvent(LogicalKeyboardKey.select);
-      } else {
-        await tester.tap(find.byKey(const ValueKey('profile-guide-next')));
-      }
+      await tester.tap(find.byKey(const ValueKey('profile-guide-next')));
       await tester.pumpAndSettle();
       expect(find.text(t.profileSetupGuide.homeStep), findsOneWidget);
-      expect(tester.widget<SingleChildScrollView>(find.byKey(const ValueKey('profile-guide-form'))).controller!.offset, 0);
+      expect(
+        tester.widget<SingleChildScrollView>(find.byKey(const ValueKey('profile-guide-form'))).controller!.offset,
+        0,
+      );
       await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-skip')));
       await tester.pumpAndSettle();
       expect(tester.getTopLeft(find.byKey(const ValueKey('profile-guide-preview'))).dy, lessThan(size.height / 2));

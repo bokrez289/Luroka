@@ -46,6 +46,10 @@ import 'profile/full_backup_actions.dart';
 import 'profile/cloud_backup_actions.dart';
 import 'settings/connection_persistence.dart';
 import '../services/profile_appearance_service.dart';
+import '../services/kids_profile_service.dart';
+import '../services/luroka_backup_snapshot.dart';
+import '../main.dart' show SetupScreen;
+import '../database/tvos_database_recovery_store.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({
@@ -65,6 +69,7 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   bool _isAuthenticating = false;
   bool _backupRestored = false;
+  bool _loadingRestore = false;
   String? _errorMessage;
   // Reuse a one-shot service for the debug-token verify path; the Plex
   // PIN/QR flow inside [PlexPinAuthFlow] owns its own service instance.
@@ -347,14 +352,37 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
+  Future<void> _loadRestoredBackup() async {
+    if (_loadingRestore) return;
+    setState(() {
+      _backupRestored = true;
+      _loadingRestore = true;
+    });
+    try {
+      await LurokaBackupSnapshot.recoverInterruptedRestore(context.read<AppDatabase>());
+      await KidsProfileService.instance.reloadAfterBackupRestore();
+      if (!mounted) return;
+      await context.read<ActiveProfileProvider>().prepareSelectionAfterRestore();
+      if (!mounted) return;
+      unawaited(
+        Navigator.pushReplacement(
+          context,
+          fadeRoute(const SetupScreen(databaseRecoveryOutcome: TvosDatabaseRecoveryOutcome.notApplicable)),
+        ),
+      );
+    } catch (_) {
+      if (mounted) setState(() => _loadingRestore = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Focus(
       canRequestFocus: false,
       onKeyEvent: (_, event) => handleBackKeyNavigation(context, event),
       child: ConnectionSetupScaffold(
-        title: t.onboarding.connectTitle,
-        description: t.onboarding.connectHint,
+        title: _backupRestored ? 'Backup restored' : t.onboarding.connectTitle,
+        description: _backupRestored ? 'Your profiles and settings are ready to load.' : t.onboarding.connectHint,
         canGoBack: false,
         child: _buildAuthBody(),
       ),
@@ -363,7 +391,15 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Widget _buildAuthBody() {
     if (_backupRestored) {
-      return const Text('Backup restored. Close and reopen Luroka to load your profiles and settings.');
+      return _loadingRestore
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Could not load the restored data. Try again or reopen Luroka.'),
+                TextButton(onPressed: _loadRestoredBackup, child: const Text('Try again')),
+              ],
+            );
     }
     if (_isAuthenticating) {
       return Column(
@@ -455,7 +491,7 @@ class _AuthScreenState extends State<AuthScreen> {
               ? null
               : () async {
                   final restored = await restoreFullBackup(context);
-                  if (mounted && restored) setState(() => _backupRestored = true);
+                  if (mounted && restored) await _loadRestoredBackup();
                 },
           icon: const Icon(Icons.restore_rounded),
           label: const Text('Restore encrypted backup'),
@@ -466,12 +502,12 @@ class _AuthScreenState extends State<AuthScreen> {
                 ? null
                 : () async {
                     final restored = await showCloudBackupRestore(context);
-                    if (mounted && restored) setState(() => _backupRestored = true);
+                    if (mounted && restored) await _loadRestoredBackup();
                   },
             icon: const Icon(Icons.cloud_download_outlined),
             label: const Text('Restore cloud backup'),
           ),
-        if (kDebugMode) ...[
+        if (kDebugMode && !isTV) ...[
           const SizedBox(height: 12),
           FocusableButton(
             onPressed: _handleDebugTap,

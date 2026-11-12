@@ -11,6 +11,7 @@ class WatchTogetherDeepLink {
   const WatchTogetherDeepLink({required this.code});
 
   static const scheme = 'luroka';
+  static const legacyScheme = 'plezy';
   static const host = 'watch';
 
   /// The room code as the relay writes it: 6 symbols, normalized.
@@ -23,7 +24,7 @@ class WatchTogetherDeepLink {
   /// with a code.
   static WatchTogetherDeepLink? tryParse(String link) {
     final uri = Uri.tryParse(link);
-    if (uri == null || uri.scheme != scheme || uri.host != host) {
+    if (uri == null || !{scheme, legacyScheme, 'lumora'}.contains(uri.scheme) || uri.host != host) {
       return null;
     }
     final raw = uri.queryParameters['code']?.trim();

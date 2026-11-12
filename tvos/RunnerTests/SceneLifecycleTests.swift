@@ -2,15 +2,11 @@ import XCTest
 @testable import Runner
 
 final class SceneLifecycleTests: XCTestCase {
-  func testShelfLinkUsesLurokaScheme() {
-    XCTAssertEqual(
-      SystemShelfPlugin.contentId(from: URL(string: "luroka://play?content_id=luroka_server_item")!),
-      "luroka_server_item"
-    )
-    XCTAssertNil(SystemShelfPlugin.contentId(from: URL(string: "plezy://play?content_id=old")!))
+  func testShelfLinksAcceptCurrentAndLegacySchemes() {
+    XCTAssertEqual(SystemShelfPlugin.contentId(from: URL(string: "luroka://play?content_id=luroka_server_item")!), "luroka_server_item")
+    XCTAssertEqual(SystemShelfPlugin.contentId(from: URL(string: "plezy://play?content_id=plezy_server_item")!), "plezy_server_item")
     XCTAssertNil(SystemShelfPlugin.contentId(from: URL(string: "luroka://watch?code=K7MQ2X")!))
   }
-
   func testRunnerDeclaresSingleFlutterSceneLifecycle() throws {
     let manifest = try XCTUnwrap(
       Bundle(for: AppDelegate.self).object(forInfoDictionaryKey: "UIApplicationSceneManifest")

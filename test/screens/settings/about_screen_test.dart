@@ -53,7 +53,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(PrivacyPolicyScreen), findsOneWidget);
-    expect(find.text('Last updated: November 6, 2026'), findsOneWidget);
+    expect(find.text('Last updated: November 12, 2026'), findsOneWidget);
     expect(find.text('Information stored on your device'), findsOneWidget);
   });
 

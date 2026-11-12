@@ -4,16 +4,22 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:http/http.dart' as http;
 
 import 'secure_server_pairing_crypto.dart';
+import 'cloud_backup_recovery.dart';
 
 /// A QR invitation contains no server address, username, token or password.
-/// The fragment is handled locally; it must never be sent to a web server.
+/// Its fragment contains a secret and must never be sent to a web server or log.
 final class ServerPairingInvite {
-  const ServerPairingInvite({required this.sessionId, required this.tvPublicKey});
+  const ServerPairingInvite({required this.sessionId, required this.tvPublicKey, this.recovery = false, this.secret});
   final String sessionId;
   final String tvPublicKey;
+  final bool recovery;
+  final String? secret;
 
-  Uri toUri() => Uri(scheme: 'luroka', host: 'pair', fragment: 'v1.$sessionId.$tvPublicKey');
-  Uri toBrowserUri() => Uri.https('connect.luroka.app', '/pair').replace(fragment: 'v1.$sessionId.$tvPublicKey');
+  String get _fragment => secret == null
+      ? '${recovery ? 'v2' : 'v1'}.$sessionId.$tvPublicKey'
+      : 'v3.${recovery ? 'r' : 's'}.$sessionId.$tvPublicKey.$secret';
+  Uri toUri() => Uri(scheme: 'luroka', host: 'pair', fragment: _fragment);
+  Uri toBrowserUri() => Uri.https('connect.luroka.app', '/pair').replace(fragment: _fragment);
 
   static ServerPairingInvite parse(Uri uri) {
     final appLink = uri.scheme == 'luroka' && uri.host == 'pair' && uri.path.isEmpty && !uri.hasPort;
@@ -22,15 +28,30 @@ final class ServerPairingInvite {
       throw const FormatException('Invalid pairing invitation');
     }
     final parts = uri.fragment.split('.');
-    if (parts.length != 3 || parts[0] != 'v1' || !_validValue(parts[1]) || !_validValue(parts[2])) {
+    if (parts.length == 5 &&
+        parts[0] == 'v3' &&
+        const {'r', 's'}.contains(parts[1]) &&
+        _validValue(parts[2]) &&
+        _validValue(parts[3]) &&
+        _validValue(parts[4])) {
+      return ServerPairingInvite(
+        sessionId: parts[2],
+        tvPublicKey: parts[3],
+        secret: parts[4],
+        recovery: parts[1] == 'r',
+      );
+    }
+    if (parts.length != 3 ||
+        !const {'v1', 'v2'}.contains(parts[0]) ||
+        !_validValue(parts[1]) ||
+        !_validValue(parts[2])) {
       throw const FormatException('Invalid pairing invitation');
     }
-    return ServerPairingInvite(sessionId: parts[1], tvPublicKey: parts[2]);
+    return ServerPairingInvite(sessionId: parts[1], tvPublicKey: parts[2], recovery: parts[0] == 'v2');
   }
 }
 
-/// Experimental protocol client. There is intentionally no UI/deep-link or
-/// production deployment until user confirmation and transport are reviewed.
+/// Short-lived encrypted phone-to-TV transfer over the pairing relay.
 final class ServerPairingClient {
   ServerPairingClient({http.Client? client})
     : _client = client ?? http.Client(),
@@ -62,7 +83,7 @@ final class ServerPairingClient {
     final keys = await ServerPairingKeyPair.create(sessionId: id, isTv: true);
     final response = await _request('POST', '/v1/pairings', id, auth, {'publicKey': keys.publicKey});
     if (response.status != 201) throw const PairingTransportException();
-    return TvPairingAttempt._(this, id, auth, keys);
+    return TvPairingAttempt._(this, id, auth, keys, ServerPairingKeyPair.newSessionId());
   }
 
   Future<PhonePairingAttempt> join(ServerPairingInvite invite) async {
@@ -70,7 +91,7 @@ final class ServerPairingClient {
     final checked = ServerPairingInvite.parse(invite.toUri());
     final auth = ServerPairingKeyPair.newSessionId();
     final keys = await ServerPairingKeyPair.create(sessionId: checked.sessionId, isTv: false);
-    final session = await keys.connect(checked.tvPublicKey);
+    final session = await keys.connect(checked.tvPublicKey, invitationSecret: checked.secret);
     final response = await _request('POST', '/v1/pairings/join', checked.sessionId, auth, {
       'publicKey': keys.publicKey,
     });
@@ -110,11 +131,12 @@ final class ServerPairingClient {
 }
 
 final class TvPairingAttempt {
-  TvPairingAttempt._(this._client, this._id, this._auth, this._keys) : _age = Stopwatch()..start();
+  TvPairingAttempt._(this._client, this._id, this._auth, this._keys, this._secret) : _age = Stopwatch()..start();
   final ServerPairingClient _client;
   final String _id;
   final String _auth;
   final ServerPairingKeyPair _keys;
+  final String _secret;
   final Stopwatch _age;
   String? _phonePublic;
   PairingSession? _session;
@@ -122,14 +144,14 @@ final class TvPairingAttempt {
   bool _polling = false;
   bool _closed = false;
 
-  ServerPairingInvite get invite => ServerPairingInvite(sessionId: _id, tvPublicKey: _keys.publicKey);
+  ServerPairingInvite get invite => ServerPairingInvite(sessionId: _id, tvPublicKey: _keys.publicKey, secret: _secret);
   String? get checkCode => _session?.checkCode;
   bool get hasPayload => _pendingEnvelope != null;
   bool confirm(String code) =>
       !_closed && _age.elapsed < const Duration(minutes: 5) && (_session?.confirm(code) ?? false);
 
-  /// Polling may receive ciphertext before the TV user confirms. It remains
-  /// encrypted in memory until [takeConnection] is explicitly authorized.
+  /// Polling stores ciphertext in memory until the caller accepts it. The v3
+  /// session key is bound to the secret carried only in the QR fragment.
   Future<void> poll() async {
     _checkAge(_age);
     if (_closed) throw StateError('Pairing is closed');
@@ -150,7 +172,7 @@ final class TvPairingAttempt {
         }
         if (_session == null) {
           _phonePublic = peer;
-          _session = await _keys.connect(peer);
+          _session = await _keys.connect(peer, invitationSecret: _secret);
           if (_closed) return;
         }
       }
@@ -171,6 +193,17 @@ final class TvPairingAttempt {
     final result = PairedServerConnection.fromJson(await _session!.decrypt(envelope));
     _pendingEnvelope = null;
     return result;
+  }
+
+  Future<String> takeRecoveryCode() async {
+    _checkAge(_age);
+    if (_closed || _session == null || _pendingEnvelope == null) throw StateError('Pairing is incomplete');
+    final payload = await _session!.decrypt(_pendingEnvelope!);
+    _pendingEnvelope = null;
+    if (payload.length != 2 || payload['type'] != 'recovery' || payload['code'] is! String) {
+      throw const FormatException('Invalid recovery payload');
+    }
+    return CloudBackupRecoveryCode.parse(payload['code'] as String).reveal();
   }
 
   Future<void> cancel() async {
@@ -197,6 +230,23 @@ final class PhonePairingAttempt {
     if (_closed) throw StateError('Pairing is closed');
     _checkAge(_age);
     final envelope = await _session.encrypt(connection.toJson());
+    if (_closed) throw StateError('Pairing is closed');
+    _checkAge(_age);
+    final response = await _client._request(
+      'PUT',
+      '/v1/pairings/payload',
+      _id,
+      _auth,
+      Map<String, Object?>.from(jsonDecode(envelope) as Map),
+    );
+    if (response.status != 204) throw const PairingTransportException();
+  }
+
+  Future<void> sendRecoveryCode(String code) async {
+    if (_closed) throw StateError('Pairing is closed');
+    _checkAge(_age);
+    final checked = CloudBackupRecoveryCode.parse(code).reveal();
+    final envelope = await _session.encrypt({'type': 'recovery', 'code': checked});
     if (_closed) throw StateError('Pairing is closed');
     _checkAge(_age);
     final response = await _client._request(

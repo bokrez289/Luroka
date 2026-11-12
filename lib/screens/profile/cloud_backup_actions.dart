@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -22,6 +23,7 @@ import '../../services/kids_profile_service.dart';
 import '../../services/file_picker_service.dart';
 import '../../services/luroka_backup_snapshot.dart';
 import '../../services/profile_backup_authorization.dart';
+import '../../services/secure_server_pairing_client.dart';
 import '../../utils/dialogs.dart';
 import '../../utils/error_dialog.dart';
 import '../../widgets/dialog_action_button.dart';
@@ -394,7 +396,9 @@ Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? cl
   if (!context.mounted) return false;
   final code = await showScopedDialog<String>(
     context: context,
-    builder: (_) => const _RecoveryCodeDialog(title: 'Restore cloud backup', action: 'Review'),
+    builder: (_) => PlatformDetector.isTV()
+        ? const _TvRecoveryCodeDialog()
+        : const _RecoveryCodeDialog(title: 'Restore cloud backup', action: 'Review'),
   );
   if (code == null || !context.mounted) return false;
   final service = client ?? CloudBackupClient();
@@ -421,6 +425,133 @@ Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? cl
     return false;
   } finally {
     if (client == null) service.close();
+  }
+}
+
+class _TvRecoveryCodeDialog extends StatefulWidget {
+  const _TvRecoveryCodeDialog();
+  @override
+  State<_TvRecoveryCodeDialog> createState() => _TvRecoveryCodeDialogState();
+}
+
+class _TvRecoveryCodeDialogState extends State<_TvRecoveryCodeDialog> {
+  final _relay = ServerPairingClient();
+  TvPairingAttempt? _attempt;
+  Timer? _timer;
+  bool _polling = false;
+  bool _enteringManually = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_start());
+  }
+
+  Future<void> _start() async {
+    try {
+      final attempt = await _relay.createTvAttempt();
+      if (!mounted) {
+        await attempt.cancel();
+        return;
+      }
+      setState(() => _attempt = attempt);
+      _timer = Timer.periodic(const Duration(seconds: 2), (_) => unawaited(_poll()));
+      await _poll();
+    } catch (_) {
+      if (mounted) setState(() => _error = 'Phone transfer unavailable. Enter your code manually.');
+    }
+  }
+
+  Future<void> _poll() async {
+    final attempt = _attempt;
+    if (attempt == null || _polling || _enteringManually || _error != null) return;
+    _polling = true;
+    try {
+      await attempt.poll();
+      if (!mounted) return;
+      if (_enteringManually) return;
+      if (attempt.hasPayload) {
+        final code = attempt.checkCode;
+        if (code == null || !attempt.confirm(code)) throw StateError('Transfer expired');
+        final recovery = await attempt.takeRecoveryCode();
+        if (mounted) Navigator.pop(context, recovery);
+      } else {
+        setState(() {});
+      }
+    } catch (_) {
+      _timer?.cancel();
+      if (mounted) setState(() => _error = 'Transfer expired or was interrupted. Enter your code manually.');
+    } finally {
+      _polling = false;
+    }
+  }
+
+  Future<void> _manual() async {
+    _enteringManually = true;
+    final result = await showScopedDialog<String>(
+      context: context,
+      builder: (_) => const _RecoveryCodeDialog(title: 'Restore cloud backup', action: 'Review'),
+    );
+    _enteringManually = false;
+    if (mounted && result != null) {
+      Navigator.pop(context, result);
+    } else if (mounted) {
+      unawaited(_poll());
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    final attempt = _attempt;
+    if (attempt == null) {
+      _relay.close();
+    } else {
+      unawaited(attempt.cancel().catchError((Object _) {}).whenComplete(_relay.close));
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final attempt = _attempt;
+    final code = attempt?.checkCode;
+    final invite = attempt == null
+        ? null
+        : ServerPairingInvite(
+            sessionId: attempt.invite.sessionId,
+            tvPublicKey: attempt.invite.tvPublicKey,
+            secret: attempt.invite.secret,
+            recovery: true,
+          );
+    return AlertDialog(
+      title: const Text('Restore with your phone'),
+      content: SizedBox(
+        width: 440,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_error != null)
+                Text(_error!)
+              else if (invite == null)
+                const CircularProgressIndicator()
+              else ...[
+                const Text('Scan with your phone, then use Luroka to scan or paste your saved recovery code.'),
+                const SizedBox(height: 12),
+              QrImageView(data: invite.toBrowserUri().toString(), size: 240, backgroundColor: Colors.white),
+                if (code != null) ...[const SizedBox(height: 12), Text('Confirm this code on your phone: $code')],
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(context)),
+        DialogActionButton(label: 'Enter manually', onPressed: _manual),
+      ],
+    );
   }
 }
 

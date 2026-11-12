@@ -15,7 +15,7 @@ import com.bokrez.luroka.shared.PlayerDebugLog
  * blank, and on one that can (or whose HWC keeps its modes in a single
  * group) it is what moves a 60 Hz panel to 24/25 Hz under ExoPlayer without
  * any app-side mode switch. Deliberate, non-seamless switches stay with
- * [com.bokrez.lumora.shared.FrameRateManager]. mpv-build `6aa1d87` removed the
+ * [com.bokrez.luroka.shared.FrameRateManager]. mpv-build `6aa1d87` removed the
  * vote from the fork vo; this puts it back where Media3 keeps it, in the
  * player that owns the Surface.
  *

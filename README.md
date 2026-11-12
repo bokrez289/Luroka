@@ -158,6 +158,13 @@ entered in the app; without one, Cinemeta discovery remains available.
 
 Flutter and Dart · Kotlin and Swift · mpv · Media3 · Provider · Drift
 
+## Open-source acknowledgments
+
+Luroka is independently developed on the open-source foundation of
+[Plezy](https://github.com/edde746/plezy) by edde746 and contributors, with its
+own interface, household features and phone-to-TV workflows. Upstream copyright
+and modification notices are preserved in [LICENSE](LICENSE).
+
 ## License
 
 Licensed under [GPL-3.0](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.md)

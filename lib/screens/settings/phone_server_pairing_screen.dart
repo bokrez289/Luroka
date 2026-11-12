@@ -13,6 +13,7 @@ import '../../services/kids_profile_service.dart';
 import '../../services/jellyfin_lan_discovery_service.dart';
 import '../../services/pairing_phone_auth.dart';
 import '../../services/secure_server_pairing_client.dart';
+import '../../services/cloud_backup_recovery.dart';
 import '../secure_transfer_qr_scanner.dart';
 
 /// Experimental phone half of server pairing. The invitation can be pasted
@@ -35,6 +36,8 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
   final _server = TextEditingController();
   final _username = TextEditingController();
   final _password = TextEditingController();
+  final _recovery = TextEditingController();
+  bool _recoveryTransfer = false;
   PhonePairingAttempt? _attempt;
   String _backend = 'jellyfin';
   bool _confirmed = false;
@@ -130,7 +133,10 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
         return;
       }
       _invite.clear();
-      setState(() => _attempt = attempt);
+      setState(() {
+        _recoveryTransfer = invitation.recovery;
+        _attempt = attempt;
+      });
     } catch (_) {
       if (mounted) setState(() => _error = 'Invitation invalid, expired, or unavailable. Try a new code.');
     } finally {
@@ -218,6 +224,32 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
     }
   }
 
+  Future<void> _sendRecovery() async {
+    final attempt = _attempt;
+    if (_busy || !_confirmed || attempt == null || !_requireAuthorization()) return;
+    try {
+      final code = CloudBackupRecoveryCode.parse(_recovery.text).reveal();
+      setState(() {
+        _busy = true;
+        _error = null;
+      });
+      await attempt.sendRecoveryCode(code);
+      _recovery.clear();
+      if (_requireAuthorization()) setState(() => _sent = true);
+    } on FormatException {
+      if (mounted) setState(() => _error = 'Enter a valid recovery code.');
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _terminal = true;
+          _error = 'Transfer failed. Start again on your TV.';
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _findServers() async {
     if (_busy || !_requireAuthorization()) return;
     setState(() {
@@ -285,9 +317,10 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
     _server.dispose();
     _username.dispose();
     _password.dispose();
+    _recovery.dispose();
     if (widget.serverHttp == null) _serverHttp.close();
     final attempt = _attempt;
-    if (attempt == null) {
+    if (attempt == null || _sent) {
       if (widget.relay == null) _relay.close();
     } else {
       unawaited(
@@ -311,7 +344,11 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (_sent)
-                const Text('Connection sent. Finish setup on your TV.')
+                Text(
+                  _recoveryTransfer
+                      ? 'Recovery code sent. Continue on your TV.'
+                      : 'Connection sent. Finish setup on your TV.',
+                )
               else if (attempt == null) ...[
                 const Text('Scan the TV code or paste the invitation.'),
                 OutlinedButton.icon(
@@ -331,6 +368,26 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
                 Text('Check that your TV shows the same code: ${attempt.checkCode}'),
                 const SizedBox(height: 16),
                 FilledButton(onPressed: _busy ? null : _confirm, child: const Text('Codes match')),
+              ] else if (_recoveryTransfer) ...[
+                const Text('Scan or paste your saved recovery code. It will be encrypted for your TV.'),
+                TextField(
+                  controller: _recovery,
+                  obscureText: true,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  decoration: const InputDecoration(labelText: 'Recovery code'),
+                ),
+                TextButton.icon(
+                  onPressed: _busy
+                      ? null
+                      : () async {
+                          final code = await scanSecureTransferQr(context, SecureTransferQrKind.recovery);
+                          if (mounted && code != null) _recovery.text = code;
+                        },
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: const Text('Scan recovery code'),
+                ),
+                FilledButton(onPressed: _busy || _terminal ? null : _sendRecovery, child: const Text('Send to TV')),
               ] else ...[
                 ..._savedServerChoices(),
                 const Text('Sign in to your server. Your password is sent to that server, not to Luroka.'),

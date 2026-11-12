@@ -94,7 +94,7 @@ internal object AndroidRuntimeDiagnostics {
   private val decoderNamePattern = Regex("[A-Za-z0-9_.:-]{1,96}")
   private val executor by lazy {
     Executors.newSingleThreadExecutor { task ->
-      Thread(task, "plezy-runtime-diagnostics").apply { isDaemon = true }
+      Thread(task, "luroka-runtime-diagnostics").apply { isDaemon = true }
     }
   }
 

@@ -75,7 +75,7 @@
                 <data android:scheme="plezy" android:host="play"/>
                 <data android:scheme="luroka" android:host="play"/>
             </intent-filter>
-            <!-- Deep link for tuning a live TV channel: plezy://live?channel=...&start=beginning|live -->
+            <!-- Live TV links use luroka://live; retain plezy://live for existing shortcuts. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>

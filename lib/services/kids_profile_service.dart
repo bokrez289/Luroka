@@ -40,6 +40,20 @@ class KidsProfileService extends ChangeNotifier {
     _prefs = prefs;
   }
 
+  /// Reload restored policy before any restored profile can be selected.
+  Future<void> reloadAfterBackupRestore() async {
+    await initialize();
+    await _writes;
+    final raw = _prefs!.getString(_key);
+    final restored = raw == null ? <String, dynamic>{} : Map<String, dynamic>.from(jsonDecode(raw) as Map);
+    _data = restored;
+    _committedJson = jsonEncode(restored);
+    _activeId = null;
+    _approvedParents.clear();
+    _itemContext.clear();
+    notifyListeners();
+  }
+
   Map<String, dynamic> get _children => (_data['children'] as Map?)?.cast<String, dynamic>() ?? {};
   bool get hasKids => _children.isNotEmpty;
   bool isKids(String? id) => id != null && _children.containsKey(id);
@@ -118,6 +132,7 @@ class KidsProfileService extends ChangeNotifier {
     if (viewerId == null || targetId == null || isKids(viewerId)) return false;
     return targetId == viewerId || (isKids(targetId) && parentFor(targetId) == viewerId);
   }
+
   bool hideKidsFor(String? id) => ((_data['hideKids'] as Map?)?[id] as bool?) ?? false;
   bool hasHideKidsPreference(String id) => (_data['hideKids'] as Map?)?.containsKey(id) ?? false;
   bool get hasParentPin => (_data['parentPin'] as String?)?.isNotEmpty ?? false;

@@ -85,7 +85,7 @@ internal object SystemShelfLifecycle {
   fun <T> exclusive(block: () -> T): T = synchronized(operationLock, block)
 }
 
-/** Owns Plezy's durable Android TV Watch Next rows and their local artwork. */
+/** Owns Luroka's durable Android TV Watch Next rows and their local artwork. */
 class WatchNextProvider internal constructor(
   private val context: Context,
   private val lifecycleLease: SystemShelfLifecycle.Lease?,
@@ -457,7 +457,7 @@ class WatchNextProvider internal constructor(
 
   private fun contentIdFromIntent(value: String?): String? {
     val uri = value?.let { runCatching { Uri.parse(it) }.getOrNull() } ?: return null
-    if (uri.scheme != "plezy" || uri.authority != "play") return null
+    if (uri.scheme !in setOf("luroka", "plezy") || uri.authority != "play") return null
     return uri.getQueryParameter("content_id")?.takeIf(String::isNotBlank)
   }
 
@@ -740,7 +740,7 @@ class WatchNextProvider internal constructor(
       metadata.episodeNumber?.let(builder::setEpisodeNumber)
     }
     builder.setIntentUri(
-      Uri.Builder().scheme("plezy").authority("play")
+      Uri.Builder().scheme("luroka").authority("play")
         .appendQueryParameter("content_id", metadata.contentId).build()
     )
     return builder.build()

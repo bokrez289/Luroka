@@ -17,22 +17,25 @@ void main() {
     });
 
     test('defaults to asking and any server', () {
-      final link = LiveTvDeepLink.tryParse('luroka://live?channel=KNTV');
+      final link = LiveTvDeepLink.tryParse('plezy://live?channel=KNTV');
       expect(link!.serverId, isNull);
       expect(link.startPosition, LiveTvStartPosition.ask);
     });
 
     test('accepts live start', () {
-      expect(LiveTvDeepLink.tryParse('luroka://live?channel=4&start=live')!.startPosition, LiveTvStartPosition.live);
+      expect(LiveTvDeepLink.tryParse('plezy://live?channel=4&start=live')!.startPosition, LiveTvStartPosition.live);
+    });
+
+    test('accepts existing legacy live links after the scheme migration', () {
+      expect(LiveTvDeepLink.tryParse('plezy://live?channel=4')?.channel, '4');
     });
 
     test('rejects other links and malformed input', () {
       expect(LiveTvDeepLink.tryParse('plezy_server_123'), isNull);
-      expect(LiveTvDeepLink.tryParse('plezy://live?channel=4'), isNull);
-      expect(LiveTvDeepLink.tryParse('luroka://play?content_id=luroka_a_1'), isNull);
-      expect(LiveTvDeepLink.tryParse('luroka://live'), isNull);
-      expect(LiveTvDeepLink.tryParse('luroka://live?channel='), isNull);
-      expect(LiveTvDeepLink.tryParse('luroka://live?channel=4&start=sideways'), isNull);
+      expect(LiveTvDeepLink.tryParse('plezy://play?content_id=plezy_a_1'), isNull);
+      expect(LiveTvDeepLink.tryParse('plezy://live'), isNull);
+      expect(LiveTvDeepLink.tryParse('plezy://live?channel='), isNull);
+      expect(LiveTvDeepLink.tryParse('plezy://live?channel=4&start=sideways'), isNull);
     });
   });
 

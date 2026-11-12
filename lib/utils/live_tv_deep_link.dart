@@ -36,7 +36,7 @@ class LiveTvDeepLink {
   /// Parses [link], returning null when it is not a well-formed live link.
   static LiveTvDeepLink? tryParse(String link) {
     final uri = Uri.tryParse(link);
-    if (uri == null || uri.scheme != scheme || uri.host != host) return null;
+    if (uri == null || !{scheme, 'plezy'}.contains(uri.scheme) || uri.host != host) return null;
     final channel = uri.queryParameters['channel']?.trim();
     if (channel == null || channel.isEmpty) return null;
     final server = uri.queryParameters['server']?.trim();

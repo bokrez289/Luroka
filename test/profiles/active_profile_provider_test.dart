@@ -167,6 +167,26 @@ void main() {
   });
 
   group('ActiveProfileProvider', () {
+    test('restored household with multiple selectable profiles requires a fresh choice', () async {
+      await registry.upsert(Profile.local(id: 'first', displayName: 'First', createdAt: DateTime(2026)));
+      await registry.upsert(Profile.local(id: 'second', displayName: 'Second', createdAt: DateTime(2026)));
+      await storage.setActiveProfileId('first');
+      await provider.prepareSelectionAfterRestore();
+      expect(provider.pickerProfiles, hasLength(2));
+      expect(provider.active, isNull);
+      expect(storage.getActiveProfileId(), isNull);
+      await provider.reloadFromStorage();
+      expect(provider.active, isNull);
+    });
+
+    test('restoring one selectable profile keeps its automatic selection', () async {
+      await registry.upsert(Profile.local(id: 'only', displayName: 'Only', createdAt: DateTime(2026)));
+      await storage.setActiveProfileId('only');
+      await provider.prepareSelectionAfterRestore();
+      expect(provider.activeId, 'only');
+      expect(storage.getActiveProfileId(), 'only');
+    });
+
     test('committed profile switches change the active settings and notify listeners', () async {
       final settings = await SettingsService.getInstance();
       final first = Profile.local(id: 'first', displayName: 'First', createdAt: DateTime(2026));

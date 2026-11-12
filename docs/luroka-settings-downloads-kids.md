@@ -23,7 +23,7 @@
   cancellation, size/SHA-256 verification, release notes, unknown-source
   permission handoff and Android installation confirmation. Native validation
   requires the installed package/signing identity and a higher matching version
-  code. See [publishing instructions](luroka-updates.md).
+  code. See [publishing instructions](lumora-updates.md).
 - Kids restrictions now honor Jellyfin/Emby CustomRating, reject permissive
   descendant ratings under a known mature series/season, and prevent stale
   records from downgrading stricter session metadata. Mixed-shelf ordering,

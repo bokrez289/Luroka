@@ -22,17 +22,24 @@ Future<JellyfinConnection?> showTvServerPairing(
   MediaBrowserDialect dialect, {
   @visibleForTesting ServerPairingClient? relay,
   @visibleForTesting http.Client? validationClient,
+  @visibleForTesting void Function(ServerPairingInvite)? onInvitation,
 }) => showScopedDialog<JellyfinConnection>(
   context: context,
   barrierDismissible: false,
-  builder: (_) => _TvServerPairingDialog(dialect: dialect, relay: relay, validationClient: validationClient),
+  builder: (_) => _TvServerPairingDialog(
+    dialect: dialect,
+    relay: relay,
+    validationClient: validationClient,
+    onInvitation: onInvitation,
+  ),
 );
 
 class _TvServerPairingDialog extends StatefulWidget {
-  const _TvServerPairingDialog({required this.dialect, this.relay, this.validationClient});
+  const _TvServerPairingDialog({required this.dialect, this.relay, this.validationClient, this.onInvitation});
   final MediaBrowserDialect dialect;
   final ServerPairingClient? relay;
   final http.Client? validationClient;
+  final void Function(ServerPairingInvite)? onInvitation;
   @override
   State<_TvServerPairingDialog> createState() => _TvServerPairingDialogState();
 }
@@ -43,7 +50,6 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
   TvPairingAttempt? _attempt;
   Timer? _timer;
   bool _polling = false;
-  bool _confirmed = false;
   bool _completing = false;
   String? _error;
   ActiveProfileProvider? _activeProfiles;
@@ -130,6 +136,7 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
         return;
       }
       setState(() => _attempt = attempt);
+      widget.onInvitation?.call(attempt.invite);
       _timer = Timer.periodic(const Duration(seconds: 2), (_) => unawaited(_poll()));
       await _poll();
     } catch (_) {
@@ -145,7 +152,7 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
       await attempt.poll();
       if (!mounted) return;
       setState(() {});
-      if (_confirmed && attempt.hasPayload) await _complete();
+      if (attempt.hasPayload) await _complete();
     } catch (_) {
       if (mounted) setState(() => _error = 'Pairing expired or was interrupted. Start again.');
       _timer?.cancel();
@@ -156,9 +163,11 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
 
   Future<void> _complete() async {
     final attempt = _attempt;
-    if (_completing || attempt == null || !_confirmed || !attempt.hasPayload || !_requireAuthorization()) return;
+    if (_completing || attempt == null || !attempt.hasPayload || !_requireAuthorization()) return;
     setState(() => _completing = true);
     try {
+      final code = attempt.checkCode;
+      if (code == null || !attempt.confirm(code)) throw StateError('Pairing expired');
       final paired = await attempt.takeConnection();
       if (!_requireAuthorization()) return;
       if (paired.backend != widget.dialect.name) throw const FormatException('Wrong server type');
@@ -170,14 +179,6 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
     } finally {
       if (mounted) setState(() => _completing = false);
     }
-  }
-
-  void _confirm() {
-    final attempt = _attempt;
-    final code = attempt?.checkCode;
-    if (!_requireAuthorization() || attempt == null || code == null || !attempt.confirm(code)) return;
-    setState(() => _confirmed = true);
-    if (attempt.hasPayload) unawaited(_complete());
   }
 
   @override
@@ -221,29 +222,25 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
-                  width: 180,
-                  height: 180,
+                  width: 240,
+                  height: 240,
                   child: QrImageView(
                     data: attempt.invite.toBrowserUri().toString(),
-                    size: 180,
+                    size: 240,
                     backgroundColor: Colors.white,
                   ),
                 ),
                 if (code != null) ...[
                   const SizedBox(height: 12),
                   Text('Check that your phone shows: $code'),
-                  if (_confirmed) const Text('Waiting for your phone to finish sign-in.'),
+                  const Text('Confirm the matching code on your phone, then finish sign-in there.'),
                 ],
               ],
             ],
           ),
         ),
       ),
-      actions: [
-        DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(context)),
-        if (code != null && !_confirmed && _error == null)
-          DialogActionButton(label: 'Codes match', isPrimary: true, onPressed: _confirm),
-      ],
+      actions: [DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(context))],
     );
   }
 }
