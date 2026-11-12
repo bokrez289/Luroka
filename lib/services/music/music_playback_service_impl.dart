@@ -99,7 +99,10 @@ class MusicPlaybackServiceImpl extends MusicPlaybackService with WidgetsBindingO
        _resolver = resolver ?? ServerMusicSourceResolver(serverManager: serverManager, database: database!),
        _coordinator = PlaybackCoordinator.instance,
        _queue = MusicQueueController(random: queueRandom),
-       _volumePersistenceWriter = volumePersistenceWriter ?? _writePersistedVolume {
+       _volumePersistenceWriter =
+           volumePersistenceWriter ??
+           SettingsService.instanceOrNull?.captureWriter(SettingsService.musicVolume) ??
+           _writePersistedVolume {
     _coordinator.registerMusicSession(stopAndDispose: _stopForVideoClaim);
     // tvOS has no background-audio session in v1, so it pauses on
     // backgrounding. A car keeps observing the lifecycle only as the fallback

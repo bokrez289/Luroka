@@ -64,6 +64,10 @@ import UserNotifications
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "AppIconPlugin") {
       AppIconPlugin.register(with: registrar)
     }
+
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "PairingLinkPlugin") {
+      PairingLinkPlugin.register(with: registrar)
+    }
   }
 
   override func userNotificationCenter(
@@ -201,5 +205,61 @@ import UserNotifications
     }
 
     return UIApplication.shared.windows.first(where: { $0.isKeyWindow }) ?? UIApplication.shared.windows.first
+  }
+}
+
+/// Receives only ephemeral pairing invitations. Values stay in memory and are
+/// never logged. Dart validates the invitation again before presenting setup.
+private final class PairingLinkPlugin: NSObject, FlutterPlugin, FlutterSceneLifeCycleDelegate {
+  private static var channel: FlutterMethodChannel?
+  private static var pending: String?
+
+  static func register(with registrar: FlutterPluginRegistrar) {
+    let channel = FlutterMethodChannel(name: "com.luroka/pairing_links", binaryMessenger: registrar.messenger())
+    let instance = PairingLinkPlugin()
+    Self.channel = channel
+    registrar.addMethodCallDelegate(instance, channel: channel)
+    registrar.addSceneDelegate(instance)
+    registrar.addApplicationDelegate(instance)
+  }
+
+  func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard call.method == "takeInitialInvitation" else {
+      result(FlutterMethodNotImplemented)
+      return
+    }
+    let value = Self.pending
+    Self.pending = nil
+    result(value)
+  }
+
+  private static func receive(_ url: URL) -> Bool {
+    guard let parts = URLComponents(url: url, resolvingAgainstBaseURL: false),
+          parts.scheme == "luroka", parts.host == "pair", parts.path.isEmpty,
+          parts.user == nil, parts.password == nil, parts.port == nil, parts.query == nil,
+          let fragment = parts.fragment,
+          fragment.range(of: #"^v1\.[A-Za-z0-9_-]{43}\.[A-Za-z0-9_-]{43}$"#,
+                         options: .regularExpression) != nil else { return false }
+    let value = url.absoluteString
+    pending = value
+    channel?.invokeMethod("onInvitation", arguments: value) { response in
+      if let accepted = response as? Bool, accepted, pending == value { pending = nil }
+    }
+    return true
+  }
+
+  func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
+             options connectionOptions: UIScene.ConnectionOptions?) -> Bool {
+    guard let connectionOptions else { return false }
+    return connectionOptions.urlContexts.contains { Self.receive($0.url) }
+  }
+
+  func scene(_ scene: UIScene, openURLContexts contexts: Set<UIOpenURLContext>) -> Bool {
+    contexts.contains { Self.receive($0.url) }
+  }
+
+  func application(_ application: UIApplication, open url: URL,
+                   options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+    Self.receive(url)
   }
 }

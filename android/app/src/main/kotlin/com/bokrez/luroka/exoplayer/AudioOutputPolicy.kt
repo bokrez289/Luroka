@@ -592,7 +592,7 @@ private fun hdmiAdvertisesIecRoute(context: Context, sampleRate: Int, channelCou
   false
 }
 
-/** The exact tuple an IEC output's `AudioTrack` is built with; see [LurokaRenderersFactory]. */
+/** The exact tuple an IEC output's `AudioTrack` is built with; see [PlezyRenderersFactory]. */
 private fun iecProbeFormat(sampleRate: Int, channelMask: Int): AudioFormat = directProbeFormat(AudioFormat.ENCODING_IEC61937, sampleRate, channelMask)
 
 private fun directProbeFormat(encoding: Int, sampleRate: Int, channelMask: Int): AudioFormat = AudioFormat.Builder()

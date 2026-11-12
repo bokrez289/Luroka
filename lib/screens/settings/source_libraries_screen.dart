@@ -8,6 +8,7 @@ import '../../profiles/active_profile_provider.dart';
 import '../../providers/hidden_libraries_provider.dart';
 import '../../providers/multi_server_provider.dart';
 import '../../services/storage_service.dart';
+import '../../services/profile_appearance_service.dart';
 import '../../widgets/focusable_list_tile.dart';
 import '../../focus/focusable_button.dart';
 import '../../widgets/focused_scroll_scaffold.dart';
@@ -72,6 +73,11 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
             servers.expectedServerIds.any((id) => !result.succeededServerIds.contains(id));
         _loading = false;
       });
+      if (widget.firstRun && !_partial && libraries.length == 1 && saved == null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && ModalRoute.of(context)?.isCurrent == true) _save();
+        });
+      }
     } catch (_) {
       if (mounted) {
         setState(() {
@@ -94,7 +100,10 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
       await storage.saveHiddenLibrariesForProfile(widget.profileId, hidden);
       if (!mounted) return;
       await context.read<HiddenLibrariesProvider?>()?.refresh();
-      if (mounted) Navigator.of(context).pop(true);
+      if (widget.firstRun) await ProfileAppearanceService.instance.completeSourceSelection(widget.profileId);
+      if (mounted && context.read<ActiveProfileProvider>().activeId == widget.profileId) {
+        Navigator.of(context).pop(true);
+      }
     } catch (_) {
       if (mounted) setState(() => _error = t.homeLayout.saveFailed);
     } finally {
@@ -114,13 +123,29 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
         top: false,
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: FocusableButton(
-            onPressed: _loading || _saving || _selected.isEmpty ? null : _save,
-            child: FilledButton.icon(
-              onPressed: _loading || _saving || _selected.isEmpty ? null : _save,
-              icon: const Icon(Icons.check_rounded),
-              label: Text(widget.firstRun ? t.profiles.continueButton : t.common.save),
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FocusableButton(
+                onPressed: _loading || _saving || _selected.isEmpty ? null : _save,
+                child: FilledButton.icon(
+                  onPressed: _loading || _saving || _selected.isEmpty ? null : _save,
+                  icon: const Icon(Icons.check_rounded),
+                  label: Text(widget.firstRun ? t.profiles.continueButton : t.common.save),
+                ),
+              ),
+              if (widget.firstRun)
+                FocusableButton(
+                  autofocus: _libraries.isEmpty,
+                  onPressed: _saving ? null : _chooseLater,
+                  child: TextButton(
+                    key: const ValueKey('source-libraries-later'),
+                    onPressed: _saving ? null : _chooseLater,
+                    child: Text(t.profileSetupGuide.chooseLater),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -135,6 +160,8 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(t.sourceLibraries.description, style: Theme.of(context).textTheme.bodyLarge),
+                    const SizedBox(height: 8),
+                    Text(t.profileSetupGuide.libraryScope, style: Theme.of(context).textTheme.bodySmall),
                     const SizedBox(height: 16),
                     if (_loading)
                       const Center(child: CircularProgressIndicator())
@@ -203,5 +230,20 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _chooseLater() async {
+    if (_saving || context.read<ActiveProfileProvider>().activeId != widget.profileId) return;
+    setState(() => _saving = true);
+    try {
+      await ProfileAppearanceService.instance.completeSourceSelection(widget.profileId);
+      if (mounted && context.read<ActiveProfileProvider>().activeId == widget.profileId) {
+        Navigator.of(context).pop(true);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _error = t.homeLayout.saveFailed);
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 }

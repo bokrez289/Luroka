@@ -1,7 +1,7 @@
 name: luroka
 description: "Luroka, a cinematic media client for Plex, Jellyfin, and Emby"
 publish_to: "none"
-version: 1.0.4+2020
+version: 1.0.7+2033
 
 environment:
   # Dart floor stays 3.12: freezed 3.x emits `final` constructor parameters,
@@ -29,6 +29,7 @@ dependencies:
   provider: ^6.1.2
   flex_color_picker: ^3.8.0
   qr_flutter: ^4.1.0
+  mobile_scanner: 7.5.0
   slang: ^4.14.0
   slang_flutter: ^4.14.0
   duration: ^4.0.3

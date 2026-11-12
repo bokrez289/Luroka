@@ -330,9 +330,16 @@ abstract class PaginatedCardGridTabState<T extends Object, W extends BaseLibrary
       padding: _effectivePadding,
       fullBleedImage: useFullCardLayout,
       shape: shape,
-      listEpoch: (ViewMode.list, totalSize, density, shape),
-      gridEpochBuilder: (geometry) =>
-          (ViewMode.grid, geometry.columnCount, totalSize, useFullCardLayout, density, shape),
+      listEpoch: (ViewMode.list, totalSize, density, shape, widget.onNavigateLibraryMenu != null),
+      gridEpochBuilder: (geometry) => (
+        ViewMode.grid,
+        geometry.columnCount,
+        totalSize,
+        useFullCardLayout,
+        density,
+        shape,
+        widget.onNavigateLibraryMenu != null,
+      ),
       itemBuilder: (context, position) {
         final index = position.index;
         final item = loadedItems[index];
@@ -378,7 +385,7 @@ abstract class PaginatedCardGridTabState<T extends Object, W extends BaseLibrary
         : () => _focusGridItem(index - columnCount);
     final navigateDown = index + columnCount < totalSize ? () => _focusGridItem(index + columnCount) : null;
     final wrap = PlatformDetector.isTV() && position.isGrid;
-    final navigateLeft = position.isFirstColumn && (!wrap || index == 0)
+    final navigateLeft = position.isFirstColumn && (widget.onNavigateLibraryMenu != null || !wrap || index == 0)
         ? _navigateToSidebar
         : () => _focusGridItem(index - 1);
     final navigateRight = (!position.isLastColumn || wrap) && index + 1 < totalSize
@@ -432,6 +439,10 @@ abstract class PaginatedCardGridTabState<T extends Object, W extends BaseLibrary
   }
 
   void _navigateToSidebar() {
+    if (widget.onNavigateLibraryMenu case final callback?) {
+      callback();
+      return;
+    }
     MainScreenFocusScope.focusSidebarOf(context);
   }
 

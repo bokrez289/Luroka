@@ -16,9 +16,17 @@ import '../../widgets/focusable_list_tile.dart';
 import '../../widgets/settings_page.dart';
 import '../../widgets/settings_section.dart';
 import '../../widgets/setting_tile.dart';
+import '../../widgets/mobile_settings_preview.dart';
+import '../../widgets/tv_settings_preview.dart';
+import '../../widgets/expanded_settings_preview.dart';
+import '../../widgets/live_home_preview.dart';
+import '../../utils/platform_detector.dart';
+import '../../widgets/settings_workspace_scope.dart';
 import '../../services/settings_service.dart';
+import '../../services/kids_profile_service.dart';
 import 'settings_utils.dart';
 import 'source_libraries_screen.dart';
+import 'studio_preferences_screen.dart';
 import '../../profiles/active_profile_provider.dart';
 
 /// Row actions use the same focusable menu on touch and D-pad. Reordering
@@ -91,6 +99,59 @@ class _HomeLayoutScreenState extends State<HomeLayoutScreen> {
     }
   }
 
+  Future<void> _editProgressLayout() async {
+    final provider = context.read<HomeLayoutProvider>();
+    final current = provider.layout.splitContinueWatching;
+    final selected = await showAdaptiveAppMenu<bool>(
+      context,
+      title: t.homeLayout.progressLayout,
+      position: Offset(MediaQuery.sizeOf(context).width / 2, MediaQuery.sizeOf(context).height / 3),
+      focusFirstItem: true,
+      entries: [
+        AppMenuItem(value: false, label: t.homeLayout.progressCombined, selected: !current),
+        AppMenuItem(value: true, label: t.homeLayout.progressSeparate, selected: current),
+      ],
+    );
+    if (mounted && selected != null && selected != current) {
+      await _save(() => provider.setSplitContinueWatching(selected));
+    }
+  }
+
+  String _spotlightSourceLabel(HomeSpotlightSource source) => switch (source) {
+    HomeSpotlightSource.forYou => t.homeLayout.spotlightForYou,
+    HomeSpotlightSource.trending => t.homeLayout.spotlightTrending,
+    HomeSpotlightSource.continueWatching => t.homeLayout.spotlightContinue,
+  };
+
+  String _spotlightSourceDescription(HomeSpotlightSource source) => switch (source) {
+    HomeSpotlightSource.forYou => t.homeLayout.spotlightForYouDescription,
+    HomeSpotlightSource.trending => t.homeLayout.spotlightTrendingDescription,
+    HomeSpotlightSource.continueWatching => t.homeLayout.spotlightContinueDescription,
+  };
+
+  Future<void> _editSpotlightSource() async {
+    final provider = context.read<HomeLayoutProvider>();
+    final current = provider.layout.spotlightSource;
+    final selected = await showAdaptiveAppMenu<HomeSpotlightSource>(
+      context,
+      title: t.homeLayout.spotlightSource,
+      position: Offset(MediaQuery.sizeOf(context).width / 2, MediaQuery.sizeOf(context).height / 3),
+      focusFirstItem: true,
+      entries: [
+        for (final source in HomeSpotlightSource.values)
+          AppMenuItem(
+            value: source,
+            label: _spotlightSourceLabel(source),
+            subtitle: _spotlightSourceDescription(source),
+            selected: source == current,
+          ),
+      ],
+    );
+    if (mounted && selected != null && selected != current) {
+      await _save(() => provider.setSpotlightSource(selected));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<HomeLayoutProvider>();
@@ -103,6 +164,8 @@ class _HomeLayoutScreenState extends State<HomeLayoutScreen> {
       pinnedTitle: t.homeLayout.pinnedCollections,
       studios: context.watch<StudiosProvider?>()?.groups.map((group) => group.homeItem).toList() ?? const [],
       studiosTitle: t.studios.title,
+      splitContinueWatching: provider.layout.splitContinueWatching,
+      nextUpTitle: t.discover.nextUp,
       includeEmpty: true,
     );
     final rows = provider.layout.arrange(available, includeHidden: true);
@@ -111,7 +174,31 @@ class _HomeLayoutScreenState extends State<HomeLayoutScreen> {
     final uniqueRows = rows.where((row) => seen.add(homeRowKey(row))).toList();
     return SettingsPage(
       title: Text(t.homeLayout.title),
+      previewHeader: SettingsWorkspaceScope.maybeOf(context) == null
+          ? PlatformDetector.isTV()
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: IconButton(
+                          tooltip: t.common.fullscreen,
+                          icon: const Icon(Icons.open_in_full_rounded),
+                          onPressed: () => showExpandedSettingsPreview(context, const LiveHomePreview()),
+                        ),
+                      ),
+                      const MiniHomePreview(),
+                    ],
+                  )
+                : const MobileSettingsPreviewFrame(categoryId: 'home')
+          : null,
       children: [
+        SettingNavigationTile(
+          icon: Symbols.movie_rounded,
+          title: t.homeLayout.manageStudios,
+          subtitle: t.homeLayout.manageStudiosDescription,
+          destinationBuilder: (_) => const StudioPreferencesScreen(),
+        ),
         SettingNavigationTile(
           icon: Symbols.video_library_rounded,
           title: t.sourceLibraries.title,
@@ -123,10 +210,67 @@ class _HomeLayoutScreenState extends State<HomeLayoutScreen> {
             }
           },
         ),
+        SettingNavigationTile(
+          key: const ValueKey('home-progress-layout'),
+          icon: Symbols.view_agenda_rounded,
+          title: t.homeLayout.progressLayout,
+          subtitle: provider.layout.splitContinueWatching
+              ? t.homeLayout.progressSeparate
+              : t.homeLayout.progressCombined,
+          onTap: _saving ? () {} : _editProgressLayout,
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+          child: Text(t.homeLayout.progressDescription, style: Theme.of(context).textTheme.bodySmall),
+        ),
+        if (!KidsProfileService.instance.isActiveKids)
+          SettingNavigationTile(
+            key: const ValueKey('home-spotlight-source'),
+            icon: Symbols.view_carousel_rounded,
+            title: t.homeLayout.spotlightSource,
+            subtitle: _spotlightSourceLabel(provider.layout.spotlightSource),
+            onTap: _saving ? () {} : _editSpotlightSource,
+          ),
+        if (!KidsProfileService.instance.isActiveKids)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+            child: Text(t.homeLayout.spotlightSourceDescription, style: Theme.of(context).textTheme.bodySmall),
+          ),
+        SettingStepperTile<int>(
+          pref: SettingsService.homePosterSize,
+          icon: Symbols.view_carousel_rounded,
+          title: 'Home poster size',
+          values: const [1, 2, 3, 4, 5],
+          label: (value) => switch (value) {
+            1 => 'Small',
+            2 => 'Medium',
+            3 => 'Comfortable (default)',
+            4 => 'Large',
+            _ => 'Extra large',
+          },
+        ),
         if (widget.includeSpotlight)
           SettingsGroup(
             title: t.lurokaWorkspace.spotlight,
             children: [
+              if (PlatformDetector.isTV())
+                SettingSelectionTile<HomeHeroSize>(
+                  pref: SettingsService.homeHeroSize,
+                  icon: Symbols.aspect_ratio_rounded,
+                  title: t.settings.homeHeroSize,
+                  subtitleBuilder: (value) => switch (value) {
+                    HomeHeroSize.compact => 'Compact',
+                    HomeHeroSize.small => t.settings.homeHeroSizeSmall,
+                    HomeHeroSize.medium => t.settings.homeHeroSizeMedium,
+                    HomeHeroSize.large => t.settings.homeHeroSizeLarge,
+                  },
+                  options: [
+                    const DialogOption(value: HomeHeroSize.compact, title: 'Compact'),
+                    DialogOption(value: HomeHeroSize.small, title: t.settings.homeHeroSizeSmall),
+                    DialogOption(value: HomeHeroSize.medium, title: t.settings.homeHeroSizeMedium),
+                    DialogOption(value: HomeHeroSize.large, title: t.settings.homeHeroSizeLarge),
+                  ],
+                ),
               SettingSwitchTile(
                 pref: SettingsService.showHeroSection,
                 icon: Symbols.view_carousel_rounded,

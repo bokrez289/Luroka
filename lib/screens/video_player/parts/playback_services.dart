@@ -855,7 +855,7 @@ extension _VideoPlayerPlaybackServiceMethods on VideoPlayerScreenState {
   /// Evaluated per checkpoint, so title switches split sessions naturally.
   ScreenTimeSessionKeySource get _screenTimeSessionKeySource {
     return () {
-      final metadata = widget.metadata;
+      final metadata = _currentMetadata;
       final kind = widget.isLive
           ? ScreenTimeMediaKind.liveTv
           : switch (metadata.kind) {

@@ -270,33 +270,33 @@ abstract class BaseSharedPreferencesService {
   /// [UnreadableSensitivePreferenceException], which the startup gate
   /// classifies as repairable so the user gets the same consented repair as an
   /// unparseable store.
-  T? _readTolerant<T>(String key, T? Function() read) => readPreferenceTolerantly(_cache, key, read);
+  T? _readTolerant<T>(String key, T? Function() read) => readPreferenceTolerantly(prefs, key, read);
 
   /// Nullable reads routed through [readPreferenceTolerantly]. Use these
   /// instead of `prefs.getX(..)` wherever a mistyped stored value must not
   /// throw — which is everywhere except a call site that deliberately probes
   /// two types to migrate between them.
-  String? readNullableString(String key) => readTolerantString(_cache, key);
-  bool? readNullableBool(String key) => _readTolerant(key, () => _cache.getBool(key));
-  int? readNullableInt(String key) => _readTolerant(key, () => _cache.getInt(key));
+  String? readNullableString(String key) => readTolerantString(prefs, key);
+  bool? readNullableBool(String key) => _readTolerant(key, () => prefs.getBool(key));
+  int? readNullableInt(String key) => _readTolerant(key, () => prefs.getInt(key));
 
   /// Typed read helpers — return the stored value or [defaultValue] when missing.
   bool readBool(String key, {bool defaultValue = false}) =>
-      _readTolerant(key, () => _cache.getBool(key)) ?? defaultValue;
-  int readInt(String key, {int defaultValue = 0}) => _readTolerant(key, () => _cache.getInt(key)) ?? defaultValue;
+      _readTolerant(key, () => prefs.getBool(key)) ?? defaultValue;
+  int readInt(String key, {int defaultValue = 0}) => _readTolerant(key, () => prefs.getInt(key)) ?? defaultValue;
   double readDouble(String key, {double defaultValue = 0.0}) =>
-      _readTolerant(key, () => _cache.getDouble(key)) ?? defaultValue;
+      _readTolerant(key, () => prefs.getDouble(key)) ?? defaultValue;
   String readString(String key, {String defaultValue = ''}) => readNullableString(key) ?? defaultValue;
   List<String> readStringList(String key, {List<String> defaultValue = const []}) =>
-      _readTolerant(key, () => _cache.getStringList(key)) ?? defaultValue;
+      _readTolerant(key, () => prefs.getStringList(key)) ?? defaultValue;
 
   /// Typed write helpers — symmetric with the read helpers above; use these
   /// instead of `prefs.setX(..)` so call sites stay terse.
-  Future<void> writeBool(String key, bool value) => _cache.setBool(key, value);
-  Future<void> writeInt(String key, int value) => _cache.setInt(key, value);
-  Future<void> writeDouble(String key, double value) => _cache.setDouble(key, value);
-  Future<void> writeString(String key, String value) => _cache.setString(key, value);
-  Future<void> writeStringList(String key, List<String> value) => _cache.setStringList(key, value);
+  Future<void> writeBool(String key, bool value) => prefs.setBool(key, value);
+  Future<void> writeInt(String key, int value) => prefs.setInt(key, value);
+  Future<void> writeDouble(String key, double value) => prefs.setDouble(key, value);
+  Future<void> writeString(String key, String value) => prefs.setString(key, value);
+  Future<void> writeStringList(String key, List<String> value) => prefs.setStringList(key, value);
 
   /// Decode a JSON string to a Map with error handling.
   ///
@@ -434,7 +434,7 @@ class BoolPref extends Pref<bool> {
   Future<void> removeFrom(BaseSharedPreferencesService svc, {void Function()? checkCurrent}) async {
     await super.removeFrom(svc, checkCurrent: checkCurrent);
     checkCurrent?.call();
-    onWrite?.call(resolvedDefault);
+    onWrite?.call(readFrom(svc));
   }
 
   @override
@@ -443,7 +443,7 @@ class BoolPref extends Pref<bool> {
   @override
   Future<void> writeTo(BaseSharedPreferencesService svc, bool value) async {
     await svc.writeBool(key, value);
-    onWrite?.call(value);
+    onWrite?.call(readFrom(svc));
   }
 }
 

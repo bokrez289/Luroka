@@ -35,6 +35,7 @@ import 'profiles/plex_home_service.dart';
 import 'screens/auth_screen.dart';
 import 'screens/profile/pin_entry_dialog.dart';
 import 'screens/profile/profile_switch_screen.dart';
+import 'screens/settings/pairing_link_host.dart';
 import 'services/storage_service.dart';
 import 'services/app_license_registry.dart';
 import 'services/assistive_technology_service.dart';
@@ -47,6 +48,7 @@ import 'services/settings_service.dart';
 import 'services/agent_control_service.dart';
 import 'widgets/agent_control_scope.dart';
 import 'widgets/settings_builder.dart';
+import 'widgets/profile_settings_binding.dart';
 import 'utils/platform_detector.dart';
 import 'utils/pointer_scroll_axis.dart';
 import 'services/apple_tv_remote_touch_service.dart';
@@ -1061,7 +1063,11 @@ void _startNonessentialInitialization(SettingsService settings) {
 
   bestEffort('Fullscreen monitor', () async {
     FullscreenStateManager().startMonitoring();
-    if (PlatformDetector.isDesktopOS() && settings.read(SettingsService.startInFullscreen)) {
+    final profileId = (await StorageService.getInstance()).getActiveProfileId();
+    final startFullscreen = profileId == null
+        ? settings.read(SettingsService.startInFullscreen)
+        : settings.readForProfile(profileId, SettingsService.startInFullscreen);
+    if (PlatformDetector.isDesktopOS() && startFullscreen) {
       await FullscreenStateManager().enterFullscreen();
     }
   });
@@ -1631,8 +1637,10 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
       return;
     }
     final run = _autoDeleteRun = Completer<void>();
+    final profileGeneration = downloadProvider.profileGeneration;
     try {
       await downloadProvider.refreshMetadataFromCache();
+      if (downloadProvider.profileGeneration != profileGeneration) return;
       final activeGlobalKey = VideoPlayerScreenState.activeGlobalKey;
       final settings = SettingsService.instanceOrNull;
       if (settings != null && settings.read(SettingsService.autoRemoveWatchedDownloads)) {
@@ -1915,7 +1923,14 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
           },
         ),
       ],
-      child: _AppShell(databaseRecoveryOutcome: widget.databaseRecoveryOutcome),
+      child: ProfileSettingsBinding(
+        settings: widget.settings,
+        updateServerLanguage: _serverManager.updatePlexLanguage,
+        child: SettingValueBuilder<bool>(
+          pref: SettingsService.forceTvMode,
+          builder: (_, _, _) => _AppShell(databaseRecoveryOutcome: widget.databaseRecoveryOutcome),
+        ),
+      ),
     );
   }
 }
@@ -1981,7 +1996,7 @@ class _AppShell extends StatelessWidget {
                       const SingleActivator(LogicalKeyboardKey.gameButtonB): const DismissIntent(),
                     },
                     builder: (context, child) {
-                      final shell = rootShell(child);
+                      final shell = PairingLinkHost(navigatorKey: rootNavigatorKey, child: rootShell(child));
                       if (!agentControlEnabled) return shell;
                       return AgentControlScope(
                         commandContext: () => rootNavigatorKey.currentState?.overlay?.context,
@@ -2222,6 +2237,18 @@ class _SetupScreenState extends State<SetupScreen> with MountedSetStateMixin {
         // selected active profile are visible before setup decides binding is
         // already settled and navigates to MainScreen.
         await activeProfiles.reloadFromStorage();
+        final existingProfileIds = <String>{
+          for (final profile in activeProfiles.profiles) profile.id,
+          ?activeProfiles.activeId,
+          for (final entry in activeProfiles.plexHomeByConnectionId.entries)
+            if (activeProfiles.connectionsById[entry.key] is PlexAccountConnection)
+              for (final user in entry.value)
+                if (user.uuid.isNotEmpty) plexHomeProfileId(accountConnectionId: entry.key, homeUserUuid: user.uuid),
+        };
+        await (await SettingsService.getInstance()).prepareProfileSettings(existingProfileIds);
+        // Migration is local and idempotent; do not hold startup on preference
+        // writes. Per-profile serialization protects concurrent edits/deletion.
+        unawaited(storage.migrateKnownHomeSpotlights(existingProfileIds));
       } catch (e, st) {
         appLogger.w('Boot-time migration failed', error: e, stackTrace: st);
       }

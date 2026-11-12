@@ -17,6 +17,7 @@ import 'package:luroka/media/media_library.dart';
 import 'package:luroka/media/media_server_client.dart';
 import 'package:luroka/media/server_capabilities.dart';
 import 'package:luroka/providers/libraries_provider.dart';
+import 'package:luroka/providers/home_favorites_snapshot.dart';
 import 'package:luroka/providers/multi_server_provider.dart';
 import 'package:luroka/screens/favorites_screen.dart';
 import 'package:luroka/screens/media_detail_screen.dart';
@@ -179,6 +180,7 @@ Future<void> _pumpFavorites(
   CatalogSourcesProvider? catalogSources,
   bool settle = true,
   NavigatorObserver? observer,
+  HomeFavoritesSnapshot? homeSnapshot,
 }) async {
   await SettingsService.getInstance();
   await StorageService.getInstance();
@@ -200,6 +202,7 @@ Future<void> _pumpFavorites(
         providers: [
           ChangeNotifierProvider<LibrariesProvider>.value(value: librariesProvider),
           ChangeNotifierProvider<MultiServerProvider>.value(value: multiServer),
+          if (homeSnapshot != null) ChangeNotifierProvider<HomeFavoritesSnapshot>.value(value: homeSnapshot),
           if (catalogSources != null) ChangeNotifierProvider<CatalogSourcesProvider>.value(value: catalogSources),
         ],
         child: MaterialApp(
@@ -234,6 +237,19 @@ void main() {
     expect(provider.hasUserFavorites, isTrue);
     provider.dispose();
     manager.dispose();
+  });
+
+  testWidgets('Favorites hands already loaded items to the profile Spotlight without extra requests', (tester) async {
+    final snapshot = HomeFavoritesSnapshot();
+    addTearDown(snapshot.dispose);
+    final client = _FavoritesClient({
+      'movies': [_favorite('a', 'Saved movie', 'movies')],
+    });
+    await _pumpFavorites(tester, client: client, libraries: [_library('movies', 'Movies')], homeSnapshot: snapshot);
+    expect(snapshot.items.map((item) => item.id), ['a']);
+    expect(client.calls, hasLength(1));
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets('Favorites combines Jellyfin favorites and every Plex Watchlist page', (tester) async {
@@ -338,6 +354,26 @@ void main() {
         .map((card) => (card.item as MediaItem).displayTitle)
         .toList();
     expect(titles, ['Alpha Movie', 'Beta Movie', 'Charlie Show']);
+  });
+
+  testWidgets('anime recognizes any grouped library copy without additional server calls', (tester) async {
+    final a = _favorite('a', 'Shared movie', 'mixed').copyWith(kind: MediaKind.movie, year: 2026);
+    final b = _favorite('b', 'Shared movie', 'anime').copyWith(kind: MediaKind.movie, year: 2026);
+    final client = _FavoritesClient({
+      'mixed': [a],
+      'anime': [b],
+    });
+    await _pumpFavorites(
+      tester,
+      client: client,
+      libraries: [_library('mixed', 'Movies'), _library('anime', 'Anime Movies')],
+    );
+    final before = client.calls.length;
+    await tester.tap(find.text(t.animeFavorites.filter));
+    await tester.pumpAndSettle();
+    expect(find.byType(FocusableMediaCard), findsOneWidget);
+    expect(client.calls, hasLength(before));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('reloads when the library set changes', (tester) async {

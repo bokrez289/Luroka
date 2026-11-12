@@ -17,11 +17,7 @@ class ScreenTimeStreaks {
 
 /// Personal bests over the queried window (all-time when the window spans it).
 class ScreenTimeRecords {
-  const ScreenTimeRecords({
-    required this.longestDay,
-    required this.longestWeek,
-    required this.busiestWeekday,
-  });
+  const ScreenTimeRecords({required this.longestDay, required this.longestWeek, required this.busiestWeekday});
   final ScreenTimeDailyPoint longestDay;
   final ({String startLocalDate, int durationMs}) longestWeek;
   final ({int weekday, int durationMs}) busiestWeekday;
@@ -125,11 +121,7 @@ class ScreenTimeAnalytics {
   /// ends on a still-empty day (nothing watched yet today), the streak may
   /// end on the previous day instead — watching daily and opening the screen
   /// mid-morning must not report a broken streak.
-  static Future<ScreenTimeStreaks> streaks(
-    AppDatabase db,
-    String profileId,
-    ScreenTimeDateRange range_,
-  ) async {
+  static Future<ScreenTimeStreaks> streaks(AppDatabase db, String profileId, ScreenTimeDateRange range_) async {
     final series = await dailySeries(db, profileId, range_);
     var longest = 0;
     var running = 0;
@@ -156,11 +148,7 @@ class ScreenTimeAnalytics {
 
   /// Personal bests: longest single day, highest rolling seven-day span, and
   /// the weekday (1 = Monday … 7 = Sunday) with the greatest watch time.
-  static Future<ScreenTimeRecords> records(
-    AppDatabase db,
-    String profileId,
-    ScreenTimeDateRange range_,
-  ) async {
+  static Future<ScreenTimeRecords> records(AppDatabase db, String profileId, ScreenTimeDateRange range_) async {
     final series = await dailySeries(db, profileId, range_);
     if (series.isEmpty) {
       return ScreenTimeRecords(
@@ -203,11 +191,7 @@ class ScreenTimeAnalytics {
 
   /// Watch time by weekday, index 0 = Monday … 6 = Sunday, summed over the
   /// daily aggregates for the window.
-  static Future<List<int>> weekdayBreakdown(
-    AppDatabase db,
-    String profileId,
-    ScreenTimeDateRange range_,
-  ) async {
+  static Future<List<int>> weekdayBreakdown(AppDatabase db, String profileId, ScreenTimeDateRange range_) async {
     final series = await dailySeries(db, profileId, range_);
     final week = List<int>.filled(7, 0);
     for (final point in series) {
@@ -280,9 +264,7 @@ class ScreenTimeAnalytics {
         if (segmentMs <= 0) break;
       }
     }
-    return [
-      for (var i = 0; i < binCount; i++) (startMinuteOfDay: i * binMinutes, durationMs: bins[i]),
-    ];
+    return [for (var i = 0; i < binCount; i++) (startMinuteOfDay: i * binMinutes, durationMs: bins[i])];
   }
 
   /// Most-watched titles in the window. Episodes aggregate into their series
@@ -355,4 +337,20 @@ class ScreenTimeAnalytics {
       offset: page < 0 ? 0 : page * pageSize,
     );
   }
+
+  /// Recent identifiable titles with paused/resumed intervals combined over
+  /// the selected period. Pagination applies after grouping, not to raw rows.
+  static Future<List<ScreenTimeSessionRow>> viewingTotals(
+    AppDatabase db,
+    String profileId,
+    ScreenTimeDateRange range_, {
+    int limit = 50,
+    int offset = 0,
+  }) => db.getScreenTimeViewingTotals(
+    profileId: profileId,
+    startLocalDate: range_.startLocalDate,
+    endLocalDate: range_.endLocalDate,
+    limit: limit,
+    offset: offset,
+  );
 }

@@ -10,6 +10,7 @@ import 'package:luroka/focus/input_mode_tracker.dart';
 import 'package:luroka/focus/locked_hub_controller.dart';
 import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/media/home_layout.dart';
+import 'package:luroka/media/home_taste.dart';
 import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_hub.dart';
 import 'package:luroka/media/media_item.dart';
@@ -20,6 +21,7 @@ import 'package:luroka/theme/mono_theme.dart';
 import 'package:luroka/utils/platform_detector.dart';
 import 'package:luroka/widgets/home_dashboard.dart';
 import 'package:luroka/widgets/mobile_home_carousel.dart';
+import 'package:luroka/widgets/optimized_media_image.dart';
 import 'package:luroka/widgets/cycling_media_backdrop.dart';
 import 'package:luroka/widgets/hub_section.dart';
 import 'package:luroka/widgets/media_card.dart';
@@ -84,6 +86,9 @@ void main() {
     bool showFeature = true,
     List<MediaHub>? rows,
     List<MediaItem> trendingItems = const [],
+    List<MediaItem>? onDeck,
+    HomeSpotlightSource spotlightSource = HomeSpotlightSource.trending,
+    List<HomeViewingSignal> viewingSignals = const [],
     bool featureLoading = false,
     ValueChanged<MediaItem>? onPlay,
     ValueChanged<MediaItem>? onDetails,
@@ -126,8 +131,10 @@ void main() {
                               items: [episode],
                             ),
                           ],
-                      onDeck: [episode],
+                      onDeck: onDeck ?? [episode],
                       trendingItems: trendingItems,
+                      spotlightSource: spotlightSource,
+                      viewingSignals: viewingSignals,
                       featureLoading: featureLoading,
                       toolbar: const Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -160,6 +167,33 @@ void main() {
 
   String text(WidgetTester tester, String key) =>
       tester.widget<Text>(find.byKey(ValueKey(key), skipOffstage: false)).data!;
+
+  testWidgets('Google TV poster size changes at every step even with the shelf height cap', (tester) async {
+    await mount(
+      tester,
+      size: const Size(960, 540),
+      tv: true,
+      showFeature: false,
+      rows: [shelf('recent', List.generate(12, (i) => movie('$i', 'Movie $i')))],
+    );
+    expect(SettingsService.instance.read(SettingsService.homePosterSize), 3);
+    var previous = 0.0;
+    for (var density = 1; density <= 5; density++) {
+      await SettingsService.instance.write(SettingsService.homePosterSize, density);
+      await tester.pumpAndSettle();
+      final card = tester.widget<MediaCard>(find.byType(MediaCard).first);
+      expect(card.width, greaterThan(previous), reason: 'density $density should visibly enlarge posters');
+      previous = card.width!;
+      expect(tester.takeException(), isNull);
+    }
+    await SettingsService.instance.write(SettingsService.libraryDensity, 1);
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<MediaCard>(find.byType(MediaCard).first).width,
+      previous,
+      reason: 'Home poster size is independent of the library grid',
+    );
+  });
 
   testWidgets('pending trends do not flash a recently added title as the featured recommendation', (tester) async {
     await mount(
@@ -228,9 +262,7 @@ void main() {
     expect(find.byKey(const ValueKey('home_browse_description')), findsNothing);
   });
 
-  testWidgets('Plex recently added episodes use show posters while Continue Watching uses episode stills', (
-    tester,
-  ) async {
+  testWidgets('Plex recently added and Continue Watching use show posters by default', (tester) async {
     final plexEpisode = episode.copyWith(thumbPath: '/episode-still', grandparentThumbPath: '/show-poster');
     await mount(
       tester,
@@ -249,7 +281,22 @@ void main() {
     final continuing = tester
         .widgetList<HubSection>(find.byType(HubSection))
         .firstWhere((row) => row.hub.id == homeContinueWatchingId);
-    expect(plexEpisode.posterThumb(mode: continuing.episodePosterModeOverride!), '/episode-still');
+    expect(plexEpisode.posterThumb(mode: continuing.episodePosterModeOverride!), '/show-poster');
+  });
+
+  testWidgets('Continue Watching can opt into episode thumbnails', (tester) async {
+    await SettingsService.instance.write(SettingsService.homeEpisodeThumbnails, true);
+    final item = episode.copyWith(thumbPath: '/episode-still', grandparentThumbPath: '/show-poster');
+    await mount(
+      tester,
+      rows: [
+        MediaHub(id: homeContinueWatchingId, title: 'Continue Watching', type: 'episode', items: [item]),
+      ],
+    );
+    final row = tester
+        .widgetList<HubSection>(find.byType(HubSection))
+        .firstWhere((row) => row.hub.id == homeContinueWatchingId);
+    expect(item.posterThumb(mode: row.episodePosterModeOverride!), '/episode-still');
   });
 
   for (final size in [const Size(960, 540), const Size(1280, 720), const Size(1920, 1080), const Size(3840, 2160)]) {
@@ -452,6 +499,103 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     expect(selected?.globalKey, episode.globalKey);
     expect(selected?.viewOffsetMs, episode.viewOffsetMs);
+  });
+
+  for (final tv in [false, true]) {
+    testWidgets('${tv ? 'TV' : 'phone'} personal Spotlight resumes the actual episode', (tester) async {
+      final resume = episode.copyWith(serverId: 'server', grandparentId: 'series');
+      MediaItem? selected;
+      final key = await mount(
+        tester,
+        tv: tv,
+        size: tv ? const Size(1280, 720) : const Size(390, 844),
+        rows: [
+          MediaHub(id: homeContinueWatchingId, title: t.discover.continueWatching, type: 'episode', items: [resume]),
+        ],
+        onDeck: [resume],
+        spotlightSource: HomeSpotlightSource.forYou,
+        onResume: (item) => selected = item,
+      );
+      if (tv) {
+        expect(text(tester, 'home_preview_title'), resume.grandparentTitle);
+        expect(find.text(t.discover.continueWatching), findsWidgets);
+        key.currentState!.requestContentFocus();
+        await tester.pumpAndSettle();
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      } else {
+        expect(find.text(t.discover.continueWatching), findsWidgets);
+        await tester.tap(find.byKey(ValueKey('mobile_feature_open_${resume.globalKey}')));
+      }
+      await tester.pumpAndSettle();
+      expect(selected?.globalKey, resume.globalKey);
+      expect(selected?.viewOffsetMs, resume.viewOffsetMs);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final tv in [false, true]) {
+    testWidgets('${tv ? 'TV' : 'phone'} Spotlight explains and plays a local taste match', (tester) async {
+      final watched1 = movie('watched1', 'Watched One').copyWith(serverId: 'server', viewCount: 1, genres: ['Mystery']);
+      final watched2 = movie('watched2', 'Watched Two').copyWith(serverId: 'server', viewCount: 1, genres: ['Mystery']);
+      final other = movie('other', 'Other').copyWith(serverId: 'server', viewCount: 0, genres: ['Comedy']);
+      final match = movie('match', 'Mystery Match').copyWith(serverId: 'server', viewCount: 0, genres: ['Mystery']);
+      MediaItem? played;
+      final key = await mount(
+        tester,
+        tv: tv,
+        size: tv ? const Size(1280, 720) : const Size(390, 844),
+        rows: [
+          shelf('watch-history-visible', [watched1, watched2]),
+          shelf('library.movies.recent', [other, match]),
+        ],
+        onDeck: const [],
+        spotlightSource: HomeSpotlightSource.forYou,
+        viewingSignals: const [
+          (serverId: 'server', itemId: 'watched1', durationMs: 360000, episode: false),
+          (serverId: 'server', itemId: 'watched2', durationMs: 360000, episode: false),
+        ],
+        onPlay: (item) => played = item,
+      );
+      expect(find.text(t.homeLayout.spotlightInspired), findsWidgets);
+      if (tv) {
+        expect(text(tester, 'home_preview_title'), 'Mystery Match');
+        key.currentState!.requestContentFocus();
+        await tester.pumpAndSettle();
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      } else {
+        await tester.tap(find.byKey(ValueKey('mobile_feature_open_${match.globalKey}')));
+      }
+      expect(played?.globalKey, match.globalKey);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('personal phone Spotlight does not expose a protected episode title or art', (tester) async {
+    await SettingsService.instance.write(SettingsService.hideSpoilers, true);
+    final protected = episode.copyWith(
+      serverId: 'server',
+      grandparentId: 'series',
+      grandparentTitle: null,
+      thumbPath: 'secret-episode-poster',
+      grandparentThumbPath: null,
+    );
+    await mount(
+      tester,
+      tv: false,
+      size: const Size(390, 844),
+      rows: [
+        MediaHub(id: homeContinueWatchingId, title: t.discover.continueWatching, type: 'episode', items: [protected]),
+      ],
+      onDeck: [protected],
+      spotlightSource: HomeSpotlightSource.forYou,
+    );
+    final hero = find.byType(MobileHomeCarousel);
+    expect(find.descendant(of: hero, matching: find.text(t.dashboard.episodeFallback)), findsOneWidget);
+    final images = tester.widgetList<OptimizedMediaImage>(
+      find.descendant(of: hero, matching: find.byType(OptimizedMediaImage)),
+    );
+    expect(images.any((image) => image.imagePath == 'secret-episode-poster'), isFalse);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('spoiler preference masks episode title, synopsis and episode artwork', (tester) async {
@@ -661,6 +805,62 @@ void main() {
     await tester.pumpAndSettle();
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     expect(played?.globalKey, b.globalKey);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('late Favorites data does not replace the focused personal Spotlight', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    await SettingsService.instance.write(SettingsService.homeSpotlightAutoRotate, false);
+    final first = a.copyWith(serverId: 'server', viewCount: 0);
+    final second = b.copyWith(serverId: 'server', viewCount: 0);
+    final rows = [
+      shelf('library.movies.recent', [first, second]),
+    ];
+    final favorites = ValueNotifier<List<MediaItem>>(const []);
+    addTearDown(favorites.dispose);
+    final key = GlobalKey<HomeDashboardState>();
+    tester.view.physicalSize = const Size(1280, 720);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      InputModeTracker(
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.dark),
+          home: Scaffold(
+            body: ValueListenableBuilder<List<MediaItem>>(
+              valueListenable: favorites,
+              builder: (context, saved, _) => HomeDashboard(
+                key: key,
+                rows: rows,
+                onDeck: const [],
+                favoriteSnapshot: saved,
+                spotlightSource: HomeSpotlightSource.forYou,
+                toolbar: const SizedBox.shrink(),
+                focusMemory: HubFocusMemory(),
+                resolveClient: (_) => null,
+                onPlay: (_) {},
+                onDetails: (_) {},
+                onResume: (_) {},
+                onSidebar: () {},
+                onToolbar: () {},
+                onRefresh: (_) {},
+                onRemoveFromContinueWatching: () {},
+                loadMoreItems: (_) => null,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    key.currentState!.requestContentFocus();
+    await tester.pumpAndSettle();
+    expect(text(tester, 'home_preview_title'), first.title);
+    final focus = FocusManager.instance.primaryFocus;
+    favorites.value = [second];
+    await tester.pumpAndSettle();
+    expect(text(tester, 'home_preview_title'), first.title);
+    expect(FocusManager.instance.primaryFocus, same(focus));
     expect(tester.takeException(), isNull);
   });
 

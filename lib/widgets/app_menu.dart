@@ -12,6 +12,7 @@ import '../focus/input_mode_tracker.dart';
 import '../focus/key_event_utils.dart';
 import '../theme/mono_tokens.dart';
 import '../utils/focus_utils.dart';
+import '../utils/platform_detector.dart';
 import 'app_icon.dart';
 import 'clickable_cursor.dart';
 import 'overlay_sheet.dart';
@@ -68,7 +69,10 @@ class AppMenuHeader<T> extends AppMenuEntry<T> {
   final String? label;
   final Widget? child;
 
-  const AppMenuHeader({this.label, this.child})
+  /// Space reserved by an anchored popup for a custom header.
+  final double estimatedHeight;
+
+  const AppMenuHeader({this.label, this.child, this.estimatedHeight = 32})
     : assert(label != null || child != null, 'AppMenuHeader requires either label or child');
 }
 
@@ -269,7 +273,7 @@ Future<T?> showAdaptiveAppMenu<T>(
   // ThemeData.platform follows the real target platform by default, including
   // Android TV and tvOS, while remaining overrideable in widget tests.
   final platform = Theme.of(context).platform;
-  if (platform == TargetPlatform.iOS || platform == TargetPlatform.android) {
+  if (!PlatformDetector.isTV() && (platform == TargetPlatform.iOS || platform == TargetPlatform.android)) {
     return OverlaySheetController.showAdaptive<T>(
       context,
       showDragHandle: true,
@@ -638,7 +642,7 @@ class _AppMenuItemTileState<T> extends State<AppMenuItemTile<T>> with FocusableT
                                 style: textTheme.labelSmall?.copyWith(
                                   color: enabled ? subtitleColor : colorScheme.onSurface.withValues(alpha: 0.38),
                                 ),
-                                maxLines: 1,
+                                maxLines: PlatformDetector.isTV() ? 3 : 1,
                                 overflow: TextOverflow.ellipsis,
                                 child: subtitle,
                               ),
@@ -874,7 +878,7 @@ double _estimateMenuHeight<T>(List<AppMenuEntry<T>> entries) {
       case AppMenuDivider<T>():
         height += 9;
       case AppMenuHeader<T>():
-        height += 32;
+        height += entry.estimatedHeight;
       default:
         break;
     }

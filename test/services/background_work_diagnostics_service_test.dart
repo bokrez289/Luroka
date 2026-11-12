@@ -231,7 +231,7 @@ void main() {
   group('BackgroundWorkDiagnosticsService', () {
     late List<MethodCall> calls;
     late Map<String, Object?> signals;
-    const channel = MethodChannel('com.luroka/device.test');
+    const channel = MethodChannel('com.plezy/device.test');
 
     BackgroundWorkDiagnosticsService buildService({
       DownloadStallDetector? stallDetector,

@@ -30,6 +30,8 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>luroka</string>
+				<string>lumora</string>
+				<string>plezy</string>
 			</array>
 		</dict>
 	</array>

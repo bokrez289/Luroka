@@ -94,6 +94,18 @@ class StudiosProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
   int _retryAttempts = 0;
   Object? _lastTargetSignature;
   final _completedTargets = <(String, MediaServerClient, MediaKind)>{};
+  final _facetOffsets = <(String, MediaServerClient, MediaKind), int>{};
+  final _facetSeen = <(String, MediaServerClient, MediaKind), Set<String>>{};
+  bool get hasMore => _facetOffsets.isNotEmpty;
+
+  /// Continue discovery only when requested by the directory, rather than
+  /// walking tens of thousands of studio names behind Home/detail requests.
+  void loadMore() {
+    if (loading || !hasMore || isDisposed) return;
+    _signature = null;
+    unawaited(_load());
+  }
+
   bool _warming = false;
   List<StudioGroup> _groups = [];
   List<StudioGroup> get groups => _groups;
@@ -296,7 +308,11 @@ class StudiosProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
             kind: source.kind,
             offset: offset,
             limit: 40,
-            sort: sort.forBackend(source.library.backend),
+            sort:
+                (sort == StudioSort.recentlyAdded && source.kind == MediaKind.show
+                        ? StudioSort.recentlyAddedEpisode
+                        : sort)
+                    .forBackend(source.library.backend),
             filters: [
               LibraryFilter(field: 'studio', values: [source.studio.id]),
             ],
@@ -340,6 +356,8 @@ class StudiosProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
     _signature = null;
     _lastTargetSignature = null;
     _completedTargets.clear();
+    _facetOffsets.clear();
+    _facetSeen.clear();
     invalidatePages();
     loading = false;
     failed = false;
@@ -403,6 +421,8 @@ class StudiosProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
     if (!retryingSameTargets) {
       _retryAttempts = 0;
       _completedTargets.clear();
+      _facetOffsets.clear();
+      _facetSeen.clear();
     }
     _lastTargetSignature = signature;
     _retryTimer?.cancel();
@@ -450,9 +470,11 @@ class StudiosProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
         final targetKey = (library.globalKey, client, kind);
         if (_completedTargets.contains(targetKey)) continue;
         try {
-          var offset = 0;
-          final seen = <String>{};
-          for (var pageIndex = 0; pageIndex < 50; pageIndex++) {
+          var offset = _facetOffsets[targetKey] ?? 0;
+          final seen = _facetSeen.putIfAbsent(targetKey, () => <String>{});
+          // One page per library per interaction. Keep each cursor so the next
+          // batch resumes fairly across libraries instead of monopolizing one.
+          do {
             abort.throwIfAborted();
             final requestAbort = activeRequest = AbortController();
             final page = await (client as StudioBrowserClient)
@@ -487,11 +509,22 @@ class StudiosProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
               }
             }
             if (matched) publishGroups();
-            if (page.items.isEmpty || added == 0) break;
+            if (page.items.isNotEmpty && added == 0) {
+              throw StateError('Studio discovery returned a repeated page');
+            }
+            if (page.items.isEmpty) {
+              _completedTargets.add(targetKey);
+              _facetOffsets.remove(targetKey);
+              break;
+            }
             offset += page.items.length;
-            if (offset >= page.totalCount) break;
-          }
-          _completedTargets.add(targetKey);
+            if (offset >= page.totalCount) {
+              _completedTargets.add(targetKey);
+              _facetOffsets.remove(targetKey);
+              break;
+            }
+            _facetOffsets[targetKey] = offset;
+          } while (false);
         } catch (error) {
           if (abort.isAborted) return;
           errors++;
@@ -507,7 +540,7 @@ class StudiosProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
     if (failed) {
       // A transient cold-start failure must not permanently memoize an empty
       // facet set. Retry a bounded number of times and permit later re-entry.
-      if (_retryAttempts < 2) {
+      if (_retryAttempts < 2 && _facetOffsets.isEmpty) {
         final delay = Duration(seconds: ++_retryAttempts * 2);
         _retryTimer = Timer(delay, () {
           _signature = null;
@@ -611,7 +644,11 @@ class StudioItemsCursor {
                       kind: source.kind,
                       offset: offset,
                       limit: 40,
-                      sort: sort.forBackend(source.library.backend),
+                      sort:
+                          (sort == StudioSort.recentlyAdded && source.kind == MediaKind.show
+                                  ? StudioSort.recentlyAddedEpisode
+                                  : sort)
+                              .forBackend(source.library.backend),
                       filters: [
                         LibraryFilter(field: 'studio', values: [source.studio.id]),
                       ],
@@ -675,7 +712,7 @@ class StudioItemsCursor {
           if (isVisible(sources[index]) && (_buffers[index]?.isNotEmpty ?? false)) index,
       ];
       if (heads.isEmpty) break;
-      if (sort == StudioSort.recentlyAddedEpisode && heads.length > 1) {
+      if ((sort == StudioSort.recentlyAddedEpisode || sort == StudioSort.recentlyAdded) && heads.length > 1) {
         // Server order is sufficient for a single source. Across sources the
         // show row may omit its latest episode date; resolve only merge heads,
         // with bounded concurrency, and reuse each lookup for later batches.
@@ -684,7 +721,7 @@ class StudioItemsCursor {
           while (nextHead < heads.length) {
             final index = heads[nextHead++];
             final item = _buffers[index]!.first;
-            if (studioEpisodeAddedAt(item) != null) continue;
+            if (item.kind != MediaKind.show || studioEpisodeAddedAt(item) != null) continue;
             final client = sources[index].client;
             if (client is! LatestEpisodeAddedClient) continue;
             final key = (client, item.id);

@@ -40,6 +40,7 @@ class LibraryRecommendedTab extends BaseLibraryTab<MediaHub> {
     super.isActive,
     super.suppressAutoFocus,
     super.onBack,
+    super.onNavigateLibraryMenu,
     this.onNavigateToChrome,
   });
 
@@ -276,6 +277,10 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
   }
 
   void _navigateToSidebar() {
+    if (widget.onNavigateLibraryMenu case final callback?) {
+      callback();
+      return;
+    }
     MainScreenFocusScope.focusSidebarOf(context);
   }
 

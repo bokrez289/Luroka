@@ -21,8 +21,8 @@ import 'settings_surface.dart';
 import 'settings_workspace_scope.dart';
 import 'setting_tile.dart';
 import 'system_clock.dart';
-import 'appearance_workspace.dart';
 import 'tv_settings_preview.dart';
+import 'appearance_workspace.dart';
 import 'mobile_settings_preview.dart';
 import 'account_recovery_menu.dart';
 
@@ -87,12 +87,19 @@ class TvSettingsHubState extends State<TvSettingsHub> {
   final _everyday = FocusNode(debugLabel: 'settings_everyday');
   final _advancedFocus = FocusNode(debugLabel: 'settings_advanced');
   final _searchFocus = FocusNode(debugLabel: 'settings_search');
+  final _previewFocus = FocusNode(debugLabel: 'settings_preview');
   final _help = ValueNotifier<SettingsHelp?>(null);
   late bool _advanced;
   bool _writingMode = false;
   String? _selected;
   FocusNode _node(String id) => _nodes.putIfAbsent(id, () => FocusNode(debugLabel: 'SettingsCategory:$id'));
-  FocusScopeNode _scope(String id) => _scopes.putIfAbsent(id, () => FocusScopeNode(debugLabel: 'SettingsContent:$id'));
+  FocusScopeNode _scope(String id) => _scopes.putIfAbsent(
+    id,
+    () => FocusScopeNode(
+      debugLabel: 'SettingsContent:$id',
+      directionalTraversalEdgeBehavior: TraversalEdgeBehavior.parentScope,
+    ),
+  );
   List<TvSettingsCategory> get _visible => widget.categories.where((c) => !c.advanced || _advanced).toList();
   TvSettingsCategory? get _category => _visible.where((c) => c.id == _selected).firstOrNull ?? _visible.firstOrNull;
 
@@ -102,9 +109,8 @@ class TvSettingsHubState extends State<TvSettingsHub> {
     _advanced = SettingsService.instanceOrNull?.read(_modePreference) ?? false;
   }
 
-  BoolPref get _modePreference => PlatformDetector.isTV()
-      ? SettingsService.tvSettingsAdvancedMode
-      : SettingsService.mobileSettingsAdvancedMode;
+  BoolPref get _modePreference =>
+      PlatformDetector.isTV() ? SettingsService.tvSettingsAdvancedMode : SettingsService.mobileSettingsAdvancedMode;
 
   void requestFocus() {
     final category = _category;
@@ -131,6 +137,9 @@ class TvSettingsHubState extends State<TvSettingsHub> {
         if (nodes.isNotEmpty) nodes.first.requestFocus();
       }
     });
+    // Returning from the preview does not rebuild the category. Ensure the
+    // deferred focus request runs even when there is no animation or new frame.
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
 
   void _select(TvSettingsCategory category, {bool enter = false}) {
@@ -150,6 +159,9 @@ class TvSettingsHubState extends State<TvSettingsHub> {
       if (!mounted) return;
       setState(() {
         _advanced = advanced;
+        // Registrations from the previous mode may describe controls that are
+        // now hidden. Re-register the mounted pages for the current mode.
+        _registered.clear();
         if (!_visible.any((c) => c.id == _selected)) _selected = _visible.firstOrNull?.id;
       });
       if (!advanced) {
@@ -217,8 +229,10 @@ class TvSettingsHubState extends State<TvSettingsHub> {
         keywords: '${c.keywords} ${c.description ?? ''}',
       );
     }
-    for (final entry in [...widget.searchEntries, ..._registered.values]) {
-      all['${entry.categoryId}:${entry.settingId ?? entry.title}:${entry.title}'] = entry;
+    // Explicit entries provide synonyms and advanced-mode metadata even after
+    // the page has been visited and registered its ordinary visible rows.
+    for (final entry in [..._registered.values, ...widget.searchEntries]) {
+      all['${entry.categoryId}:${entry.settingId ?? entry.title}'] = entry;
     }
     final picked = await showDialog<TvSettingsSearchEntry>(
       context: context,
@@ -255,6 +269,7 @@ class TvSettingsHubState extends State<TvSettingsHub> {
     _everyday.dispose();
     _advancedFocus.dispose();
     _searchFocus.dispose();
+    _previewFocus.dispose();
     _help.dispose();
     super.dispose();
   }
@@ -298,16 +313,21 @@ class TvSettingsHubState extends State<TvSettingsHub> {
                         children: [
                           const LurokaMark(size: 30),
                           const SizedBox(width: 10),
-                          if (!narrowHeader) Text(
-                            AppIdentity.name.toUpperCase(),
-                            style: theme.textTheme.titleLarge?.copyWith(letterSpacing: 2, fontWeight: FontWeight.w700),
-                          ),
-                          if (!narrowHeader) Container(
-                            height: 28,
-                            width: 1,
-                            margin: const EdgeInsets.symmetric(horizontal: 22),
-                            color: colors.outlineVariant,
-                          ),
+                          if (!narrowHeader)
+                            Text(
+                              AppIdentity.name.toUpperCase(),
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                letterSpacing: 2,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          if (!narrowHeader)
+                            Container(
+                              height: 28,
+                              width: 1,
+                              margin: const EdgeInsets.symmetric(horizontal: 22),
+                              color: colors.outlineVariant,
+                            ),
                           if (!narrowHeader) const Icon(Icons.settings_outlined, size: 24),
                           if (!narrowHeader) const SizedBox(width: 10),
                           Text(t.settings.title, style: theme.textTheme.titleLarge),
@@ -383,9 +403,9 @@ class TvSettingsHubState extends State<TvSettingsHub> {
                                             return KeyEventResult.ignored;
                                           },
                                           child: ListTileTheme.merge(
-                                            minTileHeight: compact ? 46 : 54,
+                                            minTileHeight: compact ? 56 : 64,
                                             titleTextStyle: theme.textTheme.bodyMedium?.copyWith(
-                                              fontSize: compact ? 13 : 14,
+                                              fontSize: compact ? 15 : 17,
                                               fontWeight: FontWeight.w600,
                                             ),
                                             selectedTileColor: colors.primary.withValues(alpha: .16),
@@ -430,11 +450,23 @@ class TvSettingsHubState extends State<TvSettingsHub> {
                                               category.description!,
                                               style: theme.textTheme.bodyMedium?.copyWith(
                                                 color: colors.onSurfaceVariant,
-                                                fontSize: compact ? 12 : 14,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ],
                                         ],
+                                      ),
+                                    ),
+                                  if ((category?.preview ?? false) && bounds.maxWidth < 1050)
+                                    ValueListenableBuilder<SettingsHelp?>(
+                                      valueListenable: _help,
+                                      builder: (_, help, _) => MobileSettingsPreviewFrame(
+                                        categoryId:
+                                            category!.id == 'library' && help?.title == t.homeLayout.episodeThumbnails
+                                            ? 'home'
+                                            : category.id,
+                                        previewFocus: _previewFocus,
+                                        onReturn: _focusContent,
                                       ),
                                     ),
                                   Expanded(
@@ -455,6 +487,13 @@ class TvSettingsHubState extends State<TvSettingsHub> {
                                                       child: Focus(
                                                         canRequestFocus: false,
                                                         onKeyEvent: (_, event) {
+                                                          if (event.isActionable &&
+                                                              c.preview &&
+                                                              event.logicalKey == LogicalKeyboardKey.arrowRight &&
+                                                              _previewFocus.context != null) {
+                                                            _previewFocus.requestFocus();
+                                                            return KeyEventResult.handled;
+                                                          }
                                                           if (event.isActionable &&
                                                               event.logicalKey == LogicalKeyboardKey.arrowLeft) {
                                                             _node(c.id).requestFocus();
@@ -497,13 +536,16 @@ class TvSettingsHubState extends State<TvSettingsHub> {
                                 ],
                               ),
                             ),
-                            if ((category?.preview ?? false) && bounds.maxWidth >= 500)
+                            if ((category?.preview ?? false) && bounds.maxWidth >= 1050)
                               SizedBox(
                                 width: (bounds.maxWidth * .30).clamp(150.0, 400.0),
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 4),
-                                  child: ExcludeFocus(
-                                    child: TvSettingsPreviewPanel(categoryId: category!.id, help: _help),
+                                  child: TvSettingsPreviewPanel(
+                                    categoryId: category!.id,
+                                    help: _help,
+                                    previewFocus: _previewFocus,
+                                    onReturn: _focusContent,
                                   ),
                                 ),
                               ),
@@ -527,17 +569,24 @@ class TvSettingsHubState extends State<TvSettingsHub> {
     final active = context.watch<ActiveProfileProvider?>();
     return Scaffold(
       appBar: AppBar(
-        title: Row(mainAxisSize: MainAxisSize.min, children: [
-          const LurokaMark(size: 27),
-          const SizedBox(width: 10),
-          Flexible(child: Text(t.settings.title, overflow: TextOverflow.ellipsis)),
-        ]),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const LurokaMark(size: 27),
+            const SizedBox(width: 10),
+            Flexible(child: Text(t.settings.title, overflow: TextOverflow.ellipsis)),
+          ],
+        ),
         actions: [
           const AccountRecoveryMenu(),
           if (active?.active != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: ProfileAvatar(profile: active!.active!, size: 32, avatarUrl: active.avatarUrlFor(active.active!.id)),
+              child: ProfileAvatar(
+                profile: active!.active!,
+                size: 32,
+                avatarUrl: active.avatarUrlFor(active.active!.id),
+              ),
             ),
           IconButton(
             tooltip: t.lurokaWorkspace.searchSettings,
@@ -560,27 +609,36 @@ class TvSettingsHubState extends State<TvSettingsHub> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(5),
-                  child: Row(children: [
-                    for (final advanced in [false, true])
-                      Expanded(child: TextButton(
-                        key: ValueKey('mobile-settings-mode-${advanced ? 'advanced' : 'simple'}'),
-                        onPressed: _writingMode ? null : () => _mode(advanced),
-                        style: TextButton.styleFrom(
-                          minimumSize: const Size(0, 48),
-                          backgroundColor: _advanced == advanced ? colors.primary : Colors.transparent,
-                          foregroundColor: _advanced == advanced ? colors.onPrimary : colors.onSurfaceVariant,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+                  child: Row(
+                    children: [
+                      for (final advanced in [false, true])
+                        Expanded(
+                          child: TextButton(
+                            key: ValueKey('mobile-settings-mode-${advanced ? 'advanced' : 'simple'}'),
+                            onPressed: _writingMode ? null : () => _mode(advanced),
+                            style: TextButton.styleFrom(
+                              minimumSize: const Size(0, 48),
+                              backgroundColor: _advanced == advanced ? colors.primary : Colors.transparent,
+                              foregroundColor: _advanced == advanced ? colors.onPrimary : colors.onSurfaceVariant,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+                            ),
+                            child: Text(
+                              advanced ? t.settings.advanced : t.tvSettingsV2.simple,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                            ),
+                          ),
                         ),
-                        child: Text(advanced ? t.settings.advanced : t.tvSettingsV2.simple,
-                            textAlign: TextAlign.center, maxLines: 2),
-                      )),
-                  ]),
+                    ],
+                  ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(4, 12, 4, 20),
-                child: Text(t.tvSettingsV2.settingsSaved,
-                    style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant)),
+                child: Text(
+                  t.tvSettingsV2.settingsSaved,
+                  style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+                ),
               ),
               for (final entry in _visible)
                 Padding(
@@ -600,15 +658,21 @@ class TvSettingsHubState extends State<TvSettingsHub> {
                         visualDensity: VisualDensity.standard,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         leading: Container(
-                          width: 46, height: 46,
+                          width: 46,
+                          height: 46,
                           decoration: BoxDecoration(
                             color: colors.primary.withValues(alpha: .12),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Center(child: AppIcon(entry.icon, color: colors.primary, size: 23)),
                         ),
-                        title: Text(entry.title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                        subtitle: entry.description == null ? null : Text(entry.description!, maxLines: 2, overflow: TextOverflow.ellipsis),
+                        title: Text(
+                          entry.title,
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        subtitle: entry.description == null
+                            ? null
+                            : Text(entry.description!, maxLines: 2, overflow: TextOverflow.ellipsis),
                         trailing: Icon(Icons.chevron_right_rounded, color: colors.onSurfaceVariant),
                         onTap: () => _openMobile(entry),
                       ),
@@ -642,9 +706,7 @@ class TvSettingsHubState extends State<TvSettingsHub> {
                 settingId: id,
                 keywords: description,
               ),
-              child: SettingsSurface(
-                child: _MobileSettingsCategory(category: category),
-              ),
+              child: SettingsSurface(child: _MobileSettingsCategory(category: category)),
             ),
           ),
         ),
@@ -674,23 +736,25 @@ class _MobileSettingsCategoryState extends State<_MobileSettingsCategory> {
 
   @override
   Widget build(BuildContext context) {
-    final showPreview = PlatformDetector.isMobile(context) &&
-        const {'appearance', 'home', 'library'}.contains(widget.category.id);
+    final showPreview =
+        PlatformDetector.isMobile(context) && const {'appearance', 'home', 'library'}.contains(widget.category.id);
     if (!showPreview) return Builder(builder: widget.category.builder);
     _expanded ??= MediaQuery.sizeOf(context).height >= 500;
-    return Column(children: [
-      if (_expanded!) MobileSettingsPreviewFrame(categoryId: widget.category.id),
-      Align(
-        alignment: Alignment.centerRight,
-        child: TextButton.icon(
-          key: const ValueKey('mobile-settings-preview-toggle'),
-          onPressed: () => setState(() => _expanded = !_expanded!),
-          icon: Icon(_expanded! ? Icons.expand_less_rounded : Icons.visibility_outlined, size: 18),
-          label: Text(t.tvSettingsV2.previewLive),
+    return Column(
+      children: [
+        if (_expanded!) MobileSettingsPreviewFrame(categoryId: widget.category.id),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            key: const ValueKey('mobile-settings-preview-toggle'),
+            onPressed: () => setState(() => _expanded = !_expanded!),
+            icon: Icon(_expanded! ? Icons.expand_less_rounded : Icons.visibility_outlined, size: 18),
+            label: Text(t.tvSettingsV2.previewLive),
+          ),
         ),
-      ),
-      Expanded(child: Builder(builder: widget.category.builder)),
-    ]);
+        Expanded(child: Builder(builder: widget.category.builder)),
+      ],
+    );
   }
 }
 
@@ -743,6 +807,7 @@ class _SettingsSearchDialogState extends State<_SettingsSearchDialog> {
                   itemBuilder: (context, index) => FocusableListTile(
                     focusNode: index == 0 ? _first : null,
                     title: Text(results[index].title),
+                    subtitle: results[index].advanced ? Text(t.settings.advanced) : null,
                     onTap: () => Navigator.of(context).pop(results[index]),
                   ),
                 ),

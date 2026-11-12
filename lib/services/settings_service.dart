@@ -16,6 +16,8 @@ import '../models/player_setting_scope.dart';
 import '../models/external_player_models.dart';
 import '../utils/language_codes.dart';
 import 'base_shared_preferences_service.dart';
+import 'profile_settings_store.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'sensitive_prefs.dart';
 import 'device_performance.dart';
 import 'shortcut_action.dart';
@@ -160,7 +162,9 @@ class LibraryDensity {
 /// gapless cards read as one slab from across the room.
 enum GridSpacing { tight, normal, spacious }
 
-enum HomeHeroSize { small, medium, large }
+enum HomeHeroSize { compact, small, medium, large }
+
+HomeHeroSize _homeHeroSizeDefault() => PlatformDetector.isTV() ? HomeHeroSize.small : HomeHeroSize.medium;
 
 extension GridSpacingMetrics on GridSpacing {
   /// Inter-card gutter fed to the grid delegate's cross/main axis spacing.
@@ -409,8 +413,10 @@ class _EpisodePosterModePref extends EnumPref<EpisodePosterMode> {
   @override
   Future<void> removeFrom(BaseSharedPreferencesService svc, {void Function()? checkCurrent}) async {
     checkCurrent?.call();
-    await svc.prefs.remove(_legacyUseSeasonPosterKey);
-    await super.removeFrom(svc, checkCurrent: checkCurrent);
+    final target = svc.prefs;
+    await target.remove(_legacyUseSeasonPosterKey);
+    checkCurrent?.call();
+    await target.remove(key);
   }
 
   @override
@@ -442,9 +448,15 @@ class PlayerSettingScopePref extends EnumPref<PlayerSettingScope> {
 
   @override
   Future<void> writeTo(BaseSharedPreferencesService svc, PlayerSettingScope value) async {
-    final entersKeyedScope = value.keysEntries && !readFrom(svc).keysEntries;
-    await super.writeTo(svc, value);
-    if (entersKeyedScope) await resetGlobals(svc);
+    final target = _CapturedPreferencesService(svc.prefs);
+    final entersKeyedScope = value.keysEntries && !readFrom(target).keysEntries;
+    await super.writeTo(target, value);
+    if (entersKeyedScope) {
+      await resetGlobals(target);
+      for (final pref in globals) {
+        pref.refreshListenable(svc);
+      }
+    }
   }
 
   Future<void> resetGlobals(BaseSharedPreferencesService svc) async {
@@ -452,6 +464,15 @@ class PlayerSettingScopePref extends EnumPref<PlayerSettingScope> {
       await svc.reset(pref);
     }
   }
+}
+
+/// Holds the preference view captured before an asynchronous operation.
+class _CapturedPreferencesService extends BaseSharedPreferencesService {
+  _CapturedPreferencesService(this._target);
+  final SharedPreferencesWithCache _target;
+
+  @override
+  SharedPreferencesWithCache get prefs => _target;
 }
 
 /// An [EnumPref] that replaced a boolean preference stored under [legacyKey].
@@ -477,8 +498,10 @@ class LegacyBoolEnumPref<T extends Enum> extends EnumPref<T> {
   @override
   Future<void> removeFrom(BaseSharedPreferencesService svc, {void Function()? checkCurrent}) async {
     checkCurrent?.call();
-    await svc.prefs.remove(legacyKey);
-    await super.removeFrom(svc, checkCurrent: checkCurrent);
+    final target = svc.prefs;
+    await target.remove(legacyKey);
+    checkCurrent?.call();
+    await target.remove(key);
   }
 
   @override
@@ -631,8 +654,10 @@ class _MpvConfigTextPref extends StringPref {
   @override
   Future<void> removeFrom(BaseSharedPreferencesService svc, {void Function()? checkCurrent}) async {
     checkCurrent?.call();
-    await svc.prefs.remove(_legacyMpvConfigEntriesKey);
-    await super.removeFrom(svc, checkCurrent: checkCurrent);
+    final target = svc.prefs;
+    await target.remove(_legacyMpvConfigEntriesKey);
+    checkCurrent?.call();
+    await target.remove(key);
   }
 
   @override
@@ -738,14 +763,21 @@ class SettingsService extends BaseSharedPreferencesService {
   static const seekTimeLarge = IntPref('seek_time_large', defaultValue: 30);
   static const rewindOnResume = IntPref('rewind_on_resume');
   static const showHeroSection = BoolPref('show_hero_section', defaultValue: true);
+
+  /// Continue Watching / Next Up artwork, independently of other episode cards.
+  static const homeEpisodeThumbnails = BoolPref('luroka_home_episode_thumbnails');
   static const showThemeMusic = BoolPref('show_theme_music', defaultValue: true);
+  static const homePosterSize = IntPref('luroka_home_poster_size', defaultValue: 3);
   static const homeHeroSize = EnumPref<HomeHeroSize>(
     'home_hero_size',
     values: HomeHeroSize.values,
-    defaultValue: HomeHeroSize.medium,
+    defaultValueProvider: _homeHeroSizeDefault,
   );
   static const tvFullCardLayout = BoolPref('tv_full_card_layout', defaultValue: false);
   // Preserve the existing device preference when expanding it to all browse surfaces.
+  static const groupRecentEpisodes = BoolPref('group_recent_episodes', defaultValue: true);
+  static const showRemainingEpisodes = BoolPref('show_remaining_episodes', defaultValue: true);
+
   static const posterDetails = BoolPref('luroka_library_poster_captions', defaultValue: false);
   static const catalogEpisodeInfo = BoolPref('luroka_catalog_episode_info', defaultValue: false);
   static const libraryPosterCaptions = posterDetails;
@@ -753,6 +785,7 @@ class SettingsService extends BaseSharedPreferencesService {
   static const useGlobalHubs = BoolPref('use_global_hubs', defaultValue: true);
   static const showServerNameOnHubs = BoolPref('show_server_name_on_hubs');
   static const groupLibrariesByServer = BoolPref('group_libraries_by_server', defaultValue: true);
+  static const compactTvLibraryNavigation = BoolPref('compact_tv_library_navigation', defaultValue: false);
   static const sleepTimerDuration = IntPref('sleep_timer_duration', defaultValue: 30);
   static const audioSyncOffset = IntPref('audio_sync_offset');
   static const subtitleSyncOffset = IntPref('subtitle_sync_offset');
@@ -1229,6 +1262,305 @@ class SettingsService extends BaseSharedPreferencesService {
 
   SettingsService._();
 
+  // These preferences are either read by the profile session/player or have
+  // live bindings. Preferences that control app-global services or require
+  // special migration remain outside this list until their effects are bound
+  // to profile changes as well.
+  static final Set<String> profileSettingKeys = {
+    themeMode.key,
+    customThemePalette.key,
+    posterDetails.key,
+    groupRecentEpisodes.key,
+    showRemainingEpisodes.key,
+    showThemeMusic.key,
+    showHeroSection.key,
+    homeEpisodeThumbnails.key,
+    homeHeroSize.key,
+    homePosterSize.key,
+    tvFullCardLayout.key,
+    catalogEpisodeInfo.key,
+    focusGlow.key,
+    showServerNameOnHubs.key,
+    groupLibrariesByServer.key,
+    compactTvLibraryNavigation.key,
+    homeSpotlightAutoRotate.key,
+    homeSpotlightInterval.key,
+    alwaysKeepSidebarOpen.key,
+    librariesSectionExpanded.key,
+    showUnwatchedCount.key,
+    showWatchedIndicators.key,
+    showEpisodeNumberOnCards.key,
+    showSeasonPostersOnTabs.key,
+    hideSpoilers.key,
+    showNavBarLabels.key,
+    libraryDensity.key,
+    gridSpacing.key,
+    tvCornerSpotlightBackdrop.key,
+    viewMode.key,
+    seekTimeSmall.key,
+    seekTimeLarge.key,
+    rewindOnResume.key,
+    sleepTimerDuration.key,
+    subtitleSearchLanguage.key,
+    subtitleFontSize.key,
+    subtitleTextColor.key,
+    subtitleBorderSize.key,
+    subtitleBorderColor.key,
+    subtitleBackgroundColor.key,
+    subtitleBackgroundOpacity.key,
+    subAssOverride.key,
+    subtitleRenderResolution.key,
+    subtitleBold.key,
+    subtitleItalic.key,
+    subtitleUseMargins.key,
+    subtitleAnchorToScreen.key,
+    rememberTrackSelections.key,
+    followServerTrackSelections.key,
+    showChapterMarkersOnTimeline.key,
+    clickVideoTogglesPlayback.key,
+    forceSkipMarkerFallback.key,
+    autoSkipDelay.key,
+    introPattern.key,
+    creditsPattern.key,
+    downloadIncludeSpecials.key,
+    defaultQualityPreset.key,
+    cellularQualityPreset.key,
+    directPlayCoveredQuality.key,
+    musicQualityPreset.key,
+    autoPlayNextEpisode.key,
+    playNextCountdown.key,
+    shuffleStartsFromBeginning.key,
+    gestureBrightnessSwipe.key,
+    gestureVolumeSwipe.key,
+    gesturePinchToZoom.key,
+    playerAlwaysOnTop.key,
+    specialsOrdering.key,
+    startupSection.key,
+    showExploreTab.key,
+    showLiveTvTab.key,
+    homeShelfItemCount.key,
+    continueWatchingAction.key,
+    episodeAction.key,
+    liveTvDefaultFavorites.key,
+    enableHardwareDecoding.key,
+    enableHDR.key,
+    hdrToneMapping.key,
+    matchContentFrameRate.key,
+    matchContentResolution.key,
+    tunneledPlayback.key,
+    dvConversionMode.key,
+    disableDolbyVision.key,
+    hdrSdrConversion.key,
+    refusedVideoCodecs.key,
+    useExoPlayer.key,
+    useExternalPlayer.key,
+    ambientLighting.key,
+    audioPassthrough.key,
+    audioNormalization.key,
+    audioDownmixNormalize.key,
+    audioOutputDevice.key,
+    maxVolume.key,
+    downmixCenterBoost.key,
+    subtitlePosition.key,
+    matchRefreshRate.key,
+    matchDynamicRange.key,
+    displaySwitchDelay.key,
+    rememberBrightnessLevel.key,
+    rememberedBrightnessLevel.key,
+    skipIntroMode.key,
+    skipCreditsMode.key,
+    audioChannelLimit.key,
+    deinterlaceMode.key,
+    episodePosterMode.key,
+    _legacyAutoSkipIntroKey,
+    _legacyAutoSkipCreditsKey,
+    _legacyAudioDownmixKey,
+    _legacyDeinterlaceKey,
+    _legacyUseSeasonPosterKey,
+    ...additionalProfileSettingKeys,
+    ...latestProfileSettingKeys,
+  };
+
+  static final Set<String> additionalProfileSettingKeys = {
+    volume.key,
+    musicVolume.key,
+    resumeMusicOnLaunch.key,
+    audioSyncOffset.key,
+    subtitleSyncOffset.key,
+    defaultPlaybackSpeed.key,
+    defaultBoxFitMode.key,
+    playbackSpeedScope.key,
+    shaderPresetScope.key,
+    boxFitScope.key,
+    syncOffsetScope.key,
+    scopedPlayerPrefValues.key,
+    globalShaderPreset.key,
+    customShaderPresets.key,
+    rotationLocked.key,
+    videoPlayerNavigationEnabled.key,
+    playbackBufferTier.key,
+    automotiveUiScale.key,
+    autoPip.key,
+    useGlobalHubs.key,
+    exitFullscreenOnPlayerClose.key,
+    appLocale.key,
+    enableDiscordRPC.key,
+    keyboardHotkeys.key,
+    mediaVersionPreferences.key,
+    selectedExternalPlayer.key,
+    customExternalPlayers.key,
+    tvScreenMargin.key,
+    showPerformanceOverlay.key,
+    autoHidePerformanceOverlay.key,
+    enableDebugLogging.key,
+    fireStickMode.key,
+    visualEffects.key,
+    mpvConfigText.key,
+    mpvPresets.key,
+    _legacyMpvConfigEntriesKey,
+    watchPartyRelayUrl.key,
+    tvSettingsAdvancedMode.key,
+    mobileSettingsAdvancedMode.key,
+    enableTraktWatchedSync.key,
+    for (final service in TrackerService.values) ...[
+      scrobblePref(service).key,
+      trackerFilterModePref(service).key,
+      trackerFilterIdsPref(service).key,
+    ],
+  };
+
+  static final Set<String> latestProfileSettingKeys = {
+    forceTvMode.key,
+    autoCheckUpdatesOnStartup.key,
+    startInFullscreen.key,
+    autoRemoveWatchedDownloads.key,
+  };
+
+  late ProfileSettingsStore _profileSettings = ProfileSettingsStore(super.prefs);
+  String? _settingsProfileId;
+  bool _profileSettingsEnabled = false;
+  final ValueNotifier<int> profileSettingsRevision = ValueNotifier<int>(0);
+  bool get hasActiveProfileSettings => _profileSettingsEnabled && _settingsProfileId != null;
+
+  @override
+  SharedPreferencesWithCache get prefs {
+    final id = _settingsProfileId;
+    if (!_profileSettingsEnabled || id == null) return super.prefs;
+    return ProfileSettingsView(super.prefs, _profileSettings, id, profileSettingKeys);
+  }
+
+  /// Call only after the existing profiles have been loaded at startup.
+  Future<void> prepareProfileSettings(Iterable<String> existingProfileIds) async {
+    final ids = existingProfileIds.toSet();
+    await _profileSettings.migrateLegacy(profileIds: ids, preferenceKeys: profileSettingKeys);
+    await _profileSettings.migrateAdditionalLegacy(profileIds: ids, preferenceKeys: additionalProfileSettingKeys);
+    await _profileSettings.migrateAdditionalLegacy(
+      profileIds: ids,
+      preferenceKeys: latestProfileSettingKeys,
+      revision: 3,
+    );
+    _profileSettingsEnabled = true;
+    _applyProfilePlatformSettings();
+    refreshActiveListenables();
+    profileSettingsRevision.value++;
+  }
+
+  /// Selects the committed profile; an in-flight write keeps its original view.
+  void selectProfile(String? profileId) {
+    if (_settingsProfileId == profileId) return;
+    _settingsProfileId = profileId;
+    if (_profileSettingsEnabled) {
+      _applyProfilePlatformSettings();
+      refreshActiveListenables();
+      profileSettingsRevision.value++;
+    }
+  }
+
+  void _applyProfilePlatformSettings() {
+    if (_settingsProfileId != null) TvDetectionService.setForceTVSync(read(forceTvMode));
+  }
+
+  Future<void> deleteProfileSettings(String profileId) => _profileSettings.delete(profileId);
+
+  /// Commit the guide's appearance choices in one profile-owned write.
+  /// Null values leave the existing choice untouched.
+  Future<void> saveProfileAppearanceChoices({
+    required String profileId,
+    ThemeMode? theme,
+    bool? showPosterDetails,
+    bool? playThemeMusic,
+    bool? showSpotlight,
+    bool? showEpisodeThumbnails,
+  }) async {
+    if (!_profileSettingsEnabled || _settingsProfileId != profileId) {
+      throw StateError('The active profile changed during setup');
+    }
+    final changes = <String, Object?>{
+      if (theme != null) themeMode.key: theme.name,
+      posterDetails.key: ?showPosterDetails,
+      showThemeMusic.key: ?playThemeMusic,
+      showHeroSection.key: ?showSpotlight,
+      homeEpisodeThumbnails.key: ?showEpisodeThumbnails,
+    };
+    if (changes.isEmpty) return;
+    final store = _profileSettings;
+    await store.initialize(profileId);
+    if (!_profileSettingsEnabled || _settingsProfileId != profileId || !identical(store, _profileSettings)) {
+      throw StateError('The active profile changed during setup');
+    }
+    await store.update(profileId, changes);
+    if (_settingsProfileId == profileId && identical(store, _profileSettings)) refreshActiveListenables();
+  }
+
+  /// Reads a profile's preferences without changing the active UI session.
+  /// This also lets shared background work evaluate every owner's policy.
+  T readForProfile<T>(String profileId, Pref<T> pref) {
+    if (!_profileSettingsEnabled && _profileSettings.read(profileId) == null) return read(pref);
+    final target = _CapturedPreferencesService(
+      ProfileSettingsView(super.prefs, _profileSettings, profileId, profileSettingKeys),
+    );
+    return target.read(pref);
+  }
+
+  /// Custom shader files are shared on disk even though each profile has its
+  /// own list. Do not delete a file still named by another profile.
+  bool isShaderFileReferenced(String fileName) {
+    if (!_profileSettingsEnabled) {
+      return read(customShaderPresets).any((preset) => preset['fileName'] == fileName);
+    }
+    for (final key in super.prefs.keys.where(ProfileSettingsStore.isDocumentKey)) {
+      try {
+        final raw = super.prefs.getString(key);
+        if (raw == null) continue;
+        final value = ProfileSettingsStore.decodeDocument(raw)[customShaderPresets.key];
+        if (value == null) continue;
+        final decoded = jsonDecode(value as String);
+        if (decoded is! List) return true;
+        if (decoded.any((entry) => entry is Map && entry['fileName'] == fileName)) return true;
+      } catch (_) {
+        // Preserve the file when another profile's settings cannot be read.
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Captures the current profile for a delayed write owned by a player or
+  /// other session that may finish after a profile switch.
+  Future<void> Function(T) captureWriter<T>(Pref<T> pref) {
+    final target = _CapturedPreferencesService(prefs);
+    return (value) async {
+      await pref.writeTo(target, value);
+      pref.refreshListenable(this);
+    };
+  }
+
+  Future<void> clearProfileSettingsForLogout(Iterable<String> profileIds) async {
+    final previous = _profileSettings;
+    await previous.clearAll(profileIds);
+    if (identical(_profileSettings, previous)) _profileSettings = ProfileSettingsStore(super.prefs);
+  }
+
   static SettingsService? _cachedInstance;
 
   static Future<SettingsService> getInstance() async {
@@ -1345,20 +1677,23 @@ class SettingsService extends BaseSharedPreferencesService {
   }) async {
     validateCustomExternalPlayers(players);
     checkCurrent?.call();
-    final selected = read(selectedExternalPlayer);
+    final target = _CapturedPreferencesService(prefs);
+    final selected = target.read(selectedExternalPlayer);
     if (resetOverride) {
-      await reset(customExternalPlayers, checkCurrent: checkCurrent);
+      await target.reset(customExternalPlayers, checkCurrent: checkCurrent);
     } else {
-      await write(customExternalPlayers, players, checkCurrent: checkCurrent);
+      await target.write(customExternalPlayers, players, checkCurrent: checkCurrent);
     }
+    customExternalPlayers.refreshListenable(this);
     checkCurrent?.call();
     if (selected.isCustom) {
       final replacement = players.where((p) => p.id == selected.id).firstOrNull;
-      await write(
+      await target.write(
         selectedExternalPlayer,
         replacement ?? selectedExternalPlayer.resolvedDefault,
         checkCurrent: checkCurrent,
       );
+      selectedExternalPlayer.refreshListenable(this);
     }
   }
 
@@ -1367,15 +1702,17 @@ class SettingsService extends BaseSharedPreferencesService {
     void Function()? checkCurrent,
     bool resetOverride = false,
   }) async {
-    if (player.isCustom && !read(customExternalPlayers).any((p) => p.id == player.id)) {
+    final target = _CapturedPreferencesService(prefs);
+    if (player.isCustom && !target.read(customExternalPlayers).any((p) => p.id == player.id)) {
       throw const FormatException('Unknown custom player');
     }
     checkCurrent?.call();
     if (resetOverride) {
-      await reset(selectedExternalPlayer, checkCurrent: checkCurrent);
+      await target.reset(selectedExternalPlayer, checkCurrent: checkCurrent);
     } else {
-      await write(selectedExternalPlayer, player, checkCurrent: checkCurrent);
+      await target.write(selectedExternalPlayer, player, checkCurrent: checkCurrent);
     }
+    selectedExternalPlayer.refreshListenable(this);
   }
 
   Future<void> removeCustomExternalPlayer(String id) =>
@@ -1590,9 +1927,11 @@ class SettingsService extends BaseSharedPreferencesService {
     seekTimeSmall,
     seekTimeLarge,
     showHeroSection,
+    homeEpisodeThumbnails,
     showThemeMusic,
     catalogEpisodeInfo,
     homeHeroSize,
+    homePosterSize,
     sleepTimerDuration,
     audioSyncOffset,
     subtitleSyncOffset,
@@ -1686,6 +2025,8 @@ class SettingsService extends BaseSharedPreferencesService {
     gridSpacing,
     automotiveUiScale,
     tvCornerSpotlightBackdrop,
+    groupRecentEpisodes,
+    showRemainingEpisodes,
     episodePosterMode,
     continueWatchingAction,
     episodeAction,
@@ -1705,6 +2046,7 @@ class SettingsService extends BaseSharedPreferencesService {
     useGlobalHubs,
     showServerNameOnHubs,
     groupLibrariesByServer,
+    compactTvLibraryNavigation,
     rotationLocked,
     subAssOverride,
     subtitleRenderResolution,
@@ -1843,26 +2185,28 @@ class SettingsService extends BaseSharedPreferencesService {
   }
 
   Future<void> resetAllSettings() async {
+    // Keep the initiating profile's view even if a switch occurs mid-reset.
+    final targetPrefs = prefs;
     // Materialize an unread legacy choice before retiring its old key, just as
     // if it had already been read — but only where the new preference survives
     // the reset (the portable-only marker modes); the rest are reset anyway.
     final resettable = _resettablePrefs.toSet();
     for (final entry in legacyBoolPrefs.entries) {
       final pref = entry.value;
-      if (!resettable.contains(pref) && !prefs.containsKey(pref.key)) {
-        final legacyValue = readNullableBool(entry.key);
-        if (legacyValue != null) await pref.writeTo(this, pref.fromLegacy(legacyValue));
+      if (!resettable.contains(pref) && !targetPrefs.containsKey(pref.key)) {
+        final legacyValue = readPreferenceTolerantly(targetPrefs, entry.key, () => targetPrefs.getBool(entry.key));
+        if (legacyValue != null) await targetPrefs.setString(pref.key, pref.fromLegacy(legacyValue).name);
       }
-      await prefs.remove(entry.key);
+      await targetPrefs.remove(entry.key);
     }
     await Future.wait([
-      ..._resettablePrefs.map((p) => prefs.remove(p.key)),
+      ..._resettablePrefs.map((p) => targetPrefs.remove(p.key)),
       // Legacy migration sentinels — removed alongside the keys they guarded.
-      prefs.remove(_legacyUseSeasonPosterKey),
-      prefs.remove(_legacyMpvConfigEntriesKey),
-      prefs.remove(_legacyBufferSizeKey),
-      prefs.remove(_legacyDemuxerModeKey),
-      prefs.remove(_bufferSizeMigratedKey),
+      targetPrefs.remove(_legacyUseSeasonPosterKey),
+      targetPrefs.remove(_legacyMpvConfigEntriesKey),
+      targetPrefs.remove(_legacyBufferSizeKey),
+      targetPrefs.remove(_legacyDemuxerModeKey),
+      targetPrefs.remove(_bufferSizeMigratedKey),
     ]);
     refreshListenables();
   }

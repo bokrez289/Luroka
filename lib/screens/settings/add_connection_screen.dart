@@ -7,12 +7,16 @@ import '../../i18n/strings.g.dart';
 import '../../media/media_backend.dart';
 import '../../media/media_browser_dialect.dart';
 import '../../theme/mono_tokens.dart';
+import '../../utils/platform_detector.dart';
+import '../../services/kids_profile_service.dart';
 import '../../profiles/profile.dart';
 import '../../widgets/backend_badge.dart';
 import '../../widgets/focused_scroll_scaffold.dart';
 import '../profile/borrow_connection_screen.dart';
 import 'add_jellyfin_screen.dart';
 import 'add_plex_account_screen.dart';
+import 'phone_server_pairing_screen.dart';
+import 'tv_server_pairing_dialog.dart';
 
 /// Picker shown when the user taps "Add connection".
 ///
@@ -63,12 +67,19 @@ class AddConnectionScreen extends StatelessWidget {
             : t.addServer.connectToMediaBrowserCardSubtitle,
         builder: (_) => AddJellyfinScreen(targetProfile: targetProfile, dialect: embyDialect),
       ),
+      if (serverPairingEnabled && !PlatformDetector.isTV() && !KidsProfileService.instance.isActiveKids)
+        _BackendOption(
+          backend: null,
+          title: 'Connect a TV',
+          subtitle: 'Use this phone to sign in on a TV',
+          builder: (_) => const PhoneServerPairingScreen(),
+        ),
       if (scoped)
         _BackendOption(
           backend: null,
           title: t.addServer.borrowFromAnotherProfile,
           subtitle: t.addServer.borrowFromAnotherProfileSubtitle,
-          builder: (_) => BorrowConnectionScreen(targetProfile: targetProfile!),
+          builder: (_) => BorrowConnectionScreen(targetProfile: targetProfile!, popOnSuccess: true),
         ),
     ];
     final tokensRef = tokens(context);

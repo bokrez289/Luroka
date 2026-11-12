@@ -444,9 +444,9 @@ static int decodePacket(
     const int outputSampleCapacity = swr_get_out_samples(resampleState->context, sampleCount);
     int outputByteCapacity;
     int requiredOutputSize;
-    if (!luroka::ffmpeg::CheckedAudioByteCount(
+    if (!plezy::ffmpeg::CheckedAudioByteCount(
             outputSampleCapacity, channelCount, bytesPerSample, &outputByteCapacity) ||
-        !luroka::ffmpeg::CheckedAddByteCount(outSize, outputByteCapacity, &requiredOutputSize)) {
+        !plezy::ffmpeg::CheckedAddByteCount(outSize, outputByteCapacity, &requiredOutputSize)) {
       LOGE("Decoded audio output size is invalid or too large.");
       av_frame_free(&frame);
       return AUDIO_DECODER_ERROR_INVALID_DATA;
@@ -477,9 +477,9 @@ static int decodePacket(
 
     int writtenByteCount;
     int nextOutSize;
-    if (!luroka::ffmpeg::CheckedAudioByteCount(result, channelCount, bytesPerSample, &writtenByteCount) ||
+    if (!plezy::ffmpeg::CheckedAudioByteCount(result, channelCount, bytesPerSample, &writtenByteCount) ||
         writtenByteCount > outputByteCapacity ||
-        !luroka::ffmpeg::CheckedAddByteCount(outSize, writtenByteCount, &nextOutSize)) {
+        !plezy::ffmpeg::CheckedAddByteCount(outSize, writtenByteCount, &nextOutSize)) {
       LOGE("Resampler returned an invalid output sample count.");
       return AUDIO_DECODER_ERROR_INVALID_DATA;
     }

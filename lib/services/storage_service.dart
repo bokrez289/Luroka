@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import '../media/ids.dart';
+import '../media/anime_favorites.dart';
 import '../media/library_filter_selection.dart';
 import '../media/library_query.dart';
 import '../media/home_layout.dart';
@@ -10,6 +12,7 @@ import 'package:uuid/uuid.dart';
 
 import '../profiles/profile.dart';
 import '../utils/log_redaction_manager.dart';
+import '../utils/app_logger.dart';
 import 'base_shared_preferences_service.dart';
 
 enum LibraryPreference { filters, sort, grouping, tab }
@@ -28,6 +31,15 @@ class StorageService extends BaseSharedPreferencesService {
   static const String _keyRecentSearches = 'recent_searches';
   static const String _keyHomeLayout = 'custom_home_layout';
   static const String _keyShowOtherPlexHomeProfiles = 'luroka_show_other_plex_home_profiles';
+
+  // The profile session can be replaced while an older session is still
+  // writing. Serialize Home changes by actual preference scope, including
+  // Plex Home profiles sharing the same underlying user scope.
+  final Map<String, Future<void>> _homeLayoutWrites = {};
+  final Map<String, int> _homeScopeEpochs = {};
+  int _homeClearEpoch = 0;
+  bool _homeClearPending = false;
+  Future<void> _homeClearBarrier = Future<void>.value();
 
   // Key prefixes for per-id storage
   static const String _prefixServerEndpoint = 'server_endpoint_';
@@ -141,14 +153,119 @@ class StorageService extends BaseSharedPreferencesService {
     return data == null ? HomeLayout() : HomeLayout.fromJson(data);
   }
 
-  Future<void> saveHomeLayout(String profileId, HomeLayout layout) =>
-      _setJsonMap('${_userPrefixForProfileId(profileId)}$_keyHomeLayout', layout.toJson());
+  Future<T> _serializeHomeLayout<T>(String profileId, Future<T> Function() operation) {
+    final scope = userScopeForProfileId(profileId);
+    final prior = _homeLayoutWrites[scope];
+    final Future<T> result;
+    if (prior == null && !_homeClearPending) {
+      try {
+        result = operation();
+      } catch (error, stack) {
+        return Future<T>.error(error, stack);
+      }
+    } else {
+      result = Future.wait([?prior, if (_homeClearPending) _homeClearBarrier]).then((_) => operation());
+    }
+    final settled = result.then<void>((_) {}, onError: (Object error, StackTrace stack) {});
+    _homeLayoutWrites[scope] = settled;
+    unawaited(
+      settled.then((_) {
+        if (identical(_homeLayoutWrites[scope], settled)) _homeLayoutWrites.remove(scope);
+      }),
+    );
+    return result;
+  }
+
+  Future<void> saveHomeLayout(String profileId, HomeLayout layout) => _serializeHomeLayout(
+    profileId,
+    () => _setJsonMap('${_userPrefixForProfileId(profileId)}$_keyHomeLayout', layout.toJson()),
+  );
+
+  /// Applies a read-modify-write against the latest persisted profile layout.
+  Future<HomeLayout> updateHomeLayout(String profileId, HomeLayout Function(HomeLayout) update) =>
+      _serializeHomeLayout(profileId, () async {
+        final next = update(getHomeLayout(profileId));
+        await _setJsonMap('${_userPrefixForProfileId(profileId)}$_keyHomeLayout', next.toJson());
+        return next;
+      });
+
+  /// Version 1 Home layouts predate Spotlight sources. Record their existing
+  /// Trending behavior explicitly, without dropping unknown fields or
+  /// rewriting malformed/newer data. Safe to repeat and to race with edits.
+  Future<void> migrateLegacyHomeSpotlight(String profileId) => _migrateLegacyHomeSpotlight(profileId);
+
+  Future<void> _migrateLegacyHomeSpotlight(String profileId, {bool Function()? isCurrent}) =>
+      _serializeHomeLayout(profileId, () async {
+        if (isCurrent != null && !isCurrent()) return;
+        final key = '${_userPrefixForProfileId(profileId)}$_keyHomeLayout';
+        final exists = prefs.containsKey(key);
+        Map<String, dynamic>? current;
+        if (exists) {
+          final raw = prefs.get(key);
+          if (raw is! String) return;
+          try {
+            final decoded = jsonDecode(raw);
+            if (decoded is! Map<String, dynamic>) return;
+            current = decoded;
+          } catch (_) {
+            return;
+          }
+        }
+        if (current?.containsKey('spotlightSource') == true) return;
+        final version = current?['version'];
+        if (version != null && (version is! int || version > 2)) return;
+        await _setJsonMap(key, {...?current, 'version': 2, 'spotlightSource': HomeSpotlightSource.trending.name});
+      });
+
+  /// Best-effort boot migration for known profiles. Later-discovered Plex
+  /// Home users are migrated when their own profile session is opened.
+  Future<void> migrateKnownHomeSpotlights(Iterable<String> profileIds) {
+    final ids = profileIds.where((id) => id.isNotEmpty).toSet();
+    final clearEpoch = _homeClearEpoch;
+    final scopeEpochs = {
+      for (final id in ids) userScopeForProfileId(id): _homeScopeEpochs[userScopeForProfileId(id)] ?? 0,
+    };
+    return () async {
+      for (final id in ids) {
+        final scope = userScopeForProfileId(id);
+        bool current() => _homeClearEpoch == clearEpoch && (_homeScopeEpochs[scope] ?? 0) == scopeEpochs[scope];
+        if (!current()) continue;
+        try {
+          await _migrateLegacyHomeSpotlight(id, isCurrent: current);
+        } catch (error, stack) {
+          appLogger.w('Could not migrate a profile Home Spotlight preference', error: error, stackTrace: stack);
+        }
+      }
+    }();
+  }
+
+  /// Called only by explicit new-profile creation, never by activation or
+  /// restore. Existing and unrecognized profiles keep the legacy default.
+  Future<bool> initializeNewProfileHome(String profileId) => _serializeHomeLayout(profileId, () async {
+    final key = '${_userPrefixForProfileId(profileId)}$_keyHomeLayout';
+    if (prefs.containsKey(key)) return false;
+    await _setJsonMap(key, HomeLayout(spotlightSource: HomeSpotlightSource.forYou).toJson());
+    return true;
+  });
+
+  /// Compensate failed profile creation without erasing a later user edit.
+  Future<void> removeNewProfileHomeIfUnchanged(String profileId) => _serializeHomeLayout(profileId, () async {
+    final key = '${_userPrefixForProfileId(profileId)}$_keyHomeLayout';
+    final original = jsonEncode(HomeLayout(spotlightSource: HomeSpotlightSource.forYou).toJson());
+    if (prefs.getString(key) == original) await prefs.remove(key);
+  });
 
   Map<String, dynamic> getLibraryCoverRecipes({required String? profileId}) =>
       _readJsonMap('${profileId == null ? '' : _userPrefixForProfileId(profileId)}library_cover_recipes_v1') ?? {};
 
   Future<void> saveLibraryCoverRecipes(Map<String, Object?> recipes, {required String? profileId}) =>
       _setJsonMap('${profileId == null ? '' : _userPrefixForProfileId(profileId)}library_cover_recipes_v1', recipes);
+
+  AnimeFavoritesRules getAnimeFavoritesRules(String profileId) =>
+      AnimeFavoritesRules.fromJson(_readJsonMap('${_userPrefixForProfileId(profileId)}anime_favorites_v1'));
+
+  Future<void> saveAnimeFavoritesRules(String profileId, AnimeFavoritesRules rules) =>
+      _setJsonMap('${_userPrefixForProfileId(profileId)}anime_favorites_v1', rules.toJson());
 
   static String _prefPrefix(LibraryPreference preference) => switch (preference) {
     LibraryPreference.filters => _prefixLibraryFilters,
@@ -632,13 +749,24 @@ class StorageService extends BaseSharedPreferencesService {
   /// profiles the scope is the home-user uuid, which is shared by any borrow
   /// of the same home user — only call when that user's access is being torn
   /// down entirely (profile delete / account sign-out).
-  Future<void> clearUserScopedPreferencesForProfile(String profileId) async {
-    await _clearKeysWithPrefix(_userPrefixForProfileId(profileId));
+  Future<void> clearUserScopedPreferencesForProfile(String profileId) {
+    final scope = userScopeForProfileId(profileId);
+    _homeScopeEpochs.update(scope, (value) => value + 1, ifAbsent: () => 1);
+    return _serializeHomeLayout(profileId, () => _clearKeysWithPrefix(_userPrefixForProfileId(profileId)));
   }
 
   /// Remove user-scoped prefs for every scope (full logout).
-  Future<void> clearAllUserScopedPreferences() async {
-    await _clearKeysWithPrefix('user_');
+  Future<void> clearAllUserScopedPreferences() {
+    _homeClearEpoch++;
+    final pending = [_homeClearBarrier, ..._homeLayoutWrites.values];
+    final result = Future.wait(pending).then((_) => _clearKeysWithPrefix('user_'));
+    _homeClearPending = true;
+    final settled = result.then<void>((_) {}, onError: (Object error, StackTrace stack) {});
+    _homeClearBarrier = settled;
+    unawaited(settled.then((_) {
+      if (identical(_homeClearBarrier, settled)) _homeClearPending = false;
+    }));
+    return result;
   }
 
   // Private helper methods

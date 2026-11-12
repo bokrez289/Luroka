@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show setEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:material_symbols_icons/symbols.dart';
@@ -9,6 +10,8 @@ import '../focus/focusable_button.dart';
 import '../focus/locked_hub_controller.dart';
 import '../i18n/strings.g.dart';
 import '../media/home_layout.dart';
+import '../media/home_spotlight.dart';
+import '../media/home_taste.dart';
 import '../media/media_hub.dart';
 import '../media/movie_copy_groups.dart';
 import 'movie_copy_picker.dart';
@@ -73,10 +76,17 @@ class HomeDashboard extends StatefulWidget {
     this.emptySubtitle,
     this.showToolbar = true,
     this.trendingItems = const [],
+    this.favoriteSnapshot = const [],
+    this.viewingSignals = const [],
+    this.onlineServerIds,
     this.weeklyTrends = true,
     this.featureLoading = false,
+    this.spotlightSource = HomeSpotlightSource.trending,
     this.kidsStyle,
     this.kidsName,
+    this.previewScrollController,
+    this.previewEpisodeThumbnails,
+    this.previewPosterDetails,
   });
 
   final List<MediaHub> rows;
@@ -105,10 +115,19 @@ class HomeDashboard extends StatefulWidget {
   final String? emptySubtitle;
   final bool showToolbar;
   final List<MediaItem> trendingItems;
+  final List<MediaItem> favoriteSnapshot;
+  final List<HomeViewingSignal> viewingSignals;
+  final Set<String>? onlineServerIds;
   final bool weeklyTrends;
   final bool featureLoading;
+  final HomeSpotlightSource spotlightSource;
   final KidsStyle? kidsStyle;
   final String? kidsName;
+
+  /// Read-only settings previews can drive scrolling from the remote overlay.
+  final ScrollController? previewScrollController;
+  final bool? previewEpisodeThumbnails;
+  final bool? previewPosterDetails;
 
   @override
   State<HomeDashboard> createState() => HomeDashboardState();
@@ -117,7 +136,7 @@ class HomeDashboard extends StatefulWidget {
 class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserver {
   final _kidsShelfKey = GlobalKey<KidsMovieShelfState>();
   final _mobileStudiosKey = GlobalKey<MobileStudiosShelfState>();
-  final _scroll = ScrollController();
+  late final _scroll = widget.previewScrollController ?? ScrollController();
   final _play = FocusNode(debugLabel: 'dashboard_play');
   final _details = FocusNode(debugLabel: 'dashboard_details');
   final _previousFeature = FocusNode(debugLabel: 'home_previous_feature');
@@ -245,6 +264,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
   @override
   void didUpdateWidget(covariant HomeDashboard oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final previousKey = _preview.value?.item.globalKey;
     if (oldWidget.active != widget.active) setPreviewActive(widget.active);
     if (!identical(oldWidget.rows, widget.rows)) _syncRows();
     if (PlatformDetector.isTV() && !widget.showFeature && (oldWidget.showFeature || _browsePreview.value == null)) {
@@ -255,8 +275,18 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
     if (!identical(oldWidget.rows, widget.rows) ||
         !identical(oldWidget.onDeck, widget.onDeck) ||
         !identical(oldWidget.trendingItems, widget.trendingItems) ||
+        !identical(oldWidget.favoriteSnapshot, widget.favoriteSnapshot) ||
+        !identical(oldWidget.viewingSignals, widget.viewingSignals) ||
+        !setEquals(oldWidget.onlineServerIds, widget.onlineServerIds) ||
+        oldWidget.spotlightSource != widget.spotlightSource ||
         oldWidget.showFeature != widget.showFeature ||
         oldWidget.featureLoading != widget.featureLoading) {
+      if (oldWidget.spotlightSource != widget.spotlightSource) {
+        _featureIndex = 0;
+      } else if (previousKey != null) {
+        final index = _features.indexWhere((feature) => feature.$1.globalKey == previousKey);
+        if (index >= 0) _featureIndex = index;
+      }
       _syncPreview();
       _scheduleRotation();
     }
@@ -355,7 +385,11 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
   /// rather than playable media. If only those rows exist, fall back to the
   /// first row with content.
   (MediaItem, MediaHub)? _curatedBillboard() {
-    if (widget.featureLoading && widget.trendingItems.isEmpty) return null;
+    if (widget.spotlightSource == HomeSpotlightSource.trending &&
+        widget.featureLoading &&
+        widget.trendingItems.isEmpty) {
+      return null;
+    }
     final features = _features;
     if (features.isNotEmpty) {
       _featureIndex = _featureIndex.clamp(0, features.length - 1);
@@ -364,13 +398,21 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
     MediaHub? fallback;
     for (final row in _rows) {
       if (row.items.isEmpty) continue;
+      final eligible = widget.spotlightSource == HomeSpotlightSource.trending || widget.onlineServerIds == null
+          ? row.items
+          : row.items.where((item) => widget.onlineServerIds!.contains(item.serverId)).toList();
+      if (eligible.isEmpty) continue;
       fallback ??= row;
       if (row.isContinueWatchingHub || row.id == homeContinueWatchingId || row.id == homeStudiosId) {
         continue;
       }
-      return (row.items.first, row);
+      return (eligible.first, row);
     }
-    return fallback == null ? null : (fallback.items.first, fallback);
+    if (fallback == null) return null;
+    final item = widget.spotlightSource == HomeSpotlightSource.trending || widget.onlineServerIds == null
+        ? fallback.items.first
+        : fallback.items.firstWhere((item) => widget.onlineServerIds!.contains(item.serverId));
+    return (item, fallback);
   }
 
   void _select(MediaItem item, MediaHub row) {
@@ -383,9 +425,80 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
     );
   }
 
+  Object? _featuresCacheKey;
+  List<(MediaItem, MediaHub)>? _featuresCache;
+  HomeSpotlightSource? _featuresCacheSource;
+  int? _featuresCacheDay;
+
   List<(MediaItem, MediaHub)> get _features {
-    if (widget.featureLoading && widget.trendingItems.isEmpty) return const [];
-    if (widget.trendingItems.isNotEmpty && !KidsProfileService.instance.isActiveKids) {
+    final today = DateTime.now();
+    final day = today.year * 10000 + today.month * 100 + today.day;
+    final key = (
+      _rows,
+      widget.onDeck,
+      widget.trendingItems,
+      widget.spotlightSource,
+      widget.weeklyTrends,
+      widget.featureLoading,
+      widget.favoriteSnapshot,
+      widget.viewingSignals,
+      widget.onlineServerIds == null ? null : Object.hashAllUnordered(widget.onlineServerIds!),
+      KidsProfileService.instance.isActiveKids,
+      day,
+    );
+    if (key == _featuresCacheKey && _featuresCache != null) return _featuresCache!;
+    _featuresCacheKey = key;
+    final fresh = _buildFeatures();
+    final previous = _featuresCache;
+    if (widget.spotlightSource != HomeSpotlightSource.trending &&
+        _featuresCacheSource == widget.spotlightSource &&
+        _featuresCacheDay == day &&
+        previous != null) {
+      final remaining = {for (final entry in fresh) entry.$1.globalKey: entry};
+      _featuresCache = [
+        for (final old in previous)
+          if (remaining.containsKey(old.$1.globalKey)) remaining.remove(old.$1.globalKey)!,
+        ...remaining.values,
+      ];
+    } else {
+      _featuresCache = fresh;
+    }
+    _featuresCacheSource = widget.spotlightSource;
+    _featuresCacheDay = day;
+    return _featuresCache!;
+  }
+
+  List<(MediaItem, MediaHub)> _buildFeatures() {
+    if (widget.spotlightSource != HomeSpotlightSource.trending && !KidsProfileService.instance.isActiveKids) {
+      final visibleKeys = {
+        for (final row in _rows)
+          for (final item in row.items) item.globalKey,
+      };
+      final selected = selectPersonalSpotlight(
+        source: widget.spotlightSource,
+        visibleRows: _rows,
+        onDeck: widget.onDeck,
+        trending: widget.trendingItems.where((item) => visibleKeys.contains(item.globalKey)).toList(),
+        favoritesSnapshot: widget.favoriteSnapshot,
+        viewingSignals: widget.viewingSignals,
+        onlineServerIds: widget.onlineServerIds,
+        continueTitle: t.discover.continueWatching,
+        nextTitle: t.homeLayout.spotlightNextUp,
+        favoritesTitle: t.homeLayout.spotlightFavorites,
+        recentTitle: t.discover.recentlyAdded,
+        trendingTitle: widget.weeklyTrends ? t.lurokaDiscovery.weeklyLibrary : t.lurokaDiscovery.popularLibrary,
+        inspiredTitle: t.homeLayout.spotlightInspired,
+      );
+      if (selected.isNotEmpty) return selected;
+    }
+    if (widget.spotlightSource == HomeSpotlightSource.trending &&
+        widget.featureLoading &&
+        widget.trendingItems.isEmpty) {
+      return const [];
+    }
+    if (widget.spotlightSource == HomeSpotlightSource.trending &&
+        widget.trendingItems.isNotEmpty &&
+        !KidsProfileService.instance.isActiveKids) {
       final row = MediaHub(
         id: 'luroka:weekly',
         title: !PlatformDetector.isTV()
@@ -407,6 +520,11 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
       for (final item in row.items.take(3)) {
         if (item.kind != MediaKind.movie && item.kind != MediaKind.show) continue;
         if (!KidsProfileService.instance.allows(item)) continue;
+        if (widget.spotlightSource != HomeSpotlightSource.trending &&
+            widget.onlineServerIds != null &&
+            !widget.onlineServerIds!.contains(item.serverId)) {
+          continue;
+        }
         if (seen.add(item.globalKey)) result.add((item, row));
         if (result.length == 8) return result;
       }
@@ -546,7 +664,8 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
     WidgetsBinding.instance.removeObserver(this);
     _preview.dispose();
     _browsePreview.dispose();
-    _scroll.dispose();
+    _scroll.removeListener(_mobileScrollChanged);
+    if (widget.previewScrollController == null) _scroll.dispose();
     _play.dispose();
     _details.dispose();
     _previousFeature.dispose();
@@ -761,8 +880,12 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                                       maxPosterHeight: maxPosterHeight,
                                       focusScrollAlignment: 0.03,
                                       episodePosterModeOverride:
-                                          (row.usesContinueWatchingAction || row.id == homeContinueWatchingId)
-                                          ? EpisodePosterMode.episodeThumbnail
+                                          (row.usesContinueWatchingAction ||
+                                              row.id == homeContinueWatchingId ||
+                                              row.id == homeNextUpId)
+                                          ? (SettingsService.instance.read(SettingsService.homeEpisodeThumbnails)
+                                                ? EpisodePosterMode.episodeThumbnail
+                                                : EpisodePosterMode.seriesPoster)
                                           : EpisodePosterMode.seriesPoster,
                                       forceWideCards: row.id == homeStudiosId,
                                       cardBuilder: row.id != homeStudiosId
@@ -872,8 +995,24 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                               child: MobileHomeCarousel(
                                 items: [for (final feature in features) feature.$1],
                                 label: features.first.$2.title,
+                                labelFor: (item) =>
+                                    features
+                                        .where((feature) => feature.$1.globalKey == item.globalKey)
+                                        .firstOrNull
+                                        ?.$2
+                                        .title ??
+                                    features.first.$2.title,
                                 resolveClient: widget.resolveClient,
-                                onPlay: widget.onPlay,
+                                onPlay: (item) {
+                                  final feature = features
+                                      .where((entry) => entry.$1.globalKey == item.globalKey)
+                                      .firstOrNull;
+                                  if (feature?.$2.usesContinueWatchingAction == true) {
+                                    _resumeCopy(item);
+                                  } else {
+                                    widget.onPlay(item);
+                                  }
+                                },
                                 onDetails: widget.onDetails,
                                 active: _previewActive && _mobileHeroVisible,
                               ),
@@ -936,8 +1075,13 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                         showHeaderIcon: false,
                         inset: true,
                         streamingHome: true,
-                        episodePosterModeOverride: (row.usesContinueWatchingAction || row.id == homeContinueWatchingId)
-                            ? EpisodePosterMode.episodeThumbnail
+                        episodePosterModeOverride:
+                            (row.usesContinueWatchingAction ||
+                                row.id == homeContinueWatchingId ||
+                                row.id == homeNextUpId)
+                            ? (SettingsService.instance.read(SettingsService.homeEpisodeThumbnails)
+                                  ? EpisodePosterMode.episodeThumbnail
+                                  : EpisodePosterMode.seriesPoster)
                             : EpisodePosterMode.seriesPoster,
                         forceWideCards: row.id == homeStudiosId,
                         cardBuilder: row.id != homeStudiosId
@@ -1231,7 +1375,11 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                         streamingHome: mobile,
                         isInContinueWatching: continuing,
                         usesContinueWatchingAction: row.usesContinueWatchingAction,
-                        onItemTap: continuing ? _resumeCopy : widget.onDetails,
+                        onItemTap: row.id == homeNextUpId
+                            ? null
+                            : continuing
+                            ? _resumeCopy
+                            : widget.onDetails,
                         onRefresh: widget.onRefresh,
                         onRemoveFromContinueWatching: widget.onRemoveFromContinueWatching,
                         loadMoreItems: _loadMore(row),
@@ -1270,12 +1418,13 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
           final inset = 48.0 * scale;
           final hasPreview = widget.showFeature && !_browsing && (_preview.value != null || widget.featureLoading);
           final heroFraction = switch (SettingsService.instance.read(SettingsService.homeHeroSize)) {
+            HomeHeroSize.compact => 0.44,
             HomeHeroSize.small => 0.60,
             HomeHeroSize.medium => 0.70,
             HomeHeroSize.large => 0.84,
           };
           final heroHeight = math.max(280.0, viewport.maxHeight * heroFraction);
-          final descriptionHeight = math.min(360 * scale, viewport.maxHeight * 0.47);
+          final descriptionHeight = math.min(280 * scale, viewport.maxHeight * 0.34);
           final shelfHeight = viewport.maxHeight - (_browsing ? descriptionHeight : 0);
           return Column(
             children: [
@@ -1409,10 +1558,15 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                               showHeaderIcon: false,
                               inset: true,
                               cinemaArtwork: !studio,
-                              forceWideCards: studio || continuing,
+                              forceWideCards:
+                                  studio ||
+                                  (continuing &&
+                                      (widget.previewEpisodeThumbnails ??
+                                          SettingsService.instance.read(SettingsService.homeEpisodeThumbnails))),
                               streamingHome: true,
+                              posterDetailsOverride: widget.previewPosterDetails,
                               maxPosterHeight: math.min(
-                                270 * scale,
+                                340 * scale,
                                 math.max(
                                   90,
                                   shelfHeight -
@@ -1422,8 +1576,13 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                               ),
                               focusScrollAlignment: 0.12,
                               episodePosterModeOverride:
-                                  (row.usesContinueWatchingAction || row.id == homeContinueWatchingId)
-                                  ? EpisodePosterMode.episodeThumbnail
+                                  (row.usesContinueWatchingAction ||
+                                      row.id == homeContinueWatchingId ||
+                                      row.id == homeNextUpId)
+                                  ? ((widget.previewEpisodeThumbnails ??
+                                            SettingsService.instance.read(SettingsService.homeEpisodeThumbnails))
+                                        ? EpisodePosterMode.episodeThumbnail
+                                        : EpisodePosterMode.seriesPoster)
                                   : EpisodePosterMode.seriesPoster,
                               cardBuilder: !studio
                                   ? null
@@ -1734,7 +1893,12 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
         : item.displayTitle;
     final playable =
         const {MediaKind.movie, MediaKind.episode, MediaKind.clip, MediaKind.show}.contains(item.kind) &&
-        (item.kind != MediaKind.show || (item.serverId != null && item.raw?['customStudio'] == null));
+        (item.kind != MediaKind.show ||
+            (item.serverId != null &&
+                item.raw?['customStudio'] == null &&
+                (_browsing ||
+                    widget.spotlightSource == HomeSpotlightSource.trending ||
+                    preview.usesContinueWatchingAction)));
     final episode = item.isEpisode
         ? t.dashboard.episodeLabel(season: item.parentIndex ?? '–', episode: item.index ?? '–')
         : null;
@@ -1763,7 +1927,8 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
 
     final primaryLabel = !playable
         ? t.mediaMenu.viewDetails
-        : item.hasActiveProgress
+        : (item.hasActiveProgress ||
+              (preview.usesContinueWatchingAction && (item.viewOffsetMs ?? 0) > 0 && item.durationMs == null))
         ? t.common.resume
         : t.common.play;
     final smallActions = infoWidth < 420;
@@ -1783,7 +1948,9 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
               children: [
                 if (!minimal) ...[
                   Text(
-                    tv && widget.trendingItems.isEmpty ? t.dashboard.featured : preview.rowTitle,
+                    tv && widget.spotlightSource == HomeSpotlightSource.trending && widget.trendingItems.isEmpty
+                        ? t.dashboard.featured
+                        : preview.rowTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -2003,11 +2170,16 @@ class _CinematicBackdrop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final media = item;
-    final protectedEpisode = media != null && media.isEpisode && hideSpoilers && media.shouldHideSpoiler;
+    final protectedEpisode = media != null && media.isEpisode;
     final paths = media == null
         ? const <String>[]
         : protectedEpisode
-        ? <String>[...?media.grandparentBackdropPaths, ?media.grandparentArtPath, ?media.grandparentThumbPath]
+        ? <String>[
+            ...?media.grandparentBackdropPaths,
+            ?media.grandparentArtPath,
+            ?media.grandparentThumbPath,
+            ?media.parentThumbPath,
+          ]
         : <String>[
             ...media.heroArtCandidates(containerAspectRatio: size.width / math.max(1, size.height)),
             ?media.artPath,

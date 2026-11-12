@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../media/ids.dart';
 
-import '../i18n/strings.g.dart';
 import '../media/episode_collection.dart';
 import '../media/media_item.dart';
 import '../mixins/disposable_change_notifier_mixin.dart';
@@ -123,17 +122,25 @@ class OfflineWatchProvider extends ChangeNotifier with DisposableChangeNotifierM
       patchId: WatchPatchId.offlineAction(profileId: queued.profileId, rowId: queued.rowId, revision: queued.revision),
     );
     safeNotifyListeners();
-    unawaited(_autoDeleteIfWatched(serverId, itemId));
+    unawaited(_autoDeleteIfWatched(serverId, itemId, queued.profileId));
   }
 
   /// Auto-delete a download if the auto-remove setting is enabled.
-  Future<void> _autoDeleteIfWatched(ServerId serverId, String itemId) async {
+  Future<void> _autoDeleteIfWatched(ServerId serverId, String itemId, String? profileId) async {
     final settings = SettingsService.instanceOrNull;
-    if (settings == null || !settings.read(SettingsService.autoRemoveWatchedDownloads)) return;
+    if (settings == null ||
+        profileId == null ||
+        !settings.readForProfile(profileId, SettingsService.autoRemoveWatchedDownloads)) {
+      return;
+    }
 
     final globalKey = buildGlobalKey(ServerId(serverId), itemId);
     try {
-      final title = await _downloadProvider.deleteWatchedDownloadCandidate(globalKey, logContext: 'locally-watched');
+      await _downloadProvider.deleteWatchedDownloadCandidate(
+        globalKey,
+        logContext: 'locally-watched',
+        expectedProfileId: profileId,
+      );
     } catch (e) {
       appLogger.w('Failed to auto-delete locally-watched download $globalKey: $e');
     }

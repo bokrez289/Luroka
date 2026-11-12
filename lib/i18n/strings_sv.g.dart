@@ -137,6 +137,11 @@ class TranslationsSv extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$trakt$sv trakt = _Translations$trakt$sv._(_root);
 	@override late final _Translations$seerr$sv seerr = _Translations$seerr$sv._(_root);
 	@override late final _Translations$services$sv services = _Translations$services$sv._(_root);
+	@override late final _Translations$offlineRecovery$sv offlineRecovery = _Translations$offlineRecovery$sv._(_root);
+	@override late final _Translations$releaseUpdates$sv releaseUpdates = _Translations$releaseUpdates$sv._(_root);
+	@override late final _Translations$profileIntegrations$sv profileIntegrations = _Translations$profileIntegrations$sv._(_root);
+	@override late final _Translations$profileSetupGuide$sv profileSetupGuide = _Translations$profileSetupGuide$sv._(_root);
+	@override late final _Translations$animeFavorites$sv animeFavorites = _Translations$animeFavorites$sv._(_root);
 	@override late final _Translations$addServer$sv addServer = _Translations$addServer$sv._(_root);
 }
 
@@ -320,6 +325,9 @@ class _Translations$libraryPolish$sv extends Translations$libraryPolish$en {
 	final TranslationsSv _root; // ignore: unused_field
 
 	// Translations
+	@override String get compactTvNavigation => 'Kompakt biblioteksnavigering';
+	@override String get compactTvNavigationDescription => 'Visa bibliotekssektioner och bläddra bland alternativ i en utdragbar meny, vilket ger mer utrymme för affischer.';
+	@override String get openLibraryMenu => 'Öppna biblioteksmenyn';
 	@override String get posterDetails => 'Affischdetaljer';
 	@override String get showPosterDetails => 'Visa affischdetaljer · namn, årtal & IMDb';
 	@override String get hidePosterDetails => 'Dölj affischdetaljer';
@@ -633,6 +641,8 @@ class _Translations$settingsRedesign$sv extends Translations$settingsRedesign$en
 	// Translations
 	@override String get themeEffects => 'Tema och effekter';
 	@override String get libraryLayout => 'Bibliotekets layout';
+	@override String get posterInformation => 'Affischinformation';
+	@override String get libraryBehavior => 'Biblioteksbeteende';
 	@override String get appearanceHint => 'Anpassa utseendet, layouten och beteendet hos Luroka.';
 	@override String get livePreview => 'Live Preview';
 	@override String get previewHint => 'Se hur ditt bibliotek kommer att se ut med de nuvarande inställningarna.';
@@ -651,7 +661,7 @@ class _Translations$settingsRedesign$sv extends Translations$settingsRedesign$en
 	@override String get downloadFailed => 'Det gick inte att ladda ner eller verifiera uppdateringen. Försök igen.';
 	@override String get installPermission => 'Tillåt Luroka att installera uppdateringar i Android-inställningarna, återvänd sedan och välj Installera uppdatering.';
 	@override String get updateReady => 'Nedladdning verifierad. Klar att installera.';
-	@override String get releaseNotes => 'Release notes';
+	@override String get releaseNotes => 'Versionsinformation';
 	@override String get invalidFeed => 'Ange en giltig HTTPS-uppdateringsadress.';
 }
 
@@ -770,6 +780,19 @@ class _Translations$kids$sv extends Translations$kids$en {
 	final TranslationsSv _root; // ignore: unused_field
 
 	// Translations
+	@override String get timeLimits => 'Skärmens tidsgränser';
+	@override String get dailyWatchLimit => 'Daglig visningstid';
+	@override String get dailyWatchLimitHint => 'Begränsar videouppspelning på den här enheten varje dag.';
+	@override String get noTimeLimit => 'Ingen gräns';
+	@override String minutesLimit({required Object minutes}) => '${minutes} minuter';
+	@override String get bedtime => 'Sovdags';
+	@override String get bedtimeHint => 'En förälders PIN-kod krävs för att använda profilen under den här tiden.';
+	@override String get bedtimeStart => 'Läggdags börjar';
+	@override String get bedtimeEnd => 'Sängtiden slutar';
+	@override String get timeLimitReached => 'Visningstiden är över för idag';
+	@override String get bedtimeReached => 'Det är sängdags';
+	@override String get timeLimitParentHint => 'Be en förälder att ange sin PIN för att fortsätta för denna session.';
+	@override String get parentUnlock => 'Lås upp förälder';
 	@override String get backupProfile => 'Säkerhetskopiera barnprofilen';
 	@override String get backupExplain => 'Säkerhetskopiera profilens sparade namn, karaktär, begränsningar, utseende och lokala visningsuteslutningar. Föräldra-PIN-koder, serverinloggningar, nedladdningar och serveruppspelningsförlopp ingår inte.';
 	@override String get saveBackupFile => 'Spara backup-fil';
@@ -1313,6 +1336,7 @@ class _Translations$settings$sv extends Translations$settings$en {
 	@override String get downloadLocationPickerUnavailable => 'Mappval är inte tillgängligt på den här enheten';
 	@override String get downloadOnWifiOnly => 'Ladda endast ned via wifi';
 	@override String get downloadOnWifiOnlyDescription => 'Förhindra nedladdningar via mobildata';
+	@override String get downloadWifiScope => 'Gäller alla profiler och nedladdningar på den här enheten.';
 	@override String get autoRemoveWatchedDownloads => 'Ta automatiskt bort sedda nedladdningar';
 	@override String get autoRemoveWatchedDownloadsDescription => 'Ta automatiskt bort sedda nedladdningar';
 	@override String get cellularDownloadBlocked => 'Nedladdningar blockeras via mobilnätet. Använd wifi eller ändra inställningen.';
@@ -1651,8 +1675,8 @@ class _Translations$dashboard$sv extends Translations$dashboard$en {
 	@override String episodeLabel({required Object season, required Object episode}) => 'S${season} · E${episode}';
 	@override String get anotherPick => 'Ett annat val';
 	@override String get exploreSeries => 'Utforska serier';
-	@override String get showFeatured => 'Fokuserade titeldetaljer';
-	@override String get showFeaturedDescription => 'Visa konstverk, synopsis och avsnittsinformation för det markerade kortet';
+	@override String get showFeatured => 'Hem Spotlight';
+	@override String get showFeaturedDescription => 'Visa utvalda filmer och serier överst på startsidan.';
 }
 
 // Path: lurokaCatalog
@@ -1753,9 +1777,32 @@ class _Translations$homeLayout$sv extends Translations$homeLayout$en {
 	final TranslationsSv _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageStudios => 'Välj och beställ studios';
+	@override String get manageStudiosDescription => 'Välj vilka studior som ska visas för den här profilen och ordna deras ordning.';
+	@override String get studioUnavailable => 'Endast studior som finns i dina valda bibliotek visas på Home.';
+	@override String get showAllStudios => 'Visa alla studior';
+	@override String get hideAllStudios => 'Göm alla studior';
+	@override String get reorderStudio => 'Ändra studioordning';
+	@override String get episodeThumbnails => 'Avsnittsbilder i Fortsätt titta';
+	@override String get episodeThumbnailsDescription => 'Visa avsnittsbilder istället för serie- eller säsongsaffischer i Fortsätt titta och Nästa.';
+	@override String get spotlightSource => 'Källa för utvalt innehåll';
+	@override String get spotlightSourceDescription => 'For You använder den här profilens visningsaktivitet på den här enheten, tillsammans med favoriter och bibliotekstitlar.';
+	@override String get spotlightForYou => 'För dig';
+	@override String get spotlightForYouDescription => 'En blandning av vad du tittar på, favoriter, nya tillägg och trender, med hjälp av den här profilens visningsaktivitet på den här enheten.';
+	@override String get spotlightTrending => 'Trendigt';
+	@override String get spotlightTrendingDescription => 'Populära filmer och program i dina bibliotek.';
+	@override String get spotlightContinue => 'Fortsätt titta';
+	@override String get spotlightContinueDescription => 'Titlar du har startat och avsnitt du kan fortsätta.';
+	@override String get spotlightFavorites => 'Från dina favoriter';
+	@override String get spotlightInspired => 'Inspirerad av din visning';
+	@override String get spotlightNextUp => 'Nästa';
 	@override String get title => 'Anpassa hemmet';
 	@override String get description => 'Välj radordning och synlighet för den här profilen. Välj en rad för att flytta eller dölja den.';
 	@override String get rows => 'Hemrader';
+	@override String get progressLayout => 'Fortsätt titta och nästa';
+	@override String get progressCombined => 'Sammansatt i en rad';
+	@override String get progressSeparate => 'Separata rader';
+	@override String get progressDescription => 'Separat Next Up när det stöds av servern. Andra servrar förblir kombinerade.';
 	@override String get visible => 'Synlig';
 	@override String get hidden => 'Dold';
 	@override String get showRow => 'Visa rad';
@@ -1818,6 +1865,8 @@ class _Translations$activityStats$sv extends Translations$activityStats$en {
 	@override String get trendTitle => 'Titta tid';
 	@override String get trendToday => 'Idag';
 	@override String gapDetail({required Object stat, required Object range}) => '${stat} på ${range}';
+	@override String get patternsTitle => 'Dina mönster';
+	@override String mostlyKind({required Object kind}) => 'Mestadels ${kind}';
 	@override String get weekdayTitle => 'Efter veckodag';
 	@override String get hoursTitle => 'Efter tid på dygnet';
 	@override String get amLabel => 'AM';
@@ -1830,6 +1879,8 @@ class _Translations$activityStats$sv extends Translations$activityStats$en {
 	@override String get kindOther => 'Annat';
 	@override String get topTitlesTitle => 'Mest tittade';
 	@override String get sessionsTitle => 'Senaste sessioner';
+	@override String get recentViewingTitle => 'Senaste visning';
+	@override String get recentViewingHint => 'Totalt sett tid under den valda perioden. Datum visar den senaste visningen.';
 	@override String get showMore => 'Visa mer';
 	@override String get sessionNoTitle => 'Oidentifierad uppspelning';
 	@override String get emptyTitle => 'Inget här ännu';
@@ -2262,6 +2313,7 @@ class _Translations$messages$sv extends Translations$messages$en {
 	@override String metadataRefreshStarted({required Object title}) => 'Metadatauppdateringen har startat för "${title}"';
 	@override String metadataRefreshFailed({required Object error}) => 'Det gick inte att uppdatera metadata: ${error}';
 	@override String get logoutConfirm => 'Är du säker på att du vill logga ut?';
+	@override String get logoutDeviceConfirm => 'Logga ut från Luroka på den här enheten? Alla profiler, inklusive barnprofiler, serverkonton och nedladdade media kommer att tas bort från den här enheten. Du kan logga in igen senare.';
 	@override String get noSeasonsFound => 'Inga säsonger hittades';
 	@override String get seasonsLoadFailed => 'Det gick inte att läsa in säsonger';
 	@override String get noEpisodesFound => 'Inga avsnitt hittades i första säsongen';
@@ -2392,6 +2444,9 @@ class _Translations$profiles$sv extends Translations$profiles$en {
 	final TranslationsSv _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageProfiles => 'Hantera profiler';
+	@override String get quickAccess => 'Snabb åtkomst';
+	@override String get signOutDevice => 'Logga ut från den här enheten';
 	@override String get addLurokaProfile => 'Lägg till Luroka-profil';
 	@override String get switchingProfile => 'Byter profil…';
 	@override String get deleteThisProfileTitle => 'Ta bort denna profil?';
@@ -2510,7 +2565,7 @@ class _Translations$accountPreferences$sv extends Translations$accountPreference
 	@override String hubSubtitleSingle({required Object account}) => 'Ljud-, undertext- och biblioteksalternativ sparade på ${account}';
 	@override String hubSubtitleMultiple({required Object count}) => 'Ljud-, undertext- och biblioteksalternativ sparade på ${count} konton';
 	@override String get pickAccount => 'Varje konto lagrar sina egna inställningar. Välj det du vill redigera.';
-	@override String get storedOnAccount => 'Dessa alternativ sparas på själva kontot, så alla appar som är inloggade på det använder dem — inklusive Luroka på dina andra enheter.';
+	@override String get storedOnAccount => 'Dessa alternativ sparas på serverkontot och delas av alla Luroka-profiler och appar som använder det kontot, inklusive på andra enheter.';
 	@override String get noAccounts => 'Inga konton att konfigurera';
 	@override String get noAccountsHint => 'Logga in på Plex, eller anslut en Jellyfin- eller Emby-server, så visas de inställningar som lagras på det kontot här.';
 	@override String get unavailable => 'Det går inte att nå detta konto';
@@ -2704,7 +2759,7 @@ class _Translations$about$sv extends Translations$about$en {
 	@override String get documentationDescription => 'Installation, funktioner och bygganteckningar';
 	@override String get upstreamProjectDescription => 'Open-source-projekt av edde746 och bidragsgivare';
 	@override String get upstreamWebsite => 'Uppströms webbplats';
-	@override String get attribution => 'Data & attribution';
+	@override String get attribution => 'Data och källhänvisning';
 	@override String get attributionDescription => 'Metadata, betyg och varumärken';
 	@override String get attributionBody => 'Denna produkt använder TMDB API men är inte godkänd eller certifierad av TMDB. Popularitetslistor, metadata och IMDb-betyg tillhandahålls av Cinemeta. Poäng behåller sina källetiketter.';
 	@override String get trademarkNotices => 'Plex, Jellyfin, Emby, Trakt, Simkl, MyAnimeList, AniList, Trakt, Simkl, MyAnimeList, AniList, Trakt, och relaterade varumärken tillhör deras varumärken, Z07XKEEPQ0 och relaterade varumärken ägare. Luroka är inte ansluten till eller godkänd av dem.';
@@ -3167,7 +3222,7 @@ class _Translations$watchTogether$sv extends Translations$watchTogether$en {
 	@override String get matchMatched => 'Har videon';
 	@override String get matchMismatched => 'Olika längd';
 	@override String get matchUnavailable => 'Har inte videon';
-	@override String participantOffset({required Object offset}) => 'Offset ${offset}';
+	@override String participantOffset({required Object offset}) => 'Förskjutning ${offset}';
 	@override String get makeHost => 'Gör till värd';
 	@override String get makeHostQuestion => 'Överför värdskapet?';
 	@override String makeHostConfirm({required Object name}) => '${name} kommer att styra uppspelningen och driva sessionen för alla.';
@@ -3700,6 +3755,108 @@ class _Translations$services$sv extends Translations$services$en {
 	@override late final _Translations$services$libraryFilter$sv libraryFilter = _Translations$services$libraryFilter$sv._(_root);
 }
 
+// Path: offlineRecovery
+class _Translations$offlineRecovery$sv extends Translations$offlineRecovery$en {
+	_Translations$offlineRecovery$sv._(TranslationsSv root) : this._root = root, super.internal(root);
+
+	final TranslationsSv _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Dina servrar är offline';
+	@override String get description => 'Dina nedladdningar är fortfarande tillgängliga. Försök att ansluta igen när din server är tillbaka, eller lägg till en annan server.';
+	@override String get appleTvDescription => 'Luroka kunde inte nå dina mediaservrar. Försök att ansluta igen när de är tillgängliga, eller lägg till en annan server för att fortsätta titta.';
+	@override String get kidsDescription => 'Vi kunde inte nå din mediaserver. Försök att ansluta igen eller be en förälder om hjälp.';
+	@override String get retrying => 'Ansluter...';
+	@override String get addServer => 'Lägg till en server';
+}
+
+// Path: releaseUpdates
+class _Translations$releaseUpdates$sv extends Translations$releaseUpdates$en {
+	_Translations$releaseUpdates$sv._(TranslationsSv root) : this._root = root, super.internal(root);
+
+	final TranslationsSv _root; // ignore: unused_field
+
+	// Translations
+	@override String get manualInstructions => 'Ladda ner releasearkivet från GitHub, extrahera APK och installera det på din Android-enhet.';
+	@override String get tvInstructions => 'Öppna den här adressen på din telefon eller dator, eller skanna QR-koden för att ladda ner releasen.';
+	@override String get pressBackAgain => 'Tryck på Tillbaka igen för att avsluta uppspelningen';
+}
+
+// Path: profileIntegrations
+class _Translations$profileIntegrations$sv extends Translations$profileIntegrations$en {
+	_Translations$profileIntegrations$sv._(TranslationsSv root) : this._root = root, super.internal(root);
+
+	final TranslationsSv _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Gör Luroka till din';
+	@override String get description => 'Anslut dina favorittjänster för att spåra vad du tittar på och begära nya filmer och program. Varje Luroka-profil har sina egna anslutningar.';
+	@override String get step => 'Valfria integrationer';
+	@override String get examples => 'Trakt · Simkl · AniList · MyAnimeList · Seerr';
+	@override String get connect => 'Utforska integrationer';
+	@override String get later => 'Ställ in senare';
+	@override String get manage => 'Hantera integrationer';
+	@override String forProfile({required Object name}) => 'Anslutningar för ${name}';
+}
+
+// Path: profileSetupGuide
+class _Translations$profileSetupGuide$sv extends Translations$profileSetupGuide$en {
+	_Translations$profileSetupGuide$sv._(TranslationsSv root) : this._root = root, super.internal(root);
+
+	final TranslationsSv _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Gör din profil till din';
+	@override String get description => 'Välj hur Luroka ser ut och känns för den här profilen på den här enheten. Du kan ändra allt senare i Inställningar.';
+	@override String get appearanceStep => '1 av 2 · Utseende';
+	@override String get homeStep => '2 av 2 · Din startskärm';
+	@override String get preview => 'Förhandsgranska';
+	@override String get previewTitle => 'Ditt hem';
+	@override String get previewPoster => 'Affisch';
+	@override String get posterArtwork => 'Endast konstverk';
+	@override String get posterWithDetails => 'Visa affischdetaljer';
+	@override String get musicDescription => 'Spela upp en film eller ett programs tema medan dess informationssida är öppen, när det är tillgängligt.';
+	@override String get moreThemes => 'Fler teman';
+	@override String get fewerThemes => 'Färre teman';
+	@override String get spotlightHeading => 'Vad ska visas i Spotlight?';
+	@override String get progressHeading => 'Fortsätt titta och nästa';
+	@override String get skip => 'Använd standardinställningar och börja titta';
+	@override String get finish => 'Börja titta';
+	@override String get back => 'Tillbaka';
+	@override String get kContinue => 'Fortsätt';
+	@override String get chooseLater => 'Välj bibliotek senare';
+	@override String get libraryScope => 'Detta ändrar vad som visas i Luroka för den här profilen; det ändrar inte serverbehörigheter.';
+	@override String get createdTitle => 'Profil skapad';
+	@override String get createdDescription => 'Din nya profil är klar. Dess ägare kan anpassa den första gången de öppnar den.';
+	@override String get switchProfile => 'Byt till den här profilen';
+	@override String get stayHere => 'Håll kvar nuvarande profil';
+}
+
+// Path: animeFavorites
+class _Translations$animeFavorites$sv extends Translations$animeFavorites$en {
+	_Translations$animeFavorites$sv._(TranslationsSv root) : this._root = root, super.internal(root);
+
+	final TranslationsSv _root; // ignore: unused_field
+
+	// Translations
+	@override String get filter => 'Anime';
+	@override String get manage => 'Hantera anime';
+	@override String get description => 'Automatisk upptäckt använder anime-biblioteksnamn och tillgängliga anime-taggar eller ID:n. Välj bibliotek och korrigera enskilda favoriter. Val sparas på den här enheten för din profil.';
+	@override String get libraries => 'Anime bibliotek';
+	@override String get libraryHint => 'Bibliotek med namnet Anime känns igen automatiskt. Välj ett bibliotek för att ändra dess klassificering.';
+	@override String get titles => 'Favorittitlar';
+	@override String get titleHint => 'Välj en titel för att markera den som anime eller korrigera en automatisk matchning.';
+	@override String get automatic => 'Automatisk';
+	@override String get include => 'Anime';
+	@override String get exclude => 'Inte anime';
+	@override String get automaticIncluded => 'Automatisk · Anime';
+	@override String get automaticExcluded => 'Automatisk · Inte anime';
+	@override String get noLibraries => 'Inga anslutna bibliotek tillgängliga.';
+	@override String get noTitles => 'Inga favoritfilmer eller -program tillgängliga.';
+	@override String get empty => 'Inga anime-favoriter hittades. Kontrollera dina anime-bibliotek eller markera en titel som anime.';
+	@override String get saveFailed => 'Det gick inte att spara dina anime-inställningar. Försök igen.';
+}
+
 // Path: addServer
 class _Translations$addServer$sv extends Translations$addServer$en {
 	_Translations$addServer$sv._(TranslationsSv root) : this._root = root, super.internal(root);
@@ -3712,7 +3869,7 @@ class _Translations$addServer$sv extends Translations$addServer$en {
 	@override String get serverUrlsHelper => 'Du kan ange flera URL:er avgränsade med kommatecken.';
 	@override String get findServer => 'Hitta server';
 	@override String searchingLocalMediaBrowserServers({required Object product}) => 'Söker efter lokala ${product}-servrar...';
-	@override String localMediaBrowserServers({required Object product}) => 'Lokala ${product}-servrar';
+	@override String localMediaBrowserServers({required Object product}) => 'Sparade och närliggande ${product}-servrar';
 	@override String get username => 'Användarnamn';
 	@override String get password => 'Lösenord';
 	@override String get signIn => 'Logga in';
@@ -4788,6 +4945,9 @@ extension on TranslationsSv {
 			'posterDetails.catalogEpisodeInfoDescription' => 'Visa avsnittsantal och genomsnittlig längd på Upptäck-affischer.',
 			'posterDetails.title' => 'Affischdetaljer',
 			'posterDetails.description' => 'Visa titeln, årtalet och IMDb-betyget under affischer i Studio, Search, Upptäck och Libraries. Saknade IMDb-betyg förblir dolda. Stäng av för affischer endast för konstverk.',
+			'libraryPolish.compactTvNavigation' => 'Kompakt biblioteksnavigering',
+			'libraryPolish.compactTvNavigationDescription' => 'Visa bibliotekssektioner och bläddra bland alternativ i en utdragbar meny, vilket ger mer utrymme för affischer.',
+			'libraryPolish.openLibraryMenu' => 'Öppna biblioteksmenyn',
 			'libraryPolish.posterDetails' => 'Affischdetaljer',
 			'libraryPolish.showPosterDetails' => 'Visa affischdetaljer · namn, årtal & IMDb',
 			'libraryPolish.hidePosterDetails' => 'Dölj affischdetaljer',
@@ -5002,6 +5162,8 @@ extension on TranslationsSv {
 			'tvSettingsV2.simpleAudio' => 'Språk och undertexter',
 			'settingsRedesign.themeEffects' => 'Tema och effekter',
 			'settingsRedesign.libraryLayout' => 'Bibliotekets layout',
+			'settingsRedesign.posterInformation' => 'Affischinformation',
+			'settingsRedesign.libraryBehavior' => 'Biblioteksbeteende',
 			'settingsRedesign.appearanceHint' => 'Anpassa utseendet, layouten och beteendet hos Luroka.',
 			'settingsRedesign.livePreview' => 'Live Preview',
 			'settingsRedesign.previewHint' => 'Se hur ditt bibliotek kommer att se ut med de nuvarande inställningarna.',
@@ -5020,7 +5182,7 @@ extension on TranslationsSv {
 			'settingsRedesign.downloadFailed' => 'Det gick inte att ladda ner eller verifiera uppdateringen. Försök igen.',
 			'settingsRedesign.installPermission' => 'Tillåt Luroka att installera uppdateringar i Android-inställningarna, återvänd sedan och välj Installera uppdatering.',
 			'settingsRedesign.updateReady' => 'Nedladdning verifierad. Klar att installera.',
-			'settingsRedesign.releaseNotes' => 'Release notes',
+			'settingsRedesign.releaseNotes' => 'Versionsinformation',
 			'settingsRedesign.invalidFeed' => 'Ange en giltig HTTPS-uppdateringsadress.',
 			'onboarding.connectStep' => '01 · Anslut',
 			'onboarding.connectTitle' => 'Välkommen till Luroka',
@@ -5103,6 +5265,19 @@ extension on TranslationsSv {
 			'detailComposition.mediaInformation' => 'Medieinformation',
 			'detailComposition.fullFileInformation' => 'Fullständig filinformation',
 			'detailComposition.castAndCrew' => 'Cast & Crew',
+			'kids.timeLimits' => 'Skärmens tidsgränser',
+			'kids.dailyWatchLimit' => 'Daglig visningstid',
+			'kids.dailyWatchLimitHint' => 'Begränsar videouppspelning på den här enheten varje dag.',
+			'kids.noTimeLimit' => 'Ingen gräns',
+			'kids.minutesLimit' => ({required Object minutes}) => '${minutes} minuter',
+			'kids.bedtime' => 'Sovdags',
+			'kids.bedtimeHint' => 'En förälders PIN-kod krävs för att använda profilen under den här tiden.',
+			'kids.bedtimeStart' => 'Läggdags börjar',
+			'kids.bedtimeEnd' => 'Sängtiden slutar',
+			'kids.timeLimitReached' => 'Visningstiden är över för idag',
+			'kids.bedtimeReached' => 'Det är sängdags',
+			'kids.timeLimitParentHint' => 'Be en förälder att ange sin PIN för att fortsätta för denna session.',
+			'kids.parentUnlock' => 'Lås upp förälder',
 			'kids.backupProfile' => 'Säkerhetskopiera barnprofilen',
 			'kids.backupExplain' => 'Säkerhetskopiera profilens sparade namn, karaktär, begränsningar, utseende och lokala visningsuteslutningar. Föräldra-PIN-koder, serverinloggningar, nedladdningar och serveruppspelningsförlopp ingår inte.',
 			'kids.saveBackupFile' => 'Spara backup-fil',
@@ -5187,6 +5362,8 @@ extension on TranslationsSv {
 			'kids.blocked' => 'Den här titeln är inte tillgänglig i den här barnprofilen.',
 			'kids.switchProfile' => 'Byt profil',
 			'kids.manageFromAdult' => 'Byt till en vuxenprofil för att hantera inställningar.',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => 'Anslut en server till din vuxenprofil innan du lägger till en barnprofil.',
 			'kids.created' => 'Barnprofil skapad',
 			'kids.updated' => 'Barnprofilen uppdaterad',
@@ -5205,8 +5382,6 @@ extension on TranslationsSv {
 			'lurokaDiscovery.imdbTv100' => 'IMDb Topp 100 program · Sep 2026 ögonblicksbild',
 			'lurokaDiscovery.emmyComedy' => 'Emmys · Vinnare av komediserier · 1971–2026',
 			'lurokaDiscovery.emmys' => 'Emmys · Dramaserievinnare · 1966–2026',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.bafta' => 'BAFTA · Vinnare av bästa film',
 			'lurokaDiscovery.cannes' => 'Cannes · Guldpalmen vinnare',
 			'lurokaDiscovery.awardsNote' => 'Prissamlingarna inkluderar historien om Oscar för bästa film, vinnare av Emmy-drama/komedi och utökade BAFTA/Cannes-val. Upprepade vinnande titlar visas en gång. Medlemskap använder historik i priskategorier och Wikidata-fakta. IMDb Topp 100 film-/programlistor bevara september 2026 diagrams ögonblicksbilder från mmdju/imdb-top250-api. Endast matchningar i dina synliga onlinebibliotek visas; samlingens storlek beror på bibliotekets tillgänglighet.',
@@ -5599,6 +5774,7 @@ extension on TranslationsSv {
 			'settings.downloadLocationPickerUnavailable' => 'Mappval är inte tillgängligt på den här enheten',
 			'settings.downloadOnWifiOnly' => 'Ladda endast ned via wifi',
 			'settings.downloadOnWifiOnlyDescription' => 'Förhindra nedladdningar via mobildata',
+			'settings.downloadWifiScope' => 'Gäller alla profiler och nedladdningar på den här enheten.',
 			'settings.autoRemoveWatchedDownloads' => 'Ta automatiskt bort sedda nedladdningar',
 			'settings.autoRemoveWatchedDownloadsDescription' => 'Ta automatiskt bort sedda nedladdningar',
 			'settings.cellularDownloadBlocked' => 'Nedladdningar blockeras via mobilnätet. Använd wifi eller ändra inställningen.',
@@ -5700,6 +5876,8 @@ extension on TranslationsSv {
 			'settings.languageAndRegion' => 'Språk och region',
 			'settings.startup' => 'Start',
 			'settings.display' => 'Skärm',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Bibliotek och kort',
 			'settings.homeScreen' => 'Hemskärm',
 			'settings.navigation' => 'Navigering',
@@ -5719,8 +5897,6 @@ extension on TranslationsSv {
 			'settings.gestureVolumeSwipeDescription' => 'Svep uppåt eller nedåt i högerkanten för att justera volymen',
 			'settings.gesturePinchToZoom' => 'Nyp för att zooma',
 			'settings.gesturePinchToZoomDescription' => 'Nyp på videon för att zooma in eller ut',
-			_ => null,
-		} ?? switch (path) {
 			'settings.rememberBrightnessLevel' => 'Kom ihåg ljusstyrkan',
 			'settings.rememberBrightnessLevelDescription' => 'Starta uppspelningen med ljusstyrkan från det senaste svepet',
 			'settings.controls' => 'Kontroller',
@@ -5860,8 +6036,8 @@ extension on TranslationsSv {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => 'Ett annat val',
 			'dashboard.exploreSeries' => 'Utforska serier',
-			'dashboard.showFeatured' => 'Fokuserade titeldetaljer',
-			'dashboard.showFeaturedDescription' => 'Visa konstverk, synopsis och avsnittsinformation för det markerade kortet',
+			'dashboard.showFeatured' => 'Hem Spotlight',
+			'dashboard.showFeaturedDescription' => 'Visa utvalda filmer och serier överst på startsidan.',
 			'lurokaCatalog.aboutPerson' => 'I FRAMLJUS',
 			'lurokaCatalog.biographyUnavailable' => 'En biografi är inte tillgänglig från denna server.',
 			'lurokaCatalog.filmography' => 'Filmer och program i dina bibliotek',
@@ -5917,9 +6093,32 @@ extension on TranslationsSv {
 			'customPerformance.frameBudget' => 'Budget per ram',
 			'customPerformance.processMemory' => 'Appens processminne vid provänden',
 			'customPerformance.noFrames' => 'Inga renderade ramar fångades. Starta ett nytt prov och bläddra i appen.',
+			'homeLayout.manageStudios' => 'Välj och beställ studios',
+			'homeLayout.manageStudiosDescription' => 'Välj vilka studior som ska visas för den här profilen och ordna deras ordning.',
+			'homeLayout.studioUnavailable' => 'Endast studior som finns i dina valda bibliotek visas på Home.',
+			'homeLayout.showAllStudios' => 'Visa alla studior',
+			'homeLayout.hideAllStudios' => 'Göm alla studior',
+			'homeLayout.reorderStudio' => 'Ändra studioordning',
+			'homeLayout.episodeThumbnails' => 'Avsnittsbilder i Fortsätt titta',
+			'homeLayout.episodeThumbnailsDescription' => 'Visa avsnittsbilder istället för serie- eller säsongsaffischer i Fortsätt titta och Nästa.',
+			'homeLayout.spotlightSource' => 'Källa för utvalt innehåll',
+			'homeLayout.spotlightSourceDescription' => 'For You använder den här profilens visningsaktivitet på den här enheten, tillsammans med favoriter och bibliotekstitlar.',
+			'homeLayout.spotlightForYou' => 'För dig',
+			'homeLayout.spotlightForYouDescription' => 'En blandning av vad du tittar på, favoriter, nya tillägg och trender, med hjälp av den här profilens visningsaktivitet på den här enheten.',
+			'homeLayout.spotlightTrending' => 'Trendigt',
+			'homeLayout.spotlightTrendingDescription' => 'Populära filmer och program i dina bibliotek.',
+			'homeLayout.spotlightContinue' => 'Fortsätt titta',
+			'homeLayout.spotlightContinueDescription' => 'Titlar du har startat och avsnitt du kan fortsätta.',
+			'homeLayout.spotlightFavorites' => 'Från dina favoriter',
+			'homeLayout.spotlightInspired' => 'Inspirerad av din visning',
+			'homeLayout.spotlightNextUp' => 'Nästa',
 			'homeLayout.title' => 'Anpassa hemmet',
 			'homeLayout.description' => 'Välj radordning och synlighet för den här profilen. Välj en rad för att flytta eller dölja den.',
 			'homeLayout.rows' => 'Hemrader',
+			'homeLayout.progressLayout' => 'Fortsätt titta och nästa',
+			'homeLayout.progressCombined' => 'Sammansatt i en rad',
+			'homeLayout.progressSeparate' => 'Separata rader',
+			'homeLayout.progressDescription' => 'Separat Next Up när det stöds av servern. Andra servrar förblir kombinerade.',
 			'homeLayout.visible' => 'Synlig',
 			'homeLayout.hidden' => 'Dold',
 			'homeLayout.showRow' => 'Visa rad',
@@ -5961,6 +6160,8 @@ extension on TranslationsSv {
 			'activityStats.trendTitle' => 'Titta tid',
 			'activityStats.trendToday' => 'Idag',
 			'activityStats.gapDetail' => ({required Object stat, required Object range}) => '${stat} på ${range}',
+			'activityStats.patternsTitle' => 'Dina mönster',
+			'activityStats.mostlyKind' => ({required Object kind}) => 'Mestadels ${kind}',
 			'activityStats.weekdayTitle' => 'Efter veckodag',
 			'activityStats.hoursTitle' => 'Efter tid på dygnet',
 			'activityStats.amLabel' => 'AM',
@@ -5973,6 +6174,8 @@ extension on TranslationsSv {
 			'activityStats.kindOther' => 'Annat',
 			'activityStats.topTitlesTitle' => 'Mest tittade',
 			'activityStats.sessionsTitle' => 'Senaste sessioner',
+			'activityStats.recentViewingTitle' => 'Senaste visning',
+			'activityStats.recentViewingHint' => 'Totalt sett tid under den valda perioden. Datum visar den senaste visningen.',
 			'activityStats.showMore' => 'Visa mer',
 			'activityStats.sessionNoTitle' => 'Oidentifierad uppspelning',
 			'activityStats.emptyTitle' => 'Inget här ännu',
@@ -6187,6 +6390,8 @@ extension on TranslationsSv {
 			'accessibility.hue' => 'Nyans',
 			'accessibility.saturation' => 'Mättnad',
 			'accessibility.brightness' => 'Ljusstyrka',
+			_ => null,
+		} ?? switch (path) {
 			'accessibility.hexColor' => 'Hexfärg',
 			'accessibility.expandText' => 'Expandera text',
 			'accessibility.collapseText' => 'Fäll ihop text',
@@ -6233,8 +6438,6 @@ extension on TranslationsSv {
 			'videoControls.seekBackwardButton' => ({required Object seconds}) => 'Spola bakåt ${seconds} sekunder',
 			'videoControls.seekForwardButton' => ({required Object seconds}) => 'Spola framåt ${seconds} sekunder',
 			'videoControls.previousButton' => 'Föregående avsnitt',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.nextButton' => 'Nästa avsnitt',
 			'videoControls.previousChapterButton' => 'Föregående kapitel',
 			'videoControls.nextChapterButton' => 'Nästa kapitel',
@@ -6336,6 +6539,7 @@ extension on TranslationsSv {
 			'messages.metadataRefreshStarted' => ({required Object title}) => 'Metadatauppdateringen har startat för "${title}"',
 			'messages.metadataRefreshFailed' => ({required Object error}) => 'Det gick inte att uppdatera metadata: ${error}',
 			'messages.logoutConfirm' => 'Är du säker på att du vill logga ut?',
+			'messages.logoutDeviceConfirm' => 'Logga ut från Luroka på den här enheten? Alla profiler, inklusive barnprofiler, serverkonton och nedladdade media kommer att tas bort från den här enheten. Du kan logga in igen senare.',
 			'messages.noSeasonsFound' => 'Inga säsonger hittades',
 			'messages.seasonsLoadFailed' => 'Det gick inte att läsa in säsonger',
 			'messages.noEpisodesFound' => 'Inga avsnitt hittades i första säsongen',
@@ -6421,6 +6625,9 @@ extension on TranslationsSv {
 			'mpvConfig.removeLine' => 'Ta bort rad',
 			'mpvConfig.embeddedVoHint' => 'vo, gpu-context och gpu-api ignoreras på Linux: inbäddad video renderas alltid via vo=libmpv på videoplanet, och gpu-next (som compute-shaders som ArtCNN behöver) kan inte köras inbäddat.',
 			'dialog.confirmAction' => 'Bekräfta åtgärd',
+			'profiles.manageProfiles' => 'Hantera profiler',
+			'profiles.quickAccess' => 'Snabb åtkomst',
+			'profiles.signOutDevice' => 'Logga ut från den här enheten',
 			'profiles.addLurokaProfile' => 'Lägg till Luroka-profil',
 			'profiles.switchingProfile' => 'Byter profil…',
 			'profiles.deleteThisProfileTitle' => 'Ta bort denna profil?',
@@ -6512,7 +6719,7 @@ extension on TranslationsSv {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => 'Ljud-, undertext- och biblioteksalternativ sparade på ${account}',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => 'Ljud-, undertext- och biblioteksalternativ sparade på ${count} konton',
 			'accountPreferences.pickAccount' => 'Varje konto lagrar sina egna inställningar. Välj det du vill redigera.',
-			'accountPreferences.storedOnAccount' => 'Dessa alternativ sparas på själva kontot, så alla appar som är inloggade på det använder dem — inklusive Luroka på dina andra enheter.',
+			'accountPreferences.storedOnAccount' => 'Dessa alternativ sparas på serverkontot och delas av alla Luroka-profiler och appar som använder det kontot, inklusive på andra enheter.',
 			'accountPreferences.noAccounts' => 'Inga konton att konfigurera',
 			'accountPreferences.noAccountsHint' => 'Logga in på Plex, eller anslut en Jellyfin- eller Emby-server, så visas de inställningar som lagras på det kontot här.',
 			'accountPreferences.unavailable' => 'Det går inte att nå detta konto',
@@ -6697,6 +6904,8 @@ extension on TranslationsSv {
 			'libraries.sortLabels.dateShared' => 'Delningsdatum',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Senaste avsnittets sändningsdatum',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Datum då senaste avsnittet lades till',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Nedladdningsdatum',
 			'libraries.sortLabels.size' => 'Storlek',
 			'libraries.sortLabels.library' => 'Bibliotek',
@@ -6747,8 +6956,6 @@ extension on TranslationsSv {
 			'about.packageLine' => ({required Object package}) => 'Paket: ${package}',
 			'about.localeLine' => ({required Object locale}) => 'Språk: ${locale}',
 			'about.copyDetails' => 'Kopiera detaljer',
-			_ => null,
-		} ?? switch (path) {
 			'about.detailsCopied' => 'Appinformationen har kopierats',
 			'about.detailsCopyFailed' => 'Det gick inte att kopiera appinformation',
 			'about.checkForUpdatesDescription' => 'Kontrollera GitHub för en nyare version',
@@ -6762,7 +6969,7 @@ extension on TranslationsSv {
 			'about.documentationDescription' => 'Installation, funktioner och bygganteckningar',
 			'about.upstreamProjectDescription' => 'Open-source-projekt av edde746 och bidragsgivare',
 			'about.upstreamWebsite' => 'Uppströms webbplats',
-			'about.attribution' => 'Data & attribution',
+			'about.attribution' => 'Data och källhänvisning',
 			'about.attributionDescription' => 'Metadata, betyg och varumärken',
 			'about.attributionBody' => 'Denna produkt använder TMDB API men är inte godkänd eller certifierad av TMDB. Popularitetslistor, metadata och IMDb-betyg tillhandahålls av Cinemeta. Poäng behåller sina källetiketter.',
 			'about.trademarkNotices' => 'Plex, Jellyfin, Emby, Trakt, Simkl, MyAnimeList, AniList, Trakt, Simkl, MyAnimeList, AniList, Trakt, och relaterade varumärken tillhör deras varumärken, Z07XKEEPQ0 och relaterade varumärken ägare. Luroka är inte ansluten till eller godkänd av dem.',
@@ -7211,6 +7418,8 @@ extension on TranslationsSv {
 			'watchTogether.offsetPlusSecond' => '+1 s',
 			'watchTogether.participants' => 'Deltagare',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('sv'))(n, one: '${n}-deltagare', other: '${n} deltagare', ), 
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'VÄRD',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (Du)',
 			'watchTogether.playerIdle' => 'Inaktiv',
@@ -7221,7 +7430,7 @@ extension on TranslationsSv {
 			'watchTogether.matchMatched' => 'Har videon',
 			'watchTogether.matchMismatched' => 'Olika längd',
 			'watchTogether.matchUnavailable' => 'Har inte videon',
-			'watchTogether.participantOffset' => ({required Object offset}) => 'Offset ${offset}',
+			'watchTogether.participantOffset' => ({required Object offset}) => 'Förskjutning ${offset}',
 			'watchTogether.makeHost' => 'Gör till värd',
 			'watchTogether.makeHostQuestion' => 'Överför värdskapet?',
 			'watchTogether.makeHostConfirm' => ({required Object name}) => '${name} kommer att styra uppspelningen och driva sessionen för alla.',
@@ -7261,8 +7470,6 @@ extension on TranslationsSv {
 			'watchTogether.notices.finished' => 'Färdig',
 			'watchTogether.notices.hostChangedTo' => ({required Object name}) => '${name} är nu värden',
 			'watchTogether.notices.youAreNowHost' => 'Du är nu värden',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.joined' => ({required Object name}) => '${name} gick med',
 			'watchTogether.notices.left' => ({required Object name}) => '${name} lämnade',
 			'watchTogether.notices.controlRefused' => 'Endast värden kan styra uppspelningen',
@@ -7725,6 +7932,8 @@ extension on TranslationsSv {
 			'seerr.statusPartiallyAvailable' => 'Delvis tillgänglig',
 			'seerr.statusRequested' => 'Begärd',
 			'seerr.statusProcessing' => 'Bearbetas',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'På blockeringslistan',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Kunde inte nå ${url}: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'Det finns ingen Seerr-instans på ${url} (HTTP ${status})',
@@ -7775,8 +7984,6 @@ extension on TranslationsSv {
 			'services.deviceCode.title' => ({required Object service}) => 'Aktivera Luroka på ${service}',
 			'services.deviceCode.instructions' => 'Skanna QR-koden eller gå till adressen nedan och ange den här koden:',
 			'services.deviceCode.openToActivate' => ({required Object service}) => 'Öppna ${service} för att aktivera',
-			_ => null,
-		} ?? switch (path) {
 			'services.deviceCode.copyCode' => 'Kopiera aktiveringskod',
 			'services.deviceCode.waitingForAuthorization' => 'Väntar på auktorisering…',
 			'services.deviceCode.codeCopied' => 'Kod kopierad',
@@ -7797,12 +8004,69 @@ extension on TranslationsSv {
 			'services.libraryFilter.modeHintWhitelist' => 'Synkronisera endast de bibliotek som markeras nedan.',
 			'services.libraryFilter.libraries' => 'Bibliotek',
 			'services.libraryFilter.noLibraries' => 'Inga bibliotek tillgängliga',
+			'offlineRecovery.title' => 'Dina servrar är offline',
+			'offlineRecovery.description' => 'Dina nedladdningar är fortfarande tillgängliga. Försök att ansluta igen när din server är tillbaka, eller lägg till en annan server.',
+			'offlineRecovery.appleTvDescription' => 'Luroka kunde inte nå dina mediaservrar. Försök att ansluta igen när de är tillgängliga, eller lägg till en annan server för att fortsätta titta.',
+			'offlineRecovery.kidsDescription' => 'Vi kunde inte nå din mediaserver. Försök att ansluta igen eller be en förälder om hjälp.',
+			'offlineRecovery.retrying' => 'Ansluter...',
+			'offlineRecovery.addServer' => 'Lägg till en server',
+			'releaseUpdates.manualInstructions' => 'Ladda ner releasearkivet från GitHub, extrahera APK och installera det på din Android-enhet.',
+			'releaseUpdates.tvInstructions' => 'Öppna den här adressen på din telefon eller dator, eller skanna QR-koden för att ladda ner releasen.',
+			'releaseUpdates.pressBackAgain' => 'Tryck på Tillbaka igen för att avsluta uppspelningen',
+			'profileIntegrations.title' => 'Gör Luroka till din',
+			'profileIntegrations.description' => 'Anslut dina favorittjänster för att spåra vad du tittar på och begära nya filmer och program. Varje Luroka-profil har sina egna anslutningar.',
+			'profileIntegrations.step' => 'Valfria integrationer',
+			'profileIntegrations.examples' => 'Trakt · Simkl · AniList · MyAnimeList · Seerr',
+			'profileIntegrations.connect' => 'Utforska integrationer',
+			'profileIntegrations.later' => 'Ställ in senare',
+			'profileIntegrations.manage' => 'Hantera integrationer',
+			'profileIntegrations.forProfile' => ({required Object name}) => 'Anslutningar för ${name}',
+			'profileSetupGuide.title' => 'Gör din profil till din',
+			'profileSetupGuide.description' => 'Välj hur Luroka ser ut och känns för den här profilen på den här enheten. Du kan ändra allt senare i Inställningar.',
+			'profileSetupGuide.appearanceStep' => '1 av 2 · Utseende',
+			'profileSetupGuide.homeStep' => '2 av 2 · Din startskärm',
+			'profileSetupGuide.preview' => 'Förhandsgranska',
+			'profileSetupGuide.previewTitle' => 'Ditt hem',
+			'profileSetupGuide.previewPoster' => 'Affisch',
+			'profileSetupGuide.posterArtwork' => 'Endast konstverk',
+			'profileSetupGuide.posterWithDetails' => 'Visa affischdetaljer',
+			'profileSetupGuide.musicDescription' => 'Spela upp en film eller ett programs tema medan dess informationssida är öppen, när det är tillgängligt.',
+			'profileSetupGuide.moreThemes' => 'Fler teman',
+			'profileSetupGuide.fewerThemes' => 'Färre teman',
+			'profileSetupGuide.spotlightHeading' => 'Vad ska visas i Spotlight?',
+			'profileSetupGuide.progressHeading' => 'Fortsätt titta och nästa',
+			'profileSetupGuide.skip' => 'Använd standardinställningar och börja titta',
+			'profileSetupGuide.finish' => 'Börja titta',
+			'profileSetupGuide.back' => 'Tillbaka',
+			'profileSetupGuide.kContinue' => 'Fortsätt',
+			'profileSetupGuide.chooseLater' => 'Välj bibliotek senare',
+			'profileSetupGuide.libraryScope' => 'Detta ändrar vad som visas i Luroka för den här profilen; det ändrar inte serverbehörigheter.',
+			'profileSetupGuide.createdTitle' => 'Profil skapad',
+			'profileSetupGuide.createdDescription' => 'Din nya profil är klar. Dess ägare kan anpassa den första gången de öppnar den.',
+			'profileSetupGuide.switchProfile' => 'Byt till den här profilen',
+			'profileSetupGuide.stayHere' => 'Håll kvar nuvarande profil',
+			'animeFavorites.filter' => 'Anime',
+			'animeFavorites.manage' => 'Hantera anime',
+			'animeFavorites.description' => 'Automatisk upptäckt använder anime-biblioteksnamn och tillgängliga anime-taggar eller ID:n. Välj bibliotek och korrigera enskilda favoriter. Val sparas på den här enheten för din profil.',
+			'animeFavorites.libraries' => 'Anime bibliotek',
+			'animeFavorites.libraryHint' => 'Bibliotek med namnet Anime känns igen automatiskt. Välj ett bibliotek för att ändra dess klassificering.',
+			'animeFavorites.titles' => 'Favorittitlar',
+			'animeFavorites.titleHint' => 'Välj en titel för att markera den som anime eller korrigera en automatisk matchning.',
+			'animeFavorites.automatic' => 'Automatisk',
+			'animeFavorites.include' => 'Anime',
+			'animeFavorites.exclude' => 'Inte anime',
+			'animeFavorites.automaticIncluded' => 'Automatisk · Anime',
+			'animeFavorites.automaticExcluded' => 'Automatisk · Inte anime',
+			'animeFavorites.noLibraries' => 'Inga anslutna bibliotek tillgängliga.',
+			'animeFavorites.noTitles' => 'Inga favoritfilmer eller -program tillgängliga.',
+			'animeFavorites.empty' => 'Inga anime-favoriter hittades. Kontrollera dina anime-bibliotek eller markera en titel som anime.',
+			'animeFavorites.saveFailed' => 'Det gick inte att spara dina anime-inställningar. Försök igen.',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => 'Lägg till ${product}-server',
 			'addServer.serverUrls' => 'Server-URL:er',
 			'addServer.serverUrlsHelper' => 'Du kan ange flera URL:er avgränsade med kommatecken.',
 			'addServer.findServer' => 'Hitta server',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => 'Söker efter lokala ${product}-servrar...',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Lokala ${product}-servrar',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Sparade och närliggande ${product}-servrar',
 			'addServer.username' => 'Användarnamn',
 			'addServer.password' => 'Lösenord',
 			'addServer.signIn' => 'Logga in',

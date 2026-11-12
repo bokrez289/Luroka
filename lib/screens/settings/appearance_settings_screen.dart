@@ -89,85 +89,121 @@ class AppearanceSettingsScreen extends StatelessWidget {
         ],
       ),
 
-      SettingsGroup(
-        title: t.settings.libraryAndCards,
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _densitySelector(),
-          _gridSpacingSelector(),
-          if (advanced) _episodePosterModeSelector(),
-          if (advanced) _viewModeSelector(),
-          SettingSwitchTile(
-            pref: SettingsService.posterDetails,
-            icon: Symbols.info_rounded,
-            title: t.posterDetails.title,
-            subtitle: t.posterDetails.description,
+          SettingsGroup(
+            title: section == AppearanceSettingsSection.all
+                ? t.settings.libraryAndCards
+                : t.settingsRedesign.libraryLayout,
+            children: [
+              if (PlatformDetector.isTV())
+                SettingSwitchTile(
+                  pref: SettingsService.compactTvLibraryNavigation,
+                  icon: Symbols.dock_to_left_rounded,
+                  title: t.libraryPolish.compactTvNavigation,
+                  subtitle: t.libraryPolish.compactTvNavigationDescription,
+                ),
+              _densitySelector(),
+              _gridSpacingSelector(),
+              if (advanced) _episodePosterModeSelector(),
+              SettingSwitchTile(
+                pref: SettingsService.homeEpisodeThumbnails,
+                icon: Symbols.image_rounded,
+                title: t.homeLayout.episodeThumbnails,
+                subtitle: t.homeLayout.episodeThumbnailsDescription,
+              ),
+              if (advanced) _viewModeSelector(),
+              if (advanced && PlatformDetector.isTV())
+                SettingSwitchTile(
+                  pref: SettingsService.tvFullCardLayout,
+                  icon: Symbols.image_rounded,
+                  title: t.settings.tvFullCardLayout,
+                  subtitle: t.settings.tvFullCardLayoutDescription,
+                ),
+              if (advanced && PlatformDetector.isTV())
+                SettingSwitchTile(
+                  pref: SettingsService.tvCornerSpotlightBackdrop,
+                  icon: Symbols.picture_in_picture_alt_rounded,
+                  title: t.settings.tvCornerSpotlightBackdrop,
+                  subtitle: t.settings.tvCornerSpotlightBackdropDescription,
+                ),
+              if (advanced && PlatformDetector.isTV())
+                SettingSwitchTile(
+                  pref: SettingsService.focusGlow,
+                  icon: Symbols.lightbulb_rounded,
+                  title: t.settings.focusGlow,
+                  subtitle: t.settings.focusGlowDescription,
+                ),
+            ],
           ),
-          if (advanced)
-            SettingSwitchTile(
-              pref: SettingsService.showEpisodeNumberOnCards,
-              icon: Symbols.tag_rounded,
-              title: t.settings.showEpisodeNumberOnCards,
-              subtitle: t.settings.showEpisodeNumberOnCardsDescription,
-            ),
-          if (!PlatformDetector.isTV())
-            SettingSwitchTile(
-              pref: SettingsService.showSeasonPostersOnTabs,
-              icon: Symbols.image_rounded,
-              title: t.settings.showSeasonPostersOnTabs,
-              subtitle: t.settings.showSeasonPostersOnTabsDescription,
-            ),
-          SettingSwitchTile(
-            pref: SettingsService.hideSpoilers,
-            icon: Symbols.visibility_off_rounded,
-            title: t.settings.hideSpoilers,
-            subtitle: t.settings.hideSpoilersDescription,
+          SettingsGroup(
+            title: t.settingsRedesign.posterInformation,
+            children: [
+              SettingSwitchTile(
+                pref: SettingsService.posterDetails,
+                icon: Symbols.info_rounded,
+                title: t.posterDetails.title,
+                subtitle: t.posterDetails.description,
+              ),
+              if (advanced)
+                SettingSwitchTile(
+                  pref: SettingsService.showEpisodeNumberOnCards,
+                  icon: Symbols.tag_rounded,
+                  title: t.settings.showEpisodeNumberOnCards,
+                  subtitle: t.settings.showEpisodeNumberOnCardsDescription,
+                ),
+              if (!PlatformDetector.isTV())
+                SettingSwitchTile(
+                  pref: SettingsService.showSeasonPostersOnTabs,
+                  icon: Symbols.image_rounded,
+                  title: t.settings.showSeasonPostersOnTabs,
+                  subtitle: t.settings.showSeasonPostersOnTabsDescription,
+                ),
+              SettingSwitchTile(
+                pref: SettingsService.hideSpoilers,
+                icon: Symbols.visibility_off_rounded,
+                title: t.settings.hideSpoilers,
+                subtitle: t.settings.hideSpoilersDescription,
+              ),
+              SettingSwitchTile(
+                pref: SettingsService.showWatchedIndicators,
+                icon: Symbols.check_circle_rounded,
+                title: t.settings.showWatchedIndicators,
+                subtitle: t.settings.showWatchedIndicatorsDescription,
+              ),
+              SettingSwitchTile(
+                pref: SettingsService.catalogEpisodeInfo,
+                icon: Symbols.movie_info_rounded,
+                title: t.posterDetails.catalogEpisodeInfo,
+                subtitle: t.posterDetails.catalogEpisodeInfoDescription,
+              ),
+            ],
           ),
-          SettingSwitchTile(
-            pref: SettingsService.showWatchedIndicators,
-            icon: Symbols.check_circle_rounded,
-            title: t.settings.showWatchedIndicators,
-            subtitle: t.settings.showWatchedIndicatorsDescription,
+          SettingsGroup(
+            title: t.settingsRedesign.libraryBehavior,
+            children: [
+              SettingSwitchTile(
+                pref: SettingsService.showThemeMusic,
+                icon: Symbols.music_note_rounded,
+                title: t.posterDetails.showThemeMusic,
+                subtitle: t.posterDetails.showThemeMusicDescription,
+              ),
+            ],
           ),
-          if (advanced && PlatformDetector.isTV())
-            SettingSwitchTile(
-              pref: SettingsService.tvFullCardLayout,
-              icon: Symbols.image_rounded,
-              title: t.settings.tvFullCardLayout,
-              subtitle: t.settings.tvFullCardLayoutDescription,
-            ),
-          if (advanced && PlatformDetector.isTV())
-            SettingSwitchTile(
-              pref: SettingsService.tvCornerSpotlightBackdrop,
-              icon: Symbols.picture_in_picture_alt_rounded,
-              title: t.settings.tvCornerSpotlightBackdrop,
-              subtitle: t.settings.tvCornerSpotlightBackdropDescription,
-            ),
-          if (advanced && PlatformDetector.isTV())
-            SettingSwitchTile(
-              pref: SettingsService.focusGlow,
-              icon: Symbols.lightbulb_rounded,
-              title: t.settings.focusGlow,
-              subtitle: t.settings.focusGlowDescription,
-            ),
         ],
       ),
 
       SettingsGroup(
         title: t.settings.homeScreen,
         children: [
-          if (!categoryWorkspace)
-            SettingSwitchTile(
-              pref: SettingsService.showThemeMusic,
-              icon: Symbols.music_note_rounded,
-              title: t.posterDetails.showThemeMusic,
-              subtitle: t.posterDetails.showThemeMusicDescription,
-            ),
-          if (!categoryWorkspace)
-            SettingSwitchTile(
-              pref: SettingsService.catalogEpisodeInfo,
-              icon: Symbols.movie_info_rounded,
-              title: t.posterDetails.catalogEpisodeInfo,
-              subtitle: t.posterDetails.catalogEpisodeInfoDescription,
+          if (context.watch<HomeLayoutProvider?>()?.profileId != null)
+            SettingNavigationTile(
+              icon: Symbols.dashboard_customize_rounded,
+              title: t.homeLayout.title,
+              settingId: 'customize_home',
+              subtitle: t.homeLayout.description,
+              destinationBuilder: (_) => HomeLayoutScreen(includeSpotlight: !categoryWorkspace),
             ),
           SettingSegmentedTile<int>(
             pref: SettingsService.homeShelfItemCount,
@@ -186,14 +222,20 @@ class AppearanceSettingsScreen extends StatelessWidget {
             title: t.dashboard.showFeatured,
             subtitle: t.dashboard.showFeaturedDescription,
           ),
-          if (!categoryWorkspace && context.watch<HomeLayoutProvider?>()?.profileId != null)
-            SettingNavigationTile(
-              icon: Symbols.dashboard_customize_rounded,
-              title: t.homeLayout.title,
-              subtitle: t.homeLayout.description,
-              destinationBuilder: (_) => const HomeLayoutScreen(),
-            ),
           if (!categoryWorkspace || !PlatformDetector.isMobile(context)) _homeHeroSizeSelector(),
+          SettingStepperTile<int>(
+            pref: SettingsService.homePosterSize,
+            icon: Symbols.view_carousel_rounded,
+            title: 'Home poster size',
+            values: const [1, 2, 3, 4, 5],
+            label: (value) => switch (value) {
+              1 => 'Small',
+              2 => 'Medium',
+              3 => 'Comfortable (default)',
+              4 => 'Large',
+              _ => 'Extra large',
+            },
+          ),
           if (tvWorkspace && advanced)
             SettingSwitchTile(
               pref: SettingsService.homeSpotlightAutoRotate,
@@ -214,6 +256,18 @@ class AppearanceSettingsScreen extends StatelessWidget {
                   ),
               ],
             ),
+          SettingSwitchTile(
+            pref: SettingsService.groupRecentEpisodes,
+            icon: Symbols.tv_rounded,
+            title: 'Group recently added episodes',
+            subtitle: 'Show one series poster in View all. Turn off to browse individual episodes.',
+          ),
+          SettingSwitchTile(
+            pref: SettingsService.showRemainingEpisodes,
+            icon: Symbols.format_list_numbered_rounded,
+            title: 'Remaining episodes',
+            subtitle: 'Show available unwatched episodes on Continue Watching cards.',
+          ),
           _continueWatchingActionSelector(),
           _episodeActionSelector(),
           if (advanced)
@@ -293,26 +347,7 @@ class AppearanceSettingsScreen extends StatelessWidget {
     if (section == AppearanceSettingsSection.all) return AppearanceWorkspace(firstFocus: firstFocus, groups: groups);
     final selected = switch (section) {
       AppearanceSettingsSection.appearance => [groups[0]],
-      AppearanceSettingsSection.library => [
-        groups[1],
-        SettingsGroup(
-          title: t.settings.behavior,
-          children: [
-            SettingSwitchTile(
-              pref: SettingsService.showThemeMusic,
-              icon: Symbols.music_note_rounded,
-              title: t.posterDetails.showThemeMusic,
-              subtitle: t.posterDetails.showThemeMusicDescription,
-            ),
-            SettingSwitchTile(
-              pref: SettingsService.catalogEpisodeInfo,
-              icon: Symbols.movie_info_rounded,
-              title: t.posterDetails.catalogEpisodeInfo,
-              subtitle: t.posterDetails.catalogEpisodeInfoDescription,
-            ),
-          ],
-        ),
-      ],
+      AppearanceSettingsSection.library => [groups[1]],
       AppearanceSettingsSection.home => [groups[2], groups[3], groups[4]],
       AppearanceSettingsSection.all => groups,
     };
@@ -348,41 +383,46 @@ class AppearanceSettingsScreen extends StatelessWidget {
         label: (value) => '$value / 5',
       );
     }
-    return SettingValueBuilder<int>(
-      pref: SettingsService.libraryDensity,
-      builder: (context, density, _) {
-        final theme = Theme.of(context);
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Column(
-            crossAxisAlignment: .start,
-            children: [
-              Row(
-                children: [
-                  const AppIcon(Symbols.grid_view_rounded, fill: 1),
-                  const SizedBox(width: 16),
-                  Expanded(child: Text(t.settings.libraryDensity, style: settingsOptionTitleStyle(context))),
-                ],
-              ),
-              const SizedBox(height: 12),
-              FocusableSlider(
-                value: density.toDouble(),
-                min: 1,
-                max: 5,
-                divisions: 4,
-                onChanged: (v) => SettingsService.instance.write(SettingsService.libraryDensity, v.round()),
-              ),
-              Row(
-                mainAxisAlignment: .spaceBetween,
-                children: [
-                  Text(t.settings.compact, style: theme.textTheme.bodySmall),
-                  Text(t.settings.comfortable, style: theme.textTheme.bodySmall),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
+    return WorkspaceSettingRow(
+      settingId: SettingsService.libraryDensity.key,
+      title: t.settings.libraryDensity,
+      description: '',
+      child: SettingValueBuilder<int>(
+        pref: SettingsService.libraryDensity,
+        builder: (context, density, _) {
+          final theme = Theme.of(context);
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              crossAxisAlignment: .start,
+              children: [
+                Row(
+                  children: [
+                    const AppIcon(Symbols.grid_view_rounded, fill: 1),
+                    const SizedBox(width: 16),
+                    Expanded(child: Text(t.settings.libraryDensity, style: settingsOptionTitleStyle(context))),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                FocusableSlider(
+                  value: density.toDouble(),
+                  min: 1,
+                  max: 5,
+                  divisions: 4,
+                  onChanged: (v) => SettingsService.instance.write(SettingsService.libraryDensity, v.round()),
+                ),
+                Row(
+                  mainAxisAlignment: .spaceBetween,
+                  children: [
+                    Text(t.settings.compact, style: theme.textTheme.bodySmall),
+                    Text(t.settings.comfortable, style: theme.textTheme.bodySmall),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -445,6 +485,7 @@ class AppearanceSettingsScreen extends StatelessWidget {
     icon: Symbols.aspect_ratio_rounded,
     title: t.settings.homeHeroSize,
     segments: [
+      const ButtonSegment(value: HomeHeroSize.compact, label: Text('Compact')),
       ButtonSegment(value: HomeHeroSize.small, label: Text(t.settings.homeHeroSizeSmall)),
       ButtonSegment(value: HomeHeroSize.medium, label: Text(t.settings.homeHeroSizeMedium)),
       ButtonSegment(value: HomeHeroSize.large, label: Text(t.settings.homeHeroSizeLarge)),

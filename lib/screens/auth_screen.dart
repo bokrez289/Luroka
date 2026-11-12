@@ -39,8 +39,11 @@ import 'auth/plex_pin_auth_flow.dart';
 import 'auth/plex_home_identity_screen.dart';
 import 'profile/profile_switch_screen.dart';
 import 'settings/add_jellyfin_screen.dart';
+import 'settings/phone_server_pairing_screen.dart';
+import 'settings/tv_server_pairing_dialog.dart';
 import 'profile/onboarding_profile_screen.dart';
 import 'profile/full_backup_actions.dart';
+import 'profile/cloud_backup_actions.dart';
 import 'settings/connection_persistence.dart';
 import '../services/profile_appearance_service.dart';
 
@@ -436,6 +439,16 @@ class _AuthScreenState extends State<AuthScreen> {
           label: t.auth.connectToMediaBrowser(product: embyDialect.productName),
           onPressed: busy ? null : connectToEmby,
         ),
+        if (serverPairingEnabled && !isTV)
+          TextButton.icon(
+            onPressed: busy
+                ? null
+                : () => Navigator.of(
+                    context,
+                  ).push<void>(MaterialPageRoute(builder: (_) => const PhoneServerPairingScreen())),
+            icon: const Icon(Icons.tv_rounded),
+            label: const Text('Connect a TV'),
+          ),
         const SizedBox(height: 12),
         TextButton.icon(
           onPressed: busy
@@ -447,6 +460,17 @@ class _AuthScreenState extends State<AuthScreen> {
           icon: const Icon(Icons.restore_rounded),
           label: const Text('Restore encrypted backup'),
         ),
+        if (cloudBackupEnabled)
+          TextButton.icon(
+            onPressed: busy
+                ? null
+                : () async {
+                    final restored = await showCloudBackupRestore(context);
+                    if (mounted && restored) setState(() => _backupRestored = true);
+                  },
+            icon: const Icon(Icons.cloud_download_outlined),
+            label: const Text('Restore cloud backup'),
+          ),
         if (kDebugMode) ...[
           const SizedBox(height: 12),
           FocusableButton(

@@ -237,6 +237,9 @@ class DownloadProvider extends ChangeNotifier with DisposableChangeNotifierMixin
 
   bool _ownsDownloadKey(String globalKey) => _ownedDownloadKeys.contains(globalKey);
 
+  /// Identifies the profile session owning asynchronous download operations.
+  int get profileGeneration => _profileGeneration;
+
   bool _ownsProgressEntry(MapEntry<String, DownloadProgress> entry) => _ownsDownloadKey(entry.key);
 
   /// Claim [globalKey] for an explicit [profileId] — sync rules claim for
@@ -2394,7 +2397,12 @@ class DownloadProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   /// with the caller: the sweep in [autoDeleteWatchedDownloads] trusts server
   /// metadata, while [OfflineWatchProvider] fires right after a local
   /// mark-watched that metadata cannot reflect yet.
-  Future<String?> deleteWatchedDownloadCandidate(String globalKey, {required String logContext}) async {
+  Future<String?> deleteWatchedDownloadCandidate(
+    String globalKey, {
+    required String logContext,
+    String? expectedProfileId,
+  }) async {
+    if (expectedProfileId != null && expectedProfileId != _activeProfileId) return null;
     final meta = _resolvedMetadata(globalKey);
     if (meta == null) return null;
     if (!meta.isEpisode && !meta.isMovie) return null;

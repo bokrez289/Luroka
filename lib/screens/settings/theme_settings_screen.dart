@@ -20,6 +20,7 @@ import '../../widgets/app_icon.dart';
 import '../../widgets/focusable_list_tile.dart';
 import '../../widgets/overlay_sheet.dart';
 import '../../widgets/mobile_settings_preview.dart';
+import '../../widgets/tv_settings_preview.dart';
 import '../../widgets/palette_swatch.dart';
 import '../../widgets/settings_page.dart';
 import '../../widgets/settings_section.dart';
@@ -169,7 +170,18 @@ class ThemeSettingsScreen extends StatelessWidget {
         ),
       );
     }
-    return SettingsPage(title: Text(showMore ? t.lurokaThemes.moreThemes : t.settings.theme), children: children);
+    return SettingsPage(
+      title: Text(showMore ? t.lurokaThemes.moreThemes : t.settings.theme),
+      previewHeader: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(t.tvSettingsV2.previewLive, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+          const MiniHomePreview(),
+        ],
+      ),
+      children: children,
+    );
   }
 
   /// Applies [mode]. A locked perk first offers the Supporter sheet; Custom

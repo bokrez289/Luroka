@@ -40,7 +40,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   const windowChannel = MethodChannel('window_manager');
-  const macWindowChannel = MethodChannel('com.luroka/window_utils');
+  const macWindowChannel = MethodChannel('com.plezy/window_utils');
   const surface = Size(1280, 720);
 
   late SettingsService settings;

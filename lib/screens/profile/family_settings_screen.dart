@@ -102,7 +102,9 @@ Future<void> showAddFamilyPerson(BuildContext context) async {
   }
   await Navigator.of(context).push(
     MaterialPageRoute(
-      builder: (_) => choice == _AddPerson.adult ? const AddLocalProfileScreen() : const KidsProfileScreen(),
+      builder: (_) => choice == _AddPerson.adult
+          ? const AddLocalProfileScreen(offerSwitchAfterCreate: true)
+          : const KidsProfileScreen(),
     ),
   );
 }
@@ -116,34 +118,68 @@ class FamilySettingsScreen extends StatefulWidget {
 
 class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
   String? _activityOwner;
+  String? _activityScope;
   Future<ViewingActivitySummary?>? _activity;
   Future<Map<String, int>>? _todayPerProfile;
   bool _managing = false;
 
   @override
+  void initState() {
+    super.initState();
+    KidsProfileService.instance.addListener(_policyChanged);
+  }
+
+  @override
+  void dispose() {
+    KidsProfileService.instance.removeListener(_policyChanged);
+    super.dispose();
+  }
+
+  void _policyChanged() {
+    if (!mounted) return;
+    final scope = (_activityProfiles(context.read<ActiveProfileProvider?>()).toList()..sort()).join('\u0000');
+    if (scope == _activityScope) return;
+    _activityScope = scope;
+    _refreshActivity();
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final service = context.watch<ScreenTimeService?>();
-    if (_activityOwner != service?.profileId || _activity == null) {
+    final active = context.watch<ActiveProfileProvider?>();
+    final eligible = _activityProfiles(active);
+    final scope = (eligible.toList()..sort()).join('\u0000');
+    if (_activityOwner != service?.profileId || _activityScope != scope || _activity == null) {
       _activityOwner = service?.profileId;
-      _activity = service == null ? Future.value() : loadViewingActivitySummary(service);
-      _todayPerProfile = _loadTodayPerProfile(service);
+      _activityScope = scope;
+      _activity = service == null || service.profileId != active?.activeId
+          ? Future.value() : loadViewingActivitySummary(service);
+      _todayPerProfile = _loadTodayPerProfile(service, eligible);
     }
+  }
+
+  Set<String> _activityProfiles(ActiveProfileProvider? active) {
+    final viewer = active?.activeId;
+    return {for (final profile in active?.profiles ?? const <Profile>[])
+      if (KidsProfileService.instance.canViewActivity(viewerId: viewer, targetId: profile.id)) profile.id};
   }
 
   /// Per-person "Today" chips for the family hub; single group-by over the
   /// daily aggregates, after the active profile's pending time is flushed.
-  Future<Map<String, int>> _loadTodayPerProfile(ScreenTimeService? service) async {
-    if (service == null) return const {};
+  Future<Map<String, int>> _loadTodayPerProfile(ScreenTimeService? service, Set<String> allowed) async {
+    if (service == null || !allowed.contains(service.profileId)) return const {};
     await loadViewingActivitySummary(service);
-    return service.database.getScreenTimePerProfileForDate(localDate: localDateKey(DateTime.now()));
+    return service.database.getScreenTimePerProfileForDate(localDate: localDateKey(DateTime.now()), profileIds: allowed);
   }
 
   void _refreshActivity() {
     final service = context.read<ScreenTimeService?>();
+    final active = context.read<ActiveProfileProvider?>();
     setState(() {
-      _activity = service == null ? Future.value() : loadViewingActivitySummary(service);
-      _todayPerProfile = _loadTodayPerProfile(service);
+      _activity = service == null || service.profileId != active?.activeId
+          ? Future.value() : loadViewingActivitySummary(service);
+      _todayPerProfile = _loadTodayPerProfile(service, _activityProfiles(active));
     });
   }
 
@@ -194,16 +230,18 @@ class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
     _refreshActivity();
   }
 
-  /// Another person's statistics: routed through the shared profile-PIN
-  /// helper (parent PIN first, then the person's own Profile PIN), matching
-  /// profile management. Kids' own sessions can never reach this screen —
-  /// they get KidsSettingsScreen instead.
+  /// Child statistics are available only to the explicitly linked parent.
   Future<void> _openOtherActivity(Profile profile) async {
     if (_managing) return;
+    final active = context.read<ActiveProfileProvider>();
+    final owner = active.activeId;
+    bool authorized() => active.activeId == owner &&
+      KidsProfileService.instance.canViewActivity(viewerId: owner, targetId: profile.id);
+    if (!authorized()) return;
     final origin = FocusManager.instance.primaryFocus;
     setState(() => _managing = true);
     try {
-      if (!await ensureProfileManagementAccess(context, profile) || !mounted) return;
+      if (!await ensureProfileManagementAccess(context, profile) || !mounted || !authorized()) return;
       await Navigator.of(context).push(MaterialPageRoute(builder: (_) => ScreenTimeScreen(profileId: profile.id)));
       if (!mounted) return;
       _refreshActivity();
@@ -264,7 +302,8 @@ class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
                                 profile: profile,
                                 active: profile.id == active?.activeId,
                                 avatarUrl: active?.avatarUrlFor(profile.id),
-                                todayMs: todayMap[profile.id],
+                                todayMs: kids.canViewActivity(viewerId: active?.activeId, targetId: profile.id)
+                                    ? todayMap[profile.id] : null,
                                 onTap: _managing ? null : () => _manage(profile),
                               ),
                         ],
@@ -354,9 +393,10 @@ class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
                               },
                             ),
                           ),
-                          // Everyone else's statistics: same ledger, PIN-gated.
+                          // Only children linked to the active parent.
                           for (final profile in ordered)
-                            if (profile.id != active?.activeId)
+                            if (profile.id != active?.activeId &&
+                                kids.canViewActivity(viewerId: active?.activeId, targetId: profile.id))
                               FutureBuilder<Map<String, int>>(
                                 future: _todayPerProfile,
                                 builder: (context, todaySnap) => FocusableListTile(

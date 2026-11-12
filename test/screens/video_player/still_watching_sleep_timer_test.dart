@@ -36,8 +36,8 @@ void main() {
     final nativeInitialize = Completer<bool>();
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       methodHandler: (call) {
         if (call.method == 'initialize') return nativeInitialize.future;
         return Future<Object?>.value(null);
@@ -82,8 +82,8 @@ void main() {
     final nativeInitialize = Completer<bool>();
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       methodHandler: (call) {
         if (call.method == 'initialize') return nativeInitialize.future;
         return Future<Object?>.value(null);

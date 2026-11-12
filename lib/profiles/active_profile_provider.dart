@@ -74,6 +74,7 @@ class ActiveProfileProvider extends ChangeNotifier with DisposableChangeNotifier
   @override
   void notifyListeners() {
     KidsProfileService.instance.selectProfile(_active?.id);
+    SettingsService.instanceOrNull?.selectProfile(_active?.id);
     super.notifyListeners();
   }
 

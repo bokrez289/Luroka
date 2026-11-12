@@ -1,9 +1,11 @@
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/connection/connection_registry.dart';
 import 'package:luroka/database/app_database.dart';
 import 'package:luroka/models/plex/plex_home_user.dart';
+import 'package:luroka/media/home_layout.dart';
 import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/navigation/profile_navigation_scope.dart';
 import 'package:luroka/navigation/profile_session_screen.dart';
@@ -17,6 +19,8 @@ import 'package:luroka/screens/profile/profile_switch_screen.dart';
 import 'package:luroka/providers/companion_remote_provider.dart';
 import 'package:luroka/providers/discover_provider.dart';
 import 'package:luroka/providers/hidden_libraries_provider.dart';
+import 'package:luroka/providers/home_favorites_snapshot.dart';
+import 'package:luroka/providers/home_taste_provider.dart';
 import 'package:luroka/providers/multi_server_provider.dart';
 import 'package:luroka/providers/trackers_provider.dart';
 import 'package:luroka/services/multi_server_manager.dart';
@@ -24,12 +28,15 @@ import 'package:luroka/services/offline_watch_sync_service.dart';
 import 'package:luroka/services/storage_service.dart';
 import 'package:luroka/services/system_shelf_service.dart';
 import 'package:luroka/services/settings_service.dart';
+import 'package:luroka/services/settings_service.dart' as app_settings show ThemeMode;
 import 'package:luroka/services/profile_appearance_service.dart';
 import 'package:luroka/services/kids_profile_service.dart';
 import 'package:luroka/theme/mono_theme.dart';
+import 'package:luroka/utils/platform_detector.dart';
 import 'package:provider/provider.dart';
 
 import '../test_helpers/io_fakes.dart';
+import '../test_helpers/media_items.dart';
 import '../test_helpers/multi_server_fixtures.dart';
 import '../test_helpers/prefs.dart';
 
@@ -58,6 +65,8 @@ void main() {
       await KidsProfileService.instance.setChild(child.id, parentId: 'parent', maxAge: 7);
       KidsProfileService.instance.selectProfile(child.id);
       await ProfileAppearanceService.instance.markIntegrationsPending(child.id);
+      await ProfileAppearanceService.instance.markPersonalizationPending(child.id);
+      await ProfileAppearanceService.instance.markSourceSelectionPending(child.id);
       return graph;
     }))!;
     addTearDown(() async {
@@ -74,8 +83,240 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text(t.profileIntegrations.title), findsNothing);
+    expect(find.text(t.profileSetupGuide.title), findsNothing);
     expect(find.text('Kids home'), findsOneWidget);
   });
+
+  testWidgets('new profile guide saves choices to its owner and is shown only once', (tester) async {
+    final graph = (await tester.runAsync(() async {
+      final graph = await _SessionGraph.create();
+      final first = Profile.local(id: 'first', displayName: 'First', createdAt: DateTime(2026));
+      final second = Profile.local(id: 'second', displayName: 'Second', createdAt: DateTime(2026));
+      await graph.profileRegistry.upsert(first);
+      await graph.profileRegistry.upsert(second);
+      await graph.storage.initializeNewProfileHome(second.id);
+      await graph.storage.setActiveProfileId(first.id);
+      await graph.activeProfile.initialize();
+      await SettingsService.instance.prepareProfileSettings([first.id, second.id]);
+      await ProfileAppearanceService.instance.markPersonalizationPending(second.id);
+      return graph;
+    }))!;
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+      await tester.runAsync(graph.dispose);
+    });
+    await graph.pump(
+      tester,
+      httpClientFactory: () => FakeHttpClient(200, const <int>[]),
+      profileShellBuilder: (context) =>
+          Scaffold(body: Text('Profile ${context.watch<ActiveProfileProvider>().activeId}')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text(t.profileSetupGuide.title), findsNothing);
+    final second = graph.activeProfile.profiles.singleWhere((profile) => profile.id == 'second');
+    expect(await tester.runAsync(() => graph.activeProfile.activate(second)), isTrue);
+    await tester.pumpAndSettle();
+    expect(find.text(t.profileSetupGuide.title), findsOneWidget);
+    expect(ProfileAppearanceService.instance.personalizationPendingFor('second'), isTrue);
+
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-theme-dark')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-theme-dark')));
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-posters')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-posters')));
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-music')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-music')));
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-next')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-next')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-show-spotlight')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-show-spotlight')));
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-spotlight-trending')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-spotlight-trending')));
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-progress-true')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-progress-true')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('live-home-spotlight')), findsNothing);
+    expect(find.byKey(const ValueKey('live-home-row-home.nextup')), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-episode-thumbnails')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-episode-thumbnails')));
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-studios')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-studios')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('studio-pref-netflix')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('studio-pref-netflix')));
+    await tester.pumpAndSettle();
+    expect(graph.storage.getHomeLayout('second').hiddenStudios, isEmpty);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-next')));
+    final finish = tester.widget<FilledButton>(find.byKey(const ValueKey('profile-guide-next')));
+    await tester.runAsync(() async => await (finish.onPressed as dynamic)());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Profile second'), findsOneWidget);
+    expect(ProfileAppearanceService.instance.personalizationPendingFor('second'), isFalse);
+    final settings = SettingsService.instance;
+    expect(settings.readForProfile('second', SettingsService.themeMode), app_settings.ThemeMode.dark);
+    expect(settings.readForProfile('second', SettingsService.posterDetails), isTrue);
+    expect(settings.readForProfile('second', SettingsService.showThemeMusic), isFalse);
+    expect(settings.readForProfile('second', SettingsService.showHeroSection), isFalse);
+    expect(settings.readForProfile('second', SettingsService.homeEpisodeThumbnails), isTrue);
+    expect(settings.readForProfile('first', SettingsService.homeEpisodeThumbnails), isFalse);
+    expect(settings.readForProfile('first', SettingsService.showHeroSection), isTrue);
+    expect(settings.readForProfile('first', SettingsService.posterDetails), isFalse);
+    expect(graph.storage.getHomeLayout('second').spotlightSource, HomeSpotlightSource.trending);
+    expect(graph.storage.getHomeLayout('second').splitContinueWatching, isTrue);
+    expect(graph.storage.getHomeLayout('second').hiddenStudios, contains('netflix'));
+    expect(graph.storage.getHomeLayout('first').hiddenStudios, isEmpty);
+  });
+
+  testWidgets('an interrupted guide returns on next activation and skipping keeps defaults', (tester) async {
+    final graph = (await tester.runAsync(() async {
+      final graph = await _SessionGraph.create();
+      final first = Profile.local(id: 'first', displayName: 'First', createdAt: DateTime(2026));
+      final second = Profile.local(id: 'second', displayName: 'Second', createdAt: DateTime(2026));
+      await graph.profileRegistry.upsert(first);
+      await graph.profileRegistry.upsert(second);
+      await graph.storage.initializeNewProfileHome(second.id);
+      await graph.storage.setActiveProfileId(first.id);
+      await graph.activeProfile.initialize();
+      await SettingsService.instance.prepareProfileSettings([first.id, second.id]);
+      await ProfileAppearanceService.instance.markPersonalizationPending(second.id);
+      return graph;
+    }))!;
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+      await tester.runAsync(graph.dispose);
+    });
+    await graph.pump(
+      tester,
+      httpClientFactory: () => FakeHttpClient(200, const <int>[]),
+      profileShellBuilder: (_) => const Scaffold(body: Text('Home')),
+    );
+    await tester.pumpAndSettle();
+    final first = graph.activeProfile.profiles.singleWhere((profile) => profile.id == 'first');
+    final second = graph.activeProfile.profiles.singleWhere((profile) => profile.id == 'second');
+    expect(await tester.runAsync(() => graph.activeProfile.activate(second)), isTrue);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-posters')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-posters')));
+    expect(await tester.runAsync(() => graph.activeProfile.activate(first)), isTrue);
+    await tester.pumpAndSettle();
+    expect(ProfileAppearanceService.instance.personalizationPendingFor('second'), isTrue);
+    expect(await tester.runAsync(() => graph.activeProfile.activate(second)), isTrue);
+    await tester.pumpAndSettle();
+    expect(find.text(t.profileSetupGuide.title), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-next')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-next')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-studios')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-studios')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('studio-pref-netflix')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('studio-pref-netflix')));
+    await tester.pumpAndSettle();
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-skip')));
+    final skip = tester.widget<OutlinedButton>(find.byKey(const ValueKey('profile-guide-skip')));
+    await tester.runAsync(() async => await (skip.onPressed as dynamic)());
+    await tester.pumpAndSettle();
+    expect(ProfileAppearanceService.instance.personalizationPendingFor('second'), isFalse);
+    expect(SettingsService.instance.readForProfile('second', SettingsService.posterDetails), isFalse);
+    expect(graph.storage.getHomeLayout('second').spotlightSource, HomeSpotlightSource.forYou);
+    expect(graph.storage.getHomeLayout('second').hiddenStudios, isEmpty);
+    expect(await tester.runAsync(() => graph.activeProfile.activate(first)), isTrue);
+    expect(await tester.runAsync(() => graph.activeProfile.activate(second)), isTrue);
+    await tester.pumpAndSettle();
+    expect(find.text(t.profileSetupGuide.title), findsNothing);
+  });
+
+  testWidgets('new profile can defer unavailable libraries before personalizing', (tester) async {
+    final graph = (await tester.runAsync(() async {
+      final graph = await _SessionGraph.create();
+      final profile = Profile.local(id: 'new', displayName: 'New', createdAt: DateTime(2026));
+      await graph.profileRegistry.upsert(profile);
+      await graph.storage.initializeNewProfileHome(profile.id);
+      await graph.storage.saveSelectedSourceLibraries({'offline:movies'}, profileId: profile.id);
+      await graph.storage.setActiveProfileId(profile.id);
+      await graph.activeProfile.initialize();
+      await SettingsService.instance.prepareProfileSettings([profile.id]);
+      await ProfileAppearanceService.instance.markPersonalizationPending(profile.id);
+      await ProfileAppearanceService.instance.markSourceSelectionPending(profile.id);
+      return graph;
+    }))!;
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+      await tester.runAsync(graph.dispose);
+    });
+    await graph.pump(
+      tester,
+      binder: _TestBinder(),
+      httpClientFactory: () => FakeHttpClient(200, const <int>[]),
+      profileShellBuilder: (_) => const Scaffold(body: Text('Home')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text(t.sourceLibraries.title), findsOneWidget);
+    final later = tester.widget<TextButton>(find.byKey(const ValueKey('source-libraries-later')));
+    await tester.runAsync(() async => await (later.onPressed as dynamic)());
+    await tester.pumpAndSettle();
+    expect(ProfileAppearanceService.instance.sourceSelectionPendingFor('new'), isFalse);
+    expect(find.text(t.profileSetupGuide.title), findsOneWidget);
+    expect(graph.storage.getSelectedSourceLibraries(profileId: 'new'), {'offline:movies'});
+  });
+
+  for (final size in [const Size(320, 640), const Size(960, 540)]) {
+    testWidgets('profile guide remains usable at $size with enlarged text', (tester) async {
+      TvDetectionService.debugSetAppleTVOverride(size.width >= 900);
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.reset();
+        TvDetectionService.debugSetAppleTVOverride(null);
+      });
+      final graph = (await tester.runAsync(() async {
+        final graph = await _SessionGraph.create();
+        final profile = Profile.local(id: 'new', displayName: 'New', createdAt: DateTime(2026));
+        await graph.profileRegistry.upsert(profile);
+        await graph.storage.initializeNewProfileHome(profile.id);
+        await graph.storage.setActiveProfileId(profile.id);
+        await graph.activeProfile.initialize();
+        await SettingsService.instance.prepareProfileSettings([profile.id]);
+        await ProfileAppearanceService.instance.markPersonalizationPending(profile.id);
+        return graph;
+      }))!;
+      addTearDown(() async {
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+        await tester.runAsync(graph.dispose);
+      });
+      await graph.pump(
+        tester,
+        textScale: 1.6,
+        httpClientFactory: () => FakeHttpClient(200, const <int>[]),
+        profileShellBuilder: (_) => const Scaffold(body: Text('Home')),
+      );
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-next')));
+      if (size.width >= 900) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.select);
+      } else {
+        await tester.tap(find.byKey(const ValueKey('profile-guide-next')));
+      }
+      await tester.pumpAndSettle();
+      expect(find.text(t.profileSetupGuide.homeStep), findsOneWidget);
+      expect(tester.widget<SingleChildScrollView>(find.byKey(const ValueKey('profile-guide-form'))).controller!.offset, 0);
+      await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-skip')));
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(find.byKey(const ValueKey('profile-guide-preview'))).dy, lessThan(size.height / 2));
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('a remembered Kids profile is covered at bedtime before its home is accessible', (tester) async {
     final graph = (await tester.runAsync(() async {
@@ -348,6 +589,11 @@ void main() {
     final ownerHidden = hiddenProviders.single;
     final ownerTrackers = trackerProviders.single;
     final ownerCompanion = companionProviders.single;
+    final ownerFavorites = tester.element(find.byType(_ProfileProbeShell)).read<HomeFavoritesSnapshot>();
+    final ownerTaste = tester.element(find.byType(_ProfileProbeShell)).read<HomeTasteProvider>();
+    expect(ownerTaste.profileId, owner.id);
+    ownerFavorites.replace([testMediaItem(id: 'owner-only', serverId: 'server')]);
+    expect(ownerFavorites.items.single.id, 'owner-only');
     await tester.runAsync(ownerHidden.ensureInitialized);
     expect(ownerHidden.profileId, owner.id);
     expect(ownerHidden.hiddenLibraryKeys, {'srv:owner'});
@@ -375,6 +621,13 @@ void main() {
     expect(ownerTrackers.isDisposed, isTrue);
     expect(companionProviders, hasLength(2));
     expect(companionProviders.last, isNot(same(ownerCompanion)));
+    final kidsFavorites = tester.element(find.byType(_ProfileProbeShell)).read<HomeFavoritesSnapshot>();
+    final kidsTaste = tester.element(find.byType(_ProfileProbeShell)).read<HomeTasteProvider>();
+    expect(kidsTaste, isNot(same(ownerTaste)));
+    expect(kidsTaste.profileId, kids.id);
+    expect(kidsTaste.signals, isEmpty);
+    expect(kidsFavorites, isNot(same(ownerFavorites)));
+    expect(kidsFavorites.items, isEmpty);
     expect(ownerCompanion.isDisposed, isTrue);
     await tester.runAsync(hiddenProviders.last.ensureInitialized);
     expect(hiddenProviders.last.profileId, kids.id);
@@ -536,6 +789,7 @@ class _SessionGraph {
     GlobalKey<NavigatorState>? navigatorKey,
     bool initialIntegrationsPrompt = false,
     ActiveProfileBinder? binder,
+    double textScale = 1,
   }) => tester.pumpWidget(
     MultiProvider(
       providers: [
@@ -552,6 +806,10 @@ class _SessionGraph {
       ],
       child: MaterialApp(
         theme: monoTheme(MonoPalette.dark),
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScale)),
+          child: child!,
+        ),
         navigatorKey: navigatorKey,
         home: ProfileSessionScreen.forTesting(
           initialPromptHandled: true,

@@ -137,6 +137,11 @@ class TranslationsRu extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$trakt$ru trakt = _Translations$trakt$ru._(_root);
 	@override late final _Translations$seerr$ru seerr = _Translations$seerr$ru._(_root);
 	@override late final _Translations$services$ru services = _Translations$services$ru._(_root);
+	@override late final _Translations$offlineRecovery$ru offlineRecovery = _Translations$offlineRecovery$ru._(_root);
+	@override late final _Translations$releaseUpdates$ru releaseUpdates = _Translations$releaseUpdates$ru._(_root);
+	@override late final _Translations$profileIntegrations$ru profileIntegrations = _Translations$profileIntegrations$ru._(_root);
+	@override late final _Translations$profileSetupGuide$ru profileSetupGuide = _Translations$profileSetupGuide$ru._(_root);
+	@override late final _Translations$animeFavorites$ru animeFavorites = _Translations$animeFavorites$ru._(_root);
 	@override late final _Translations$addServer$ru addServer = _Translations$addServer$ru._(_root);
 }
 
@@ -324,6 +329,9 @@ class _Translations$libraryPolish$ru extends Translations$libraryPolish$en {
 	final TranslationsRu _root; // ignore: unused_field
 
 	// Translations
+	@override String get compactTvNavigation => 'Компактная навигация по библиотеке';
+	@override String get compactTvNavigationDescription => 'Показывайте разделы библиотеки и параметры просмотра в выдвижном меню, оставляя больше места для плакатов.';
+	@override String get openLibraryMenu => 'Открыть меню библиотеки';
 	@override String get posterDetails => 'Детали плаката';
 	@override String get showPosterDetails => 'Показать детали плаката · имя, год и IMDb';
 	@override String get hidePosterDetails => 'Скрыть детали постера';
@@ -637,6 +645,8 @@ class _Translations$settingsRedesign$ru extends Translations$settingsRedesign$en
 	// Translations
 	@override String get themeEffects => 'Тема и эффекты';
 	@override String get libraryLayout => 'Макет библиотеки';
+	@override String get posterInformation => 'Информация о плакате';
+	@override String get libraryBehavior => 'Поведение библиотеки';
 	@override String get appearanceHint => 'Настройте внешний вид, макет и поведение Luroka.';
 	@override String get livePreview => 'Живой просмотр';
 	@override String get previewHint => 'Посмотрите, как ваша библиотека будет выглядеть с текущими настройками.';
@@ -774,6 +784,19 @@ class _Translations$kids$ru extends Translations$kids$en {
 	final TranslationsRu _root; // ignore: unused_field
 
 	// Translations
+	@override String get timeLimits => 'Ограничения по экранному времени';
+	@override String get dailyWatchLimit => 'Ежедневное время просмотра';
+	@override String get dailyWatchLimitHint => 'Ограничивает воспроизведение видео на этом устройстве каждый день.';
+	@override String get noTimeLimit => 'Без ограничений';
+	@override String minutesLimit({required Object minutes}) => '${minutes} минут';
+	@override String get bedtime => 'перед сном';
+	@override String get bedtimeHint => 'Для использования этого профиля в эти часы необходим родительский PIN.';
+	@override String get bedtimeStart => 'Начало сна';
+	@override String get bedtimeEnd => 'Время сна заканчивается';
+	@override String get timeLimitReached => 'Время просмотра на сегодня закончилось';
+	@override String get bedtimeReached => 'пора спать';
+	@override String get timeLimitParentHint => 'Попросите родителя ввести свой PIN, чтобы продолжить этот сеанс.';
+	@override String get parentUnlock => 'Родительская разблокировка';
 	@override String get backupProfile => 'Резервное копирование детского профиля';
 	@override String get backupExplain => 'Создайте резервную копию сохраненного имени, персонажа, ограничений, внешнего вида и исключений локального просмотра этого профиля. Родительские PIN-коды, входы на сервер, загрузки и прогресс воспроизведения на сервере не учитываются.';
 	@override String get saveBackupFile => 'Сохранить файл резервной копии';
@@ -1317,6 +1340,7 @@ class _Translations$settings$ru extends Translations$settings$en {
 	@override String get downloadLocationPickerUnavailable => 'Выбор папки недоступен на этом устройстве';
 	@override String get downloadOnWifiOnly => 'Загружать только по Wi-Fi';
 	@override String get downloadOnWifiOnlyDescription => 'Запретить загрузку по мобильным данным';
+	@override String get downloadWifiScope => 'Применяется ко всем профилям и загрузкам на этом устройстве.';
 	@override String get autoRemoveWatchedDownloads => 'Автоудаление просмотренных загрузок';
 	@override String get autoRemoveWatchedDownloadsDescription => 'Автоматически удалять просмотренные загрузки';
 	@override String get cellularDownloadBlocked => 'Загрузки через мобильную сеть заблокированы. Используйте Wi-Fi или измените настройку.';
@@ -1655,8 +1679,8 @@ class _Translations$dashboard$ru extends Translations$dashboard$en {
 	@override String episodeLabel({required Object season, required Object episode}) => 'S${season} · E${episode}';
 	@override String get anotherPick => 'Еще один выбор';
 	@override String get exploreSeries => 'Изучите серию';
-	@override String get showFeatured => 'Сфокусированные детали заголовка';
-	@override String get showFeaturedDescription => 'Показать обложку, краткий обзор и информацию об эпизоде для выделенной карточки.';
+	@override String get showFeatured => 'Рекомендации на главной';
+	@override String get showFeaturedDescription => 'Показывайте популярные фильмы и шоу в верхней части главной страницы.';
 }
 
 // Path: lurokaCatalog
@@ -1757,9 +1781,32 @@ class _Translations$homeLayout$ru extends Translations$homeLayout$en {
 	final TranslationsRu _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageStudios => 'Выбирайте и заказывайте студии';
+	@override String get manageStudiosDescription => 'Выберите, какие студии появятся в этом профиле, и настройте их порядок.';
+	@override String get studioUnavailable => 'На главной странице отображаются только студии, найденные в выбранных вами библиотеках.';
+	@override String get showAllStudios => 'Показать все студии';
+	@override String get hideAllStudios => 'Скрыть все студии';
+	@override String get reorderStudio => 'Изменить порядок студии';
+	@override String get episodeThumbnails => 'Изображения серий в разделе «Продолжить просмотр»';
+	@override String get episodeThumbnailsDescription => 'Показывайте изображения эпизодов вместо постеров сериалов или сезонов в режимах «Продолжить просмотр» и «Далее».';
+	@override String get spotlightSource => 'Источник рекомендуемого контента';
+	@override String get spotlightSourceDescription => '«Для вас» использует историю просмотров этого профиля на этом устройстве, а также избранное и названия библиотеки.';
+	@override String get spotlightForYou => 'Для тебя';
+	@override String get spotlightForYouDescription => 'Сочетание того, что вы смотрите, избранного, новых дополнений и тенденций, с учетом активности просмотров этого профиля на этом устройстве.';
+	@override String get spotlightTrending => 'Тенденции';
+	@override String get spotlightTrendingDescription => 'Популярные фильмы и сериалы в ваших библиотеках.';
+	@override String get spotlightContinue => 'Продолжить просмотр';
+	@override String get spotlightContinueDescription => 'Заголовки, которые вы начали, и эпизоды, которые вы можете продолжить.';
+	@override String get spotlightFavorites => 'Из избранного';
+	@override String get spotlightInspired => 'Вдохновлен вашим просмотром';
+	@override String get spotlightNextUp => 'Дальше';
 	@override String get title => 'Персонализируйте дом';
 	@override String get description => 'Выберите порядок строк и видимость для этого профиля. Выберите строку, чтобы переместить или скрыть ее.';
 	@override String get rows => 'Домашние строки';
+	@override String get progressLayout => 'Продолжить просмотр и следующее';
+	@override String get progressCombined => 'Объединены в один ряд';
+	@override String get progressSeparate => 'Отдельные строки';
+	@override String get progressDescription => 'Отдельный пункт «Далее», если поддерживается сервером. Остальные серверы остаются объединенными.';
 	@override String get visible => 'Видимый';
 	@override String get hidden => 'Скрытый';
 	@override String get showRow => 'Показать строку';
@@ -1824,6 +1871,8 @@ class _Translations$activityStats$ru extends Translations$activityStats$en {
 	@override String get trendTitle => 'Время просмотра';
 	@override String get trendToday => 'Сегодня';
 	@override String gapDetail({required Object stat, required Object range}) => '${stat} на ${range}';
+	@override String get patternsTitle => 'Ваши шаблоны';
+	@override String mostlyKind({required Object kind}) => 'В основном ${kind}';
 	@override String get weekdayTitle => 'По будням';
 	@override String get hoursTitle => 'По времени суток';
 	@override String get amLabel => 'AM';
@@ -1836,6 +1885,8 @@ class _Translations$activityStats$ru extends Translations$activityStats$en {
 	@override String get kindOther => 'Другое';
 	@override String get topTitlesTitle => 'Самые просматриваемые';
 	@override String get sessionsTitle => 'Последние сессии';
+	@override String get recentViewingTitle => 'Недавний просмотр';
+	@override String get recentViewingHint => 'Общее время просмотра за выбранный период. Даты показывают последний просмотр.';
 	@override String get showMore => 'Показать больше';
 	@override String get sessionNoTitle => 'Неопознанное воспроизведение';
 	@override String get emptyTitle => 'Здесь пока ничего';
@@ -2276,6 +2327,7 @@ class _Translations$messages$ru extends Translations$messages$en {
 	@override String metadataRefreshStarted({required Object title}) => 'Обновление метаданных начато для "${title}"';
 	@override String metadataRefreshFailed({required Object error}) => 'Не удалось обновить метаданные: ${error}';
 	@override String get logoutConfirm => 'Вы уверены, что хотите выйти?';
+	@override String get logoutDeviceConfirm => 'Выйти из Luroka на этом устройстве? Все профили, включая профили «Дети», учетные записи сервера и загруженные медиафайлы, будут удалены с этого устройства. Вы можете войти снова позже.';
 	@override String get noSeasonsFound => 'Сезоны не найдены';
 	@override String get seasonsLoadFailed => 'Не удалось загрузить сезоны';
 	@override String get noEpisodesFound => 'Эпизоды в первом сезоне не найдены';
@@ -2406,6 +2458,9 @@ class _Translations$profiles$ru extends Translations$profiles$en {
 	final TranslationsRu _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageProfiles => 'Управление профилями';
+	@override String get quickAccess => 'Быстрый доступ';
+	@override String get signOutDevice => 'Выйти из этого устройства';
 	@override String get addLurokaProfile => 'Добавить профиль Luroka';
 	@override String get switchingProfile => 'Переключение профиля…';
 	@override String get deleteThisProfileTitle => 'Удалить этот профиль?';
@@ -2524,7 +2579,7 @@ class _Translations$accountPreferences$ru extends Translations$accountPreference
 	@override String hubSubtitleSingle({required Object account}) => 'Параметры аудио, субтитров и библиотеки сохранены на аккаунте ${account}';
 	@override String hubSubtitleMultiple({required Object count}) => 'Параметры аудио, субтитров и библиотеки сохранены на ${count} аккаунтах';
 	@override String get pickAccount => 'Каждый аккаунт хранит собственные настройки. Выберите, какой редактировать.';
-	@override String get storedOnAccount => 'Эти параметры сохраняются на самом аккаунте, поэтому их используют все приложения, вошедшие в него, — включая Luroka на ваших других устройствах.';
+	@override String get storedOnAccount => 'Эти параметры сохраняются в учетной записи сервера и доступны каждому профилю Luroka и приложению, использующему эту учетную запись, в том числе на других устройствах.';
 	@override String get noAccounts => 'Нет аккаунтов для настройки';
 	@override String get noAccountsHint => 'Войдите в Plex или подключите сервер Jellyfin или Emby — и настройки, сохранённые на этом аккаунте, появятся здесь.';
 	@override String get unavailable => 'Не удаётся получить доступ к этому аккаунту';
@@ -3726,6 +3781,108 @@ class _Translations$services$ru extends Translations$services$en {
 	@override late final _Translations$services$libraryFilter$ru libraryFilter = _Translations$services$libraryFilter$ru._(_root);
 }
 
+// Path: offlineRecovery
+class _Translations$offlineRecovery$ru extends Translations$offlineRecovery$en {
+	_Translations$offlineRecovery$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Ваши серверы отключены от сети';
+	@override String get description => 'Ваши загрузки по-прежнему доступны. Попробуйте переподключиться, когда ваш сервер снова заработает, или добавьте еще один сервер.';
+	@override String get appleTvDescription => 'Luroka не удалось связаться с вашими медиасерверами. Попробуйте повторно подключиться, когда они станут доступны, или добавьте другой сервер, чтобы продолжить просмотр.';
+	@override String get kidsDescription => 'Нам не удалось связаться с вашим медиасервером. Попробуйте восстановить соединение или попросите помощи у родителей.';
+	@override String get retrying => 'Подключение…';
+	@override String get addServer => 'Добавить сервер';
+}
+
+// Path: releaseUpdates
+class _Translations$releaseUpdates$ru extends Translations$releaseUpdates$en {
+	_Translations$releaseUpdates$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get manualInstructions => 'Загрузите архив выпуска с GitHub, извлеките APK и установите его на свое устройство Android.';
+	@override String get tvInstructions => 'Откройте этот адрес на своем телефоне или компьютере или отсканируйте QR-код, чтобы загрузить выпуск.';
+	@override String get pressBackAgain => 'Нажмите «Назад» еще раз, чтобы выйти из воспроизведения.';
+}
+
+// Path: profileIntegrations
+class _Translations$profileIntegrations$ru extends Translations$profileIntegrations$en {
+	_Translations$profileIntegrations$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Сделайте Luroka своим';
+	@override String get description => 'Подключите свои любимые сервисы, чтобы отслеживать, что вы смотрите, и запрашивать новые фильмы и шоу. Каждый профиль Luroka имеет свои собственные подключения.';
+	@override String get step => 'Дополнительные интеграции';
+	@override String get examples => 'Trakt · Simkl · AniList · MyAnimeList · Seerr';
+	@override String get connect => 'Изучите интеграции';
+	@override String get later => 'Настроить позже';
+	@override String get manage => 'Управление интеграциями';
+	@override String forProfile({required Object name}) => 'Соединения для ${name}';
+}
+
+// Path: profileSetupGuide
+class _Translations$profileSetupGuide$ru extends Translations$profileSetupGuide$en {
+	_Translations$profileSetupGuide$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Сделайте свой профиль своим';
+	@override String get description => 'Выберите, как Luroka будет выглядеть и восприниматься для этого профиля на этом устройстве. Вы можете изменить все позже в настройках.';
+	@override String get appearanceStep => '1 из 2 · Внешний вид';
+	@override String get homeStep => '2 из 2 · Главный экран';
+	@override String get preview => 'Предварительный просмотр';
+	@override String get previewTitle => 'Ваш дом';
+	@override String get previewPoster => 'Плакат';
+	@override String get posterArtwork => 'Только иллюстрации';
+	@override String get posterWithDetails => 'Показать детали постера';
+	@override String get musicDescription => 'Воспроизведите тему фильма или шоу, пока открыта страница сведений о ней, если она доступна.';
+	@override String get moreThemes => 'Больше тем';
+	@override String get fewerThemes => 'Меньше тем';
+	@override String get spotlightHeading => 'Что должно появиться в Spotlight?';
+	@override String get progressHeading => 'Продолжить просмотр и следующее';
+	@override String get skip => 'Используйте настройки по умолчанию и начните смотреть';
+	@override String get finish => 'Начать просмотр';
+	@override String get back => 'Назад';
+	@override String get kContinue => 'Продолжить';
+	@override String get chooseLater => 'Выбрать библиотеки позже';
+	@override String get libraryScope => 'Это изменит то, что отображается в Luroka для этого профиля; это не меняет разрешения сервера.';
+	@override String get createdTitle => 'Профиль создан';
+	@override String get createdDescription => 'Ваш новый профиль готов. Его владелец может персонализировать его при первом открытии.';
+	@override String get switchProfile => 'Переключиться на этот профиль';
+	@override String get stayHere => 'Остаться в текущем профиле';
+}
+
+// Path: animeFavorites
+class _Translations$animeFavorites$ru extends Translations$animeFavorites$en {
+	_Translations$animeFavorites$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get filter => 'Аниме';
+	@override String get manage => 'Управление аниме';
+	@override String get description => 'Автоматическое обнаружение использует имена библиотек аниме и доступные теги или идентификаторы аниме. Выбирайте библиотеки и корректируйте отдельные фавориты. Выборы для вашего профиля сохраняются на этом устройстве.';
+	@override String get libraries => 'Библиотеки аниме';
+	@override String get libraryHint => 'Библиотеки с именем Anime распознаются автоматически. Выберите библиотеку, чтобы изменить ее классификацию.';
+	@override String get titles => 'Любимые названия';
+	@override String get titleHint => 'Выберите заголовок, чтобы пометить его как аниме, или исправьте автоматическое совпадение.';
+	@override String get automatic => 'Автоматический';
+	@override String get include => 'Аниме';
+	@override String get exclude => 'Не аниме';
+	@override String get automaticIncluded => 'Автомат · Аниме';
+	@override String get automaticExcluded => 'Автоматически · Не аниме';
+	@override String get noLibraries => 'Нет доступных подключенных библиотек.';
+	@override String get noTitles => 'Нет любимых фильмов и сериалов.';
+	@override String get empty => 'Избранных аниме не найдено. Проверьте свои библиотеки аниме или отметьте название как аниме.';
+	@override String get saveFailed => 'Не удалось сохранить настройки аниме. Пожалуйста, попробуйте еще раз.';
+}
+
 // Path: addServer
 class _Translations$addServer$ru extends Translations$addServer$en {
 	_Translations$addServer$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -3738,7 +3895,7 @@ class _Translations$addServer$ru extends Translations$addServer$en {
 	@override String get serverUrlsHelper => 'Можно указать несколько URL через запятую.';
 	@override String get findServer => 'Найти сервер';
 	@override String searchingLocalMediaBrowserServers({required Object product}) => 'Поиск локальных серверов ${product}...';
-	@override String localMediaBrowserServers({required Object product}) => 'Локальные серверы ${product}';
+	@override String localMediaBrowserServers({required Object product}) => 'Сохраненные и ближайшие серверы ${product}';
 	@override String get username => 'Имя пользователя';
 	@override String get password => 'Пароль';
 	@override String get signIn => 'Войти';
@@ -4818,6 +4975,9 @@ extension on TranslationsRu {
 			'posterDetails.catalogEpisodeInfoDescription' => 'Покажите количество серий и среднюю продолжительность на постерах Обзор.',
 			'posterDetails.title' => 'Детали плаката',
 			'posterDetails.description' => 'Покажите название, год и рейтинг IMDb под плакатами в Studio, Search, Обзор и библиотеках. Отсутствующие рейтинги IMDb остаются скрытыми. Отключите этот параметр для плакатов, содержащих только иллюстрации.',
+			'libraryPolish.compactTvNavigation' => 'Компактная навигация по библиотеке',
+			'libraryPolish.compactTvNavigationDescription' => 'Показывайте разделы библиотеки и параметры просмотра в выдвижном меню, оставляя больше места для плакатов.',
+			'libraryPolish.openLibraryMenu' => 'Открыть меню библиотеки',
 			'libraryPolish.posterDetails' => 'Детали плаката',
 			'libraryPolish.showPosterDetails' => 'Показать детали плаката · имя, год и IMDb',
 			'libraryPolish.hidePosterDetails' => 'Скрыть детали постера',
@@ -5032,6 +5192,8 @@ extension on TranslationsRu {
 			'tvSettingsV2.simpleAudio' => 'Языки и внешний вид субтитров',
 			'settingsRedesign.themeEffects' => 'Тема и эффекты',
 			'settingsRedesign.libraryLayout' => 'Макет библиотеки',
+			'settingsRedesign.posterInformation' => 'Информация о плакате',
+			'settingsRedesign.libraryBehavior' => 'Поведение библиотеки',
 			'settingsRedesign.appearanceHint' => 'Настройте внешний вид, макет и поведение Luroka.',
 			'settingsRedesign.livePreview' => 'Живой просмотр',
 			'settingsRedesign.previewHint' => 'Посмотрите, как ваша библиотека будет выглядеть с текущими настройками.',
@@ -5133,6 +5295,19 @@ extension on TranslationsRu {
 			'detailComposition.mediaInformation' => 'Информация для СМИ',
 			'detailComposition.fullFileInformation' => 'Полная информация о файле',
 			'detailComposition.castAndCrew' => 'Актеры и съемочная группа',
+			'kids.timeLimits' => 'Ограничения по экранному времени',
+			'kids.dailyWatchLimit' => 'Ежедневное время просмотра',
+			'kids.dailyWatchLimitHint' => 'Ограничивает воспроизведение видео на этом устройстве каждый день.',
+			'kids.noTimeLimit' => 'Без ограничений',
+			'kids.minutesLimit' => ({required Object minutes}) => '${minutes} минут',
+			'kids.bedtime' => 'перед сном',
+			'kids.bedtimeHint' => 'Для использования этого профиля в эти часы необходим родительский PIN.',
+			'kids.bedtimeStart' => 'Начало сна',
+			'kids.bedtimeEnd' => 'Время сна заканчивается',
+			'kids.timeLimitReached' => 'Время просмотра на сегодня закончилось',
+			'kids.bedtimeReached' => 'пора спать',
+			'kids.timeLimitParentHint' => 'Попросите родителя ввести свой PIN, чтобы продолжить этот сеанс.',
+			'kids.parentUnlock' => 'Родительская разблокировка',
 			'kids.backupProfile' => 'Резервное копирование детского профиля',
 			'kids.backupExplain' => 'Создайте резервную копию сохраненного имени, персонажа, ограничений, внешнего вида и исключений локального просмотра этого профиля. Родительские PIN-коды, входы на сервер, загрузки и прогресс воспроизведения на сервере не учитываются.',
 			'kids.saveBackupFile' => 'Сохранить файл резервной копии',
@@ -5217,6 +5392,8 @@ extension on TranslationsRu {
 			'kids.blocked' => 'Это название недоступно в этом детском профиле.',
 			'kids.switchProfile' => 'Переключить профиль',
 			'kids.manageFromAdult' => 'Переключитесь на профиль для взрослых, чтобы управлять настройками.',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => 'Подключите сервер к своему взрослому профилю, прежде чем добавлять детский профиль.',
 			'kids.created' => 'Детский профиль создан.',
 			'kids.updated' => 'Детский профиль обновлен.',
@@ -5235,8 +5412,6 @@ extension on TranslationsRu {
 			'lurokaDiscovery.imdbTv100' => 'IMDb 100 лучших шоу · снимок за сентябрь 2026 г.',
 			'lurokaDiscovery.emmyComedy' => 'Эмми · Победители комедийных сериалов · 1971–2026 гг.',
 			'lurokaDiscovery.emmys' => 'Эмми · Победители драматических сериалов · 1966–2026 гг.',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.bafta' => 'BAFTA · Победители в номинациях «Лучший фильм»',
 			'lurokaDiscovery.cannes' => 'Канны · Обладатели «Золотой пальмовой ветви»',
 			'lurokaDiscovery.awardsNote' => 'Коллекции наград включают историю «Оскара» за лучший фильм, лауреатов премии «Эмми» в области драмы и комедии, а также расширенный отбор BAFTA/Канн. Повторные выигрышные титулы появляются один раз. При членстве используются истории категорий наград и факты из Викиданных. В списках IMDb 100 лучших фильмов и шоу сохранены снимки диаграмм за сентябрь 2026 года из mmdju/imdb-top250-api. Появляются только совпадения в видимых онлайн-библиотеках; размер коллекции зависит от наличия библиотеки.',
@@ -5629,6 +5804,7 @@ extension on TranslationsRu {
 			'settings.downloadLocationPickerUnavailable' => 'Выбор папки недоступен на этом устройстве',
 			'settings.downloadOnWifiOnly' => 'Загружать только по Wi-Fi',
 			'settings.downloadOnWifiOnlyDescription' => 'Запретить загрузку по мобильным данным',
+			'settings.downloadWifiScope' => 'Применяется ко всем профилям и загрузкам на этом устройстве.',
 			'settings.autoRemoveWatchedDownloads' => 'Автоудаление просмотренных загрузок',
 			'settings.autoRemoveWatchedDownloadsDescription' => 'Автоматически удалять просмотренные загрузки',
 			'settings.cellularDownloadBlocked' => 'Загрузки через мобильную сеть заблокированы. Используйте Wi-Fi или измените настройку.',
@@ -5730,6 +5906,8 @@ extension on TranslationsRu {
 			'settings.languageAndRegion' => 'Язык и регион',
 			'settings.startup' => 'Запуск',
 			'settings.display' => 'Экран',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Библиотека и карточки',
 			'settings.homeScreen' => 'Главный экран',
 			'settings.navigation' => 'Навигация',
@@ -5749,8 +5927,6 @@ extension on TranslationsRu {
 			'settings.gestureVolumeSwipeDescription' => 'Проведите вверх или вниз по правому краю, чтобы изменить громкость',
 			'settings.gesturePinchToZoom' => 'Щипок для масштабирования',
 			'settings.gesturePinchToZoomDescription' => 'Сведите или разведите пальцы на видео, чтобы изменить масштаб',
-			_ => null,
-		} ?? switch (path) {
 			'settings.rememberBrightnessLevel' => 'Запоминать уровень яркости',
 			'settings.rememberBrightnessLevelDescription' => 'Начинать воспроизведение с яркостью, установленной последним свайпом',
 			'settings.controls' => 'Элементы управления',
@@ -5890,8 +6066,8 @@ extension on TranslationsRu {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => 'Еще один выбор',
 			'dashboard.exploreSeries' => 'Изучите серию',
-			'dashboard.showFeatured' => 'Сфокусированные детали заголовка',
-			'dashboard.showFeaturedDescription' => 'Показать обложку, краткий обзор и информацию об эпизоде для выделенной карточки.',
+			'dashboard.showFeatured' => 'Рекомендации на главной',
+			'dashboard.showFeaturedDescription' => 'Показывайте популярные фильмы и шоу в верхней части главной страницы.',
 			'lurokaCatalog.aboutPerson' => 'В ЦЕНТРЕ ВНИМАНИЯ',
 			'lurokaCatalog.biographyUnavailable' => 'Биография недоступна на этом сервере.',
 			'lurokaCatalog.filmography' => 'Фильмы и сериалы в ваших библиотеках',
@@ -5947,9 +6123,32 @@ extension on TranslationsRu {
 			'customPerformance.frameBudget' => 'Бюджет на кадр',
 			'customPerformance.processMemory' => 'Память процесса приложения в конце выборки',
 			'customPerformance.noFrames' => 'Отрендеренные кадры не были захвачены. Запустите другой образец и просмотрите приложение.',
+			'homeLayout.manageStudios' => 'Выбирайте и заказывайте студии',
+			'homeLayout.manageStudiosDescription' => 'Выберите, какие студии появятся в этом профиле, и настройте их порядок.',
+			'homeLayout.studioUnavailable' => 'На главной странице отображаются только студии, найденные в выбранных вами библиотеках.',
+			'homeLayout.showAllStudios' => 'Показать все студии',
+			'homeLayout.hideAllStudios' => 'Скрыть все студии',
+			'homeLayout.reorderStudio' => 'Изменить порядок студии',
+			'homeLayout.episodeThumbnails' => 'Изображения серий в разделе «Продолжить просмотр»',
+			'homeLayout.episodeThumbnailsDescription' => 'Показывайте изображения эпизодов вместо постеров сериалов или сезонов в режимах «Продолжить просмотр» и «Далее».',
+			'homeLayout.spotlightSource' => 'Источник рекомендуемого контента',
+			'homeLayout.spotlightSourceDescription' => '«Для вас» использует историю просмотров этого профиля на этом устройстве, а также избранное и названия библиотеки.',
+			'homeLayout.spotlightForYou' => 'Для тебя',
+			'homeLayout.spotlightForYouDescription' => 'Сочетание того, что вы смотрите, избранного, новых дополнений и тенденций, с учетом активности просмотров этого профиля на этом устройстве.',
+			'homeLayout.spotlightTrending' => 'Тенденции',
+			'homeLayout.spotlightTrendingDescription' => 'Популярные фильмы и сериалы в ваших библиотеках.',
+			'homeLayout.spotlightContinue' => 'Продолжить просмотр',
+			'homeLayout.spotlightContinueDescription' => 'Заголовки, которые вы начали, и эпизоды, которые вы можете продолжить.',
+			'homeLayout.spotlightFavorites' => 'Из избранного',
+			'homeLayout.spotlightInspired' => 'Вдохновлен вашим просмотром',
+			'homeLayout.spotlightNextUp' => 'Дальше',
 			'homeLayout.title' => 'Персонализируйте дом',
 			'homeLayout.description' => 'Выберите порядок строк и видимость для этого профиля. Выберите строку, чтобы переместить или скрыть ее.',
 			'homeLayout.rows' => 'Домашние строки',
+			'homeLayout.progressLayout' => 'Продолжить просмотр и следующее',
+			'homeLayout.progressCombined' => 'Объединены в один ряд',
+			'homeLayout.progressSeparate' => 'Отдельные строки',
+			'homeLayout.progressDescription' => 'Отдельный пункт «Далее», если поддерживается сервером. Остальные серверы остаются объединенными.',
 			'homeLayout.visible' => 'Видимый',
 			'homeLayout.hidden' => 'Скрытый',
 			'homeLayout.showRow' => 'Показать строку',
@@ -5991,6 +6190,8 @@ extension on TranslationsRu {
 			'activityStats.trendTitle' => 'Время просмотра',
 			'activityStats.trendToday' => 'Сегодня',
 			'activityStats.gapDetail' => ({required Object stat, required Object range}) => '${stat} на ${range}',
+			'activityStats.patternsTitle' => 'Ваши шаблоны',
+			'activityStats.mostlyKind' => ({required Object kind}) => 'В основном ${kind}',
 			'activityStats.weekdayTitle' => 'По будням',
 			'activityStats.hoursTitle' => 'По времени суток',
 			'activityStats.amLabel' => 'AM',
@@ -6003,6 +6204,8 @@ extension on TranslationsRu {
 			'activityStats.kindOther' => 'Другое',
 			'activityStats.topTitlesTitle' => 'Самые просматриваемые',
 			'activityStats.sessionsTitle' => 'Последние сессии',
+			'activityStats.recentViewingTitle' => 'Недавний просмотр',
+			'activityStats.recentViewingHint' => 'Общее время просмотра за выбранный период. Даты показывают последний просмотр.',
 			'activityStats.showMore' => 'Показать больше',
 			'activityStats.sessionNoTitle' => 'Неопознанное воспроизведение',
 			'activityStats.emptyTitle' => 'Здесь пока ничего',
@@ -6217,6 +6420,8 @@ extension on TranslationsRu {
 			'accessibility.hue' => 'Цветовой тон',
 			'accessibility.saturation' => 'Насыщенность',
 			'accessibility.brightness' => 'Яркость',
+			_ => null,
+		} ?? switch (path) {
 			'accessibility.hexColor' => 'Шестнадцатеричный цвет',
 			'accessibility.expandText' => 'Развернуть текст',
 			'accessibility.collapseText' => 'Свернуть текст',
@@ -6263,8 +6468,6 @@ extension on TranslationsRu {
 			'videoControls.seekBackwardButton' => ({required Object seconds}) => 'Перемотать назад на ${seconds} с',
 			'videoControls.seekForwardButton' => ({required Object seconds}) => 'Перемотать вперёд на ${seconds} с',
 			'videoControls.previousButton' => 'Предыдущий эпизод',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.nextButton' => 'Следующий эпизод',
 			'videoControls.previousChapterButton' => 'Предыдущая глава',
 			'videoControls.nextChapterButton' => 'Следующая глава',
@@ -6366,6 +6569,7 @@ extension on TranslationsRu {
 			'messages.metadataRefreshStarted' => ({required Object title}) => 'Обновление метаданных начато для "${title}"',
 			'messages.metadataRefreshFailed' => ({required Object error}) => 'Не удалось обновить метаданные: ${error}',
 			'messages.logoutConfirm' => 'Вы уверены, что хотите выйти?',
+			'messages.logoutDeviceConfirm' => 'Выйти из Luroka на этом устройстве? Все профили, включая профили «Дети», учетные записи сервера и загруженные медиафайлы, будут удалены с этого устройства. Вы можете войти снова позже.',
 			'messages.noSeasonsFound' => 'Сезоны не найдены',
 			'messages.seasonsLoadFailed' => 'Не удалось загрузить сезоны',
 			'messages.noEpisodesFound' => 'Эпизоды в первом сезоне не найдены',
@@ -6451,6 +6655,9 @@ extension on TranslationsRu {
 			'mpvConfig.removeLine' => 'Удалить строку',
 			'mpvConfig.embeddedVoHint' => 'vo, gpu-context и gpu-api игнорируются в Linux: встроенное видео всегда отображается через vo=libmpv на видеоплоскости, а gpu-next (нужный для compute-шейдеров вроде ArtCNN) не может работать во встроенном режиме.',
 			'dialog.confirmAction' => 'Подтвердить действие',
+			'profiles.manageProfiles' => 'Управление профилями',
+			'profiles.quickAccess' => 'Быстрый доступ',
+			'profiles.signOutDevice' => 'Выйти из этого устройства',
 			'profiles.addLurokaProfile' => 'Добавить профиль Luroka',
 			'profiles.switchingProfile' => 'Переключение профиля…',
 			'profiles.deleteThisProfileTitle' => 'Удалить этот профиль?',
@@ -6542,7 +6749,7 @@ extension on TranslationsRu {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => 'Параметры аудио, субтитров и библиотеки сохранены на аккаунте ${account}',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => 'Параметры аудио, субтитров и библиотеки сохранены на ${count} аккаунтах',
 			'accountPreferences.pickAccount' => 'Каждый аккаунт хранит собственные настройки. Выберите, какой редактировать.',
-			'accountPreferences.storedOnAccount' => 'Эти параметры сохраняются на самом аккаунте, поэтому их используют все приложения, вошедшие в него, — включая Luroka на ваших других устройствах.',
+			'accountPreferences.storedOnAccount' => 'Эти параметры сохраняются в учетной записи сервера и доступны каждому профилю Luroka и приложению, использующему эту учетную запись, в том числе на других устройствах.',
 			'accountPreferences.noAccounts' => 'Нет аккаунтов для настройки',
 			'accountPreferences.noAccountsHint' => 'Войдите в Plex или подключите сервер Jellyfin или Emby — и настройки, сохранённые на этом аккаунте, появятся здесь.',
 			'accountPreferences.unavailable' => 'Не удаётся получить доступ к этому аккаунту',
@@ -6727,6 +6934,8 @@ extension on TranslationsRu {
 			'libraries.sortLabels.dateShared' => 'Дата открытия доступа',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Дата выхода последнего эпизода',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Дата добавления последнего эпизода',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Дата загрузки',
 			'libraries.sortLabels.size' => 'Размер',
 			'libraries.sortLabels.library' => 'Библиотека',
@@ -6777,8 +6986,6 @@ extension on TranslationsRu {
 			'about.packageLine' => ({required Object package}) => 'Пакет: ${package}',
 			'about.localeLine' => ({required Object locale}) => 'Язык: ${locale}',
 			'about.copyDetails' => 'Копировать детали',
-			_ => null,
-		} ?? switch (path) {
 			'about.detailsCopied' => 'Сведения о приложении скопированы.',
 			'about.detailsCopyFailed' => 'Не удалось скопировать сведения о приложении.',
 			'about.checkForUpdatesDescription' => 'Проверьте GitHub на наличие новой версии.',
@@ -7241,6 +7448,8 @@ extension on TranslationsRu {
 			'watchTogether.offsetPlusSecond' => '+1 с',
 			'watchTogether.participants' => 'Участники',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n, one: 'Участник ${n}', few: '${n} участника', many: '${n} участников', other: '${n} участников', ), 
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'ОРГАНИЗАТОР',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (Вы)',
 			'watchTogether.playerIdle' => 'Простой',
@@ -7291,8 +7500,6 @@ extension on TranslationsRu {
 			'watchTogether.notices.finished' => 'Закончено',
 			'watchTogether.notices.hostChangedTo' => ({required Object name}) => '${name} теперь организатор',
 			'watchTogether.notices.youAreNowHost' => 'Теперь вы — организатор',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.joined' => ({required Object name}) => '${name} присоединился',
 			'watchTogether.notices.left' => ({required Object name}) => '${name} вышел',
 			'watchTogether.notices.controlRefused' => 'Только хост может управлять воспроизведением',
@@ -7755,6 +7962,8 @@ extension on TranslationsRu {
 			'seerr.statusPartiallyAvailable' => 'Частично доступно',
 			'seerr.statusRequested' => 'Запрошено',
 			'seerr.statusProcessing' => 'Обработка',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'В списке блокировки',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Не удалось связаться с ${url}: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'По адресу ${url} нет экземпляра Seerr (HTTP ${status})',
@@ -7805,8 +8014,6 @@ extension on TranslationsRu {
 			'services.deviceCode.title' => ({required Object service}) => 'Активируйте Luroka в ${service}',
 			'services.deviceCode.instructions' => 'Отсканируйте QR-код или перейдите по адресу ниже и введите этот код:',
 			'services.deviceCode.openToActivate' => ({required Object service}) => 'Открыть ${service} для активации',
-			_ => null,
-		} ?? switch (path) {
 			'services.deviceCode.copyCode' => 'Скопировать код активации',
 			'services.deviceCode.waitingForAuthorization' => 'Ожидание авторизации…',
 			'services.deviceCode.codeCopied' => 'Код скопирован',
@@ -7827,12 +8034,69 @@ extension on TranslationsRu {
 			'services.libraryFilter.modeHintWhitelist' => 'Синхронизировать только библиотеки, отмеченные ниже.',
 			'services.libraryFilter.libraries' => 'Библиотеки',
 			'services.libraryFilter.noLibraries' => 'Библиотеки недоступны',
+			'offlineRecovery.title' => 'Ваши серверы отключены от сети',
+			'offlineRecovery.description' => 'Ваши загрузки по-прежнему доступны. Попробуйте переподключиться, когда ваш сервер снова заработает, или добавьте еще один сервер.',
+			'offlineRecovery.appleTvDescription' => 'Luroka не удалось связаться с вашими медиасерверами. Попробуйте повторно подключиться, когда они станут доступны, или добавьте другой сервер, чтобы продолжить просмотр.',
+			'offlineRecovery.kidsDescription' => 'Нам не удалось связаться с вашим медиасервером. Попробуйте восстановить соединение или попросите помощи у родителей.',
+			'offlineRecovery.retrying' => 'Подключение…',
+			'offlineRecovery.addServer' => 'Добавить сервер',
+			'releaseUpdates.manualInstructions' => 'Загрузите архив выпуска с GitHub, извлеките APK и установите его на свое устройство Android.',
+			'releaseUpdates.tvInstructions' => 'Откройте этот адрес на своем телефоне или компьютере или отсканируйте QR-код, чтобы загрузить выпуск.',
+			'releaseUpdates.pressBackAgain' => 'Нажмите «Назад» еще раз, чтобы выйти из воспроизведения.',
+			'profileIntegrations.title' => 'Сделайте Luroka своим',
+			'profileIntegrations.description' => 'Подключите свои любимые сервисы, чтобы отслеживать, что вы смотрите, и запрашивать новые фильмы и шоу. Каждый профиль Luroka имеет свои собственные подключения.',
+			'profileIntegrations.step' => 'Дополнительные интеграции',
+			'profileIntegrations.examples' => 'Trakt · Simkl · AniList · MyAnimeList · Seerr',
+			'profileIntegrations.connect' => 'Изучите интеграции',
+			'profileIntegrations.later' => 'Настроить позже',
+			'profileIntegrations.manage' => 'Управление интеграциями',
+			'profileIntegrations.forProfile' => ({required Object name}) => 'Соединения для ${name}',
+			'profileSetupGuide.title' => 'Сделайте свой профиль своим',
+			'profileSetupGuide.description' => 'Выберите, как Luroka будет выглядеть и восприниматься для этого профиля на этом устройстве. Вы можете изменить все позже в настройках.',
+			'profileSetupGuide.appearanceStep' => '1 из 2 · Внешний вид',
+			'profileSetupGuide.homeStep' => '2 из 2 · Главный экран',
+			'profileSetupGuide.preview' => 'Предварительный просмотр',
+			'profileSetupGuide.previewTitle' => 'Ваш дом',
+			'profileSetupGuide.previewPoster' => 'Плакат',
+			'profileSetupGuide.posterArtwork' => 'Только иллюстрации',
+			'profileSetupGuide.posterWithDetails' => 'Показать детали постера',
+			'profileSetupGuide.musicDescription' => 'Воспроизведите тему фильма или шоу, пока открыта страница сведений о ней, если она доступна.',
+			'profileSetupGuide.moreThemes' => 'Больше тем',
+			'profileSetupGuide.fewerThemes' => 'Меньше тем',
+			'profileSetupGuide.spotlightHeading' => 'Что должно появиться в Spotlight?',
+			'profileSetupGuide.progressHeading' => 'Продолжить просмотр и следующее',
+			'profileSetupGuide.skip' => 'Используйте настройки по умолчанию и начните смотреть',
+			'profileSetupGuide.finish' => 'Начать просмотр',
+			'profileSetupGuide.back' => 'Назад',
+			'profileSetupGuide.kContinue' => 'Продолжить',
+			'profileSetupGuide.chooseLater' => 'Выбрать библиотеки позже',
+			'profileSetupGuide.libraryScope' => 'Это изменит то, что отображается в Luroka для этого профиля; это не меняет разрешения сервера.',
+			'profileSetupGuide.createdTitle' => 'Профиль создан',
+			'profileSetupGuide.createdDescription' => 'Ваш новый профиль готов. Его владелец может персонализировать его при первом открытии.',
+			'profileSetupGuide.switchProfile' => 'Переключиться на этот профиль',
+			'profileSetupGuide.stayHere' => 'Остаться в текущем профиле',
+			'animeFavorites.filter' => 'Аниме',
+			'animeFavorites.manage' => 'Управление аниме',
+			'animeFavorites.description' => 'Автоматическое обнаружение использует имена библиотек аниме и доступные теги или идентификаторы аниме. Выбирайте библиотеки и корректируйте отдельные фавориты. Выборы для вашего профиля сохраняются на этом устройстве.',
+			'animeFavorites.libraries' => 'Библиотеки аниме',
+			'animeFavorites.libraryHint' => 'Библиотеки с именем Anime распознаются автоматически. Выберите библиотеку, чтобы изменить ее классификацию.',
+			'animeFavorites.titles' => 'Любимые названия',
+			'animeFavorites.titleHint' => 'Выберите заголовок, чтобы пометить его как аниме, или исправьте автоматическое совпадение.',
+			'animeFavorites.automatic' => 'Автоматический',
+			'animeFavorites.include' => 'Аниме',
+			'animeFavorites.exclude' => 'Не аниме',
+			'animeFavorites.automaticIncluded' => 'Автомат · Аниме',
+			'animeFavorites.automaticExcluded' => 'Автоматически · Не аниме',
+			'animeFavorites.noLibraries' => 'Нет доступных подключенных библиотек.',
+			'animeFavorites.noTitles' => 'Нет любимых фильмов и сериалов.',
+			'animeFavorites.empty' => 'Избранных аниме не найдено. Проверьте свои библиотеки аниме или отметьте название как аниме.',
+			'animeFavorites.saveFailed' => 'Не удалось сохранить настройки аниме. Пожалуйста, попробуйте еще раз.',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => 'Добавить сервер ${product}',
 			'addServer.serverUrls' => 'URL-адреса сервера',
 			'addServer.serverUrlsHelper' => 'Можно указать несколько URL через запятую.',
 			'addServer.findServer' => 'Найти сервер',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => 'Поиск локальных серверов ${product}...',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Локальные серверы ${product}',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Сохраненные и ближайшие серверы ${product}',
 			'addServer.username' => 'Имя пользователя',
 			'addServer.password' => 'Пароль',
 			'addServer.signIn' => 'Войти',

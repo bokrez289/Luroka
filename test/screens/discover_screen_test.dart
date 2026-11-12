@@ -14,9 +14,11 @@ import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_hub.dart';
 import 'package:luroka/media/home_layout.dart';
+import 'package:luroka/media/home_progress.dart';
 import 'package:luroka/media/media_item.dart';
 import 'package:luroka/media/media_kind.dart';
 import 'package:luroka/media/media_library.dart';
+import 'package:luroka/media/library_query.dart';
 import 'package:luroka/media/media_server_client.dart';
 import 'package:luroka/media/server_capabilities.dart';
 import 'package:luroka/mixins/refreshable.dart';
@@ -26,10 +28,16 @@ import 'package:luroka/profiles/profile.dart';
 import 'package:luroka/profiles/profile_connection.dart';
 import 'package:luroka/profiles/profile_connection_registry.dart';
 import 'package:luroka/profiles/profile_registry.dart';
+import 'package:luroka/screens/profile/family_settings_screen.dart';
+import 'package:luroka/screens/profile/profile_switch_screen.dart';
+import 'package:luroka/screens/settings/home_layout_screen.dart';
 import 'package:luroka/providers/companion_remote_provider.dart';
 import 'package:luroka/providers/discover_provider.dart';
 import 'package:luroka/providers/hidden_libraries_provider.dart';
 import 'package:luroka/providers/home_layout_provider.dart';
+import 'package:luroka/providers/home_favorites_snapshot.dart';
+import 'package:luroka/providers/home_taste_provider.dart';
+import 'package:luroka/providers/watch_state_store.dart';
 import 'package:luroka/providers/libraries_provider.dart';
 import 'package:luroka/providers/multi_server_provider.dart';
 import 'package:luroka/screens/discover_screen.dart';
@@ -40,6 +48,8 @@ import 'package:luroka/services/settings_service.dart';
 import 'package:luroka/services/storage_service.dart';
 import 'package:luroka/theme/mono_theme.dart';
 import 'package:luroka/utils/platform_detector.dart';
+import 'package:luroka/utils/media_server_http_client.dart';
+import 'package:luroka/utils/watch_state_notifier.dart';
 import 'package:luroka/watch_together/watch_together.dart';
 import 'package:luroka/widgets/side_navigation_rail.dart';
 import 'package:luroka/widgets/tv_browse_rail.dart';
@@ -183,6 +193,57 @@ void main() {
     });
   }
 
+  for (final isTv in [true, false]) {
+    testWidgets('split progress rows update ${isTv ? 'TV' : 'phone'} Home and honor visibility', (tester) async {
+      final resume = withHomeProgressRole(
+        testMediaItem(
+          id: 'resume',
+          backend: MediaBackend.jellyfin,
+          kind: MediaKind.movie,
+          title: 'Resume',
+          serverId: 'server_1',
+        ),
+        HomeProgressRole.resume,
+      );
+      final next = withHomeProgressRole(
+        testMediaItem(
+          id: 'next',
+          backend: MediaBackend.jellyfin,
+          kind: MediaKind.episode,
+          title: 'Next',
+          serverId: 'server_1',
+        ),
+        HomeProgressRole.nextUp,
+      );
+      final unknown = testMediaItem(
+        id: 'unknown',
+        backend: MediaBackend.plex,
+        kind: MediaKind.movie,
+        title: 'Plex',
+        serverId: 'server_1',
+      );
+      final layout = (await _pumpDiscoverShell(tester, isTv: isTv, customize: true, onDeck: [resume, next, unknown]))!;
+      HomeDashboard dashboard() => tester.widget<HomeDashboard>(find.byType(HomeDashboard));
+      expect(dashboard().rows.where((row) => row.id == homeContinueWatchingId).single.items, hasLength(3));
+      await layout.setSplitContinueWatching(true);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      final rows = dashboard().rows;
+      expect(
+        rows.firstWhere((row) => row.id == homeContinueWatchingId).items.map((item) => item.id),
+        containsAll(['resume', 'unknown']),
+      );
+      final nextRow = rows.firstWhere((row) => row.id == homeNextUpId);
+      expect(nextRow.items.map((item) => item.id), ['next']);
+      expect((await dashboard().loadMoreItems(nextRow)!()).map((item) => item.id), ['next']);
+      await layout.setHidden(homeNextUpKey, true);
+      await tester.pump();
+      expect(dashboard().rows.where((row) => row.id == homeNextUpId), isEmpty);
+      expect(dashboard().rows.where((row) => row.id == homeContinueWatchingId), hasLength(1));
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('pinned collections appear only for available servers and visible libraries', (tester) async {
     final layout = (await _pumpDiscoverShell(tester, isTv: true, customize: true))!;
     final pin = testMediaItem(
@@ -205,6 +266,210 @@ void main() {
     await tester.pump();
     expect(tester.widget<HomeDashboard>(find.byType(HomeDashboard)).rows, isEmpty);
     expect(layout.layout.pins, hasLength(2), reason: 'temporary visibility changes must retain the saved shortcuts');
+  });
+
+  testWidgets('personal Spotlight follows the profile preference and respects hidden progress rows', (tester) async {
+    final resume = testMediaItem(
+      id: 'resume-personal',
+      title: 'My resume',
+      serverId: 'server_1',
+      kind: MediaKind.movie,
+      backend: MediaBackend.plex,
+      viewOffsetMs: 1000,
+      durationMs: 10000,
+    );
+    final recent = testMediaItem(
+      id: 'recent-personal',
+      title: 'A new movie',
+      serverId: 'server_1',
+      kind: MediaKind.movie,
+      backend: MediaBackend.plex,
+    );
+    final layout = (await _pumpDiscoverShell(
+      tester,
+      isTv: true,
+      customize: true,
+      onDeck: [resume],
+      hubs: [
+        MediaHub(id: 'library.movies.recent', title: 'Recently added', type: 'movie', items: [recent]),
+      ],
+    ))!;
+    await layout.setSpotlightSource(HomeSpotlightSource.forYou);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.widget<HomeDashboard>(find.byType(HomeDashboard)).spotlightSource, HomeSpotlightSource.forYou);
+    expect(tester.widget<Text>(find.byKey(const ValueKey('home_preview_title'))).data, 'My resume');
+    await layout.setHidden(homeContinueWatchingKey, true);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.widget<Text>(find.byKey(const ValueKey('home_preview_title'))).data, 'A new movie');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Home loads a bounded favorite preview after its main pass and hides it with its library', (
+    tester,
+  ) async {
+    final snapshot = HomeFavoritesSnapshot();
+    addTearDown(snapshot.dispose);
+    final watchState = WatchStateStore()..setActiveProfileId('custom-profile');
+    addTearDown(watchState.dispose);
+    final client = _FavoriteHomeClient();
+    final layout = (await _pumpDiscoverShell(
+      tester,
+      isTv: true,
+      customize: true,
+      homeSnapshot: snapshot,
+      fakeClient: client,
+      watchState: watchState,
+      profiles: [Profile.local(id: 'custom-profile', displayName: 'Viewer', createdAt: DateTime(2026))],
+      activeProfileId: 'custom-profile',
+    ))!;
+    final context = tester.element(find.byType(DiscoverScreen));
+    await context.read<LibrariesProvider>().updateLibraryOrder(const [
+      MediaLibrary(
+        id: 'movies',
+        title: 'Movies',
+        kind: MediaKind.movie,
+        backend: MediaBackend.jellyfin,
+        serverId: 'server_1',
+      ),
+    ]);
+    await tester.pump(const Duration(seconds: 3));
+    expect(client.favoriteCalls, 0, reason: 'Trending must not start personal Favorites requests');
+    await layout.setSpotlightSource(HomeSpotlightSource.forYou);
+    await tester.pump();
+    expect(client.favoriteCalls, 0, reason: 'background work must not delay the main Home pass');
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(client.favoriteCalls, 1);
+    expect(snapshot.items.single.id, 'saved-outside-home');
+    expect(tester.widget<Text>(find.byKey(const ValueKey('home_preview_title'))).data, 'Saved outside Home');
+    WatchStateNotifier().notifyWatched(item: snapshot.items.single);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Saved outside Home'), findsNothing, reason: 'a newly watched favorite is no longer eligible');
+    WatchStateNotifier().notifyWatched(item: snapshot.items.single, isNowWatched: false);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Saved outside Home'), findsWidgets);
+    await context.read<HiddenLibrariesProvider>().hideLibrary('server_1:movies');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Saved outside Home'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Home reads local profile activity after loading without replacing the focused title', (tester) async {
+    final calls = <String>[];
+    final taste = HomeTasteProvider(
+      profileId: 'custom-profile',
+      now: () => DateTime(2026, 2, 2),
+      loadSessions: ({required profileId, required startLocalDate, required limit}) async {
+        calls.add(profileId);
+        ScreenTimeSessionRow entry(int id, String itemId) => ScreenTimeSessionRow(
+          id: id,
+          profileId: profileId,
+          localDate: '2026-02-01',
+          startUtcMs: 1,
+          endUtcMs: 360001,
+          durationMs: 360000,
+          mediaKind: 0,
+          serverKey: 'server_1',
+          itemKey: itemId,
+        );
+        return [entry(1, 'watched-one'), entry(2, 'watched-two')];
+      },
+    );
+    addTearDown(taste.dispose);
+    MediaItem movie(String id, String title, String genre, int views) => testMediaItem(
+      id: id,
+      title: title,
+      serverId: 'server_1',
+      kind: MediaKind.movie,
+      backend: MediaBackend.plex,
+      viewCount: views,
+      genres: [genre],
+    );
+    final layout = (await _pumpDiscoverShell(
+      tester,
+      isTv: true,
+      customize: true,
+      homeTaste: taste,
+      profiles: [Profile.local(id: 'custom-profile', displayName: 'Viewer', createdAt: DateTime(2026))],
+      activeProfileId: 'custom-profile',
+      hubs: [
+        MediaHub(
+          id: 'watched',
+          title: 'Watched',
+          type: 'movie',
+          items: [movie('watched-one', 'Seen One', 'Mystery', 1), movie('watched-two', 'Seen Two', 'Mystery', 1)],
+        ),
+        MediaHub(
+          id: 'library.movies.recent',
+          title: 'Recent',
+          type: 'movie',
+          items: [movie('other', 'Other Movie', 'Comedy', 0), movie('match', 'Mystery Match', 'Mystery', 0)],
+        ),
+      ],
+    ))!;
+    await tester.pump(const Duration(seconds: 3));
+    expect(calls, isEmpty, reason: 'Trending does not read personal activity');
+    await layout.setSpotlightSource(HomeSpotlightSource.forYou);
+    await tester.pump();
+    expect(calls, isEmpty);
+    expect(tester.widget<Text>(find.byKey(const ValueKey('home_preview_title'))).data, 'Other Movie');
+    tester.state<HomeDashboardState>(find.byType(HomeDashboard)).requestContentFocus();
+    await tester.pump();
+    final focus = FocusManager.instance.primaryFocus;
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump();
+    expect(calls, ['custom-profile']);
+    expect(tester.widget<Text>(find.byKey(const ValueKey('home_preview_title'))).data, 'Other Movie');
+    expect(FocusManager.instance.primaryFocus, same(focus));
+    for (var i = 0; i < 3; i++) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+    }
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    expect(tester.widget<Text>(find.byKey(const ValueKey('home_preview_title'))).data, 'Mystery Match');
+    expect(find.text(t.homeLayout.spotlightInspired), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Home skips the taste-history read when loaded titles have no genre metadata', (tester) async {
+    var calls = 0;
+    final taste = HomeTasteProvider(
+      profileId: 'custom-profile',
+      loadSessions: ({required profileId, required startLocalDate, required limit}) async {
+        calls++;
+        return [];
+      },
+    );
+    addTearDown(taste.dispose);
+    final layout = (await _pumpDiscoverShell(
+      tester,
+      isTv: true,
+      customize: true,
+      homeTaste: taste,
+      profiles: [Profile.local(id: 'custom-profile', displayName: 'Viewer', createdAt: DateTime(2026))],
+      activeProfileId: 'custom-profile',
+      hubs: [
+        MediaHub(
+          id: 'library.movies.recent',
+          title: 'Recent',
+          type: 'movie',
+          items: [testMediaItem(id: 'movie', title: 'Movie', serverId: 'server_1')],
+        ),
+      ],
+    ))!;
+    await layout.setSpotlightSource(HomeSpotlightSource.forYou);
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump();
+    expect(calls, 0);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('startup prime does not duplicate the load DiscoverScreen started in initState', (tester) async {
@@ -455,6 +720,7 @@ void main() {
       isTv: false,
       customize: true,
       size: const Size(390, 844),
+      platform: TargetPlatform.android,
       profiles: [
         Profile.local(id: 'alex', displayName: 'Alex', createdAt: DateTime(2026)),
         Profile.local(id: 'sam', displayName: 'Sam', createdAt: DateTime(2026)),
@@ -487,16 +753,69 @@ void main() {
     expect(find.text(t.common.settings), findsOneWidget);
     expect(find.text(t.watchTogether.title), findsOneWidget);
     expect(find.text(t.profiles.sectionTitle), findsOneWidget);
-    expect(find.text(t.common.logout), findsOneWidget);
+    expect(find.text(t.profiles.signOutDevice), findsOneWidget);
+    expect(find.text(t.family.switchProfile), findsOneWidget);
+    expect(find.text(t.profiles.manageProfiles), findsOneWidget);
+    expect(find.text(t.homeLayout.title), findsOneWidget);
     expect(find.text('Sam'), findsNothing);
-    expect(find.text('Alex'), findsNothing);
+    expect(find.text('Alex'), findsOneWidget);
+    expect(find.text(t.profiles.active), findsOneWidget);
     expect(find.text(t.companionRemote.title), findsNothing);
     expect(tester.takeException(), isNull);
+    await tester.ensureVisible(find.byKey(const ValueKey('logout')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('logout')));
+    await tester.pumpAndSettle();
+    expect(find.text(t.messages.logoutDeviceConfirm), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(t.profiles.sectionTitle));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(t.family.activity));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.byType(ScreenTimeScreen), findsOneWidget);
     expect(find.text(t.family.activityUnavailable), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('phone profile menu opens switching, management, and Home customization', (tester) async {
+    await _pumpDiscoverShell(
+      tester,
+      isTv: false,
+      customize: true,
+      size: const Size(390, 844),
+      profiles: [
+        Profile.local(id: 'alex', displayName: 'Alex', createdAt: DateTime(2026)),
+        Profile.local(id: 'sam', displayName: 'Sam', createdAt: DateTime(2026)),
+      ],
+      activeProfileId: 'alex',
+    );
+
+    Future<void> openMenu() async {
+      await tester.tap(find.byTooltip(t.profiles.sectionTitle));
+      await tester.pumpAndSettle();
+    }
+
+    await openMenu();
+    await tester.tap(find.text(t.family.switchProfile));
+    await tester.pumpAndSettle();
+    expect(find.byType(ProfileSwitchScreen), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    await openMenu();
+    await tester.tap(find.text(t.profiles.manageProfiles));
+    await tester.pumpAndSettle();
+    expect(find.byType(FamilySettingsScreen), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    await openMenu();
+    await tester.tap(find.byKey(const ValueKey('customize_home')));
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeLayoutScreen), findsOneWidget);
+    expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
@@ -727,10 +1046,16 @@ Future<HomeLayoutProvider?> _pumpDiscoverShell(
   required bool isTv,
   bool customize = false,
   List<MediaHub> hubs = const [],
+  List<MediaItem> onDeck = const [],
   List<Profile> profiles = const [],
   String? activeProfileId,
   Size size = const Size(1280, 720),
   WatchTogetherProvider? watchTogether,
+  TargetPlatform? platform,
+  HomeFavoritesSnapshot? homeSnapshot,
+  HomeTasteProvider? homeTaste,
+  WatchStateStore? watchState,
+  _FakeMediaServerClient? fakeClient,
 }) async {
   TvDetectionService.debugSetAppleTVOverride(isTv);
   await SettingsService.getInstance();
@@ -741,7 +1066,7 @@ Future<HomeLayoutProvider?> _pumpDiscoverShell(
     tester.view.resetPhysicalSize();
   });
 
-  final client = _FakeMediaServerClient(hubs: hubs);
+  final client = fakeClient ?? _FakeMediaServerClient(hubs: hubs, onDeck: onDeck);
   final manager = MultiServerManager()..debugRegisterClientForTesting(client);
   final multiServerProvider = testMultiServerProvider(manager);
   final hiddenLibrariesProvider = HiddenLibrariesProvider();
@@ -803,10 +1128,13 @@ Future<HomeLayoutProvider?> _pumpDiscoverShell(
           ChangeNotifierProvider<ActiveProfileProvider>.value(value: activeProfileProvider),
           ChangeNotifierProvider<DiscoverProvider>.value(value: discoverProvider),
           if (layout != null) ChangeNotifierProvider<HomeLayoutProvider>.value(value: layout),
+          if (homeSnapshot != null) ChangeNotifierProvider<HomeFavoritesSnapshot>.value(value: homeSnapshot),
+          if (homeTaste != null) ChangeNotifierProvider<HomeTasteProvider>.value(value: homeTaste),
+          if (watchState != null) ChangeNotifierProvider<WatchStateStore>.value(value: watchState),
         ],
         child: InputModeTracker(
           child: MaterialApp(
-            theme: monoTheme(MonoPalette.dark),
+            theme: monoTheme(MonoPalette.dark).copyWith(platform: platform),
             home: MainScreenFocusScope(
               focusSidebar: () {},
               sideNavigationWidth: SideNavigationRailState.expandedWidth,
@@ -831,8 +1159,9 @@ Future<HomeLayoutProvider?> _pumpDiscoverShell(
 
 class _FakeMediaServerClient implements MediaServerClient {
   final List<MediaHub> hubs;
+  final List<MediaItem> onDeck;
 
-  _FakeMediaServerClient({required this.hubs});
+  _FakeMediaServerClient({required this.hubs, this.onDeck = const []});
 
   @override
   ServerId get serverId => ServerId('server_1');
@@ -848,7 +1177,7 @@ class _FakeMediaServerClient implements MediaServerClient {
 
   @override
   Future<List<MediaItem>> fetchContinueWatching({int? count = 20, Set<String> excludedLibraryIds = const {}}) async =>
-      const [];
+      count == null ? onDeck : onDeck.take(count).toList();
 
   @override
   Future<List<MediaHub>> fetchGlobalHubs({
@@ -859,6 +1188,44 @@ class _FakeMediaServerClient implements MediaServerClient {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FavoriteHomeClient extends _FakeMediaServerClient {
+  _FavoriteHomeClient() : super(hubs: const []);
+  int favoriteCalls = 0;
+
+  @override
+  MediaBackend get backend => MediaBackend.jellyfin;
+  @override
+  ServerCapabilities get capabilities => ServerCapabilities.jellyfin;
+  @override
+  Future<List<MediaLibrary>> fetchLibraries() async => const [];
+  @override
+  Future<LibraryPage<MediaItem>> fetchLibraryPagedContent(
+    String libraryId, {
+    required LibraryQuery query,
+    MediaKind? libraryKind,
+    AbortController? abort,
+  }) async {
+    favoriteCalls++;
+    return LibraryPage(
+      items: [
+        testMediaItem(
+          id: 'saved-outside-home',
+          title: 'Saved outside Home',
+          backend: MediaBackend.jellyfin,
+          kind: MediaKind.movie,
+          serverId: 'server_1',
+          libraryId: libraryId,
+          viewCount: 0,
+          raw: const {
+            'UserData': {'Played': false},
+          },
+        ),
+      ],
+      totalCount: 1,
+    );
+  }
 }
 
 /// Hub client that holds each fetch open until [release], so a test can act

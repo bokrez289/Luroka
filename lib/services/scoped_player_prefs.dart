@@ -116,7 +116,7 @@ abstract final class ScopedPlayerPrefs {
   }
 
   /// Inspect one explicit persistence level without consulting other levels.
-  /// The backing store is intentionally shared across app profiles.
+  /// The backing store belongs to the active profile on this device.
   static T? overrideAt<T>(
     ScopedPlayerPref<T> pref,
     PlayerSettingScope scope,

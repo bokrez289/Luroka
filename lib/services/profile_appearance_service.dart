@@ -68,6 +68,8 @@ class ProfileAppearanceService extends ChangeNotifier {
   static const _setupKey = 'luroka_household_setup_complete';
   static const _setupPendingKey = 'luroka_household_setup_pending';
   static const _integrationsPendingPrefix = 'luroka_profile_integrations_pending_';
+  static const _personalizationPendingPrefix = 'luroka_profile_personalization_pending_';
+  static const _sourceSelectionPendingPrefix = 'luroka_profile_source_selection_pending_';
   SharedPreferencesWithCache? _prefs;
   Future<void>? _loading;
   final Map<String, Uint8List?> _images = {};
@@ -83,10 +85,34 @@ class ProfileAppearanceService extends ChangeNotifier {
 
   String _key(String id) => '$_prefix${profileUserScope(id)}';
   String _integrationsKey(String id) => '$_integrationsPendingPrefix${profileUserScope(id)}';
+  String _personalizationKey(String id) => '$_personalizationPendingPrefix$id';
+  String _sourceSelectionKey(String id) => '$_sourceSelectionPendingPrefix$id';
   String? _value(String id) => _prefs?.getString(_key(id));
   bool get setupComplete => _prefs?.getBool(_setupKey) ?? false;
   bool get setupPending => !setupComplete && (_prefs?.getBool(_setupPendingKey) ?? false);
   bool integrationsPendingFor(String id) => _prefs?.getBool(_integrationsKey(id)) ?? false;
+  bool personalizationPendingFor(String id) => _prefs?.getBool(_personalizationKey(id)) ?? false;
+  bool sourceSelectionPendingFor(String id) => _prefs?.getBool(_sourceSelectionKey(id)) ?? false;
+
+  Future<void> markPersonalizationPending(String id) async {
+    await initialize();
+    await _prefs!.setBool(_personalizationKey(id), true);
+  }
+
+  Future<void> completePersonalization(String id) async {
+    await initialize();
+    await _prefs!.remove(_personalizationKey(id));
+  }
+
+  Future<void> markSourceSelectionPending(String id) async {
+    await initialize();
+    await _prefs!.setBool(_sourceSelectionKey(id), true);
+  }
+
+  Future<void> completeSourceSelection(String id) async {
+    await initialize();
+    await _prefs!.remove(_sourceSelectionKey(id));
+  }
 
   Future<void> markIntegrationsPending(String id) async {
     await initialize();
@@ -151,6 +177,8 @@ class ProfileAppearanceService extends ChangeNotifier {
           (key) =>
               key.startsWith(_prefix) ||
               key.startsWith(_integrationsPendingPrefix) ||
+              key.startsWith(_personalizationPendingPrefix) ||
+              key.startsWith(_sourceSelectionPendingPrefix) ||
               key == _setupKey ||
               key == _setupPendingKey,
         )

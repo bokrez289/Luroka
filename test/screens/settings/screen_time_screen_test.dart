@@ -9,6 +9,7 @@ import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/screens/settings/screen_time_screen.dart';
 import 'package:luroka/screens/settings/widgets/viewing_activity_charts.dart';
 import 'package:luroka/services/screen_time_service.dart';
+import 'package:luroka/services/kids_profile_service.dart';
 import 'package:luroka/utils/platform_detector.dart';
 import 'package:luroka/theme/mono_theme.dart';
 import 'package:provider/provider.dart';
@@ -127,15 +128,15 @@ void main() {
     await pumpScreen(tester);
 
     // Stat cards render as card labels, not separate group titles.
-    expect(find.text(t.screenTime.today), findsOneWidget);
-    expect(find.text(t.activityStats.heroAllTime), findsOneWidget);
+    expect(find.text(t.activityStats.watchedPeriod), findsOneWidget);
+    expect(find.text(t.activityStats.activeDays), findsOneWidget);
     // Daily average is a subtitle inside the All Time card.
-    expect(find.textContaining(t.activityStats.heroDailyAverage), findsOneWidget);
+    expect(find.text(t.activityStats.dailyAverage), findsOneWidget);
     // Section headers that exist in the new layout.
     expect(find.text(t.activityStats.trendTitle), findsOneWidget);
     expect(find.text(t.activityStats.topTitlesTitle), findsOneWidget);
-    expect(find.text(t.activityStats.sessionsTitle), findsOneWidget);
-    expect(find.text('45 min'), findsWidgets); // today's chip + default footer
+    expect(find.text(t.activityStats.recentViewingTitle), findsOneWidget);
+    expect(find.text('2 hr 45 min'), findsWidgets); // selected-period summary
     // "Movie A" renders twice: a Most-watched poster card and its session row.
     expect(find.text('Movie A'), findsNWidgets(2));
     // The episode session row leads with the series and its S/E position,
@@ -143,7 +144,45 @@ void main() {
     expect(find.textContaining('S1 · E2'), findsAtLeastNWidgets(1));
     expect(find.textContaining('Winter is coming'), findsAtLeastNWidgets(1));
     expect(find.textContaining('Show B'), findsAtLeastNWidgets(2));
-    expect(find.text(t.activityStats.kindMovie), findsOneWidget);
+    expect(find.text(t.activityStats.moviesFilter), findsWidgets);
+  });
+
+  testWidgets('history search and chart drill-down filter the ledger', (tester) async {
+    initTargets();
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1000, 4000);
+    addTearDown(tester.view.reset);
+    final now = DateTime.now();
+    final yesterday = now.subtract(const Duration(days: 1));
+    for (final (date, title, key) in [(now, 'Movie Today', 'today'), (yesterday, 'Movie Yesterday', 'yesterday')]) {
+      await seedDaily(dayKey(date), 60000);
+      await db.addScreenTimeSessions([
+        sessionRow(
+          localDate: dayKey(date),
+          start: date,
+          end: date.add(const Duration(minutes: 1)),
+          kind: ScreenTimeMediaKind.movie,
+          itemKey: key,
+          itemTitle: title,
+        ),
+      ]);
+    }
+    await pumpScreen(tester);
+    await tester.enterText(find.byType(TextField), 'Yesterday');
+    await tester.pump(const Duration(milliseconds: 350));
+    await pumpUntil(tester, () => find.text('Movie Today').evaluate().length == 1);
+    expect(find.text('Movie Yesterday'), findsNWidgets(2));
+    await tester.enterText(find.byType(TextField), '');
+    await tester.pump(const Duration(milliseconds: 350));
+    await pumpUntil(tester, () => find.text('Movie Today').evaluate().length == 2);
+    final chart = tester.widget<StatsDailyBarChart>(find.byType(StatsDailyBarChart));
+    chart.onSegmentTap(chart.segments.length - 1);
+    await tester.pump();
+    await tester.ensureVisible(find.text(t.activityStats.drillDown));
+    await tester.tap(find.text(t.activityStats.drillDown));
+    await pumpUntil(tester, () => find.text('Movie Yesterday').evaluate().length == 1);
+    expect(find.text(t.activityStats.clearDates), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('period summary reports the selected period rather than the all-time total', (tester) async {
@@ -290,8 +329,101 @@ void main() {
     expect(find.text(t.activityStats.showMore), findsNothing);
   });
 
-  testWidgets('profile override renders another person’s ledger, not the active one', (tester) async {
+  testWidgets('paused episode segments appear once with the total actually watched', (tester) async {
     initTargets();
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1000, 3200);
+    addTearDown(tester.view.reset);
+    final now = DateTime.now();
+    final today = dayKey(now);
+    await seedDaily(today, const Duration(minutes: 9).inMilliseconds);
+    await db.addScreenTimeSessions([
+      for (final (startMinute, duration) in [(0, 3), (10, 1), (20, 5)])
+        sessionRow(
+          localDate: today,
+          start: DateTime(now.year, now.month, now.day, 10, startMinute),
+          end: DateTime(now.year, now.month, now.day, 10, startMinute + duration),
+          kind: ScreenTimeMediaKind.episode,
+          itemKey: 'episode-1',
+          itemTitle: 'Pilot',
+          showTitle: 'Show B',
+          seasonIndex: 1,
+          episodeIndex: 1,
+        ),
+    ]);
+    await pumpScreen(tester);
+    expect(find.textContaining('S1 · E1'), findsOneWidget);
+    expect(find.textContaining('Pilot'), findsOneWidget);
+    expect(find.text(t.activityStats.recentViewingHint), findsOneWidget);
+    expect(find.text('9 min'), findsWidgets);
+    expect(find.text('3 min'), findsNothing);
+    expect(find.text('1 min'), findsNothing);
+    expect(find.text('5 min'), findsNothing);
+    expect(await db.getScreenTimeSessions(profileId: 'p1'), hasLength(3));
+  });
+
+  for (final viewport in [const Size(320, 700), const Size(960, 540)]) {
+    testWidgets('combined episode cards fit $viewport with enlarged text', (tester) async {
+      initTargets();
+      TvDetectionService.debugSetAppleTVOverride(viewport.width == 960);
+      addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = viewport;
+      addTearDown(tester.view.reset);
+      final now = DateTime.now();
+      final today = dayKey(now);
+      await seedDaily(today, 4 * 60000);
+      await db.addScreenTimeSessions([
+        for (final minute in [0, 5])
+          sessionRow(
+            localDate: today,
+            start: DateTime(now.year, now.month, now.day, 10, minute),
+            end: DateTime(now.year, now.month, now.day, 10, minute + 2),
+            kind: ScreenTimeMediaKind.episode,
+            itemKey: 'episode-1',
+            itemTitle: 'A longer episode title',
+            showTitle: 'A show with a longer title',
+            seasonIndex: 1,
+            episodeIndex: 3,
+          ),
+      ]);
+      await tester.pumpWidget(
+        Provider<ScreenTimeService>.value(
+          value: service,
+          child: MaterialApp(
+            theme: monoTheme(MonoPalette.dark),
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.3)),
+              child: child!,
+            ),
+            home: const ScreenTimeScreen(),
+          ),
+        ),
+      );
+      await pumpUntil(tester, () => find.text(t.activityStats.recentViewingTitle).evaluate().isNotEmpty);
+      await tester.ensureVisible(find.text(t.activityStats.recentViewingTitle));
+      await tester.pumpAndSettle();
+      expect(find.text('4 min'), findsWidgets);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+  }
+
+  testWidgets('profile override renders a linked child’s ledger, not the active one', (tester) async {
+    resetSharedPreferencesForTest();
+    initTargets();
+    final kids = KidsProfileService.instance;
+    kids.resetForTesting();
+    addTearDown(kids.resetForTesting);
+    await kids.initialize();
+    await kids.setParentPin('1234');
+    await kids.setChild('p2', parentId: 'p1', maxAge: 7);
+    final graph = await ProfileStack.create(db: db);
+    addTearDown(graph.dispose);
+    await graph.profiles.upsert(Profile.local(id: 'p1', displayName: 'Parent', createdAt: DateTime(2026)));
+    await graph.profiles.upsert(Profile.local(id: 'p2', displayName: 'Child', createdAt: DateTime(2026)));
+    await graph.storage.setActiveProfileId('p1');
+    await graph.active.initialize();
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(1000, 3200);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -316,7 +448,10 @@ void main() {
 
     await tester.pumpWidget(
       MultiProvider(
-        providers: [Provider<ScreenTimeService>.value(value: service)],
+        providers: [
+          Provider<ScreenTimeService>.value(value: service),
+          ChangeNotifierProvider<ActiveProfileProvider>.value(value: graph.active),
+        ],
         child: MaterialApp(
           theme: monoTheme(MonoPalette.dark),
           home: const ScreenTimeScreen(profileId: 'p2'),
@@ -333,6 +468,12 @@ void main() {
   testWidgets('profile override uses the selected profile avatar and name', (tester) async {
     resetSharedPreferencesForTest();
     initTargets();
+    final kids = KidsProfileService.instance;
+    kids.resetForTesting();
+    addTearDown(kids.resetForTesting);
+    await kids.initialize();
+    await kids.setParentPin('1234');
+    await kids.setChild('p2', parentId: 'p1', maxAge: 7);
     final graph = await ProfileStack.create(db: db);
     addTearDown(graph.dispose);
     final parent = Profile.local(id: 'p1', displayName: 'Parent', createdAt: DateTime(2026));
@@ -412,7 +553,9 @@ void main() {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = viewport;
       addTearDown(tester.view.reset);
-      await seedDaily(dayKey(DateTime.now()), 90 * 60000);
+      for (var i = 0; i < 3; i++) {
+        await seedDaily(dayKey(DateTime.now().subtract(Duration(days: i))), 90 * 60000);
+      }
       await tester.pumpWidget(
         Provider<ScreenTimeService>.value(
           value: service,
@@ -427,6 +570,11 @@ void main() {
         ),
       );
       await pumpUntil(tester, () => find.byKey(const ValueKey('activity_hero')).evaluate().isNotEmpty);
+      if (tv) {
+        await tester.ensureVisible(find.text(t.activityStats.patternsTab));
+        await tester.tap(find.text(t.activityStats.patternsTab));
+        await tester.pumpAndSettle();
+      }
       await tester.ensureVisible(find.text(t.activityStats.hoursTitle).last);
       await tester.pumpAndSettle();
       await tester.pumpWidget(const SizedBox.shrink());
@@ -440,7 +588,9 @@ void main() {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(960, 540);
     addTearDown(tester.view.reset);
-    await seedDaily(dayKey(DateTime.now()), 90 * 60000);
+    for (var i = 0; i < 3; i++) {
+      await seedDaily(dayKey(DateTime.now().subtract(Duration(days: i))), 90 * 60000);
+    }
     await tester.pumpWidget(
       Provider<ScreenTimeService>.value(
         value: service,
@@ -455,6 +605,9 @@ void main() {
       ),
     );
     await pumpUntil(tester, () => find.byKey(const ValueKey('activity_hero')).evaluate().isNotEmpty);
+    await tester.ensureVisible(find.text(t.activityStats.patternsTab));
+    await tester.tap(find.text(t.activityStats.patternsTab));
+    await tester.pumpAndSettle();
     await tester.ensureVisible(find.text(t.activityStats.hoursTitle).last);
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
@@ -550,7 +703,11 @@ void main() {
 
     expect(find.byType(StatsDailyBarChart), findsOneWidget);
     expect(find.byType(StatsActivityHeatmap), findsNothing);
-    expect(find.text(t.activityStats.hoursTitle), findsOneWidget);
+    expect(find.text(t.activityStats.hoursTitle), findsNothing);
+    await tester.ensureVisible(find.text(t.activityStats.patternsTab));
+    await tester.tap(find.text(t.activityStats.patternsTab));
+    await tester.pumpAndSettle();
+    expect(find.text(t.activityStats.gettingStarted), findsOneWidget);
   });
 }
 

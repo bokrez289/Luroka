@@ -34,6 +34,8 @@ class _Client implements MediaServerClient {
 }
 
 class _Studios extends ChangeNotifier implements StudiosProvider {
+  @override
+  bool get hasMore => false;
   _Studios({this.lookupGate, List<String> names = const ['Dream Factory', 'Family Pictures']}) {
     groups = [
       for (final name in names)

@@ -260,8 +260,8 @@ void main() {
     addTearDown(sheetButtonFocusNode.dispose);
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       // Never completes: the screen stays on its initialization surface, so no
       // real player is needed and the chrome is not presented — the state in
       // which a leaked Back goes straight to exitPlayer.

@@ -49,6 +49,7 @@ class FocusedScrollScaffold extends StatefulWidget {
   /// stays in this scaffold's focus scope, after the content in traversal.
   final Widget? bottomBar;
   final Color? backgroundColor;
+  final bool allowDirectionalExit;
 
   const FocusedScrollScaffold({
     super.key,
@@ -61,6 +62,7 @@ class FocusedScrollScaffold extends StatefulWidget {
     this.onBackPressed,
     this.bottomBar,
     this.backgroundColor,
+    this.allowDirectionalExit = false,
   });
 
   @override
@@ -68,7 +70,11 @@ class FocusedScrollScaffold extends StatefulWidget {
 }
 
 class _FocusedScrollScaffoldState extends State<FocusedScrollScaffold> {
-  final _scopeNode = FocusScopeNode();
+  late final _scopeNode = FocusScopeNode(
+    directionalTraversalEdgeBehavior: widget.allowDirectionalExit
+        ? TraversalEdgeBehavior.parentScope
+        : TraversalEdgeBehavior.stop,
+  );
   bool _focusRequested = false;
   bool _appBarFocusEnabled = false;
 

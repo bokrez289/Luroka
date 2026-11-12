@@ -272,7 +272,8 @@ extension _TitlePagePresentation on _MediaDetailScreenState {
                                             ),
                                           if (item.isShow && item.studio?.isNotEmpty == true)
                                             Text(item.studio!, style: TextStyle(fontSize: 13 * scale)),
-                                          if (remaining != null)
+                                          if (remaining != null &&
+                                              SettingsService.instance.read(SettingsService.showRemainingEpisodes))
                                             Text(
                                               remaining == 1
                                                   ? t.referenceDetails.oneEpisodeLeft

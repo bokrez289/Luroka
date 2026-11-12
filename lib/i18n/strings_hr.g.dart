@@ -140,6 +140,8 @@ class TranslationsHr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$offlineRecovery$hr offlineRecovery = _Translations$offlineRecovery$hr._(_root);
 	@override late final _Translations$releaseUpdates$hr releaseUpdates = _Translations$releaseUpdates$hr._(_root);
 	@override late final _Translations$profileIntegrations$hr profileIntegrations = _Translations$profileIntegrations$hr._(_root);
+	@override late final _Translations$profileSetupGuide$hr profileSetupGuide = _Translations$profileSetupGuide$hr._(_root);
+	@override late final _Translations$animeFavorites$hr animeFavorites = _Translations$animeFavorites$hr._(_root);
 	@override late final _Translations$addServer$hr addServer = _Translations$addServer$hr._(_root);
 }
 
@@ -325,6 +327,9 @@ class _Translations$libraryPolish$hr extends Translations$libraryPolish$en {
 	final TranslationsHr _root; // ignore: unused_field
 
 	// Translations
+	@override String get compactTvNavigation => 'Kompaktna navigacija bibliotekom';
+	@override String get compactTvNavigationDescription => 'Prikažite odjeljke biblioteke i opcije pregledavanja u bočnom izborniku kako bi ostalo više mjesta za postere.';
+	@override String get openLibraryMenu => 'Otvori izbornik biblioteke';
 	@override String get posterDetails => 'Detalji plakata';
 	@override String get showPosterDetails => 'Prikaži detalje plakata · ime, godinu i IMDb';
 	@override String get hidePosterDetails => 'Sakrij detalje plakata';
@@ -638,6 +643,8 @@ class _Translations$settingsRedesign$hr extends Translations$settingsRedesign$en
 	// Translations
 	@override String get themeEffects => 'Tema i efekti';
 	@override String get libraryLayout => 'Raspored biblioteka';
+	@override String get posterInformation => 'Pojedinosti postera';
+	@override String get libraryBehavior => 'Ponašanje biblioteke';
 	@override String get appearanceHint => 'Prilagodite izgled, raspored i ponašanje Luroke.';
 	@override String get livePreview => 'Pregled uživo';
 	@override String get previewHint => 'Pogledajte kako će vaša biblioteka izgledati s trenutačnim postavkama.';
@@ -1331,6 +1338,7 @@ class _Translations$settings$hr extends Translations$settings$en {
 	@override String get downloadLocationPickerUnavailable => 'Odabir mape nije dostupan na ovom uređaju';
 	@override String get downloadOnWifiOnly => 'Preuzmi samo na Wi-Fi';
 	@override String get downloadOnWifiOnlyDescription => 'Spriječi preuzimanje putem mobilnih podataka';
+	@override String get downloadWifiScope => 'Primjenjuje se na sve profile i preuzimanja na ovom uređaju.';
 	@override String get autoRemoveWatchedDownloads => 'Automatsko uklanjanje gledanih preuzimanja';
 	@override String get autoRemoveWatchedDownloadsDescription => 'Automatsko brisanje gledanih preuzimanja';
 	@override String get cellularDownloadBlocked => 'Preuzimanja su blokirana na mobilnoj mreži. Koristite Wi-Fi ili promijenite postavku.';
@@ -1669,8 +1677,8 @@ class _Translations$dashboard$hr extends Translations$dashboard$en {
 	@override String episodeLabel({required Object season, required Object episode}) => 'S${season} · E${episode}';
 	@override String get anotherPick => 'Još jedan izbor';
 	@override String get exploreSeries => 'Istražite seriju';
-	@override String get showFeatured => 'Pojedinosti istaknutog naslova';
-	@override String get showFeaturedDescription => 'Prikaži sliku, sinopsis i informacije o epizodi za istaknutu karticu';
+	@override String get showFeatured => 'Istaknuto na početnoj stranici';
+	@override String get showFeaturedDescription => 'Prikaži istaknute filmove i emisije na vrhu početne stranice.';
 }
 
 // Path: lurokaCatalog
@@ -1771,9 +1779,32 @@ class _Translations$homeLayout$hr extends Translations$homeLayout$en {
 	final TranslationsHr _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageStudios => 'Odaberite i naručite studije';
+	@override String get manageStudiosDescription => 'Odaberite koji će se studiji pojaviti na ovom profilu i uredite njihov redoslijed.';
+	@override String get studioUnavailable => 'Na početnoj stranici pojavljuju se samo studiji koji se nalaze u vašim odabranim bibliotekama.';
+	@override String get showAllStudios => 'Prikaži sve studije';
+	@override String get hideAllStudios => 'Sakrij sve studije';
+	@override String get reorderStudio => 'Promijeni redoslijed studija';
+	@override String get episodeThumbnails => 'Slike epizoda u nastavku gledanja';
+	@override String get episodeThumbnailsDescription => 'Prikaži slike epizoda umjesto plakata serija ili sezona u Nastavi gledati i Sljedeće.';
+	@override String get spotlightSource => 'Izvor istaknutog sadržaja';
+	@override String get spotlightSourceDescription => 'Odjeljak Za vas koristi aktivnost gledanja ovog profila na ovom uređaju, kao i favorite i naslove iz biblioteke.';
+	@override String get spotlightForYou => 'Za vas';
+	@override String get spotlightForYouDescription => 'Kombinacija sadržaja koji gledate, favorita, novih naslova i popularnog sadržaja na temelju aktivnosti ovog profila na uređaju.';
+	@override String get spotlightTrending => 'U trendu';
+	@override String get spotlightTrendingDescription => 'Popularni filmovi i serije u vašim bibliotekama.';
+	@override String get spotlightContinue => 'Nastavi gledati';
+	@override String get spotlightContinueDescription => 'Naslovi koje ste započeli i epizode koje možete nastaviti.';
+	@override String get spotlightFavorites => 'Iz vaših favorita';
+	@override String get spotlightInspired => 'Nadahnuto vašim gledanjem';
+	@override String get spotlightNextUp => 'Sljedeće';
 	@override String get title => 'Prilagodi početnu stranicu';
 	@override String get description => 'Odaberite redoslijed redaka i vidljivost za ovaj profil. Odaberite redak da biste ga premjestili ili sakrili.';
 	@override String get rows => 'Retci početne stranice';
+	@override String get progressLayout => 'Nastavi gledati i Sljedeće';
+	@override String get progressCombined => 'Zajedno u jednom retku';
+	@override String get progressSeparate => 'Odvojeni redovi';
+	@override String get progressDescription => 'Prikažite Sljedeće u zasebnom retku kada poslužitelj to podržava. Sadržaj drugih poslužitelja ostaje u zajedničkom retku.';
 	@override String get visible => 'Vidljivo';
 	@override String get hidden => 'Skriveno';
 	@override String get showRow => 'Prikaži red';
@@ -1851,6 +1882,8 @@ class _Translations$activityStats$hr extends Translations$activityStats$en {
 	@override String get kindOther => 'Ostalo';
 	@override String get topTitlesTitle => 'Najgledanije';
 	@override String get sessionsTitle => 'Nedavne sesije';
+	@override String get recentViewingTitle => 'Nedavno gledanje';
+	@override String get recentViewingHint => 'Ukupno vrijeme gledanja u odabranom razdoblju. Datumi pokazuju najnovije gledanje.';
 	@override String get showMore => 'Prikaži više';
 	@override String get sessionNoTitle => 'Nepoznat naslov';
 	@override String get emptyTitle => 'Još nema podataka';
@@ -2418,6 +2451,9 @@ class _Translations$profiles$hr extends Translations$profiles$en {
 	final TranslationsHr _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageProfiles => 'Upravljanje profilima';
+	@override String get quickAccess => 'Brzi pristup';
+	@override String get signOutDevice => 'Odjavite se s ovog uređaja';
 	@override String get addLurokaProfile => 'Dodaj profil u Luroku';
 	@override String get switchingProfile => 'Promjena profila…';
 	@override String get deleteThisProfileTitle => 'Izbrisati ovaj profil?';
@@ -2536,7 +2572,7 @@ class _Translations$accountPreferences$hr extends Translations$accountPreference
 	@override String hubSubtitleSingle({required Object account}) => 'Postavke zvuka, titlova i biblioteke spremljene na računu ${account}';
 	@override String hubSubtitleMultiple({required Object count}) => 'Postavke zvuka, titlova i biblioteke spremljene na računima: ${count}';
 	@override String get pickAccount => 'Svaki račun ima vlastite postavke. Odaberite račun čije postavke želite urediti.';
-	@override String get storedOnAccount => 'Ove su opcije spremljene na samom računu, tako da ih koristi svaka aplikacija koja je prijavljena na njega — uključujući Luroka na vašim drugim uređajima.';
+	@override String get storedOnAccount => 'Ove se postavke spremaju na račun poslužitelja i dijele ih svi profili u Luroki i sve aplikacije koje koriste taj račun, uključujući one na drugim uređajima.';
 	@override String get noAccounts => 'Nema računa za konfiguraciju';
 	@override String get noAccountsHint => 'Prijavite se na Plex ili povežite Jellyfin ili Emby poslužitelj i postavke pohranjene na tom računu pojavit će se ovdje.';
 	@override String get unavailable => 'Nije moguće pristupiti ovom računu';
@@ -3776,6 +3812,64 @@ class _Translations$profileIntegrations$hr extends Translations$profileIntegrati
 	@override String forProfile({required Object name}) => 'Veze za profil ${name}';
 }
 
+// Path: profileSetupGuide
+class _Translations$profileSetupGuide$hr extends Translations$profileSetupGuide$en {
+	_Translations$profileSetupGuide$hr._(TranslationsHr root) : this._root = root, super.internal(root);
+
+	final TranslationsHr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Prilagodite svoj profil';
+	@override String get description => 'Odaberite kako će Luroka izgledati na ovom profilu i uređaju. Sve kasnije možete promijeniti u Postavkama.';
+	@override String get appearanceStep => '1 od 2 · Izgled';
+	@override String get homeStep => '2 od 2 · Vaš početni zaslon';
+	@override String get preview => 'Pregled';
+	@override String get previewTitle => 'Vaša početna stranica';
+	@override String get previewPoster => 'Poster';
+	@override String get posterArtwork => 'Samo poster';
+	@override String get posterWithDetails => 'Prikaži pojedinosti postera';
+	@override String get musicDescription => 'Reproduciraj tematsku glazbu filma ili serije dok je otvorena stranica s pojedinostima, ako je dostupna.';
+	@override String get moreThemes => 'Više tema';
+	@override String get fewerThemes => 'Manje tema';
+	@override String get spotlightHeading => 'Što želite prikazati u istaknutom sadržaju?';
+	@override String get progressHeading => 'Nastavi gledati i Sljedeće';
+	@override String get skip => 'Koristite zadane postavke i počnite gledati';
+	@override String get finish => 'Započni gledanje';
+	@override String get back => 'Natrag';
+	@override String get kContinue => 'Nastavi';
+	@override String get chooseLater => 'Odaberite biblioteke kasnije';
+	@override String get libraryScope => 'Ovo mijenja sadržaj prikazan u Luroki za ovaj profil, ali ne mijenja dopuštenja na poslužitelju.';
+	@override String get createdTitle => 'Profil je stvoren';
+	@override String get createdDescription => 'Novi profil je spreman. Osoba koja ga koristi može ga prilagoditi kada ga prvi put otvori.';
+	@override String get switchProfile => 'Prijeđi na ovaj profil';
+	@override String get stayHere => 'Ostanite na trenutnom profilu';
+}
+
+// Path: animeFavorites
+class _Translations$animeFavorites$hr extends Translations$animeFavorites$en {
+	_Translations$animeFavorites$hr._(TranslationsHr root) : this._root = root, super.internal(root);
+
+	final TranslationsHr _root; // ignore: unused_field
+
+	// Translations
+	@override String get filter => 'Anime';
+	@override String get manage => 'Upravljaj anime sadržajem';
+	@override String get description => 'Automatsko prepoznavanje koristi nazive biblioteka te dostupne anime oznake i ID-ove. Odaberite biblioteke i ispravite pojedinačne favorite. Odabiri se spremaju za ovaj profil na ovom uređaju.';
+	@override String get libraries => 'Anime biblioteke';
+	@override String get libraryHint => 'Biblioteke nazvane Anime prepoznaju se automatski. Odaberite biblioteku da biste promijenili njezinu klasifikaciju.';
+	@override String get titles => 'Omiljeni naslovi';
+	@override String get titleHint => 'Odaberite naslov da biste ga označili kao anime ili ispravili automatsko prepoznavanje.';
+	@override String get automatic => 'Automatski';
+	@override String get include => 'Anime';
+	@override String get exclude => 'Nije anime';
+	@override String get automaticIncluded => 'Automatski · Anime';
+	@override String get automaticExcluded => 'Automatski · Nije anime';
+	@override String get noLibraries => 'Nema dostupnih povezanih biblioteka.';
+	@override String get noTitles => 'Nema dostupnih omiljenih filmova ili serija.';
+	@override String get empty => 'Nisu pronađeni omiljeni anime naslovi. Provjerite anime biblioteke ili označite naslov kao anime.';
+	@override String get saveFailed => 'Nije moguće spremiti postavke anime sadržaja. Pokušajte ponovno.';
+}
+
 // Path: addServer
 class _Translations$addServer$hr extends Translations$addServer$en {
 	_Translations$addServer$hr._(TranslationsHr root) : this._root = root, super.internal(root);
@@ -3788,7 +3882,7 @@ class _Translations$addServer$hr extends Translations$addServer$en {
 	@override String get serverUrlsHelper => 'Dopušteno je više URL-ova odvojenih zarezima.';
 	@override String get findServer => 'Pronađite poslužitelj';
 	@override String searchingLocalMediaBrowserServers({required Object product}) => 'Traženje lokalnih ${product} poslužitelja...';
-	@override String localMediaBrowserServers({required Object product}) => 'Lokalni ${product} poslužitelji';
+	@override String localMediaBrowserServers({required Object product}) => 'Spremljeni i obližnji ${product} poslužitelji';
 	@override String get username => 'Korisničko ime';
 	@override String get password => 'Lozinka';
 	@override String get signIn => 'Prijavite se';
@@ -4866,6 +4960,9 @@ extension on TranslationsHr {
 			'posterDetails.catalogEpisodeInfoDescription' => 'Prikaži broj epizoda i prosječno trajanje na posterima u odjeljku Otkrijte.',
 			'posterDetails.title' => 'Pojedinosti postera',
 			'posterDetails.description' => 'Prikaži naslov, godinu i IMDb ocjenu ispod postera u odjeljcima Studiji, Pretraživanje, Otkrijte i Biblioteke. Ako IMDb ocjena nije dostupna, neće se prikazati. Isključi ovu opciju za postere koji prikazuju samo sliku.',
+			'libraryPolish.compactTvNavigation' => 'Kompaktna navigacija bibliotekom',
+			'libraryPolish.compactTvNavigationDescription' => 'Prikažite odjeljke biblioteke i opcije pregledavanja u bočnom izborniku kako bi ostalo više mjesta za postere.',
+			'libraryPolish.openLibraryMenu' => 'Otvori izbornik biblioteke',
 			'libraryPolish.posterDetails' => 'Detalji plakata',
 			'libraryPolish.showPosterDetails' => 'Prikaži detalje plakata · ime, godinu i IMDb',
 			'libraryPolish.hidePosterDetails' => 'Sakrij detalje plakata',
@@ -5080,6 +5177,8 @@ extension on TranslationsHr {
 			'tvSettingsV2.simpleAudio' => 'Jezici i izgled titlova',
 			'settingsRedesign.themeEffects' => 'Tema i efekti',
 			'settingsRedesign.libraryLayout' => 'Raspored biblioteka',
+			'settingsRedesign.posterInformation' => 'Pojedinosti postera',
+			'settingsRedesign.libraryBehavior' => 'Ponašanje biblioteke',
 			'settingsRedesign.appearanceHint' => 'Prilagodite izgled, raspored i ponašanje Luroke.',
 			'settingsRedesign.livePreview' => 'Pregled uživo',
 			'settingsRedesign.previewHint' => 'Pogledajte kako će vaša biblioteka izgledati s trenutačnim postavkama.',
@@ -5278,13 +5377,13 @@ extension on TranslationsHr {
 			'kids.blocked' => 'Ovaj naslov nije dostupan u ovom dječjem profilu.',
 			'kids.switchProfile' => 'Promijeni profil',
 			'kids.manageFromAdult' => 'Prijeđite na profil za odrasle za upravljanje postavkama.',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => 'Povežite poslužitelj sa svojim profilom za odrasle prije dodavanja profila za djecu.',
 			'kids.created' => 'Izrađen profil djece',
 			'kids.updated' => 'Profil djece ažuriran',
 			'kids.saveFailed' => 'Nije moguće spremiti roditeljski nadzor. Molimo pokušajte ponovo.',
 			'kids.kidsBadge' => 'djeca',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.title' => 'Otkrij',
 			'lurokaDiscovery.chooseLibraryHint' => 'Odaberite biblioteku za pregledavanje',
 			'lurokaDiscovery.chooseCopyHint' => 'Dostupno je u više biblioteka. Odaberite kopiju koju želite gledati.',
@@ -5690,6 +5789,7 @@ extension on TranslationsHr {
 			'settings.downloadLocationPickerUnavailable' => 'Odabir mape nije dostupan na ovom uređaju',
 			'settings.downloadOnWifiOnly' => 'Preuzmi samo na Wi-Fi',
 			'settings.downloadOnWifiOnlyDescription' => 'Spriječi preuzimanje putem mobilnih podataka',
+			'settings.downloadWifiScope' => 'Primjenjuje se na sve profile i preuzimanja na ovom uređaju.',
 			'settings.autoRemoveWatchedDownloads' => 'Automatsko uklanjanje gledanih preuzimanja',
 			'settings.autoRemoveWatchedDownloadsDescription' => 'Automatsko brisanje gledanih preuzimanja',
 			'settings.cellularDownloadBlocked' => 'Preuzimanja su blokirana na mobilnoj mreži. Koristite Wi-Fi ili promijenite postavku.',
@@ -5791,14 +5891,14 @@ extension on TranslationsHr {
 			'settings.languageAndRegion' => 'Jezik i regija',
 			'settings.startup' => 'Pokretanje',
 			'settings.display' => 'Zaslon',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Biblioteke i kartice',
 			'settings.homeScreen' => 'Početni zaslon',
 			'settings.navigation' => 'Navigacija',
 			'settings.window' => 'Prozor',
 			'settings.liveTv' => 'Televizija uživo',
 			'settings.player' => 'Reproduktor',
-			_ => null,
-		} ?? switch (path) {
 			'settings.videoAndDisplay' => 'Video i zaslon',
 			'settings.audio' => 'Zvuk',
 			'settings.quality' => 'Kvaliteta',
@@ -5951,8 +6051,8 @@ extension on TranslationsHr {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => 'Još jedan izbor',
 			'dashboard.exploreSeries' => 'Istražite seriju',
-			'dashboard.showFeatured' => 'Pojedinosti istaknutog naslova',
-			'dashboard.showFeaturedDescription' => 'Prikaži sliku, sinopsis i informacije o epizodi za istaknutu karticu',
+			'dashboard.showFeatured' => 'Istaknuto na početnoj stranici',
+			'dashboard.showFeaturedDescription' => 'Prikaži istaknute filmove i emisije na vrhu početne stranice.',
 			'lurokaCatalog.aboutPerson' => 'U SREDIŠTU POZORNOSTI',
 			'lurokaCatalog.biographyUnavailable' => 'Biografija nije dostupna s ovog poslužitelja.',
 			'lurokaCatalog.filmography' => 'Filmovi i serije u vašim bibliotekama',
@@ -6008,9 +6108,32 @@ extension on TranslationsHr {
 			'customPerformance.frameBudget' => 'Vremensko ograničenje po sličici',
 			'customPerformance.processMemory' => 'Memorija procesa aplikacije na kraju uzorka',
 			'customPerformance.noFrames' => 'Nisu zabilježene iscrtane sličice. Pokrenite novo mjerenje i koristite aplikaciju.',
+			'homeLayout.manageStudios' => 'Odaberite i naručite studije',
+			'homeLayout.manageStudiosDescription' => 'Odaberite koji će se studiji pojaviti na ovom profilu i uredite njihov redoslijed.',
+			'homeLayout.studioUnavailable' => 'Na početnoj stranici pojavljuju se samo studiji koji se nalaze u vašim odabranim bibliotekama.',
+			'homeLayout.showAllStudios' => 'Prikaži sve studije',
+			'homeLayout.hideAllStudios' => 'Sakrij sve studije',
+			'homeLayout.reorderStudio' => 'Promijeni redoslijed studija',
+			'homeLayout.episodeThumbnails' => 'Slike epizoda u nastavku gledanja',
+			'homeLayout.episodeThumbnailsDescription' => 'Prikaži slike epizoda umjesto plakata serija ili sezona u Nastavi gledati i Sljedeće.',
+			'homeLayout.spotlightSource' => 'Izvor istaknutog sadržaja',
+			'homeLayout.spotlightSourceDescription' => 'Odjeljak Za vas koristi aktivnost gledanja ovog profila na ovom uređaju, kao i favorite i naslove iz biblioteke.',
+			'homeLayout.spotlightForYou' => 'Za vas',
+			'homeLayout.spotlightForYouDescription' => 'Kombinacija sadržaja koji gledate, favorita, novih naslova i popularnog sadržaja na temelju aktivnosti ovog profila na uređaju.',
+			'homeLayout.spotlightTrending' => 'U trendu',
+			'homeLayout.spotlightTrendingDescription' => 'Popularni filmovi i serije u vašim bibliotekama.',
+			'homeLayout.spotlightContinue' => 'Nastavi gledati',
+			'homeLayout.spotlightContinueDescription' => 'Naslovi koje ste započeli i epizode koje možete nastaviti.',
+			'homeLayout.spotlightFavorites' => 'Iz vaših favorita',
+			'homeLayout.spotlightInspired' => 'Nadahnuto vašim gledanjem',
+			'homeLayout.spotlightNextUp' => 'Sljedeće',
 			'homeLayout.title' => 'Prilagodi početnu stranicu',
 			'homeLayout.description' => 'Odaberite redoslijed redaka i vidljivost za ovaj profil. Odaberite redak da biste ga premjestili ili sakrili.',
 			'homeLayout.rows' => 'Retci početne stranice',
+			'homeLayout.progressLayout' => 'Nastavi gledati i Sljedeće',
+			'homeLayout.progressCombined' => 'Zajedno u jednom retku',
+			'homeLayout.progressSeparate' => 'Odvojeni redovi',
+			'homeLayout.progressDescription' => 'Prikažite Sljedeće u zasebnom retku kada poslužitelj to podržava. Sadržaj drugih poslužitelja ostaje u zajedničkom retku.',
 			'homeLayout.visible' => 'Vidljivo',
 			'homeLayout.hidden' => 'Skriveno',
 			'homeLayout.showRow' => 'Prikaži red',
@@ -6066,6 +6189,8 @@ extension on TranslationsHr {
 			'activityStats.kindOther' => 'Ostalo',
 			'activityStats.topTitlesTitle' => 'Najgledanije',
 			'activityStats.sessionsTitle' => 'Nedavne sesije',
+			'activityStats.recentViewingTitle' => 'Nedavno gledanje',
+			'activityStats.recentViewingHint' => 'Ukupno vrijeme gledanja u odabranom razdoblju. Datumi pokazuju najnovije gledanje.',
 			'activityStats.showMore' => 'Prikaži više',
 			'activityStats.sessionNoTitle' => 'Nepoznat naslov',
 			'activityStats.emptyTitle' => 'Još nema podataka',
@@ -6280,6 +6405,8 @@ extension on TranslationsHr {
 			'accessibility.hue' => 'Nijansa',
 			'accessibility.saturation' => 'Zasićenost',
 			'accessibility.brightness' => 'Svjetlina',
+			_ => null,
+		} ?? switch (path) {
 			'accessibility.hexColor' => 'Boja u heksadekadskom zapisu',
 			'accessibility.expandText' => 'Proširi tekst',
 			'accessibility.collapseText' => 'Sažmi tekst',
@@ -6311,8 +6438,6 @@ extension on TranslationsHr {
 			'videoControls.sleepTimerStopAtHeader' => 'Zaustavi se na',
 			'videoControls.sleepTimerDurationHeader' => 'Trajanje',
 			'videoControls.playbackWillPauseAtEnd' => 'Reprodukcija će se zaustaviti na kraju ovog videozapisa',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.stillWatching' => 'Još uvijek gledate?',
 			'videoControls.pausingIn' => ({required Object seconds}) => 'Pauziranje za ${seconds} s',
 			'videoControls.continueWatching' => 'Nastavi gledati',
@@ -6515,6 +6640,9 @@ extension on TranslationsHr {
 			'mpvConfig.removeLine' => 'Ukloni liniju',
 			'mpvConfig.embeddedVoHint' => 'vo, gpu-kontekst i gpu-api zanemaruju se na Linuxu: ugrađeni video uvijek se renderira kroz vo=libmpv na video ravnini, a gpu-next (koji izračunavaju shadere poput ArtCNN-a) ne može pokrenuti ugrađen.',
 			'dialog.confirmAction' => 'Potvrdi radnju',
+			'profiles.manageProfiles' => 'Upravljanje profilima',
+			'profiles.quickAccess' => 'Brzi pristup',
+			'profiles.signOutDevice' => 'Odjavite se s ovog uređaja',
 			'profiles.addLurokaProfile' => 'Dodaj profil u Luroku',
 			'profiles.switchingProfile' => 'Promjena profila…',
 			'profiles.deleteThisProfileTitle' => 'Izbrisati ovaj profil?',
@@ -6606,7 +6734,7 @@ extension on TranslationsHr {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => 'Postavke zvuka, titlova i biblioteke spremljene na računu ${account}',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => 'Postavke zvuka, titlova i biblioteke spremljene na računima: ${count}',
 			'accountPreferences.pickAccount' => 'Svaki račun ima vlastite postavke. Odaberite račun čije postavke želite urediti.',
-			'accountPreferences.storedOnAccount' => 'Ove su opcije spremljene na samom računu, tako da ih koristi svaka aplikacija koja je prijavljena na njega — uključujući Luroka na vašim drugim uređajima.',
+			'accountPreferences.storedOnAccount' => 'Ove se postavke spremaju na račun poslužitelja i dijele ih svi profili u Luroki i sve aplikacije koje koriste taj račun, uključujući one na drugim uređajima.',
 			'accountPreferences.noAccounts' => 'Nema računa za konfiguraciju',
 			'accountPreferences.noAccountsHint' => 'Prijavite se na Plex ili povežite Jellyfin ili Emby poslužitelj i postavke pohranjene na tom računu pojavit će se ovdje.',
 			'accountPreferences.unavailable' => 'Nije moguće pristupiti ovom računu',
@@ -6791,6 +6919,8 @@ extension on TranslationsHr {
 			'libraries.sortLabels.dateShared' => 'Datum dijeljenja',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Datum emitiranja najnovije epizode',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Datum zadnje dodane epizode',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Datum preuzimanja',
 			'libraries.sortLabels.size' => 'Veličina',
 			'libraries.sortLabels.library' => 'Biblioteka',
@@ -6825,8 +6955,6 @@ extension on TranslationsHr {
 			'about.versionLabel' => ({required Object version}) => 'Verzija ${version}',
 			'about.appDescription' => 'Vaši filmovi, serije i glazba s Plexa, Jellyfina i Embyja — na jednom mjestu.',
 			'about.customSource' => 'Izvorni kod',
-			_ => null,
-		} ?? switch (path) {
 			'about.basedOnLuroka' => 'Temelji se na izvornom kodu projekta Plezy',
 			'about.viewLicensesDescription' => 'Softver i biblioteke koje koristi Luroka',
 			'about.appSection' => 'Aplikacija',
@@ -7305,6 +7433,8 @@ extension on TranslationsHr {
 			'watchTogether.offsetPlusSecond' => '+1 s',
 			'watchTogether.participants' => 'Sudionici',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('hr'))(n, one: '${n} sudionik', few: '${n} sudionika', other: '${n} sudionika', ), 
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'DOMAĆIN',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (Vi)',
 			'watchTogether.playerIdle' => 'Neaktivan',
@@ -7339,8 +7469,6 @@ extension on TranslationsHr {
 			'watchTogether.playBlockedTitle' => 'Reprodukcija nije započela',
 			'watchTogether.playBlockedDescription' => 'Odaberite Reproduciraj da biste započeli gledanje sa sudionicima u sobi.',
 			'watchTogether.notices.pressedPlay' => ({required Object name}) => '${name} je odabrao Reproduciraj',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.playbackStarted' => 'Reprodukcija je započela',
 			'watchTogether.notices.paused' => ({required Object name}) => 'Reprodukcija je pauzirana (${name})',
 			'watchTogether.notices.playbackPaused' => 'Reprodukcija je pauzirana',
@@ -7819,6 +7947,8 @@ extension on TranslationsHr {
 			'seerr.statusPartiallyAvailable' => 'Djelomično dostupno',
 			'seerr.statusRequested' => 'Zatraženo',
 			'seerr.statusProcessing' => 'Obrada',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Na popisu blokiranih',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Nije moguće doći do ${url}: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'Nema Seerr instance na ${url} (HTTP ${status})',
@@ -7853,8 +7983,6 @@ extension on TranslationsHr {
 			'services.seerrSignInStep' => 'Odaberite način prijave koji vaš poslužitelj podržava.',
 			'services.integrations' => 'Integracije',
 			'services.notConnected' => 'Nije povezano',
-			_ => null,
-		} ?? switch (path) {
 			'services.connectedAs' => ({required Object username}) => 'Povezan kao @${username}',
 			'services.scrobble' => 'Automatski pratite napredak',
 			'services.scrobbleDescription' => 'Ažurirajte svoj popis kada završite epizodu ili film.',
@@ -7908,12 +8036,52 @@ extension on TranslationsHr {
 			'profileIntegrations.later' => 'Postavi kasnije',
 			'profileIntegrations.manage' => 'Upravljaj integracijama',
 			'profileIntegrations.forProfile' => ({required Object name}) => 'Veze za profil ${name}',
+			'profileSetupGuide.title' => 'Prilagodite svoj profil',
+			'profileSetupGuide.description' => 'Odaberite kako će Luroka izgledati na ovom profilu i uređaju. Sve kasnije možete promijeniti u Postavkama.',
+			'profileSetupGuide.appearanceStep' => '1 od 2 · Izgled',
+			'profileSetupGuide.homeStep' => '2 od 2 · Vaš početni zaslon',
+			'profileSetupGuide.preview' => 'Pregled',
+			'profileSetupGuide.previewTitle' => 'Vaša početna stranica',
+			'profileSetupGuide.previewPoster' => 'Poster',
+			'profileSetupGuide.posterArtwork' => 'Samo poster',
+			'profileSetupGuide.posterWithDetails' => 'Prikaži pojedinosti postera',
+			'profileSetupGuide.musicDescription' => 'Reproduciraj tematsku glazbu filma ili serije dok je otvorena stranica s pojedinostima, ako je dostupna.',
+			'profileSetupGuide.moreThemes' => 'Više tema',
+			'profileSetupGuide.fewerThemes' => 'Manje tema',
+			'profileSetupGuide.spotlightHeading' => 'Što želite prikazati u istaknutom sadržaju?',
+			'profileSetupGuide.progressHeading' => 'Nastavi gledati i Sljedeće',
+			'profileSetupGuide.skip' => 'Koristite zadane postavke i počnite gledati',
+			'profileSetupGuide.finish' => 'Započni gledanje',
+			'profileSetupGuide.back' => 'Natrag',
+			'profileSetupGuide.kContinue' => 'Nastavi',
+			'profileSetupGuide.chooseLater' => 'Odaberite biblioteke kasnije',
+			'profileSetupGuide.libraryScope' => 'Ovo mijenja sadržaj prikazan u Luroki za ovaj profil, ali ne mijenja dopuštenja na poslužitelju.',
+			'profileSetupGuide.createdTitle' => 'Profil je stvoren',
+			'profileSetupGuide.createdDescription' => 'Novi profil je spreman. Osoba koja ga koristi može ga prilagoditi kada ga prvi put otvori.',
+			'profileSetupGuide.switchProfile' => 'Prijeđi na ovaj profil',
+			'profileSetupGuide.stayHere' => 'Ostanite na trenutnom profilu',
+			'animeFavorites.filter' => 'Anime',
+			'animeFavorites.manage' => 'Upravljaj anime sadržajem',
+			'animeFavorites.description' => 'Automatsko prepoznavanje koristi nazive biblioteka te dostupne anime oznake i ID-ove. Odaberite biblioteke i ispravite pojedinačne favorite. Odabiri se spremaju za ovaj profil na ovom uređaju.',
+			'animeFavorites.libraries' => 'Anime biblioteke',
+			'animeFavorites.libraryHint' => 'Biblioteke nazvane Anime prepoznaju se automatski. Odaberite biblioteku da biste promijenili njezinu klasifikaciju.',
+			'animeFavorites.titles' => 'Omiljeni naslovi',
+			'animeFavorites.titleHint' => 'Odaberite naslov da biste ga označili kao anime ili ispravili automatsko prepoznavanje.',
+			'animeFavorites.automatic' => 'Automatski',
+			'animeFavorites.include' => 'Anime',
+			'animeFavorites.exclude' => 'Nije anime',
+			'animeFavorites.automaticIncluded' => 'Automatski · Anime',
+			'animeFavorites.automaticExcluded' => 'Automatski · Nije anime',
+			'animeFavorites.noLibraries' => 'Nema dostupnih povezanih biblioteka.',
+			'animeFavorites.noTitles' => 'Nema dostupnih omiljenih filmova ili serija.',
+			'animeFavorites.empty' => 'Nisu pronađeni omiljeni anime naslovi. Provjerite anime biblioteke ili označite naslov kao anime.',
+			'animeFavorites.saveFailed' => 'Nije moguće spremiti postavke anime sadržaja. Pokušajte ponovno.',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => 'Dodajte ${product} poslužitelj',
 			'addServer.serverUrls' => 'URL-ovi poslužitelja',
 			'addServer.serverUrlsHelper' => 'Dopušteno je više URL-ova odvojenih zarezima.',
 			'addServer.findServer' => 'Pronađite poslužitelj',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => 'Traženje lokalnih ${product} poslužitelja...',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Lokalni ${product} poslužitelji',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Spremljeni i obližnji ${product} poslužitelji',
 			'addServer.username' => 'Korisničko ime',
 			'addServer.password' => 'Lozinka',
 			'addServer.signIn' => 'Prijavite se',

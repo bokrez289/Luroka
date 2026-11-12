@@ -29,8 +29,13 @@ import 'profile_name_field.dart';
 /// Service authentication has already succeeded. Keep the local identity step
 /// explicit, then let the user expand their household or start watching.
 class OnboardingProfileScreen extends StatefulWidget {
-  const OnboardingProfileScreen({super.key, this.initialPromptHandled = false});
+  const OnboardingProfileScreen({super.key, this.initialPromptHandled = false}) : sessionBuilder = null;
+
+  @visibleForTesting
+  const OnboardingProfileScreen.forTesting({super.key, required this.sessionBuilder}) : initialPromptHandled = false;
+
   final bool initialPromptHandled;
+  final WidgetBuilder? sessionBuilder;
 
   @override
   State<OnboardingProfileScreen> createState() => _OnboardingProfileScreenState();
@@ -156,14 +161,13 @@ class _OnboardingProfileScreenState extends State<OnboardingProfileScreen> {
         context,
       ).push<bool>(MaterialPageRoute(builder: (_) => SourceLibrariesScreen(profileId: profile.id, firstRun: true)));
       if (!mounted || sourcesChosen != true) return;
-      await ProfileAppearanceService.instance.markIntegrationsPending(profile.id);
+      await ProfileAppearanceService.instance.markPersonalizationPending(profile.id);
       await ProfileAppearanceService.instance.completeSetup();
       if (!mounted) return;
       context.read<ActiveProfileBinder>().start();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) =>
-              ProfileSessionScreen(initialPromptHandled: widget.initialPromptHandled, initialIntegrationsPrompt: true),
+          builder: widget.sessionBuilder ?? (_) => ProfileSessionScreen(initialPromptHandled: widget.initialPromptHandled),
         ),
       );
     } catch (_) {
@@ -248,7 +252,7 @@ class _OnboardingProfileScreenState extends State<OnboardingProfileScreen> {
                         key: const ValueKey('onboarding-start-watching'),
                         onPressed: _busy ? null : _finish,
                         icon: const Icon(Icons.play_arrow_rounded),
-                        label: Text(t.household.startWatching),
+                        label: Text(t.profiles.continueButton),
                       ),
                     ),
                   ]

@@ -85,7 +85,7 @@ internal class UserCertificateChannel {
           result.success(pem)
         }
       }
-    }, "luroka-user-certificates")
+    }, "plezy-user-certificates")
     worker.isDaemon = true
     worker.start()
   }

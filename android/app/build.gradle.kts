@@ -186,7 +186,7 @@ val prepareMpvFfmpegDevelopment = tasks.register("prepareMpvFfmpegDevelopment") 
       }
       File(includeDir, "libavutil/avconfig.h").writeText(
         """
-        |/* Generated for little-endian Android ABIs. */
+        |/* Generated for Plezy's little-endian Android ABIs. */
         |#ifndef AVUTIL_AVCONFIG_H
         |#define AVUTIL_AVCONFIG_H
         |#define AV_HAVE_BIGENDIAN 0
@@ -442,7 +442,8 @@ android {
 
   sourceSets {
     if (isPlayDistribution) {
-      // Remove even a permission introduced by a dependency in Play builds.
+      // A higher-priority release overlay removes even a permission added by a
+      // dependency. Ordinary sideload builds retain the main manifest entry.
       getByName("release").manifest.srcFile("src/play/AndroidManifest.xml")
     }
     getByName("main") {
@@ -526,6 +527,12 @@ dependencies {
 
   // Android TV Watch Next integration
   implementation("androidx.tvprovider:tvprovider:1.1.0")
+
+  // Only used to cancel the legacy periodic shelf refresh job (2.13.0's
+  // removed ShelfRefreshWorker) that WorkManager persisted on updated
+  // devices. Same version background_downloader pins, so the merged
+  // classpath stays coherent.
+  implementation("androidx.work:work-runtime-ktx:2.11.0")
 
   // Media3 ExoPlayer for Android
   implementation("androidx.media3:media3-decoder:$media3Version")

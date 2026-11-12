@@ -136,6 +136,10 @@ const studioBrands = [
     'BBC Television',
     'British Broadcasting Corporation',
   ], 0xffb9c5dc),
+  StudioBrand('itv', 'ITV', ['ITV', 'ITV1', 'ITV Studios', 'Independent Television'], 0xff42b5b4),
+  StudioBrand('channel-4', 'Channel 4', ['Channel 4', 'Film4', 'Channel Four Television'], 0xffe35684),
+  StudioBrand('channel-5', 'Channel 5', ['Channel 5', 'Channel Five'], 0xffd04b60),
+  StudioBrand('sky', 'Sky', ['Sky', 'Sky UK', 'Sky Studios', 'Sky Atlantic'], 0xff3487cf),
   StudioBrand('studio-ghibli', 'Studio Ghibli', ['Studio Ghibli', 'Ghibli', 'スタジオジブリ'], 0xff63b5dc),
   StudioBrand('toei-animation', 'Toei Animation', [
     'Toei Animation',

@@ -42,6 +42,7 @@ class MobileHomeCarousel extends StatefulWidget {
     super.key,
     required this.items,
     required this.label,
+    this.labelFor,
     required this.resolveClient,
     required this.onPlay,
     required this.onDetails,
@@ -51,6 +52,7 @@ class MobileHomeCarousel extends StatefulWidget {
 
   final List<MediaItem> items;
   final String label;
+  final String Function(MediaItem)? labelFor;
   final MediaServerClient? Function(MediaItem) resolveClient;
   final ValueChanged<MediaItem> onPlay, onDetails;
   final bool active;
@@ -141,7 +143,10 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
   }
 
   void _select() {
-    if (widget.items.isNotEmpty) _preview.select(widget.items[_index], rowTitle: widget.label);
+    if (widget.items.isNotEmpty) {
+      final item = widget.items[_index];
+      _preview.select(item, rowTitle: widget.labelFor?.call(item) ?? widget.label);
+    }
   }
 
   void _visibilityChanged() {
@@ -187,7 +192,7 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
         child: Align(
           alignment: AlignmentDirectional.centerStart,
           child: Text(
-            widget.label,
+            widget.items.isEmpty ? widget.label : widget.labelFor?.call(widget.items[_index]) ?? widget.label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(
@@ -295,10 +300,24 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
     ],
   );
 
+  bool _hideSpoilers(MediaItem item) =>
+      (SettingsService.instanceOrNull?.read(SettingsService.hideSpoilers) ?? false) && item.shouldHideSpoiler;
+
+  String _safeTitle(MediaItem item) {
+    final hidden = _hideSpoilers(item);
+    if (item.isEpisode && hidden && (item.grandparentTitle?.trim().isEmpty ?? true)) {
+      return t.dashboard.episodeFallback;
+    }
+    return item.displayTitle;
+  }
+
   Widget _tabletSpotlight(BuildContext context, MediaItem item) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final movie = item.kind == MediaKind.movie;
+    final playable = movie || item.kind == MediaKind.episode;
+    final poster = item.isEpisode ? item.grandparentThumbPath ?? item.parentThumbPath : item.thumbPath;
+    final backdrop = item.isEpisode ? item.grandparentArtPath : item.artPath;
     final overview =
         (SettingsService.instanceOrNull?.read(SettingsService.hideSpoilers) ?? false) && item.shouldHideSpoiler
         ? null
@@ -316,10 +335,10 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
           fit: StackFit.expand,
           children: [
             ColoredBox(color: colors.surfaceContainerHigh),
-            if (item.artPath != null)
+            if (backdrop != null)
               OptimizedMediaImage(
                 client: widget.resolveClient(item),
-                imagePath: item.artPath,
+                imagePath: backdrop,
                 imageType: ImageType.art,
                 fit: BoxFit.cover,
               ),
@@ -345,7 +364,7 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.displayTitle,
+                          _safeTitle(item),
                           key: ValueKey('mobile_feature_title_${item.globalKey}'),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -395,20 +414,23 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
                           children: [
                             FilledButton.icon(
                               key: ValueKey('mobile_feature_open_${item.globalKey}'),
-                              onPressed: movie
+                              onPressed: playable
                                   ? () {
                                       _schedule(interacted: true);
                                       widget.onPlay(item);
                                     }
                                   : details,
-                              icon: Icon(movie ? Icons.play_arrow_rounded : Icons.info_outline_rounded),
+                              icon: Icon(playable ? Icons.play_arrow_rounded : Icons.info_outline_rounded),
                               label: Text(
-                                movie
-                                    ? (item.hasActiveProgress ? t.common.resume : t.common.play)
+                                playable
+                                    ? ((item.hasActiveProgress ||
+                                              ((item.viewOffsetMs ?? 0) > 0 && item.durationMs == null))
+                                          ? t.common.resume
+                                          : t.common.play)
                                     : t.mediaMenu.viewDetails,
                               ),
                             ),
-                            if (movie) OutlinedButton(onPressed: details, child: Text(t.mediaMenu.viewDetails)),
+                            if (playable) OutlinedButton(onPressed: details, child: Text(t.mediaMenu.viewDetails)),
                           ],
                         ),
                       ],
@@ -426,7 +448,7 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
                             borderRadius: BorderRadius.circular(12),
                             child: OptimizedMediaImage.poster(
                               client: widget.resolveClient(item),
-                              imagePath: item.thumbPath,
+                              imagePath: poster,
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -451,7 +473,8 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
 
     final movie = item.kind == MediaKind.movie;
     final kids = widget.kidsStyle;
-    final canPlay = movie || kids != null;
+    final canPlay = movie || item.kind == MediaKind.episode || kids != null;
+    final poster = item.isEpisode ? item.grandparentThumbPath ?? item.parentThumbPath : item.thumbPath ?? item.artPath;
     final colors = Theme.of(context).colorScheme;
     final panel = kids?.surface ?? colors.surface;
     return ClipRRect(
@@ -468,7 +491,7 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
                   child: OptimizedMediaImage(
                     client: widget.resolveClient(item),
-                    imagePath: item.thumbPath ?? item.artPath,
+                    imagePath: poster,
                     imageType: ImageType.poster,
                     fit: BoxFit.contain,
                     alignment: Alignment.topCenter,
@@ -485,7 +508,7 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    item.displayTitle,
+                    _safeTitle(item),
                     key: ValueKey('mobile_feature_title_${item.globalKey}'),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -528,7 +551,9 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
                           icon: Icon(canPlay ? Icons.play_arrow_rounded : Icons.info_outline_rounded, size: 20),
                           label: Text(
                             canPlay
-                                ? (item.hasActiveProgress ? t.common.resume : t.common.play)
+                                ? ((item.hasActiveProgress || ((item.viewOffsetMs ?? 0) > 0 && item.durationMs == null))
+                                      ? t.common.resume
+                                      : t.common.play)
                                 : t.mediaMenu.viewDetails,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

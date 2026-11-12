@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../media/library_query.dart';
 import '../media/media_hub.dart';
+import '../media/recent_series.dart';
 import '../media/media_item.dart';
 import '../media/movie_copy_groups.dart';
 import '../widgets/movie_copy_picker.dart';
@@ -67,6 +68,12 @@ class _HubDetailScreenState extends State<HubDetailScreen>
   bool _choosingCopy = false;
 
   List<MediaItem> _groupMovies(List<MediaItem> items) {
+    final key = '${widget.hub.id} ${widget.hub.identifier ?? ''}'.toLowerCase();
+    if (!widget.usesContinueWatchingAction &&
+        key.contains('recent') &&
+        SettingsService.instance.read(SettingsService.groupRecentEpisodes)) {
+      return groupRecentSeries(items);
+    }
     if (!widget.isInContinueWatching) return List.of(items);
     _copies = MovieCopyGroups(items);
     return _copies.items;

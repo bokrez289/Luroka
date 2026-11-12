@@ -433,7 +433,7 @@ class MpvPlayerCore private constructor(
    * waits for them. Each only launches into [scope], so the handlers run on
    * the main thread in that order, and a disposed core runs none: dispose
    * cancels the scope before the player closes. The delivery thread never
-   * blocks the app, so nothing that waits on mpv (a close, a surface handoff
+   * blocks on Plezy, so nothing that waits on mpv (a close, a surface handoff
    * holding the main thread) can wait on it in turn.
    */
   private val mpvListener = object : MpvPlayer.Listener {
@@ -1086,7 +1086,7 @@ class MpvPlayerCore private constructor(
                 // Pause on the last frame at EOF instead of unloading the file, so a
                 // seek after the video ends still works (matches Linux/Windows).
                 setOption("keep-open", "yes")
-                // The app opens media-server streams and local files, so
+                // Plezy only ever opens media-server streams and local files, so
                 // mpv's bundled ytdl_hook has nothing to resolve: it costs an
                 // on_load hook per open and, on a failed open, spawns yt-dlp with
                 // the access token in its argv. mpv decides whether to load the

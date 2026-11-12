@@ -1,16 +1,14 @@
-# Luroka repository preparation
+# Luroka repository setup
 
-The intended repository is <https://github.com/bokrez289/Luroka>. It is private
-while the project is being tested. Do not publish source, releases, screenshots,
-or build artifacts until the owner approves the first push.
+The canonical repository is <https://github.com/bokrez289/Luroka>. It is private
+while the project is being tested. See [CONTRIBUTING.md](../CONTRIBUTING.md)
+for the branch, review and push workflow.
 
-## Before the first push
+## Ongoing repository and release checks
 
-- Prepare a new source snapshot with fresh Git history, as requested by the
-  project owner. Retain required upstream license, copyright, modification,
-  and third-party notices.
-- Review the complete set of tracked changes and new files; this working tree
-  also contains local captures, APKs, and in-progress work. Do not stage blindly.
+- Retain required upstream license, copyright, modification, and third-party
+  notices. Review the complete set of proposed changes; local working trees may
+  contain captures, APKs, and in-progress work. Do not stage blindly.
 - Scan the exact proposed commit and its history for credentials, signing keys,
   private server addresses, personal data, and large unintended files. Preserve
   Android signing credentials privately so existing installations can update.
@@ -18,9 +16,8 @@ or build artifacts until the owner approves the first push.
   requirements for any distributed binaries. Review bundled component licenses.
   See [license-review.md](license-review.md) for outstanding platform-specific
   work; Flutter's generated notices do not cover the complete native stack.
-- Review GitHub Actions and permissions before enabling releases. The inherited
-  package-publication workflow is restricted to the upstream repository and
-  must not publish or modify Plezy's external package listings for Luroka.
+- Review GitHub Actions and permissions before enabling releases. Do not publish
+  or modify upstream Plezy package listings for Luroka.
 - Review ownership and disclosure of third-party application keys. Trakt is
   disabled pending production access and an appropriate authentication design;
   the inherited client credentials have been removed. Do not embed a client
@@ -32,7 +29,7 @@ or build artifacts until the owner approves the first push.
 
 Android phone and Android TV are in device testing. iOS/iPadOS and tvOS need
 Apple hardware validation. Fire TV and desktop platforms require further
-testing before being presented as supported releases. This candidate excludes
+testing before being presented as supported releases. This repository excludes
 desktop platform projects while retaining shared app and dependency code.
 
 ## Optional TMDb build configuration

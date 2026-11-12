@@ -13,6 +13,7 @@ import '../../focus/focusable_text_field.dart';
 import '../../services/file_picker_service.dart';
 import '../../services/kids_profile_service.dart';
 import '../../services/luroka_backup_snapshot.dart';
+import '../../services/cloud_backup_recovery.dart';
 import '../../utils/error_dialog.dart';
 import '../../utils/platform_detector.dart';
 import '../../widgets/dialog_action_button.dart';
@@ -81,7 +82,10 @@ Future<bool> restoreFullBackup(BuildContext context) async {
     if (!context.mounted) return false;
     final password = await _passwordDialog(context, creating: false);
     if (password == null || !context.mounted) return false;
-    await LurokaBackupSnapshot.restore(db, data, password);
+    final restorePassword = password.trim().startsWith('lrb1-')
+        ? (await CloudBackupRecoveryCode.parse(password).deriveKeys()).encryptionPassword
+        : password;
+    await LurokaBackupSnapshot.restore(db, data, restorePassword);
     return true;
   } catch (_) {
     // A failure after the database commit leaves a recovery journal. Never let
@@ -139,7 +143,7 @@ class _BackupPasswordDialogState extends State<_BackupPasswordDialog> {
           Text(
             widget.creating
                 ? 'Includes profiles, server logins and local viewing data. Keep the password safe; it is required to restore.'
-                : 'Enter the password used to create this backup. Restore requires an empty profile database.',
+                : 'Enter the password or cloud recovery code used to create this backup. Restore requires an empty profile database.',
           ),
           FocusableTextField(
             controller: password,

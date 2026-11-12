@@ -12,6 +12,7 @@ import 'package:luroka/media/media_kind.dart';
 import 'package:luroka/media/media_library.dart';
 import 'package:luroka/media/media_server_client.dart';
 import 'package:luroka/profiles/active_profile_provider.dart';
+import 'package:luroka/profiles/active_profile_binder.dart';
 import 'package:luroka/profiles/plex_home_service.dart';
 import 'package:luroka/profiles/profile.dart';
 import 'package:luroka/profiles/profile_connection_registry.dart';
@@ -20,13 +21,15 @@ import 'package:luroka/providers/multi_server_provider.dart';
 import 'package:luroka/screens/settings/source_libraries_screen.dart';
 import 'package:luroka/services/settings_service.dart';
 import 'package:luroka/services/storage_service.dart';
+import 'package:luroka/services/profile_appearance_service.dart';
 import 'package:luroka/utils/platform_detector.dart';
 import '../../test_helpers/multi_server_fixtures.dart';
 import '../../test_helpers/prefs.dart';
 
 class _Client implements MediaServerClient {
-  _Client(this.id);
+  _Client(this.id, {this.single = false});
   final String id;
+  final bool single;
   @override
   ServerId get serverId => ServerId(id);
   @override
@@ -35,7 +38,7 @@ class _Client implements MediaServerClient {
   MediaBackend get backend => MediaBackend.plex;
   @override
   Future<List<MediaLibrary>> fetchLibraries() async => [
-    for (final kind in [MediaKind.movie, MediaKind.show])
+    for (final kind in [MediaKind.movie, if (!single) MediaKind.show])
       MediaLibrary(
         id: kind.name,
         title: '${kind.name} $id',
@@ -51,7 +54,78 @@ class _Client implements MediaServerClient {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class _Binder implements ActiveProfileBinder {
+  @override
+  void start({bool allowInitialPinPrompt = true}) {}
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 void main() {
+  testWidgets('first run selects the only available library without another choice', (tester) async {
+    resetSharedPreferencesForTest();
+    ProfileAppearanceService.instance.resetForTesting();
+    final storage = await StorageService.getInstance();
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    final registry = ProfileRegistry(db);
+    final connections = ConnectionRegistry(db);
+    final links = ProfileConnectionRegistry(db);
+    final home = PlexHomeService(
+      connections: connections,
+      profileConnections: links,
+      storage: storage,
+      plexHomeUserFetcher: (_) async => [],
+    );
+    final active = ActiveProfileProvider(
+      registry: registry,
+      connections: connections,
+      profileConnections: links,
+      plexHome: home,
+      storage: storage,
+    );
+    await registry.upsert(Profile.local(id: 'alex', displayName: 'Alex', createdAt: DateTime(2026)));
+    await storage.setActiveProfileId('alex');
+    await active.initialize();
+    await ProfileAppearanceService.instance.markSourceSelectionPending('alex');
+    final servers = testMultiServer(clients: [_Client('a', single: true)]);
+    addTearDown(() async {
+      await active.resetForTesting();
+      active.dispose();
+      await home.dispose();
+      await db.close();
+      ProfileAppearanceService.instance.resetForTesting();
+    });
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ActiveProfileProvider>.value(value: active),
+          ChangeNotifierProvider<MultiServerProvider>.value(value: servers.provider),
+          Provider<ActiveProfileBinder>.value(value: _Binder()),
+        ],
+        child: InputModeTracker(
+          child: MaterialApp(
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SourceLibrariesScreen(profileId: 'alex', firstRun: true)),
+                  ),
+                  child: const Text('Open sources'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Open sources'));
+    await tester.pumpAndSettle();
+    expect(find.text('Open sources'), findsOneWidget);
+    expect(storage.getSelectedSourceLibraries(profileId: 'alex'), {'a:movie'});
+    expect(ProfileAppearanceService.instance.sourceSelectionPendingFor('alex'), isFalse);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   for (final tv in [false, true]) {
     testWidgets('server/library selection is saved per profile on ${tv ? 'TV' : 'phone'}', (tester) async {
       resetSharedPreferencesForTest();

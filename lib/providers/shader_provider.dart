@@ -99,10 +99,19 @@ class ShaderProvider extends ChangeNotifier with DisposableChangeNotifierMixin {
   /// Copies the file to the custom shaders directory and creates a preset.
   Future<ShaderPreset> importCustomShader(String filePath, String displayName, {void Function()? checkCurrent}) async {
     if (displayName.trim().isEmpty) throw const FormatException('A shader name is required');
-    checkCurrent?.call();
-    final storedFileName = await ShaderAssetLoader.importCustomShader(filePath, checkCurrent: checkCurrent);
-    try {
+    final owner = SettingsService.instanceOrNull;
+    final revision = owner?.profileSettingsRevision.value;
+    void checkOwner() {
       checkCurrent?.call();
+      if (revision != null && owner?.profileSettingsRevision.value != revision) {
+        throw StateError('The active profile changed while importing a shader');
+      }
+    }
+
+    checkOwner();
+    final storedFileName = await ShaderAssetLoader.importCustomShader(filePath, checkCurrent: checkOwner);
+    try {
+      checkOwner();
       final preset = ShaderPreset(
         id: 'custom_$storedFileName',
         name: displayName.trim(),
@@ -110,19 +119,19 @@ class ShaderProvider extends ChangeNotifier with DisposableChangeNotifierMixin {
         fileName: storedFileName,
       );
       final service = _settingsBinding.settings ?? await SettingsService.getInstance();
-      checkCurrent?.call();
+      checkOwner();
       await service.write(SettingsService.customShaderPresets, [
         ...service.read(SettingsService.customShaderPresets),
         preset.toJson(),
-      ], checkCurrent: checkCurrent);
-      checkCurrent?.call();
+      ], checkCurrent: checkOwner);
+      checkOwner();
       if (_settingsBinding.settings == null) _syncFromSettings(service);
       return preset;
     } catch (_) {
       // The generated file belongs to this import alone. Do not remove it if
       // persistence succeeded and only the caller's lifetime changed afterward.
       final service = SettingsService.instance;
-      if (!service.read(SettingsService.customShaderPresets).any((p) => p['fileName'] == storedFileName)) {
+      if (!service.isShaderFileReferenced(storedFileName)) {
         await ShaderAssetLoader.deleteCustomShader(storedFileName);
       }
       rethrow;
@@ -134,26 +143,35 @@ class ShaderProvider extends ChangeNotifier with DisposableChangeNotifierMixin {
     if (preset.type != ShaderPresetType.custom || !_customPresets.any((p) => p.id == preset.id)) {
       throw const FormatException('Unknown custom shader');
     }
+    final owner = SettingsService.instanceOrNull;
+    final revision = owner?.profileSettingsRevision.value;
+    void checkOwner() {
+      checkCurrent?.call();
+      if (revision != null && owner?.profileSettingsRevision.value != revision) {
+        throw StateError('The active profile changed while deleting a shader');
+      }
+    }
+
     final service = _settingsBinding.settings ?? await SettingsService.getInstance();
-    checkCurrent?.call();
+    checkOwner();
     // Only a global default that names the shader is reset. A scoped
     // selection (current but not saved) leaves the global default alone and
     // falls back to none, as the player does once the shader is gone.
     final deletesSaved = _savedPreset.id == preset.id;
     final deletesCurrentOnly = !deletesSaved && _currentPreset.id == preset.id;
     if (deletesSaved) {
-      await setPreset(ShaderPreset.none, checkCurrent: checkCurrent);
+      await setPreset(ShaderPreset.none, checkCurrent: checkOwner);
     }
-    checkCurrent?.call();
+    checkOwner();
     await service.write(SettingsService.customShaderPresets, [
       for (final item in service.read(SettingsService.customShaderPresets))
         if (item['id'] != preset.id) item,
-    ], checkCurrent: checkCurrent);
-    checkCurrent?.call();
-    if (preset.fileName != null) {
-      await ShaderAssetLoader.deleteCustomShader(preset.fileName!, checkCurrent: checkCurrent);
+    ], checkCurrent: checkOwner);
+    checkOwner();
+    if (preset.fileName != null && !service.isShaderFileReferenced(preset.fileName!)) {
+      await ShaderAssetLoader.deleteCustomShader(preset.fileName!, checkCurrent: checkOwner);
     }
-    checkCurrent?.call();
+    checkOwner();
     if (_settingsBinding.settings == null) _syncFromSettings(service);
     // The settings writes above re-seed current from the saved preset.
     if (deletesCurrentOnly) setCurrentPreset(ShaderPreset.none);

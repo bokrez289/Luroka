@@ -77,8 +77,8 @@ void main() {
     final shell = _LiveShell();
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       // The shell has no live server to tune. Refusing the core keeps the
       // screen's own initialization settling on a short failure instead of a
       // provider error, so the service layer can be driven directly below.
@@ -134,8 +134,8 @@ void main() {
     final shell = _LiveShell(client: _LiveMediaServerClient(liveTv));
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       methodHandler: (call) async => call.method == 'initialize' ? false : null,
       testBody: () async {
         final key = GlobalKey<VideoPlayerScreenState>();
@@ -176,8 +176,8 @@ void main() {
     final shell = _LiveShell(client: _LiveMediaServerClient(liveTv));
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       methodHandler: (call) async => call.method == 'initialize' ? false : null,
       testBody: () async {
         final key = GlobalKey<VideoPlayerScreenState>();
@@ -214,8 +214,8 @@ void main() {
     final shell = _LiveShell(client: _LiveMediaServerClient(liveTv));
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       methodHandler: (call) async => call.method == 'initialize' ? false : null,
       testBody: () async {
         final key = GlobalKey<VideoPlayerScreenState>();
@@ -261,8 +261,8 @@ void main() {
       addTearDown(player.close);
       final shell = _LiveShell(client: _LiveMediaServerClient(_ChannelLiveTvSupport()));
       await withMockPlayerChannels(
-        methodChannelName: 'com.luroka/mpv_player',
-        eventChannelName: 'com.luroka/mpv_player/events',
+        methodChannelName: 'com.plezy/mpv_player',
+        eventChannelName: 'com.plezy/mpv_player/events',
         methodHandler: (call) async => call.method == 'initialize' ? false : null,
         testBody: () async {
           final key = GlobalKey<VideoPlayerScreenState>();

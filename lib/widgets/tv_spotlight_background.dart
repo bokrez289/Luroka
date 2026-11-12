@@ -67,6 +67,8 @@ class TvSpotlightBackground extends StatelessWidget {
     final containerAspect = size.width / size.height;
     final fallbackPaths = media == null
         ? const <String>[]
+        : media.isEpisode
+        ? <String>[...?media.grandparentBackdropPaths, ?media.grandparentArtPath, ?media.grandparentThumbPath, ?media.parentThumbPath]
         : <String>[...media.heroArtCandidates(containerAspectRatio: containerAspect), ?media.thumbPath];
     return SettingValueBuilder<bool>(
       pref: SettingsService.tvCornerSpotlightBackdrop,

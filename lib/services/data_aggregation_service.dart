@@ -4,6 +4,7 @@ import '../media/ids.dart';
 import '../media/media_hub.dart';
 import '../media/media_backend.dart';
 import '../media/media_item.dart';
+import '../media/home_progress.dart';
 import '../media/media_item_merge.dart';
 import '../media/media_kind.dart';
 import '../media/media_library.dart';
@@ -281,6 +282,7 @@ class DataAggregationService {
   /// [serverIds] restricts the fan-out to those servers.
   Future<OnDeckAggregationResult> getOnDeckFromAllServers({
     int? limit,
+    bool splitRows = false,
     Set<String>? hiddenLibraryKeys,
     Set<String>? selectedSourceLibraryKeys,
     Set<String>? serverIds,
@@ -311,6 +313,7 @@ class DataAggregationService {
                     : _hiddenLibraryIdsOn(serverId, selectedSourceLibraryKeys),
                 excludedLibraryIds: excludedIds,
                 count: limit,
+                splitRows: splitRows,
                 onLibrary: (libraryId, items, complete) => onPartialLibrary?.call((
                   serverId: serverId,
                   libraryId: libraryId,
@@ -337,7 +340,7 @@ class DataAggregationService {
 
     filteredOnDeck = await _deduplicateContinueWatching(filteredOnDeck);
 
-    final items = limit != null && limit < filteredOnDeck.length ? filteredOnDeck.sublist(0, limit) : filteredOnDeck;
+    final items = limitHomeProgressRows(filteredOnDeck, limit, split: splitRows);
 
     appLogger.i('Fetched ${items.length} on deck items from all servers');
 
@@ -355,10 +358,15 @@ class DataAggregationService {
   /// Merge an [existing] Continue Watching list with [fresh] rows from
   /// newly-online servers: same recency ordering and cross-server identity
   /// dedup as [getOnDeckFromAllServers], applied to the union.
-  Future<List<MediaItem>> mergeContinueWatching(List<MediaItem> existing, List<MediaItem> fresh, {int? limit}) async {
+  Future<List<MediaItem>> mergeContinueWatching(
+    List<MediaItem> existing,
+    List<MediaItem> fresh, {
+    int? limit,
+    bool splitRows = false,
+  }) async {
     final combined = [...existing, ...fresh]..sort((a, b) => b.recencySortKey.compareTo(a.recencySortKey));
     final deduped = await _deduplicateContinueWatching(combined);
-    return limit != null && limit < deduped.length ? deduped.sublist(0, limit) : deduped;
+    return limitHomeProgressRows(deduped, limit, split: splitRows);
   }
 
   Future<List<MediaItem>> _deduplicateContinueWatching(List<MediaItem> items) async {
@@ -980,7 +988,10 @@ class DataAggregationService {
             partialSucceeded.add(serverId);
             publish();
           }
-          final missing = [for (var i = 0; i < items.length; i++) if (items[i].libraryId == null) i];
+          final missing = [
+            for (var i = 0; i < items.length; i++)
+              if (items[i].libraryId == null) i,
+          ];
           var next = 0;
           Future<void> stampWorker() async {
             while (next < missing.length) {
@@ -994,6 +1005,7 @@ class DataAggregationService {
               }
             }
           }
+
           await Future.wait(List.generate(missing.length.clamp(0, 6), (_) => stampWorker()));
         }
         final visibleItems = stamped

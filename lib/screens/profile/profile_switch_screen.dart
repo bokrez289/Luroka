@@ -648,7 +648,15 @@ class _ProfileSwitchScreenState extends State<ProfileSwitchScreen> with MountedS
 
   Future<void> _addLocalProfile() async {
     if (!await ensureParentAccess(context) || !mounted) return;
-    await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => const AddLocalProfileScreen()));
+    final active = context.read<ActiveProfileProvider>();
+    final previousId = active.activeId;
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => const AddLocalProfileScreen(offerSwitchAfterCreate: true)),
+    );
+    if (!mounted || created != true || active.activeId == previousId || active.activeId == null) return;
+    if (widget.requireSelection) setState(() => _allowPop = true);
+    final route = ModalRoute.of(context);
+    if (route != null && route.isCurrent) Navigator.of(context, rootNavigator: true).pop(true);
   }
 
   Future<void> _switchTo(Profile profile) async {
@@ -761,7 +769,7 @@ class _ProfileTile extends StatelessWidget {
                           ),
                         ),
                       ),
-                    const Spacer(),
+                    if (!isActive) const Spacer(),
                     if (hasMenu)
                       _ProfileActionsButton(
                         menuKey: menuKey,

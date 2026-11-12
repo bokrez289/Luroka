@@ -6,6 +6,7 @@ import '../media/media_item.dart';
 import '../media/media_kind.dart';
 import '../media/media_server_client.dart';
 import '../utils/app_logger.dart';
+import '../utils/media_server_http_client.dart';
 import 'kids_profile_service.dart';
 
 class HomePreview {
@@ -48,6 +49,7 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
   int _generation = 0;
   int? _readyGeneration;
   bool _fetching = false;
+  AbortController? _requestAbort;
   bool _active = true;
   bool _disposed = false;
 
@@ -73,6 +75,7 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
       return;
     }
     _source = item;
+    _requestAbort?.abort();
     final generation = ++_generation;
     _timer?.cancel();
     _readyGeneration = null;
@@ -108,6 +111,7 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
   void setActive(bool active) {
     if (_disposed || _active == active) return;
     _active = active;
+    if (!active) _requestAbort?.abort();
     _timer?.cancel();
     _readyGeneration = null;
     if (active && value != null) _schedule(_generation);
@@ -132,8 +136,19 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
     final client = _clientFor(source);
     if (client == null || _cache.containsKey((client, source.globalKey))) return;
     _fetching = true;
+    final abort = _requestAbort = AbortController();
     try {
-      final fresh = await client.fetchItem(source.id).timeout(requestTimeout);
+      // Legacy clients retain the single-flight gate until their request really
+      // completes: a UI timeout alone cannot cancel an HTTP request.
+      final fresh = client is PreviewMetadataClient
+          ? await (client as PreviewMetadataClient).fetchPreviewItem(source.id, abort: abort).timeout(
+              requestTimeout,
+              onTimeout: () {
+                abort.abort();
+                throw TimeoutException('Home preview timed out', requestTimeout);
+              },
+            )
+          : await client.fetchItem(source.id);
       if (!_disposed &&
           generation == _generation &&
           KidsProfileService.instance.isActiveKids &&
@@ -162,8 +177,9 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
         usesContinueWatchingAction: preview.usesContinueWatchingAction,
       );
     } catch (error) {
-      appLogger.d('Home preview metadata unavailable', error: error);
+      if (!abort.isAborted) appLogger.d('Home preview metadata unavailable', error: error);
     } finally {
+      if (identical(_requestAbort, abort)) _requestAbort = null;
       _fetching = false;
       if (!_disposed && _readyGeneration != null) unawaited(_hydrate());
     }
@@ -194,6 +210,7 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
 
   void clear() {
     if (_disposed) return;
+    _requestAbort?.abort();
     _generation++;
     _timer?.cancel();
     _readyGeneration = null;
@@ -203,6 +220,7 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
 
   @override
   void dispose() {
+    _requestAbort?.abort();
     _disposed = true;
     _generation++;
     _timer?.cancel();

@@ -35,7 +35,7 @@ class TranslationsZh extends Translations with BaseTranslations<AppLocale, Trans
 
 	late final TranslationsZh _root = this; // ignore: unused_field
 
-	@override 
+	@override
 	TranslationsZh $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsZh(meta: meta ?? this.$meta);
 
 	// Translations
@@ -137,6 +137,11 @@ class TranslationsZh extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$trakt$zh trakt = Translations$trakt$zh.internal(_root);
 	@override late final Translations$seerr$zh seerr = Translations$seerr$zh.internal(_root);
 	@override late final Translations$services$zh services = Translations$services$zh.internal(_root);
+	@override late final Translations$offlineRecovery$zh offlineRecovery = Translations$offlineRecovery$zh.internal(_root);
+	@override late final Translations$releaseUpdates$zh releaseUpdates = Translations$releaseUpdates$zh.internal(_root);
+	@override late final Translations$profileIntegrations$zh profileIntegrations = Translations$profileIntegrations$zh.internal(_root);
+	@override late final Translations$profileSetupGuide$zh profileSetupGuide = Translations$profileSetupGuide$zh.internal(_root);
+	@override late final Translations$animeFavorites$zh animeFavorites = Translations$animeFavorites$zh.internal(_root);
 	@override late final Translations$addServer$zh addServer = Translations$addServer$zh.internal(_root);
 }
 
@@ -254,9 +259,11 @@ class Translations$family$zh extends Translations$family$en {
 	@override String get manageHint => '管理此设备上的人员、儿童的安全和观看活动。';
 	@override String get people => '人';
 	@override String peopleCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n}​人',
 		other: '${n}人',
 	);
 	@override String kidsCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n}​子',
 		other: '${n} 儿童',
 	);
 	@override String get you => '你';
@@ -318,6 +325,9 @@ class Translations$libraryPolish$zh extends Translations$libraryPolish$en {
 	final TranslationsZh _root; // ignore: unused_field
 
 	// Translations
+	@override String get compactTvNavigation => '紧凑的图书馆导航';
+	@override String get compactTvNavigationDescription => '在滑出式菜单中显示库部分和浏览选项，为海报留出更多空间。';
+	@override String get openLibraryMenu => '打开库菜单';
 	@override String get posterDetails => '海报详情';
 	@override String get showPosterDetails => '显示海报详细信息·姓名、年份和 IMDb';
 	@override String get hidePosterDetails => '隐藏海报详细信息';
@@ -631,6 +641,8 @@ class Translations$settingsRedesign$zh extends Translations$settingsRedesign$en 
 	// Translations
 	@override String get themeEffects => '主题和效果';
 	@override String get libraryLayout => '图书馆布局';
+	@override String get posterInformation => '海报信息';
+	@override String get libraryBehavior => '图书馆行为';
 	@override String get appearanceHint => '自定义 Luroka 的外观、布局和行为。';
 	@override String get livePreview => '实时预览';
 	@override String get previewHint => '查看您的图书馆在当前设置下的外观。';
@@ -768,6 +780,19 @@ class Translations$kids$zh extends Translations$kids$en {
 	final TranslationsZh _root; // ignore: unused_field
 
 	// Translations
+	@override String get timeLimits => '屏幕时间限制';
+	@override String get dailyWatchLimit => '每日观看时长';
+	@override String get dailyWatchLimitHint => '每天限制该设备上的视频播放。';
+	@override String get noTimeLimit => '无限制';
+	@override String minutesLimit({required Object minutes}) => '${minutes} 分钟';
+	@override String get bedtime => '就寝时间';
+	@override String get bedtimeHint => '在此时段使用该用户资料需要家长 PIN 码。';
+	@override String get bedtimeStart => '就寝时间开始';
+	@override String get bedtimeEnd => '就寝时间结束';
+	@override String get timeLimitReached => '今天的观看时间已结束';
+	@override String get bedtimeReached => '睡觉时间到了';
+	@override String get timeLimitParentHint => '请家长输入 PIN，以便继续观看。';
+	@override String get parentUnlock => '家长解锁';
 	@override String get backupProfile => '备份孩子的个人资料';
 	@override String get backupExplain => '备份此配置文件的已保存名称、字符、限制、外观和本地查看排除。不包括家长 PIN、服务器登录、下载和服务器播放进度。';
 	@override String get saveBackupFile => '保存备份文件';
@@ -1311,6 +1336,7 @@ class Translations$settings$zh extends Translations$settings$en {
 	@override String get downloadLocationPickerUnavailable => '此设备不支持选择文件夹';
 	@override String get downloadOnWifiOnly => '仅通过 Wi-Fi 下载';
 	@override String get downloadOnWifiOnlyDescription => '使用移动数据时不允许下载';
+	@override String get downloadWifiScope => '适用于此设备上的所有用户资料和下载。';
 	@override String get autoRemoveWatchedDownloads => '自动移除已观看的下载';
 	@override String get autoRemoveWatchedDownloadsDescription => '自动删除已观看的下载';
 	@override String get cellularDownloadBlocked => '已阻止通过移动网络下载。请连接 Wi-Fi 或更改设置。';
@@ -1649,8 +1675,8 @@ class Translations$dashboard$zh extends Translations$dashboard$en {
 	@override String episodeLabel({required Object season, required Object episode}) => 'S${season} · E${episode}';
 	@override String get anotherPick => '另一个选择';
 	@override String get exploreSeries => '探索系列';
-	@override String get showFeatured => '重点标题细节';
-	@override String get showFeaturedDescription => '显示突出显示的卡片的艺术作品、概要和剧集信息';
+	@override String get showFeatured => '主页聚焦';
+	@override String get showFeaturedDescription => '在主页顶部显示精选电影和节目。';
 }
 
 // Path: lurokaCatalog
@@ -1751,9 +1777,32 @@ class Translations$homeLayout$zh extends Translations$homeLayout$en {
 	final TranslationsZh _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageStudios => '选择并订购工作室';
+	@override String get manageStudiosDescription => '选择此配置文件中显示的工作室，并安排它们的顺序。';
+	@override String get studioUnavailable => '只有在您选择的库中找到的工作室才会出现在主页上。';
+	@override String get showAllStudios => '显示所有工作室';
+	@override String get hideAllStudios => '隐藏所有工作室';
+	@override String get reorderStudio => '更改工作室顺序';
+	@override String get episodeThumbnails => '继续观看中的剧集图像';
+	@override String get episodeThumbnailsDescription => '在“继续观看”和“下一步”中显示剧集图像而不是系列或季海报。';
+	@override String get spotlightSource => '精选内容来源';
+	@override String get spotlightSourceDescription => '“为您推荐”使用该个人资料在此设备上的查看活动，以及收藏夹和图书馆标题。';
+	@override String get spotlightForYou => '为你';
+	@override String get spotlightForYouDescription => '使用此个人资料在此设备上的观看活动，混合您正在观看的内容、收藏夹、新增内容和趋势。';
+	@override String get spotlightTrending => '流行趋势';
+	@override String get spotlightTrendingDescription => '您图书馆中的热门电影和节目。';
+	@override String get spotlightContinue => '继续观看';
+	@override String get spotlightContinueDescription => '您已开始的标题和可以继续的剧集。';
+	@override String get spotlightFavorites => '从你的最爱';
+	@override String get spotlightInspired => '受到您的观看启发';
+	@override String get spotlightNextUp => '接下来';
 	@override String get title => '个性化主页';
 	@override String get description => '选择此配置文件的行顺序和可见性。选择一行以移动或隐藏它。';
 	@override String get rows => '主行';
+	@override String get progressLayout => '继续观看并下一步';
+	@override String get progressCombined => '组合成一排';
+	@override String get progressSeparate => '单独的行';
+	@override String get progressDescription => '当服务器支持时，单独的下一个。其他服务器保持合并。';
 	@override String get visible => '可见';
 	@override String get hidden => '隐藏';
 	@override String get showRow => '显示行';
@@ -1807,6 +1856,7 @@ class Translations$activityStats$zh extends Translations$activityStats$en {
 	@override String get consistency => '一致性';
 	@override String get currentStreak => '当前连胜';
 	@override String dayCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 天',
 		other: '${n} 天',
 	);
 	@override String get longestStreak => '最长连续纪录';
@@ -1815,6 +1865,8 @@ class Translations$activityStats$zh extends Translations$activityStats$en {
 	@override String get trendTitle => '观看时间';
 	@override String get trendToday => '今天';
 	@override String gapDetail({required Object stat, required Object range}) => '${stat} 上 ${range}';
+	@override String get patternsTitle => '你的模式';
+	@override String mostlyKind({required Object kind}) => '大部分是${kind}';
 	@override String get weekdayTitle => '按工作日';
 	@override String get hoursTitle => '按一天中的时间';
 	@override String get amLabel => '调幅';
@@ -1827,6 +1879,8 @@ class Translations$activityStats$zh extends Translations$activityStats$en {
 	@override String get kindOther => '其他';
 	@override String get topTitlesTitle => '最受关注';
 	@override String get sessionsTitle => '最近的会议';
+	@override String get recentViewingTitle => '最近观看';
+	@override String get recentViewingHint => '所选时间段内的总观看时间。日期显示最新观看次数。';
 	@override String get showMore => '显示更多';
 	@override String get sessionNoTitle => '不明播放';
 	@override String get emptyTitle => '这里还什么都没有';
@@ -2022,12 +2076,15 @@ class Translations$mediaMenu$zh extends Translations$mediaMenu$en {
 	@override String confirmDeleteTarget({required Object title}) => '从你的服务器永久删除 ${title}？';
 	@override String get deleteMultipleWarning => '这包括所有剧集及其文件。';
 	@override String deleteEpisodeCountWarning({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '这将删除其中的所有 ${n} 剧集及其文件。',
 		other: '这将删除其中全部 ${n} 集以及它们的文件。',
 	);
 	@override String deleteMultiPartWarning({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '该项目存储为 ${n} 文件，该文件将被删除。',
 		other: '此项目存储在 ${n} 个文件中，所有这些文件都会被删除。',
 	);
 	@override String deleteSharedFileHeading({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 其他剧集存储在同一文件中，也将被删除：',
 		other: '另外 ${n} 集存储在同一个文件中，也会一并删除：',
 	);
 	@override String get deleteScopeUnverifiedProbeFailed => 'Luroka 无法确认此操作会删除哪些文件，因此删除范围可能超出上面提到的项目。请取消后重试，或仍然删除。';
@@ -2222,6 +2279,7 @@ class Translations$messages$zh extends Translations$messages$en {
 	@override String get markedAsUnwatchedOffline => '已标记为未观看（将在联网时同步）';
 	@override String autoRemovedWatchedDownload({required Object title}) => '已自动移除：${title}';
 	@override String autoRemovedWatchedDownloads({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '自动删除${n}观看下载',
 		other: '已自动移除 ${n} 个看过的下载',
 	);
 	@override String get removedFromContinueWatching => '已从继续观看中移除';
@@ -2255,6 +2313,7 @@ class Translations$messages$zh extends Translations$messages$en {
 	@override String metadataRefreshStarted({required Object title}) => '已开始刷新“${title}”的元数据';
 	@override String metadataRefreshFailed({required Object error}) => '无法刷新元数据：${error}';
 	@override String get logoutConfirm => '确定要退出登录吗？';
+	@override String get logoutDeviceConfirm => '要在此设备上退出 Luroka 吗？所有用户资料（包括儿童资料）、服务器账户和已下载的媒体都将从此设备中移除。您可以稍后重新登录。';
 	@override String get noSeasonsFound => '未找到季';
 	@override String get seasonsLoadFailed => '无法加载季';
 	@override String get noEpisodesFound => '在第一季中未找到剧集';
@@ -2385,6 +2444,9 @@ class Translations$profiles$zh extends Translations$profiles$en {
 	final TranslationsZh _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageProfiles => '管理个人资料';
+	@override String get quickAccess => '快速访问';
+	@override String get signOutDevice => '退出该设备';
 	@override String get addLurokaProfile => '添加 Luroka 配置文件';
 	@override String get switchingProfile => '正在切换用户资料…';
 	@override String get deleteThisProfileTitle => '删除此用户资料？';
@@ -2503,7 +2565,7 @@ class Translations$accountPreferences$zh extends Translations$accountPreferences
 	@override String hubSubtitleSingle({required Object account}) => '音频、字幕和媒体库选项已保存在 ${account} 上';
 	@override String hubSubtitleMultiple({required Object count}) => '音频、字幕和媒体库选项已保存在 ${count} 个账户上';
 	@override String get pickAccount => '每个账户都保存自己的偏好设置。选择要编辑的账户。';
-	@override String get storedOnAccount => '这些选项保存在账户本身，因此所有登录该账户的应用都会使用它们——包括你其他设备上的 Luroka。';
+	@override String get storedOnAccount => '这些设置保存在服务器账户中，使用该账户的所有 Luroka 用户资料和应用都会共享，包括其他设备上的应用。';
 	@override String get noAccounts => '没有可配置的账户';
 	@override String get noAccountsHint => '登录 Plex，或连接 Jellyfin 或 Emby 服务器，该账户上保存的偏好设置就会显示在这里。';
 	@override String get unavailable => '无法访问此账户';
@@ -2567,6 +2629,7 @@ class Translations$discover$zh extends Translations$discover$en {
 	@override String minutesLeft({required Object minutes}) => '剩余 ${minutes} 分钟';
 	@override String get moreLikeThis => '更多类似内容';
 	@override String titleCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 标题',
 		other: '${n} 个标题',
 	);
 	@override late final Translations$discover$person$zh person = Translations$discover$person$zh.internal(_root);
@@ -2828,6 +2891,7 @@ class Translations$explore$zh extends Translations$explore$en {
 	@override late final Translations$explore$rows$zh rows = Translations$explore$rows$zh.internal(_root);
 	@override late final Translations$explore$status$zh status = Translations$explore$status$zh.internal(_root);
 	@override String episodeCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 剧集',
 		other: '${n} 集',
 	);
 	@override String get cast => '演员表';
@@ -2842,6 +2906,7 @@ class Translations$explore$zh extends Translations$explore$en {
 	@override String get inTheseLibraries => '在这些媒体库中';
 	@override String get checkingLibrary => '正在检查你的媒体库…';
 	@override String libraryCheckFailed({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '无法检查 ${n} 服务器',
 		other: '无法检查 ${n} 台服务器',
 	);
 	@override String get emptyTitle => '这里还什么都没有';
@@ -2861,6 +2926,7 @@ class Translations$explore$zh extends Translations$explore$en {
 	@override String broadcastWithZone({required Object day, required Object time, required Object timezone}) => '每周${day} ${time} ${timezone}播出';
 	@override late final Translations$explore$detail$zh detail = Translations$explore$detail$zh.internal(_root);
 	@override String totalResults({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 结果',
 		other: '${n} 条结果',
 	);
 }
@@ -3037,6 +3103,7 @@ class Translations$music$zh extends Translations$music$en {
 	@override String get addToQueue => '添加到队列';
 	@override String discNumber({required Object n}) => '碟片 ${n}';
 	@override String trackCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n}轨道',
 		other: '${n} 首',
 	);
 	@override String get nowPlaying => '正在播放';
@@ -3142,6 +3209,7 @@ class Translations$watchTogether$zh extends Translations$watchTogether$en {
 	@override String get offsetPlusSecond => '+1秒';
 	@override String get participants => '参与者';
 	@override String participantCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 参与者',
 		other: '${n} 参与者',
 	);
 	@override String get hostBadge => '主持人';
@@ -3687,6 +3755,108 @@ class Translations$services$zh extends Translations$services$en {
 	@override late final Translations$services$libraryFilter$zh libraryFilter = Translations$services$libraryFilter$zh.internal(_root);
 }
 
+// Path: offlineRecovery
+class Translations$offlineRecovery$zh extends Translations$offlineRecovery$en {
+	Translations$offlineRecovery$zh.internal(TranslationsZh root) : this._root = root, super.internal(root);
+
+	final TranslationsZh _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '您的服务器离线';
+	@override String get description => '您的下载仍然可用。当您的服务器恢复时尝试重新连接，或添加另一台服务器。';
+	@override String get appleTvDescription => 'Luroka 无法访问您的媒体服务器。尝试在可用时重新连接，或添加另一台服务器以继续观看。';
+	@override String get kidsDescription => '我们无法访问您的媒体服务器。尝试重新连接，或向家长寻求帮助。';
+	@override String get retrying => '正在连接…';
+	@override String get addServer => '添加服务器';
+}
+
+// Path: releaseUpdates
+class Translations$releaseUpdates$zh extends Translations$releaseUpdates$en {
+	Translations$releaseUpdates$zh.internal(TranslationsZh root) : this._root = root, super.internal(root);
+
+	final TranslationsZh _root; // ignore: unused_field
+
+	// Translations
+	@override String get manualInstructions => '从 GitHub 下载发布存档，解压 APK，并将其安装在您的 Android 设备上。';
+	@override String get tvInstructions => '在手机或电脑上打开此地址，或扫描二维码下载版本。';
+	@override String get pressBackAgain => '再次按返回退出播放';
+}
+
+// Path: profileIntegrations
+class Translations$profileIntegrations$zh extends Translations$profileIntegrations$en {
+	Translations$profileIntegrations$zh.internal(TranslationsZh root) : this._root = root, super.internal(root);
+
+	final TranslationsZh _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '打造专属 Luroka';
+	@override String get description => '连接您喜欢的服务，记录观看内容并请求新电影和剧集。每个 Luroka 用户资料都有自己的连接。';
+	@override String get step => '可选集成';
+	@override String get examples => 'Trakt · Simkl · AniList · MyAnimeList · Seerr';
+	@override String get connect => '探索集成';
+	@override String get later => '稍后设置';
+	@override String get manage => '管理集成';
+	@override String forProfile({required Object name}) => '${name} 的连接';
+}
+
+// Path: profileSetupGuide
+class Translations$profileSetupGuide$zh extends Translations$profileSetupGuide$en {
+	Translations$profileSetupGuide$zh.internal(TranslationsZh root) : this._root = root, super.internal(root);
+
+	final TranslationsZh _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '打造专属用户资料';
+	@override String get description => '为此设备上的用户资料选择 Luroka 的外观和使用方式。您可以稍后在设置中更改。';
+	@override String get appearanceStep => '1 / 2 · 外观';
+	@override String get homeStep => '2 / 2 · 您的首页';
+	@override String get preview => '预览';
+	@override String get previewTitle => '您的首页';
+	@override String get previewPoster => '海报';
+	@override String get posterArtwork => '仅显示海报';
+	@override String get posterWithDetails => '显示海报详细信息';
+	@override String get musicDescription => '打开电影或剧集详情页面时播放主题音乐（如有）。';
+	@override String get moreThemes => '更多主题';
+	@override String get fewerThemes => '收起主题';
+	@override String get spotlightHeading => '精选区域要显示什么内容？';
+	@override String get progressHeading => '继续观看和接下来观看';
+	@override String get skip => '使用默认设置并开始观看';
+	@override String get finish => '开始观看';
+	@override String get back => '返回';
+	@override String get kContinue => '继续';
+	@override String get chooseLater => '稍后选择媒体库';
+	@override String get libraryScope => '这只会更改此用户资料在 Luroka 中显示的内容，不会更改服务器权限。';
+	@override String get createdTitle => '用户资料已创建';
+	@override String get createdDescription => '新用户资料已准备就绪，使用者可以在首次打开时进行个性化设置。';
+	@override String get switchProfile => '切换到此用户资料';
+	@override String get stayHere => '留在当前用户资料';
+}
+
+// Path: animeFavorites
+class Translations$animeFavorites$zh extends Translations$animeFavorites$en {
+	Translations$animeFavorites$zh.internal(TranslationsZh root) : this._root = root, super.internal(root);
+
+	final TranslationsZh _root; // ignore: unused_field
+
+	// Translations
+	@override String get filter => '动漫';
+	@override String get manage => '管理动漫';
+	@override String get description => '自动检测使用动漫库名称和可用的动漫标签或 ID。选择图书馆并纠正个人最爱。您的个人资料的选择将保存在此设备上。';
+	@override String get libraries => '动漫库';
+	@override String get libraryHint => '名为 Anime 的库会自动识别。选择一个库以更改其分类。';
+	@override String get titles => '最喜欢的标题';
+	@override String get titleHint => '选择一个标题将其标记为动漫或更正自动匹配。';
+	@override String get automatic => '自动';
+	@override String get include => '动漫';
+	@override String get exclude => '不是动漫';
+	@override String get automaticIncluded => '自动·动漫';
+	@override String get automaticExcluded => '自动 · 非动漫';
+	@override String get noLibraries => '没有可用的连接库。';
+	@override String get noTitles => '没有最喜欢的电影或节目。';
+	@override String get empty => '没有找到最喜欢的动漫。检查您的动漫库或将标题标记为动漫。';
+	@override String get saveFailed => '无法保存您的动漫设置。请再试一次。';
+}
+
 // Path: addServer
 class Translations$addServer$zh extends Translations$addServer$en {
 	Translations$addServer$zh.internal(TranslationsZh root) : this._root = root, super.internal(root);
@@ -3699,7 +3869,7 @@ class Translations$addServer$zh extends Translations$addServer$en {
 	@override String get serverUrlsHelper => '可输入多个 URL，并用逗号分隔。';
 	@override String get findServer => '查找服务器';
 	@override String searchingLocalMediaBrowserServers({required Object product}) => '正在查找本地 ${product} 服务器…';
-	@override String localMediaBrowserServers({required Object product}) => '本地 ${product} 服务器';
+	@override String localMediaBrowserServers({required Object product}) => '已保存和附近的 ${product} 服务器';
 	@override String get username => '用户名';
 	@override String get password => '密码';
 	@override String get signIn => '登录';
@@ -4211,6 +4381,7 @@ class Translations$explore$stats$zh extends Translations$explore$stats$en {
 	@override String favorited({required Object n}) => '${n} 人收藏';
 	@override String dropRate({required Object percent}) => '${percent} 弃番';
 	@override String comments({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 评论',
 		other: '${n} 条评论',
 	);
 	@override String votes({required Object n}) => '${n} 票';
@@ -4332,6 +4503,7 @@ class Translations$explore$detail$zh extends Translations$explore$detail$en {
 	@override String get ratings => '评分';
 	@override String get schedule => '播出时间';
 	@override String recommendedByUsers({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n}用户推荐',
 		other: '由 ${n} 位用户推荐',
 	);
 	@override String recommendedBy({required Object who}) => '由 ${who} 推荐';
@@ -4730,8 +4902,8 @@ extension on TranslationsZh {
 			'family.yourPeople' => '你的人',
 			'family.manageHint' => '管理此设备上的人员、儿童的安全和观看活动。',
 			'family.people' => '人',
-			'family.peopleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n}人', ), 
-			'family.kidsCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 儿童', ), 
+			'family.peopleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}​人', other: '${n}人', ),
+			'family.kidsCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}​子', other: '${n} 儿童', ),
 			'family.you' => '你',
 			'family.adult' => '成人',
 			'family.child' => '儿童',
@@ -4773,6 +4945,9 @@ extension on TranslationsZh {
 			'posterDetails.catalogEpisodeInfoDescription' => '在“发现”海报上显示剧集数和平均时长。',
 			'posterDetails.title' => '海报详情',
 			'posterDetails.description' => '在 Studio、搜索、发现和图书馆的海报下方显示标题、年份和 IMDb 评级。缺失的 IMDb 评级保持隐藏状态。对于纯艺术作品海报请关闭。',
+			'libraryPolish.compactTvNavigation' => '紧凑的图书馆导航',
+			'libraryPolish.compactTvNavigationDescription' => '在滑出式菜单中显示库部分和浏览选项，为海报留出更多空间。',
+			'libraryPolish.openLibraryMenu' => '打开库菜单',
 			'libraryPolish.posterDetails' => '海报详情',
 			'libraryPolish.showPosterDetails' => '显示海报详细信息·姓名、年份和 IMDb',
 			'libraryPolish.hidePosterDetails' => '隐藏海报详细信息',
@@ -4987,6 +5162,8 @@ extension on TranslationsZh {
 			'tvSettingsV2.simpleAudio' => '语言和字幕外观',
 			'settingsRedesign.themeEffects' => '主题和效果',
 			'settingsRedesign.libraryLayout' => '图书馆布局',
+			'settingsRedesign.posterInformation' => '海报信息',
+			'settingsRedesign.libraryBehavior' => '图书馆行为',
 			'settingsRedesign.appearanceHint' => '自定义 Luroka 的外观、布局和行为。',
 			'settingsRedesign.livePreview' => '实时预览',
 			'settingsRedesign.previewHint' => '查看您的图书馆在当前设置下的外观。',
@@ -5088,6 +5265,19 @@ extension on TranslationsZh {
 			'detailComposition.mediaInformation' => '媒体资讯',
 			'detailComposition.fullFileInformation' => '完整的文件信息',
 			'detailComposition.castAndCrew' => '演职人员',
+			'kids.timeLimits' => '屏幕时间限制',
+			'kids.dailyWatchLimit' => '每日观看时长',
+			'kids.dailyWatchLimitHint' => '每天限制该设备上的视频播放。',
+			'kids.noTimeLimit' => '无限制',
+			'kids.minutesLimit' => ({required Object minutes}) => '${minutes} 分钟',
+			'kids.bedtime' => '就寝时间',
+			'kids.bedtimeHint' => '在此时段使用该用户资料需要家长 PIN 码。',
+			'kids.bedtimeStart' => '就寝时间开始',
+			'kids.bedtimeEnd' => '就寝时间结束',
+			'kids.timeLimitReached' => '今天的观看时间已结束',
+			'kids.bedtimeReached' => '睡觉时间到了',
+			'kids.timeLimitParentHint' => '请家长输入 PIN，以便继续观看。',
+			'kids.parentUnlock' => '家长解锁',
 			'kids.backupProfile' => '备份孩子的个人资料',
 			'kids.backupExplain' => '备份此配置文件的已保存名称、字符、限制、外观和本地查看排除。不包括家长 PIN、服务器登录、下载和服务器播放进度。',
 			'kids.saveBackupFile' => '保存备份文件',
@@ -5172,6 +5362,8 @@ extension on TranslationsZh {
 			'kids.blocked' => '此标题在此儿童个人资料中不可用。',
 			'kids.switchProfile' => '切换配置文件',
 			'kids.manageFromAdult' => '切换到成人配置文件以管理设置。',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => '在添加儿童个人资料之前，将服务器连接到您的成人个人资料。',
 			'kids.created' => '儿童档案已创建',
 			'kids.updated' => '孩子们的个人资料已更新',
@@ -5190,8 +5382,6 @@ extension on TranslationsZh {
 			'lurokaDiscovery.imdbTv100' => 'IMDb 前 100 场演出 · 2026 年 9 月快照',
 			'lurokaDiscovery.emmyComedy' => '艾美奖 · 喜剧系列获奖者 · 1971–2026',
 			'lurokaDiscovery.emmys' => '艾美奖 · 剧情类剧集获奖者 · 1966–2026',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.bafta' => '英国电影和电视艺术学院·最佳影片获奖者',
 			'lurokaDiscovery.cannes' => '戛纳·金棕榈奖得主',
 			'lurokaDiscovery.awardsNote' => '获奖作品包括奥斯卡最佳影片历史奖、艾美奖戏剧/喜剧获奖作品以及英国电影和电视艺术学院 (BAFTA)/戛纳电影节精选影片。重复获奖的头衔出现一次。会员资格使用奖项类别历史和维基数据事实。 IMDb 前 100 部电影/节目列表保留了来自 mmdju/imdb-top250-api 的 2026 年 9 月图表快照。仅显示您可见的在线库中的匹配项；馆藏规模取决于图书馆的可用性。',
@@ -5584,6 +5774,7 @@ extension on TranslationsZh {
 			'settings.downloadLocationPickerUnavailable' => '此设备不支持选择文件夹',
 			'settings.downloadOnWifiOnly' => '仅通过 Wi-Fi 下载',
 			'settings.downloadOnWifiOnlyDescription' => '使用移动数据时不允许下载',
+			'settings.downloadWifiScope' => '适用于此设备上的所有用户资料和下载。',
 			'settings.autoRemoveWatchedDownloads' => '自动移除已观看的下载',
 			'settings.autoRemoveWatchedDownloadsDescription' => '自动删除已观看的下载',
 			'settings.cellularDownloadBlocked' => '已阻止通过移动网络下载。请连接 Wi-Fi 或更改设置。',
@@ -5685,6 +5876,8 @@ extension on TranslationsZh {
 			'settings.languageAndRegion' => '语言与地区',
 			'settings.startup' => '启动',
 			'settings.display' => '显示',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => '媒体库与卡片',
 			'settings.homeScreen' => '主屏幕',
 			'settings.navigation' => '导航',
@@ -5704,8 +5897,6 @@ extension on TranslationsZh {
 			'settings.gestureVolumeSwipeDescription' => '在屏幕右边缘上下滑动以调节音量',
 			'settings.gesturePinchToZoom' => '双指缩放',
 			'settings.gesturePinchToZoomDescription' => '在视频上双指捏合以放大或缩小',
-			_ => null,
-		} ?? switch (path) {
 			'settings.rememberBrightnessLevel' => '记住亮度',
 			'settings.rememberBrightnessLevelDescription' => '以上次滑动设置的亮度开始播放',
 			'settings.controls' => '控制',
@@ -5845,8 +6036,8 @@ extension on TranslationsZh {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => '另一个选择',
 			'dashboard.exploreSeries' => '探索系列',
-			'dashboard.showFeatured' => '重点标题细节',
-			'dashboard.showFeaturedDescription' => '显示突出显示的卡片的艺术作品、概要和剧集信息',
+			'dashboard.showFeatured' => '主页聚焦',
+			'dashboard.showFeaturedDescription' => '在主页顶部显示精选电影和节目。',
 			'lurokaCatalog.aboutPerson' => '在聚光灯下',
 			'lurokaCatalog.biographyUnavailable' => '该服务器无法提供传记。',
 			'lurokaCatalog.filmography' => '您图书馆中的电影和节目',
@@ -5902,9 +6093,32 @@ extension on TranslationsZh {
 			'customPerformance.frameBudget' => '每帧预算',
 			'customPerformance.processMemory' => '示例结束时的应用程序进程内存',
 			'customPerformance.noFrames' => '未捕获任何渲染帧。启动另一个示例并浏览该应用程序。',
+			'homeLayout.manageStudios' => '选择并订购工作室',
+			'homeLayout.manageStudiosDescription' => '选择此配置文件中显示的工作室，并安排它们的顺序。',
+			'homeLayout.studioUnavailable' => '只有在您选择的库中找到的工作室才会出现在主页上。',
+			'homeLayout.showAllStudios' => '显示所有工作室',
+			'homeLayout.hideAllStudios' => '隐藏所有工作室',
+			'homeLayout.reorderStudio' => '更改工作室顺序',
+			'homeLayout.episodeThumbnails' => '继续观看中的剧集图像',
+			'homeLayout.episodeThumbnailsDescription' => '在“继续观看”和“下一步”中显示剧集图像而不是系列或季海报。',
+			'homeLayout.spotlightSource' => '精选内容来源',
+			'homeLayout.spotlightSourceDescription' => '“为您推荐”使用该个人资料在此设备上的查看活动，以及收藏夹和图书馆标题。',
+			'homeLayout.spotlightForYou' => '为你',
+			'homeLayout.spotlightForYouDescription' => '使用此个人资料在此设备上的观看活动，混合您正在观看的内容、收藏夹、新增内容和趋势。',
+			'homeLayout.spotlightTrending' => '流行趋势',
+			'homeLayout.spotlightTrendingDescription' => '您图书馆中的热门电影和节目。',
+			'homeLayout.spotlightContinue' => '继续观看',
+			'homeLayout.spotlightContinueDescription' => '您已开始的标题和可以继续的剧集。',
+			'homeLayout.spotlightFavorites' => '从你的最爱',
+			'homeLayout.spotlightInspired' => '受到您的观看启发',
+			'homeLayout.spotlightNextUp' => '接下来',
 			'homeLayout.title' => '个性化主页',
 			'homeLayout.description' => '选择此配置文件的行顺序和可见性。选择一行以移动或隐藏它。',
 			'homeLayout.rows' => '主行',
+			'homeLayout.progressLayout' => '继续观看并下一步',
+			'homeLayout.progressCombined' => '组合成一排',
+			'homeLayout.progressSeparate' => '单独的行',
+			'homeLayout.progressDescription' => '当服务器支持时，单独的下一个。其他服务器保持合并。',
 			'homeLayout.visible' => '可见',
 			'homeLayout.hidden' => '隐藏',
 			'homeLayout.showRow' => '显示行',
@@ -5939,13 +6153,15 @@ extension on TranslationsZh {
 			'activityStats.heroDailyAverage' => '日平均',
 			'activityStats.consistency' => '一致性',
 			'activityStats.currentStreak' => '当前连胜',
-			'activityStats.dayCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 天', ), 
+			'activityStats.dayCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 天', other: '${n} 天', ),
 			'activityStats.longestStreak' => '最长连续纪录',
 			'activityStats.bestDay' => '最好的一天',
 			'activityStats.bestWeek' => '最好的一周',
 			'activityStats.trendTitle' => '观看时间',
 			'activityStats.trendToday' => '今天',
 			'activityStats.gapDetail' => ({required Object stat, required Object range}) => '${stat} 上 ${range}',
+			'activityStats.patternsTitle' => '你的模式',
+			'activityStats.mostlyKind' => ({required Object kind}) => '大部分是${kind}',
 			'activityStats.weekdayTitle' => '按工作日',
 			'activityStats.hoursTitle' => '按一天中的时间',
 			'activityStats.amLabel' => '调幅',
@@ -5958,6 +6174,8 @@ extension on TranslationsZh {
 			'activityStats.kindOther' => '其他',
 			'activityStats.topTitlesTitle' => '最受关注',
 			'activityStats.sessionsTitle' => '最近的会议',
+			'activityStats.recentViewingTitle' => '最近观看',
+			'activityStats.recentViewingHint' => '所选时间段内的总观看时间。日期显示最新观看次数。',
 			'activityStats.showMore' => '显示更多',
 			'activityStats.sessionNoTitle' => '不明播放',
 			'activityStats.emptyTitle' => '这里还什么都没有',
@@ -6140,9 +6358,9 @@ extension on TranslationsZh {
 			'mediaMenu.deleteAnyway' => '仍然删除',
 			'mediaMenu.confirmDeleteTarget' => ({required Object title}) => '从你的服务器永久删除 ${title}？',
 			'mediaMenu.deleteMultipleWarning' => '这包括所有剧集及其文件。',
-			'mediaMenu.deleteEpisodeCountWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '这将删除其中全部 ${n} 集以及它们的文件。', ), 
-			'mediaMenu.deleteMultiPartWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '此项目存储在 ${n} 个文件中，所有这些文件都会被删除。', ), 
-			'mediaMenu.deleteSharedFileHeading' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '另外 ${n} 集存储在同一个文件中，也会一并删除：', ), 
+			'mediaMenu.deleteEpisodeCountWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '这将删除其中的所有 ${n} 剧集及其文件。', other: '这将删除其中全部 ${n} 集以及它们的文件。', ),
+			'mediaMenu.deleteMultiPartWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '该项目存储为 ${n} 文件，该文件将被删除。', other: '此项目存储在 ${n} 个文件中，所有这些文件都会被删除。', ),
+			'mediaMenu.deleteSharedFileHeading' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 其他剧集存储在同一文件中，也将被删除：', other: '另外 ${n} 集存储在同一个文件中，也会一并删除：', ),
 			'mediaMenu.deleteScopeUnverifiedProbeFailed' => 'Luroka 无法确认此操作会删除哪些文件，因此删除范围可能超出上面提到的项目。请取消后重试，或仍然删除。',
 			'mediaMenu.deleteScopeUnverifiedNoFileInfo' => '你的服务器没有提供此项目的文件详情，因此 Luroka 无法确认此操作会删除哪些文件。删除范围可能超出上面提到的项目。',
 			'mediaMenu.mediaDeletedSuccessfully' => '媒体项已成功删除',
@@ -6172,6 +6390,8 @@ extension on TranslationsZh {
 			'accessibility.hue' => '色相',
 			'accessibility.saturation' => '饱和度',
 			'accessibility.brightness' => '亮度',
+			_ => null,
+		} ?? switch (path) {
 			'accessibility.hexColor' => '十六进制颜色',
 			'accessibility.expandText' => '展开文本',
 			'accessibility.collapseText' => '折叠文本',
@@ -6218,8 +6438,6 @@ extension on TranslationsZh {
 			'videoControls.seekBackwardButton' => ({required Object seconds}) => '快退 ${seconds} 秒',
 			'videoControls.seekForwardButton' => ({required Object seconds}) => '快进 ${seconds} 秒',
 			'videoControls.previousButton' => '上一集',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.nextButton' => '下一集',
 			'videoControls.previousChapterButton' => '上一章节',
 			'videoControls.nextChapterButton' => '下一章节',
@@ -6289,7 +6507,7 @@ extension on TranslationsZh {
 			'messages.markedAsWatchedOffline' => '已标记为已观看（将在联网时同步）',
 			'messages.markedAsUnwatchedOffline' => '已标记为未观看（将在联网时同步）',
 			'messages.autoRemovedWatchedDownload' => ({required Object title}) => '已自动移除：${title}',
-			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '已自动移除 ${n} 个看过的下载', ), 
+			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '自动删除${n}观看下载', other: '已自动移除 ${n} 个看过的下载', ),
 			'messages.removedFromContinueWatching' => '已从继续观看中移除',
 			'messages.errorLoading' => ({required Object error}) => '出错：${error}',
 			'messages.searchPartialResults' => '部分媒体服务器无法搜索。正在显示可用的结果。',
@@ -6321,6 +6539,7 @@ extension on TranslationsZh {
 			'messages.metadataRefreshStarted' => ({required Object title}) => '已开始刷新“${title}”的元数据',
 			'messages.metadataRefreshFailed' => ({required Object error}) => '无法刷新元数据：${error}',
 			'messages.logoutConfirm' => '确定要退出登录吗？',
+			'messages.logoutDeviceConfirm' => '要在此设备上退出 Luroka 吗？所有用户资料（包括儿童资料）、服务器账户和已下载的媒体都将从此设备中移除。您可以稍后重新登录。',
 			'messages.noSeasonsFound' => '未找到季',
 			'messages.seasonsLoadFailed' => '无法加载季',
 			'messages.noEpisodesFound' => '在第一季中未找到剧集',
@@ -6406,6 +6625,9 @@ extension on TranslationsZh {
 			'mpvConfig.removeLine' => '移除行',
 			'mpvConfig.embeddedVoHint' => 'Linux 上会忽略 vo、gpu-context 和 gpu-api：嵌入式视频始终通过视频平面上的 vo=libmpv 渲染，而 gpu-next（ArtCNN 等计算着色器需要它）无法以嵌入式方式运行。',
 			'dialog.confirmAction' => '确认操作',
+			'profiles.manageProfiles' => '管理个人资料',
+			'profiles.quickAccess' => '快速访问',
+			'profiles.signOutDevice' => '退出该设备',
 			'profiles.addLurokaProfile' => '添加 Luroka 配置文件',
 			'profiles.switchingProfile' => '正在切换用户资料…',
 			'profiles.deleteThisProfileTitle' => '删除此用户资料？',
@@ -6497,7 +6719,7 @@ extension on TranslationsZh {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => '音频、字幕和媒体库选项已保存在 ${account} 上',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => '音频、字幕和媒体库选项已保存在 ${count} 个账户上',
 			'accountPreferences.pickAccount' => '每个账户都保存自己的偏好设置。选择要编辑的账户。',
-			'accountPreferences.storedOnAccount' => '这些选项保存在账户本身，因此所有登录该账户的应用都会使用它们——包括你其他设备上的 Luroka。',
+			'accountPreferences.storedOnAccount' => '这些设置保存在服务器账户中，使用该账户的所有 Luroka 用户资料和应用都会共享，包括其他设备上的应用。',
 			'accountPreferences.noAccounts' => '没有可配置的账户',
 			'accountPreferences.noAccountsHint' => '登录 Plex，或连接 Jellyfin 或 Emby 服务器，该账户上保存的偏好设置就会显示在这里。',
 			'accountPreferences.unavailable' => '无法访问此账户',
@@ -6574,7 +6796,7 @@ extension on TranslationsZh {
 			'discover.tvShow' => '电视剧',
 			'discover.minutesLeft' => ({required Object minutes}) => '剩余 ${minutes} 分钟',
 			'discover.moreLikeThis' => '更多类似内容',
-			'discover.titleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 个标题', ), 
+			'discover.titleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 标题', other: '${n} 个标题', ),
 			'discover.person.born' => '出生',
 			'discover.person.died' => '死了',
 			'discover.person.birthplace' => '出生地',
@@ -6682,6 +6904,8 @@ extension on TranslationsZh {
 			'libraries.sortLabels.dateShared' => '共享日期',
 			'libraries.sortLabels.latestEpisodeAirDate' => '最新一集播出日期',
 			'libraries.sortLabels.lastEpisodeDateAdded' => '最新一集添加日期',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => '下载日期',
 			'libraries.sortLabels.size' => '大小',
 			'libraries.sortLabels.library' => '媒体库',
@@ -6732,8 +6956,6 @@ extension on TranslationsZh {
 			'about.packageLine' => ({required Object package}) => '封装：${package}',
 			'about.localeLine' => ({required Object locale}) => '语言：${locale}',
 			'about.copyDetails' => '复制详细信息',
-			_ => null,
-		} ?? switch (path) {
 			'about.detailsCopied' => '已复制应用程序详细信息',
 			'about.detailsCopyFailed' => '无法复制应用详细信息',
 			'about.checkForUpdatesDescription' => '检查 GitHub 是否有更新版本',
@@ -6831,7 +7053,7 @@ extension on TranslationsZh {
 			'explore.status.ended' => '已完结',
 			'explore.status.canceled' => '已取消',
 			'explore.status.upcoming' => '即将上线',
-			'explore.episodeCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 集', ), 
+			'explore.episodeCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 剧集', other: '${n} 集', ),
 			'explore.cast' => '演员表',
 			'explore.characters' => '角色',
 			'explore.addToWatchlist' => '添加到想看列表',
@@ -6843,7 +7065,7 @@ extension on TranslationsZh {
 			'explore.notInLibrary' => '不在你的媒体库中',
 			'explore.inTheseLibraries' => '在这些媒体库中',
 			'explore.checkingLibrary' => '正在检查你的媒体库…',
-			'explore.libraryCheckFailed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '无法检查 ${n} 台服务器', ), 
+			'explore.libraryCheckFailed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '无法检查 ${n} 服务器', other: '无法检查 ${n} 台服务器', ),
 			'explore.emptyTitle' => '这里还什么都没有',
 			'explore.emptyMessage' => ({required Object source}) => '当 ${source} 有内容时，相关内容将显示在这里。',
 			'explore.searchHint' => ({required Object source}) => '搜索 ${source}',
@@ -6880,7 +7102,7 @@ extension on TranslationsZh {
 			'explore.stats.planning' => ({required Object n}) => '${n} 人想看',
 			'explore.stats.favorited' => ({required Object n}) => '${n} 人收藏',
 			'explore.stats.dropRate' => ({required Object percent}) => '${percent} 弃番',
-			'explore.stats.comments' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 条评论', ), 
+			'explore.stats.comments' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 评论', other: '${n} 条评论', ),
 			'explore.stats.votes' => ({required Object n}) => '${n} 票',
 			'explore.stats.watching' => ({required Object n}) => '${n} 人正在观看',
 			'explore.stats.completed' => ({required Object n}) => '${n} 人已看完',
@@ -6947,14 +7169,14 @@ extension on TranslationsZh {
 			'explore.detail.crew' => '演职人员',
 			'explore.detail.ratings' => '评分',
 			'explore.detail.schedule' => '播出时间',
-			'explore.detail.recommendedByUsers' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '由 ${n} 位用户推荐', ), 
+			'explore.detail.recommendedByUsers' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}用户推荐', other: '由 ${n} 位用户推荐', ),
 			'explore.detail.recommendedBy' => ({required Object who}) => '由 ${who} 推荐',
 			'explore.detail.favoritedBy' => ({required Object who}) => '由 ${who} 收藏',
 			'explore.detail.unairedEpisodes' => ({required Object n}) => '还有 ${n} 集未播出',
 			'explore.detail.recommendedByPercent' => ({required Object percent}) => '${percent} 的观众推荐',
 			'explore.detail.relatedTitles' => '相关作品',
 			'explore.detail.background' => '背景',
-			'explore.totalResults' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 条结果', ), 
+			'explore.totalResults' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 结果', other: '${n} 条结果', ),
 			'liveTv.title' => '直播电视',
 			'liveTv.guide' => '节目指南',
 			'liveTv.noChannels' => '没有可用的频道',
@@ -7099,7 +7321,7 @@ extension on TranslationsZh {
 			'music.playNext' => '下一首播放',
 			'music.addToQueue' => '添加到队列',
 			'music.discNumber' => ({required Object n}) => '碟片 ${n}',
-			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 首', ), 
+			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}轨道', other: '${n} 首', ),
 			'music.nowPlaying' => '正在播放',
 			'music.playingFrom' => ({required Object title}) => '播放来源：${title}',
 			'music.queue' => '播放队列',
@@ -7195,7 +7417,9 @@ extension on TranslationsZh {
 			'watchTogether.offsetPlusTenth' => '+100 毫秒',
 			'watchTogether.offsetPlusSecond' => '+1秒',
 			'watchTogether.participants' => '参与者',
-			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 参与者', ), 
+			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 参与者', other: '${n} 参与者', ),
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.hostBadge' => '主持人',
 			'watchTogether.nameYou' => ({required Object name}) => '${name}（你）',
 			'watchTogether.playerIdle' => '空闲',
@@ -7246,8 +7470,6 @@ extension on TranslationsZh {
 			'watchTogether.notices.finished' => '完成',
 			'watchTogether.notices.hostChangedTo' => ({required Object name}) => '${name} 现在是主持人',
 			'watchTogether.notices.youAreNowHost' => '你现在是主持人',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.joined' => ({required Object name}) => '${name} 已加入',
 			'watchTogether.notices.left' => ({required Object name}) => '${name} 已离开',
 			'watchTogether.notices.controlRefused' => '只有主机可以控制播放',
@@ -7710,6 +7932,8 @@ extension on TranslationsZh {
 			'seerr.statusPartiallyAvailable' => '部分可用',
 			'seerr.statusRequested' => '已请求',
 			'seerr.statusProcessing' => '处理中',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusBlocklisted' => '已加入屏蔽列表',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => '无法连接到 ${url}：${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => '${url} 上没有 Seerr 实例（HTTP ${status}）',
@@ -7760,8 +7984,6 @@ extension on TranslationsZh {
 			'services.deviceCode.title' => ({required Object service}) => '在 ${service} 上激活 Luroka',
 			'services.deviceCode.instructions' => '扫描二维码，或访问下方地址并输入此代码：',
 			'services.deviceCode.openToActivate' => ({required Object service}) => '打开 ${service} 以激活',
-			_ => null,
-		} ?? switch (path) {
 			'services.deviceCode.copyCode' => '复制激活代码',
 			'services.deviceCode.waitingForAuthorization' => '等待授权…',
 			'services.deviceCode.codeCopied' => '代码已复制',
@@ -7782,12 +8004,69 @@ extension on TranslationsZh {
 			'services.libraryFilter.modeHintWhitelist' => '仅同步下方勾选的媒体库。',
 			'services.libraryFilter.libraries' => '媒体库',
 			'services.libraryFilter.noLibraries' => '没有可用的媒体库',
+			'offlineRecovery.title' => '您的服务器离线',
+			'offlineRecovery.description' => '您的下载仍然可用。当您的服务器恢复时尝试重新连接，或添加另一台服务器。',
+			'offlineRecovery.appleTvDescription' => 'Luroka 无法访问您的媒体服务器。尝试在可用时重新连接，或添加另一台服务器以继续观看。',
+			'offlineRecovery.kidsDescription' => '我们无法访问您的媒体服务器。尝试重新连接，或向家长寻求帮助。',
+			'offlineRecovery.retrying' => '正在连接…',
+			'offlineRecovery.addServer' => '添加服务器',
+			'releaseUpdates.manualInstructions' => '从 GitHub 下载发布存档，解压 APK，并将其安装在您的 Android 设备上。',
+			'releaseUpdates.tvInstructions' => '在手机或电脑上打开此地址，或扫描二维码下载版本。',
+			'releaseUpdates.pressBackAgain' => '再次按返回退出播放',
+			'profileIntegrations.title' => '打造专属 Luroka',
+			'profileIntegrations.description' => '连接您喜欢的服务，记录观看内容并请求新电影和剧集。每个 Luroka 用户资料都有自己的连接。',
+			'profileIntegrations.step' => '可选集成',
+			'profileIntegrations.examples' => 'Trakt · Simkl · AniList · MyAnimeList · Seerr',
+			'profileIntegrations.connect' => '探索集成',
+			'profileIntegrations.later' => '稍后设置',
+			'profileIntegrations.manage' => '管理集成',
+			'profileIntegrations.forProfile' => ({required Object name}) => '${name} 的连接',
+			'profileSetupGuide.title' => '打造专属用户资料',
+			'profileSetupGuide.description' => '为此设备上的用户资料选择 Luroka 的外观和使用方式。您可以稍后在设置中更改。',
+			'profileSetupGuide.appearanceStep' => '1 / 2 · 外观',
+			'profileSetupGuide.homeStep' => '2 / 2 · 您的首页',
+			'profileSetupGuide.preview' => '预览',
+			'profileSetupGuide.previewTitle' => '您的首页',
+			'profileSetupGuide.previewPoster' => '海报',
+			'profileSetupGuide.posterArtwork' => '仅显示海报',
+			'profileSetupGuide.posterWithDetails' => '显示海报详细信息',
+			'profileSetupGuide.musicDescription' => '打开电影或剧集详情页面时播放主题音乐（如有）。',
+			'profileSetupGuide.moreThemes' => '更多主题',
+			'profileSetupGuide.fewerThemes' => '收起主题',
+			'profileSetupGuide.spotlightHeading' => '精选区域要显示什么内容？',
+			'profileSetupGuide.progressHeading' => '继续观看和接下来观看',
+			'profileSetupGuide.skip' => '使用默认设置并开始观看',
+			'profileSetupGuide.finish' => '开始观看',
+			'profileSetupGuide.back' => '返回',
+			'profileSetupGuide.kContinue' => '继续',
+			'profileSetupGuide.chooseLater' => '稍后选择媒体库',
+			'profileSetupGuide.libraryScope' => '这只会更改此用户资料在 Luroka 中显示的内容，不会更改服务器权限。',
+			'profileSetupGuide.createdTitle' => '用户资料已创建',
+			'profileSetupGuide.createdDescription' => '新用户资料已准备就绪，使用者可以在首次打开时进行个性化设置。',
+			'profileSetupGuide.switchProfile' => '切换到此用户资料',
+			'profileSetupGuide.stayHere' => '留在当前用户资料',
+			'animeFavorites.filter' => '动漫',
+			'animeFavorites.manage' => '管理动漫',
+			'animeFavorites.description' => '自动检测使用动漫库名称和可用的动漫标签或 ID。选择图书馆并纠正个人最爱。您的个人资料的选择将保存在此设备上。',
+			'animeFavorites.libraries' => '动漫库',
+			'animeFavorites.libraryHint' => '名为 Anime 的库会自动识别。选择一个库以更改其分类。',
+			'animeFavorites.titles' => '最喜欢的标题',
+			'animeFavorites.titleHint' => '选择一个标题将其标记为动漫或更正自动匹配。',
+			'animeFavorites.automatic' => '自动',
+			'animeFavorites.include' => '动漫',
+			'animeFavorites.exclude' => '不是动漫',
+			'animeFavorites.automaticIncluded' => '自动·动漫',
+			'animeFavorites.automaticExcluded' => '自动 · 非动漫',
+			'animeFavorites.noLibraries' => '没有可用的连接库。',
+			'animeFavorites.noTitles' => '没有最喜欢的电影或节目。',
+			'animeFavorites.empty' => '没有找到最喜欢的动漫。检查您的动漫库或将标题标记为动漫。',
+			'animeFavorites.saveFailed' => '无法保存您的动漫设置。请再试一次。',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => '添加 ${product} 服务器',
 			'addServer.serverUrls' => '服务器 URL',
 			'addServer.serverUrlsHelper' => '可输入多个 URL，并用逗号分隔。',
 			'addServer.findServer' => '查找服务器',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => '正在查找本地 ${product} 服务器…',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => '本地 ${product} 服务器',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => '已保存和附近的 ${product} 服务器',
 			'addServer.username' => '用户名',
 			'addServer.password' => '密码',
 			'addServer.signIn' => '登录',

@@ -1487,7 +1487,7 @@ void main() {
     TvDetectionService.debugSetAppleTVOverride(null);
     await TvDetectionService.getInstance(forceTv: true);
     TvDetectionService.setForceTVSync(true);
-    const channel = MethodChannel('com.luroka/text_input');
+    const channel = MethodChannel('com.plezy/text_input');
     final sentStates = <bool>[];
     GamepadService.debugNativeTextInputFocusHandler = (_) async {};
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call) async {
@@ -1548,7 +1548,7 @@ void main() {
     TvDetectionService.debugSetAppleTVOverride(null);
     await TvDetectionService.getInstance(forceTv: true);
     TvDetectionService.setForceTVSync(true);
-    const channel = MethodChannel('com.luroka/text_input');
+    const channel = MethodChannel('com.plezy/text_input');
     final calls = <MethodCall>[];
     final gamepadFocusStates = <bool>[];
     GamepadService.debugNativeTextInputFocusHandler = (focused) async {

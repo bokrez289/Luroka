@@ -42,11 +42,17 @@ class LogRedactionManager {
   /// header that Jellyfin's SDK and Findroid both send.
   static final RegExp _mediaBrowserTokenHeader = RegExp(r'Token="[^"]+"', caseSensitive: false);
 
+  // These values are bearer capabilities even though they are not conventional
+  // passwords. Redact them before generic field processing so a crash report
+  // cannot make a backup recoverable or joinable by someone else.
+  static final RegExp _backupRecoveryCode = RegExp(r'\blrb1-[A-Za-z0-9_-]{43}\b');
+  static final RegExp _pairingInvitation = RegExp(r'\bv1\.[A-Za-z0-9_-]{43}\.[A-Za-z0-9_-]{43}\b');
+
   /// Field names whose values are credentials in header, query, JSON, and
   /// Dart-map renderings. Requiring an exact key plus separator leaves prose
   /// and diagnostic fields such as `token_count` intact.
   static final RegExp _sensitiveFieldPattern = RegExp(
-    r'''(^|[\s?&{},;\[(])(["']?)(authorization|proxy-authorization|cookie|set-cookie|x-auth-token|x-plex-token|x-emby-token|x-api-key|api[-_]?key|auth[-_]?token|access[-_]?token|refresh[-_]?token|id[-_]?token|client[-_]?secret|password|passwd|secret|pin|token)(["']?)([ \t]*[:=][ \t]*)''',
+    r'''(^|[\s?&{},;\[(])(["']?)(authorization|proxy-authorization|cookie|set-cookie|x-auth-token|x-plex-token|x-emby-token|x-api-key|x-luroka-backup-(?:lookup|delete)|x-luroka-pair-(?:session|auth)|api[-_]?key|auth[-_]?token|access[-_]?token|refresh[-_]?token|id[-_]?token|client[-_]?secret|password|passwd|secret|pin|token)(["']?)([ \t]*[:=][ \t]*)''',
     caseSensitive: false,
     multiLine: true,
   );
@@ -171,6 +177,8 @@ class LogRedactionManager {
     );
     redacted = redacted.replaceAll(_plexDirectServerHashPattern, '.[REDACTED].plex.direct');
 
+    redacted = redacted.replaceAll(_backupRecoveryCode, '[REDACTED_RECOVERY_CODE]');
+    redacted = redacted.replaceAll(_pairingInvitation, '[REDACTED_PAIRING_INVITATION]');
     redacted = redacted.replaceAll(_mediaBrowserTokenHeader, 'Token="[REDACTED]"');
     redacted = _redactSensitiveFields(redacted);
 

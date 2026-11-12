@@ -28,6 +28,8 @@ import '../services/trackers/tracker_constants.dart';
 import '../services/trackers/tracker_coordinator.dart';
 import '../services/trackers/tracker_session.dart';
 import '../services/trackers/tracker_username_enricher.dart';
+import '../services/trackers/tracker.dart';
+import '../services/settings_service.dart';
 import '../utils/app_logger.dart';
 import '../mixins/disposable_change_notifier_mixin.dart';
 
@@ -192,6 +194,22 @@ class TrackersProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     for (final slot in _slots) {
       slot.session = null;
       _rebind(slot);
+    }
+    // Tracker instances live beyond this session. Apply the newly selected
+    // profile's policy before any of its account sessions are rebound.
+    final settings = SettingsService.instanceOrNull;
+    if (settings != null) {
+      for (final service in TrackerService.values) {
+        final Tracker tracker = switch (service) {
+          TrackerService.mal => MalTracker.instance,
+          TrackerService.anilist => AnilistTracker.instance,
+          TrackerService.simkl => SimklTracker.instance,
+          TrackerService.trakt => TraktTracker.instance,
+          TrackerService.mdblist => MdblistTracker.instance,
+        };
+        unawaited(tracker.setEnabled(settings.read(SettingsService.scrobblePref(service))));
+      }
+      unawaited(TraktTracker.instance.setWatchedSyncEnabled(settings.read(SettingsService.enableTraktWatchedSync)));
     }
     // Publish the detach before awaiting: proxy consumers cache the client they
     // were handed, and would otherwise keep using a disposed one until hydration

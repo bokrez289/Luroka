@@ -8,6 +8,7 @@ import 'package:luroka/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import '../../focus/focusable_action_bar.dart';
+import '../../focus/focusable_wrapper.dart';
 import '../../focus/dpad_navigator.dart';
 import '../../focus/input_mode_tracker.dart';
 import '../../mixins/tab_navigation_mixin.dart';
@@ -32,6 +33,7 @@ import '../../services/storage_service.dart';
 import '../../mixins/refreshable.dart';
 import '../../i18n/strings.g.dart';
 import 'library_server_label.dart';
+import 'compact_library_menu.dart';
 import 'state_messages.dart';
 import 'tabs/library_browse_tab.dart';
 import 'tabs/library_recommended_tab.dart';
@@ -68,7 +70,8 @@ class _LibrariesScreenState extends State<LibrariesScreen>
         LibraryLoadable,
         TickerProviderStateMixin,
         TabNavigationMixin,
-        TabVisibilityAware implements MobileScrollToTop {
+        TabVisibilityAware
+    implements MobileScrollToTop {
   final _recommendedTabKey = GlobalKey();
   final _browseTabKey = GlobalKey();
   final _collectionsTabKey = GlobalKey();
@@ -102,6 +105,11 @@ class _LibrariesScreenState extends State<LibrariesScreen>
   List<FocusNode> get tabChipFocusNodes => _tabFocusNodes;
 
   final _actionBarKey = GlobalKey<FocusableActionBarState>();
+  final _compactHeaderFocus = FocusNode(debugLabel: 'compact_library_header');
+  bool _compactMenuOpen = false;
+
+  bool get _compactTvNavigation =>
+      PlatformDetector.isTV() && SettingsService.instance.read(SettingsService.compactTvLibraryNavigation);
 
   final ScrollController _outerScrollController = ScrollController();
   final _nestedScrollKey = GlobalKey<NestedScrollViewState>();
@@ -141,6 +149,10 @@ class _LibrariesScreenState extends State<LibrariesScreen>
   /// requestFocus alone does not snap a floating SliverAppBar back into view.
   @override
   void focusTabBar() {
+    if (_compactTvNavigation) {
+      _compactHeaderFocus.requestFocus();
+      return;
+    }
     _resetOuterScroll();
     super.focusTabBar();
   }
@@ -293,7 +305,11 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     // the tab chip without suppressing, so that completion moves it on.
     if (awaitLoad && tabState is BaseLibraryTabState && tabState.isLoading) {
       _resetOuterScroll();
-      getTabChipFocusNode(tabController.index).requestFocus();
+      if (_compactTvNavigation) {
+        _compactHeaderFocus.requestFocus();
+      } else {
+        getTabChipFocusNode(tabController.index).requestFocus();
+      }
       return;
     }
     (tabState as dynamic).focusContentOrChrome();
@@ -360,7 +376,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
   void _handleTabDataLoaded(int tabIndex) {
     _loadedTabs.add(tabIndex);
 
-    if (suppressAutoFocus) return;
+    if (suppressAutoFocus || _compactMenuOpen) return;
 
     if (tabController.index == tabIndex && mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -384,6 +400,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
 
   @override
   void dispose() {
+    _compactHeaderFocus.dispose();
     _outerScrollController.dispose();
     for (final node in _tabFocusNodes) {
       node.dispose();
@@ -430,6 +447,126 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     LibraryTabType.playlists => t.libraries.tabs.playlists,
   };
 
+  @override
+  void goToPreviousTab() {
+    if (!_compactTvNavigation) return super.goToPreviousTab();
+    if (tabController.index > 0) tabController.index--;
+  }
+
+  @override
+  void goToNextTab() {
+    if (!_compactTvNavigation) return super.goToNextTab();
+    if (tabController.index < tabController.length - 1) tabController.index++;
+  }
+
+  Future<void> _openCompactLibraryMenu() async {
+    if (!mounted || _compactMenuOpen || _selectedLibraryGlobalKey == null) return;
+    final libraries = _librariesFor(context.read<LibrariesProvider>().libraries);
+    final library = libraries.where((item) => item.globalKey == _selectedLibraryGlobalKey).firstOrNull;
+    if (library == null) return;
+    final browse = _visibleTabs[tabController.index] == LibraryTabType.browse ? _browseTabKey.currentState : null;
+    final returnFocus = FocusManager.instance.primaryFocus;
+    _compactMenuOpen = true;
+    final choice = await showCompactLibraryMenu(
+      context,
+      title: library.title,
+      entries: [
+        for (final type in _visibleTabs)
+          CompactLibraryMenuEntry(
+            id: 'tab:${type.name}',
+            label: _getTabLabel(type),
+            icon: switch (type) {
+              LibraryTabType.recommended => Symbols.dashboard_rounded,
+              LibraryTabType.browse => Symbols.grid_view_rounded,
+              LibraryTabType.collections => Symbols.collections_rounded,
+              LibraryTabType.playlists => Symbols.playlist_play_rounded,
+            },
+            selected: _visibleTabs[tabController.index] == type,
+          ),
+        CompactLibraryMenuEntry(id: 'library', label: t.libraries.selectLibrary, icon: Symbols.folder_open_rounded),
+        if (browse != null) ...[
+          CompactLibraryMenuEntry(id: 'group', label: t.libraries.groupings.title, icon: Symbols.category_rounded),
+          if ((browse as dynamic).hasCompactFilters == true)
+            CompactLibraryMenuEntry(id: 'filters', label: t.libraries.filters, icon: Symbols.filter_alt_rounded),
+          if ((browse as dynamic).hasCompactSort == true)
+            CompactLibraryMenuEntry(id: 'sort', label: t.libraries.sort, icon: Symbols.sort_rounded),
+          if ((browse as dynamic).hasCompactAlphabet == true)
+            const CompactLibraryMenuEntry(id: 'alphabet', label: 'A–Z', icon: Symbols.sort_by_alpha_rounded),
+          if ((browse as dynamic).hasCompactAlphabetFilter == true)
+            CompactLibraryMenuEntry(
+              id: 'clearAlphabet',
+              label: t.libraryPolish.clearFilters,
+              icon: Symbols.filter_alt_off_rounded,
+            ),
+          if (!library.kind.isMusic)
+            CompactLibraryMenuEntry(
+              id: 'captions',
+              label: SettingsService.instance.read(SettingsService.libraryPosterCaptions)
+                  ? t.libraryPolish.hidePosterDetails
+                  : t.libraryPolish.showPosterDetails,
+              icon: Symbols.subtitles_rounded,
+            ),
+        ],
+        CompactLibraryMenuEntry(id: 'refresh', label: t.common.refresh, icon: Symbols.refresh_rounded),
+        if (!KidsProfileService.instance.isActiveKids)
+          CompactLibraryMenuEntry(id: 'manage', label: t.libraries.manageLibraries, icon: Symbols.edit_rounded),
+      ],
+    );
+    _compactMenuOpen = false;
+    if (!mounted) return;
+    if (choice == null) {
+      if (returnFocus?.context?.mounted == true) returnFocus!.requestFocus();
+      return;
+    }
+    if (choice.startsWith('tab:')) {
+      final index = _visibleTabs.indexWhere((type) => type.name == choice.substring(4));
+      if (index >= 0 && index != tabController.index) {
+        suppressAutoFocus = false;
+        tabController.index = index;
+      } else if (returnFocus?.context?.mounted == true) {
+        returnFocus!.requestFocus();
+      }
+      return;
+    }
+    if (returnFocus?.context?.mounted == true) returnFocus!.requestFocus();
+    switch (choice) {
+      case 'library':
+        final hidden = context.read<HiddenLibrariesProvider>().hiddenLibraryKeys;
+        final visible = libraries.where((item) => !hidden.contains(item.globalKey)).toList();
+        final selected = await showAdaptiveAppMenu<String>(
+          context,
+          title: t.libraries.selectLibrary,
+          focusFirstItem: true,
+          entries: _buildGroupedLibraryMenuItems(
+            visible,
+            groupByServer: SettingsService.instance.read(SettingsService.groupLibrariesByServer),
+          ),
+        );
+        if (mounted && selected != null && visible.any((item) => item.globalKey == selected)) {
+          await _loadLibraryContent(selected);
+        }
+      case 'group':
+        (browse as dynamic).showCompactGrouping();
+      case 'filters':
+        (browse as dynamic).showCompactFilters();
+      case 'sort':
+        (browse as dynamic).showCompactSort();
+      case 'alphabet':
+        (browse as dynamic).showCompactAlphabet();
+      case 'clearAlphabet':
+        (browse as dynamic).clearCompactAlphabet();
+      case 'captions':
+        await SettingsService.instance.write(
+          SettingsService.libraryPosterCaptions,
+          !SettingsService.instance.read(SettingsService.libraryPosterCaptions),
+        );
+      case 'refresh':
+        manualRefresh();
+      case 'manage':
+        _showLibraryManagementSheet();
+    }
+  }
+
   Widget _buildTabContent(
     LibraryTabType type, {
     required MediaLibrary library,
@@ -445,6 +582,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
         suppressAutoFocus: suppressAutoFocus,
         onDataLoaded: () => _handleTabDataLoaded(tabIndex),
         onBack: focusTabBar,
+        onNavigateLibraryMenu: _compactTvNavigation ? _openCompactLibraryMenu : null,
         onNavigateToChrome: focusTabBar,
       ),
       LibraryTabType.browse => LibraryBrowseTab(
@@ -455,6 +593,8 @@ class _LibrariesScreenState extends State<LibrariesScreen>
         suppressAutoFocus: suppressAutoFocus,
         onDataLoaded: () => _handleTabDataLoaded(tabIndex),
         onBack: focusTabBar,
+        onNavigateLibraryMenu: _compactTvNavigation ? _openCompactLibraryMenu : null,
+        compactTvNavigation: _compactTvNavigation,
         onResetScroll: _resetOuterScroll,
         onFiltersActiveChanged: _handleBrowseFiltersActiveChanged,
       ),
@@ -465,6 +605,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
         suppressAutoFocus: suppressAutoFocus,
         onDataLoaded: () => _handleTabDataLoaded(tabIndex),
         onBack: focusTabBar,
+        onNavigateLibraryMenu: _compactTvNavigation ? _openCompactLibraryMenu : null,
       ),
       LibraryTabType.playlists => LibraryPlaylistsTab(
         key: _playlistsTabKey,
@@ -473,6 +614,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
         suppressAutoFocus: suppressAutoFocus,
         onDataLoaded: () => _handleTabDataLoaded(tabIndex),
         onBack: focusTabBar,
+        onNavigateLibraryMenu: _compactTvNavigation ? _openCompactLibraryMenu : null,
       ),
     };
   }
@@ -852,9 +994,10 @@ class _LibrariesScreenState extends State<LibrariesScreen>
 
   @override
   Widget build(BuildContext context) {
-    return SettingValueBuilder<bool>(
-      pref: SettingsService.groupLibrariesByServer,
-      builder: (context, groupByServerSetting, _) => _buildContent(context, groupByServerSetting),
+    return SettingsBuilder(
+      prefs: const [SettingsService.groupLibrariesByServer, SettingsService.compactTvLibraryNavigation],
+      builder: (context) =>
+          _buildContent(context, SettingsService.instance.read(SettingsService.groupLibrariesByServer)),
     );
   }
 
@@ -1146,7 +1289,48 @@ class _LibrariesScreenState extends State<LibrariesScreen>
         child: Column(
           children: [
             if (PlatformDetector.isTV())
-              ColoredBox(color: Theme.of(context).scaffoldBackgroundColor, child: buildTransparentTvTopBar()),
+              _compactTvNavigation
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
+                      child: Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: FocusableWrapper(
+                          key: const ValueKey('compact-library-header'),
+                          focusNode: _compactHeaderFocus,
+                          onSelect: _openCompactLibraryMenu,
+                          onNavigateLeft: _openCompactLibraryMenu,
+                          onNavigateUp: onTabBarBack,
+                          onNavigateDown: _focusCurrentTab,
+                          onBack: onTabBarBack,
+                          useBackgroundFocus: true,
+                          disableScale: true,
+                          semanticLabel: t.libraryPolish.openLibraryMenu,
+                          descendantsAreFocusable: false,
+                          child: InkWell(
+                            onTap: _openCompactLibraryMenu,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Symbols.menu_rounded, size: 22),
+                                  const SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      '${selectedLibrary.title} · ${_getTabLabel(_visibleTabs[currentTabIndex])}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Theme.of(context).textTheme.titleMedium,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : ColoredBox(color: Theme.of(context).scaffoldBackgroundColor, child: buildTransparentTvTopBar()),
             Expanded(
               child: NestedScrollView(
                 key: _nestedScrollKey,

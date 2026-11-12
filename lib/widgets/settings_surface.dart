@@ -21,7 +21,7 @@ class SettingsSurface extends StatelessWidget {
           listTileTheme: theme.listTileTheme.copyWith(
             dense: false,
             minTileHeight: compact
-                ? (smallTv ? 52 : 62)
+                ? (smallTv ? 64 : 72)
                 : tv
                 ? 72
                 : 60,
@@ -39,7 +39,7 @@ class SettingsSurface extends StatelessWidget {
             ),
             titleTextStyle: theme.textTheme.titleMedium?.copyWith(
               fontSize: compact
-                  ? (smallTv ? 14 : 16)
+                  ? (smallTv ? 16 : 18)
                   : tv
                   ? 18
                   : 14,
@@ -47,7 +47,7 @@ class SettingsSurface extends StatelessWidget {
             ),
             subtitleTextStyle: theme.textTheme.bodyMedium?.copyWith(
               fontSize: compact
-                  ? 12
+                  ? 14
                   : tv
                   ? 14
                   : 12,

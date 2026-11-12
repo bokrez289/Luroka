@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:luroka/focus/input_mode_tracker.dart';
+import 'package:luroka/focus/focusable_button.dart';
+import 'package:luroka/widgets/home_dashboard.dart';
+import 'package:luroka/widgets/settings_preview_thumbnail.dart';
+import 'package:luroka/widgets/settings_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/screens/settings/subtitle_styling_screen.dart';
@@ -26,6 +32,112 @@ void main() {
     LocaleSettings.setLocaleSync(AppLocale.en);
   });
   tearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+
+  for (final width in [960.0, 1440.0]) {
+    testWidgets('standalone TV settings can leave list scope for preview at $width', (tester) async {
+      TvDetectionService.debugSetAppleTVOverride(true);
+      tester.view.physicalSize = Size(width, 810);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final first = FocusNode();
+      final preview = FocusNode();
+      addTearDown(first.dispose);
+      addTearDown(preview.dispose);
+      await tester.pumpWidget(
+        InputModeTracker(
+          child: MaterialApp(
+            theme: monoTheme(MonoPalette.dark),
+            home: SettingsPage(
+              title: const Text('Theme'),
+              previewHeader: MiniHomePreview(focusNode: preview),
+              children: [
+                FocusableButton(
+                  focusNode: first,
+                  onPressed: () {},
+                  child: const SizedBox(height: 120, child: Text('Theme option')),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      first.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      expect(preview.hasFocus, isTrue);
+      await tester.sendKeyEvent(LogicalKeyboardKey.select);
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.select);
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsNothing);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      expect(first.hasFocus, isTrue);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('TV remote reaches preview and closes fullscreen at $width', (tester) async {
+      await initializeDateFormatting('en');
+      TvDetectionService.debugSetAppleTVOverride(true);
+      tester.view.physicalSize = Size(width, 810);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final first = FocusNode();
+      addTearDown(first.dispose);
+      await tester.pumpWidget(
+        InputModeTracker(
+          child: MaterialApp(
+            home: TvSettingsHub(
+              onExitLeft: () {},
+              categories: [
+                TvSettingsCategory(
+                  id: 'home',
+                  title: 'Home',
+                  icon: Icons.home,
+                  firstFocus: first,
+                  preview: true,
+                  builder: (_) => FocusableButton(
+                    focusNode: first,
+                    onPressed: () {},
+                    child: const SizedBox(height: 70, child: Text('Home setting')),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      first.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      final thumbnail = tester.widget<SettingsPreviewThumbnail>(find.byType(SettingsPreviewThumbnail));
+      expect(thumbnail.focusNode!.hasFocus, isTrue);
+      expect(find.byType(HomeDashboard), findsOneWidget);
+      expect(tester.widget<HomeDashboard>(find.byType(HomeDashboard)).active, isFalse);
+      await tester.sendKeyEvent(LogicalKeyboardKey.select);
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.goBack, physicalKey: PhysicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsNothing);
+      expect(
+        thumbnail.focusNode!.hasFocus,
+        isTrue,
+        reason: 'Fullscreen must restore the thumbnail: ${FocusManager.instance.primaryFocus}',
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      expect(first.hasFocus, isTrue, reason: 'Return target: ${FocusManager.instance.primaryFocus}');
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
 
   testWidgets('TV theme picker updates the workspace preview after returning', (tester) async {
     await initializeDateFormatting('en');
@@ -74,7 +186,15 @@ void main() {
     await tester.tap(find.text(t.settings.theme));
     await tester.pumpAndSettle();
     expect(find.byType(ThemeSettingsScreen), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('more-themes')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('more-themes')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey(settings.ThemeMode.lurokaNocturne)));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey(settings.ThemeMode.lurokaNocturne)));
+    await tester.pumpAndSettle();
+    await tester.pageBack();
     await tester.pumpAndSettle();
     await tester.pageBack();
     await tester.pumpAndSettle();
@@ -141,7 +261,7 @@ void main() {
     await tester.pumpAndSettle();
     GridView grid() =>
         tester.widget(find.descendant(of: find.byType(LibrarySettingsPreview), matching: find.byType(GridView)));
-    expect((grid().gridDelegate as SliverGridDelegateWithFixedCrossAxisCount).crossAxisCount, 3);
+    expect((grid().gridDelegate as SliverGridDelegateWithFixedCrossAxisCount).crossAxisCount, 4);
     await SettingsService.instance.write(SettingsService.viewMode, ViewMode.list);
     await tester.pumpAndSettle();
     expect((grid().gridDelegate as SliverGridDelegateWithFixedCrossAxisCount).crossAxisCount, 1);

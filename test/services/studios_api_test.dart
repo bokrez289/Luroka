@@ -77,6 +77,7 @@ void main() {
       expect(uri.queryParameters['Limit'], '40');
       final fields = uri.queryParameters['Fields']!.split(',');
       expect(fields, containsAll(['Overview', 'DateCreated', 'SortName', 'ProviderIds']));
+      if (emby) expect(fields, containsAll(['ProductionYear', 'PremiereDate']));
       expect(fields, isNot(contains('RecursiveItemCount')));
       expect(fields, isNot(contains('ChildCount')));
       expect(fields, isNot(contains('MediaSources')));

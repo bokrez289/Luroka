@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:luroka/connection/connection_registry.dart';
 import 'package:luroka/focus/input_mode_tracker.dart';
@@ -18,6 +19,7 @@ import 'package:luroka/screens/profile/kids_settings_screen.dart';
 import 'package:luroka/screens/profile/parental_controls_screen.dart';
 import 'package:luroka/screens/profile/pin_entry_dialog.dart';
 import 'package:luroka/screens/profile/profile_detail_screen.dart';
+import 'package:luroka/screens/settings/screen_time_screen.dart';
 import 'package:luroka/services/base_shared_preferences_service.dart';
 import 'package:luroka/services/kids_profile_service.dart';
 import 'package:luroka/services/screen_time_service.dart';
@@ -32,6 +34,7 @@ import '../../test_helpers/prefs.dart';
 import '../../test_helpers/profile_stack.dart';
 
 void main() {
+  setUpAll(() => initializeDateFormatting('en'));
   final kids = KidsProfileService.instance;
   final alex = Profile.local(id: 'alex', displayName: 'Alex', createdAt: DateTime(2026));
   final mia = Profile.local(id: 'mia', displayName: 'Mia', createdAt: DateTime(2026), sortOrder: 1);
@@ -299,8 +302,10 @@ void main() {
     final service = ScreenTimeService(database: value.db, profileId: alex.id);
     addTearDown(service.dispose);
     final today = localDateKey(DateTime.now());
-    await value.db.addScreenTime(profileId: alex.id, localDate: today, durationMs: 45 * 60000, updatedAt: 1);
-    await value.db.addScreenTime(profileId: mia.id, localDate: today, durationMs: 20 * 60000, updatedAt: 1);
+    await tester.runAsync(() async {
+      await value.db.addScreenTime(profileId: alex.id, localDate: today, durationMs: 45 * 60000, updatedAt: 1);
+      await value.db.addScreenTime(profileId: mia.id, localDate: today, durationMs: 20 * 60000, updatedAt: 1);
+    });
 
     await tester.pumpWidget(
       MultiProvider(
@@ -322,10 +327,73 @@ void main() {
     // People tiles carry per-person Today chips, kids included.
     expect(find.textContaining('${t.screenTime.today} 45 min'), findsWidgets);
     expect(find.textContaining('${t.screenTime.today} 20 min'), findsNWidgets(2));
-    // Everyone else gets a PIN-gated statistics entry.
+    // The linked child gets a PIN-gated statistics entry.
     expect(find.text(t.family.namedActivity(name: mia.displayName)), findsOneWidget);
     expect(find.text(t.family.namedActivity(name: alex.displayName)), findsOneWidget);
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump(const Duration(milliseconds: 100));
+  });
+
+  testWidgets('activity is limited to the active adult and their linked child', (tester) async {
+    final child = Profile.local(id: 'child', displayName: 'Child', createdAt: DateTime(2026));
+    final otherChild = Profile.local(id: 'other-child', displayName: 'Other child', createdAt: DateTime(2026));
+    final value = await stack(tester, people: [alex, mia, child, otherChild]);
+    await kids.setParentPin('1234');
+    await kids.setChild(child.id, parentId: alex.id, maxAge: 7);
+    await kids.setChild(otherChild.id, parentId: mia.id, maxAge: 7);
+    final service = ScreenTimeService(database: value.db, profileId: alex.id);
+    addTearDown(service.dispose);
+    final today = localDateKey(DateTime.now());
+    await tester.runAsync(() async {
+      for (final (id, minutes) in [(alex.id, 11), (mia.id, 22), (child.id, 33), (otherChild.id, 44)]) {
+        await value.db.addScreenTime(profileId: id, localDate: today, durationMs: minutes * 60000, updatedAt: 1);
+      }
+    });
+    await tester.pumpWidget(MultiProvider(providers: [
+      ChangeNotifierProvider<ActiveProfileProvider>.value(value: value.active),
+      Provider<ProfileRegistry>.value(value: value.profiles),
+      Provider<ProfileConnectionRegistry>.value(value: value.profileConnections),
+      Provider<ConnectionRegistry>.value(value: value.connections),
+      Provider<PlexHomeService>.value(value: value.plexHome),
+      Provider<ScreenTimeService>.value(value: service),
+    ], child: InputModeTracker(child: MaterialApp(theme: monoTheme(MonoPalette.dark), home: const FamilySettingsScreen()))));
+    await tester.pumpAndSettle();
+    expect(find.byType(FamilyProfileTile), findsNWidgets(4));
+    expect(find.text(t.family.namedActivity(name: alex.displayName)), findsOneWidget);
+    expect(find.text(t.family.namedActivity(name: child.displayName)), findsOneWidget);
+    expect(find.text(t.family.namedActivity(name: mia.displayName)), findsNothing);
+    expect(find.text(t.family.namedActivity(name: otherChild.displayName)), findsNothing);
+    expect(find.textContaining('${t.screenTime.today} 22 min'), findsNothing);
+    expect(find.textContaining('${t.screenTime.today} 44 min'), findsNothing);
+    expect(find.textContaining('${t.screenTime.today} 33 min'), findsWidgets);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('direct history screen denies another adult and follows child ownership changes', (tester) async {
+    final child = Profile.local(id: 'child', displayName: 'Child', createdAt: DateTime(2026));
+    final value = await stack(tester, people: [alex, mia, child]);
+    await kids.setParentPin('1234');
+    await kids.setChild(child.id, parentId: alex.id, maxAge: 7);
+    final service = ScreenTimeService(database: value.db, profileId: alex.id);
+    addTearDown(service.dispose);
+    final today = localDateKey(DateTime.now());
+    await tester.runAsync(() async {
+      await value.db.addScreenTime(profileId: child.id, localDate: today, durationMs: 330000, updatedAt: 1);
+      await value.db.addScreenTime(profileId: mia.id, localDate: today, durationMs: 220000, updatedAt: 1);
+    });
+    Widget page(String target) => MultiProvider(providers: [
+      ChangeNotifierProvider<ActiveProfileProvider>.value(value: value.active),
+      Provider<ScreenTimeService>.value(value: service),
+    ], child: MaterialApp(theme: monoTheme(MonoPalette.dark), home: ScreenTimeScreen(profileId: target)));
+    await tester.pumpWidget(page(mia.id));
+    await tester.pumpAndSettle();
+    expect(find.text(t.family.activityUnavailable), findsOneWidget);
+    await tester.pumpWidget(page(child.id));
+    await tester.pumpAndSettle();
+    expect(find.text(t.family.activityUnavailable), findsNothing);
+    await kids.setChild(child.id, parentId: mia.id, maxAge: 7);
+    await tester.pumpAndSettle();
+    expect(find.text(t.family.activityUnavailable), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 }

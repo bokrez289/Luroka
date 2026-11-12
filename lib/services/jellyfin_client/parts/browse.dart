@@ -199,8 +199,7 @@ const _seriesLastPlayedConcurrency = 4;
 
 /// Ceiling on how many series [_attachSeriesLastPlayed] dates in one call and
 /// on how many series [_fetchRecentlyPlayedSeriesIds] returns — which also
-/// bounds the Emby Next Up shelf, since [_stampEmbyNextUpRows] drops rows the
-/// scan cannot vouch for. Sits just above `DiscoverProvider`'s 21-row
+/// bounds the Emby Next Up history enrichment (unknown rows remain visible). Sits just above `DiscoverProvider`'s 21-row
 /// continue-watching probe so the home shelf is always fully dated, and caps
 /// the uncapped `count: null` shelf, whose Next Up half is limited only by how
 /// many series the user has started.
@@ -364,7 +363,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
       // Studio grids need card metadata and overview, not per-series recursive
       // episode counts. Those counts add a DB query per show on Jellyfin.
       MediaKind.movie || MediaKind.show when query.filters.any((filter) => filter.field == 'studio') =>
-        '$_baseHubRowFields,OriginalTitle,SortName,ProviderIds',
+        '$_hubRowFields,OriginalTitle,SortName,ProviderIds',
       _ => _browseFields,
     };
     final translator = JellyfinLibraryQueryTranslator(userId: connection.userId, parentId: libraryId, fields: fields);
@@ -851,6 +850,23 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   /// Single-flight only: once a request settles the next caller re-fetches, so
   /// nothing here can serve a stale item.
   final Map<String, Future<MediaItem?>> _inFlightItems = {};
+
+  Future<MediaItem?> fetchPreviewItem(String id, {required AbortController abort}) async {
+    final response = await _http.get(
+      '/Users/${_segment(connection.userId)}/Items/${_segment(id)}',
+      queryParameters: {'Fields': 'Overview,Genres,ProductionYear,OfficialRating,PremiereDate,RecursiveItemCount'},
+      abort: abort,
+      timeout: const Duration(seconds: 8),
+    );
+    abort.throwIfAborted();
+    if (response.statusCode == 404) return null;
+    throwIfHttpError(response);
+    final data = response.data;
+    if (data is! Map<String, dynamic>) return null;
+    await _prepareKidsRows([data]);
+    abort.throwIfAborted();
+    return KidsProfileService.instance.allowedItem(_mapItem(data));
+  }
 
   @override
   Future<MediaItem?> fetchItem(String id) {
@@ -1544,7 +1560,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
               'Limit': limit.toString(),
               'MediaTypes': 'Video',
               'ParentId': library.id,
-              'Fields': '$_baseHubRowFields,OriginalTitle,SortName,ProviderIds',
+              'Fields': '$_hubRowFields,OriginalTitle,SortName,ProviderIds',
               'EnableTotalRecordCount': 'false',
               ...jellyfinImageQueryParameters,
             }, abort: abort).then(
@@ -1562,7 +1578,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
               'Limit': limit.toString(),
               'IncludeItemTypes': _searchItemTypesFor(library.kind),
               'ParentId': library.id,
-              'Fields': '$_baseHubRowFields,OriginalTitle,SortName,ProviderIds',
+              'Fields': '$_hubRowFields,OriginalTitle,SortName,ProviderIds',
               'EnableTotalRecordCount': 'false',
               ...jellyfinImageQueryParameters,
             }, abort: abort),
@@ -2100,7 +2116,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
     // video-only there.
     var libraries = _loadedLibraryViews;
     if (libraries == null) {
-      libraries = await _fetchLibraries();
+      libraries = await fetchLibraries();
       _loadedLibraryViews ??= libraries;
     }
     final visible = [
@@ -2147,13 +2163,14 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
     Set<String>? includedLibraryIds,
     Set<String> excludedLibraryIds = const {},
     int? count = 20,
+    bool splitRows = false,
     void Function(String libraryId, List<MediaItem> items, bool complete)? onLibrary,
     void Function(String libraryId, Object error)? onFailure,
   }) async {
     if (includedLibraryIds != null && includedLibraryIds.isEmpty) return const [];
     var libraries = _loadedLibraryViews;
     if (libraries == null) {
-      libraries = await _fetchLibraries();
+      libraries = await fetchLibraries();
       _loadedLibraryViews ??= libraries;
     }
     final visible = [
@@ -2186,7 +2203,12 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
           succeeded++;
           onLibrary?.call(
             library.id,
-            _mergeContinueWatchingAndNextUp(resume: rows.resume, nextUp: rows.nextUp, limit: count),
+            _mergeContinueWatchingAndNextUp(
+              resume: rows.resume,
+              nextUp: rows.nextUp,
+              limit: count,
+              splitRows: splitRows,
+            ),
             true,
           );
         } catch (error, stack) {
@@ -2205,6 +2227,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
       resume: resume,
       nextUp: nextUp,
       limit: count,
+      splitRows: splitRows,
     ).allowedForProfile(continueWatching: true);
   }
 
@@ -2216,9 +2239,13 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
     void Function(List<MediaItem>)? onResume,
   }) async {
     final parentId = library?.id;
-    List<MediaItem> stamped(List<MediaItem> items) => library == null
-        ? items
-        : [for (final item in items) item.copyWith(libraryId: library.id, libraryTitle: library.title)];
+    List<MediaItem> stamped(List<MediaItem> items, HomeProgressRole role) => [
+      for (final item in items)
+        withHomeProgressRole(
+          library == null ? item : item.copyWith(libraryId: library.id, libraryTitle: library.title),
+          role,
+        ),
+    ];
 
     if (!dialect.resumeReturnsOnlyStartedItems) {
       // Emby: both shelf halves ride the one hide-aware window request — see
@@ -2230,12 +2257,16 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
           retry: _continueWatchingRetry,
         ),
       );
-      final resume = stamped(_mapItems(split.resume)).allowedForProfile(continueWatching: true);
+      final resume = stamped(
+        _mapItems(split.resume),
+        HomeProgressRole.resume,
+      ).allowedForProfile(continueWatching: true);
       onResume?.call(resume);
       return (
         resume: resume,
         nextUp: stamped(
           _mapItems(await _stampEmbyNextUpRows(split.nextUp, parentId: parentId)),
+          HomeProgressRole.nextUp,
         ).allowedForProfile(continueWatching: true),
       );
     }
@@ -2246,7 +2277,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
         _resumeItemsQuery(limit: count, parentId: parentId),
         retry: _continueWatchingRetry,
       ).then((items) {
-        final resume = stamped(_mapItems(items)).allowedForProfile(continueWatching: true);
+        final resume = stamped(_mapItems(items), HomeProgressRole.resume).allowedForProfile(continueWatching: true);
         if (resume.isNotEmpty) onResume?.call(resume);
         return resume;
       }),
@@ -2262,8 +2293,10 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
                   retry: _continueWatchingRetry,
                 ))
           .then(
-            (items) async =>
-                stamped(await _attachSeriesLastPlayed(_mapItems(items))).allowedForProfile(continueWatching: true),
+            (items) async => stamped(
+              await _attachSeriesLastPlayed(_mapItems(items)),
+              HomeProgressRole.nextUp,
+            ).allowedForProfile(continueWatching: true),
           ),
     ]);
 
@@ -2955,25 +2988,24 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   /// A Next Up episode has never been played, so its own `UserData` carries no
   /// date and the shelf's recency sort would degrade to when the episode was
   /// added to the library. The dates come from one recently-played-episodes
-  /// scan ([_fetchRecentlyPlayedSeriesIds]); a series the scan did not reach is
-  /// dropped, which keeps the shelf bounded to the series the scan can vouch
-  /// for — the same [_seriesLastPlayedLookupLimit] bound the shelf had when it
-  /// was reconstructed from per-series `/Shows/NextUp` lookups. A failed scan
-  /// therefore costs the Next Up half, never the resume half.
+  /// scan ([_fetchRecentlyPlayedSeriesIds]). Missing history is treated as
+  /// unknown, not proof that a server-provided Next Up item should be hidden.
   Future<List<Map<String, dynamic>>> _stampEmbyNextUpRows(
     List<Map<String, dynamic>> rows, {
     String? parentId,
     AbortController? abort,
   }) async {
     if (rows.isEmpty) return rows;
-    final recentSeries = _withinNextUpCutoff(
-      await _fetchRecentlyPlayedSeriesIds(parentId: parentId, abort: abort),
-      _nextUpDateCutoff(),
-    );
+    final scannedSeries = await _fetchRecentlyPlayedSeriesIds(parentId: parentId, abort: abort);
+    final recentSeries = _withinNextUpCutoff(scannedSeries, _nextUpDateCutoff());
+    // An incomplete or failed enrichment scan must not hide server-provided
+    // Next Up rows. Only exclude a series with a known out-of-window date.
+    final expiredSeries = scannedSeries.map((entry) => entry.$1).toSet()
+      ..removeAll(recentSeries.map((entry) => entry.$1));
     final lastPlayedBySeries = {for (final (seriesId, lastPlayed) in recentSeries) seriesId: lastPlayed};
     return [
       for (final row in rows)
-        if (lastPlayedBySeries.containsKey(row['SeriesId']))
+        if (!expiredSeries.contains(row['SeriesId']))
           if (lastPlayedBySeries[row['SeriesId']] case final lastPlayed?)
             {
               ...row,
@@ -3045,7 +3077,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
         // the series they were last watching still ranks first, which is the
         // ordering the shelf exists to show.
         'Limit': (_seriesLastPlayedLookupLimit * 8).toString(),
-        'Fields': _withDialectRowFields('SeriesId'),
+        'Fields': 'SeriesId,UserDataLastPlayedDate',
         'EnableImages': 'false',
         'EnableTotalRecordCount': 'false',
       },
@@ -3131,6 +3163,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
     required List<MediaItem> resume,
     required List<MediaItem> nextUp,
     required int? limit,
+    bool splitRows = false,
   }) {
     if (limit != null && limit <= 0) return const [];
 
@@ -3156,8 +3189,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
     });
     final result = [for (final entry in ordered) entry.item];
 
-    if (limit != null && result.length > limit) return result.sublist(0, limit);
-    return result;
+    return limitHomeProgressRows(result, limit, split: splitRows);
   }
 
   /// GET [path], optionally under a hub-surface transport policy ([retry]):

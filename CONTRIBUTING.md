@@ -59,10 +59,41 @@ tvos/                  — Apple TV native (Swift)
 Android phone, Android TV, iOS/iPadOS and tvOS are being tested. Please describe
 the devices or simulators used when verifying a platform-specific change.
 
-1. Create a branch for your change
-2. Make your changes with clear commit messages
-3. Run `flutter analyze` and `flutter test` — both must pass
-4. Open a pull request with a description of what changed and why
+The canonical repository is the private [bokrez289/Luroka](https://github.com/bokrez289/Luroka).
+Ask the owner for access and use a separate clone of this repository; don't push
+from an older Plezy or Luroka working tree. Coordinate if others are editing the
+same files.
+
+1. Update your local `main` with `git pull --ff-only` and create a descriptive
+   feature or fix branch from it.
+2. Make the intended changes. Before staging, check `git status` and `git diff`;
+   stage specific files and review `git diff --cached`. Don't include unrelated
+   changes from another developer.
+3. Run `flutter analyze`, relevant tests and platform checks for your change.
+   Run the full test suite where practical; report any failures or checks you
+   couldn't run in the pull request. List devices or simulators used.
+4. Push your branch, then open a pull request into `main` describing the change,
+   verification and any remaining issues. Don't force-push or rewrite shared
+   history. Coordinate any direct change to `main` with the owner.
+
+### Before committing or pushing
+
+- Keep passwords, user credentials, access tokens, API secrets, signing keys,
+  provisioning profiles, private server details and local build configuration
+  out of Git. Use test accounts and fictional data in tests and examples.
+  If a secret is committed or pushed, notify the owner promptly so it can be
+  revoked or rotated; removing a later copy doesn't erase Git history.
+- Don't commit APKs, AABs, IPAs, build outputs, local backups, or the website
+  and screenshot collections. Those are maintained separately. Check the
+  staged file list even when `.gitignore` appears to cover them.
+- Keep `LICENSE`, upstream copyright and modification notices, and third-party
+  attribution intact. Discuss dependency or license changes with the owner.
+- The repository targets Android, Android TV, iOS/iPadOS and tvOS. Check with
+  the owner before adding desktop projects, changing release/signing settings,
+  publishing artifacts, or making the repository public.
+
+See [repository setup](docs/repository-setup.md) for dependency and release
+context. Coding assistants should also follow [AGENTS.md](AGENTS.md).
 
 ## Reporting bugs
 

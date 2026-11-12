@@ -18,6 +18,8 @@ import '../providers/discover_provider.dart';
 import '../providers/explore_provider.dart';
 import '../providers/hidden_libraries_provider.dart';
 import '../providers/home_layout_provider.dart';
+import '../providers/home_favorites_snapshot.dart';
+import '../providers/home_taste_provider.dart';
 import '../providers/studios_provider.dart';
 import '../providers/libraries_provider.dart';
 import '../providers/multi_server_provider.dart';
@@ -28,6 +30,8 @@ import '../providers/watch_state_store.dart';
 import '../database/app_database.dart';
 import '../screens/main_screen.dart';
 import '../screens/profile/profile_integrations_welcome_screen.dart';
+import '../screens/profile/profile_setup_guide_screen.dart';
+import '../screens/settings/source_libraries_screen.dart';
 import '../screens/video_player_screen.dart';
 import '../services/api_cache.dart';
 import '../services/agent_control_service.dart';
@@ -258,6 +262,7 @@ class _ProfileSessionScreenState extends State<ProfileSessionScreen> {
               ChangeNotifierProvider(
                 create: (context) => HomeLayoutProvider(storage: context.read<StorageService>(), profileId: activeId),
               ),
+              ChangeNotifierProvider(create: (_) => HomeFavoritesSnapshot()),
               ChangeNotifierProvider(
                 create: (context) => ExploreProvider(
                   context.read<CatalogSourcesProvider>(),
@@ -315,6 +320,16 @@ class _ProfileSessionScreenState extends State<ProfileSessionScreen> {
                 create: (context) => ScreenTimeService(database: context.read<AppDatabase>(), profileId: activeId),
                 dispose: (_, service) => service.dispose(),
               ),
+              ChangeNotifierProvider(
+                create: (context) {
+                  final database = context.read<AppDatabase>();
+                  return HomeTasteProvider(
+                    profileId: activeId,
+                    loadSessions: ({required profileId, required startLocalDate, required limit}) => database
+                        .getScreenTimeSessions(profileId: profileId, startLocalDate: startLocalDate, limit: limit),
+                  );
+                },
+              ),
               // Profile-session scope so a profile switch tears the music
               // session down (dispose stops playback + releases the audio
               // core).
@@ -361,6 +376,14 @@ class _ProfileSessionScreenState extends State<ProfileSessionScreen> {
                     !KidsProfileService.instance.isKids(activeId) &&
                     ((widget.initialIntegrationsPrompt && !_hasBuiltSession) ||
                         ProfileAppearanceService.instance.integrationsPendingFor(activeId)),
+                initialPersonalizationPrompt:
+                    activeId != null &&
+                    !KidsProfileService.instance.isKids(activeId) &&
+                    ProfileAppearanceService.instance.personalizationPendingFor(activeId),
+                initialSourceSelectionPrompt:
+                    activeId != null &&
+                    !KidsProfileService.instance.isKids(activeId) &&
+                    ProfileAppearanceService.instance.sourceSelectionPendingFor(activeId),
                 profileId: activeId,
                 profileShellBuilder: widget.profileShellBuilder,
               ),
@@ -377,6 +400,8 @@ class _ProfileSessionNavigator extends StatefulWidget {
     required this.isOfflineMode,
     required this.initialPromptHandled,
     required this.initialIntegrationsPrompt,
+    required this.initialPersonalizationPrompt,
+    required this.initialSourceSelectionPrompt,
     required this.profileId,
     required this.profileShellBuilder,
   });
@@ -384,6 +409,8 @@ class _ProfileSessionNavigator extends StatefulWidget {
   final bool isOfflineMode;
   final bool initialPromptHandled;
   final bool initialIntegrationsPrompt;
+  final bool initialPersonalizationPrompt;
+  final bool initialSourceSelectionPrompt;
   final String? profileId;
   final WidgetBuilder? profileShellBuilder;
 
@@ -461,10 +488,18 @@ class _ProfileSessionNavigatorState extends State<_ProfileSessionNavigator> {
                       key: _navigatorKey,
                       onGenerateInitialRoutes: (navigator, initialRoute) => [
                         _onGenerateRoute(RouteSettings(name: initialRoute)),
-                        if (widget.initialIntegrationsPrompt)
-                          MaterialPageRoute<void>(
-                            builder: (_) => ProfileIntegrationsWelcomeScreen(profileId: widget.profileId!),
-                          ),
+                         if (widget.initialIntegrationsPrompt)
+                           MaterialPageRoute<void>(
+                             builder: (_) => ProfileIntegrationsWelcomeScreen(profileId: widget.profileId!),
+                           ),
+                         if (widget.initialPersonalizationPrompt)
+                           MaterialPageRoute<void>(
+                             builder: (_) => ProfileSetupGuideScreen(profileId: widget.profileId!),
+                           ),
+                         if (widget.initialSourceSelectionPrompt)
+                           MaterialPageRoute<void>(
+                             builder: (_) => SourceLibrariesScreen(profileId: widget.profileId!, firstRun: true),
+                           ),
                       ],
                       observers: [
                         _routeObserver,

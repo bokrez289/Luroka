@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef LUROKA_FFMPEG_AUDIO_BUFFER_H_
-#define LUROKA_FFMPEG_AUDIO_BUFFER_H_
+#ifndef PLEZY_FFMPEG_AUDIO_BUFFER_H_
+#define PLEZY_FFMPEG_AUDIO_BUFFER_H_
 
 #include <limits.h>
 #include <stdint.h>
 
-namespace luroka {
+namespace plezy {
 namespace ffmpeg {
 
 inline bool CheckedAudioByteCount(int sample_count, int channel_count, int bytes_per_sample, int* byte_count) {
@@ -43,6 +43,6 @@ inline bool CheckedAddByteCount(int current_size, int additional_size, int* tota
 }
 
 }  // namespace ffmpeg
-}  // namespace luroka
+}  // namespace plezy
 
-#endif  // LUROKA_FFMPEG_AUDIO_BUFFER_H_
+#endif  // PLEZY_FFMPEG_AUDIO_BUFFER_H_

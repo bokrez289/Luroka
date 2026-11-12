@@ -137,6 +137,11 @@ class TranslationsIt extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$trakt$it trakt = _Translations$trakt$it._(_root);
 	@override late final _Translations$seerr$it seerr = _Translations$seerr$it._(_root);
 	@override late final _Translations$services$it services = _Translations$services$it._(_root);
+	@override late final _Translations$offlineRecovery$it offlineRecovery = _Translations$offlineRecovery$it._(_root);
+	@override late final _Translations$releaseUpdates$it releaseUpdates = _Translations$releaseUpdates$it._(_root);
+	@override late final _Translations$profileIntegrations$it profileIntegrations = _Translations$profileIntegrations$it._(_root);
+	@override late final _Translations$profileSetupGuide$it profileSetupGuide = _Translations$profileSetupGuide$it._(_root);
+	@override late final _Translations$animeFavorites$it animeFavorites = _Translations$animeFavorites$it._(_root);
 	@override late final _Translations$addServer$it addServer = _Translations$addServer$it._(_root);
 }
 
@@ -320,6 +325,9 @@ class _Translations$libraryPolish$it extends Translations$libraryPolish$en {
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get compactTvNavigation => 'Navigazione compatta della libreria';
+	@override String get compactTvNavigationDescription => 'Mostra le sezioni della libreria e sfoglia le opzioni in un menu a scorrimento, lasciando più spazio ai poster.';
+	@override String get openLibraryMenu => 'Apri il menu della libreria';
 	@override String get posterDetails => 'Dettagli del manifesto';
 	@override String get showPosterDetails => 'Mostra i dettagli del poster · nome, anno e IMDb';
 	@override String get hidePosterDetails => 'Nascondi i dettagli del poster';
@@ -633,6 +641,8 @@ class _Translations$settingsRedesign$it extends Translations$settingsRedesign$en
 	// Translations
 	@override String get themeEffects => 'Tema ed effetti';
 	@override String get libraryLayout => 'Disposizione della biblioteca';
+	@override String get posterInformation => 'Informazioni sul manifesto';
+	@override String get libraryBehavior => 'Comportamento della biblioteca';
 	@override String get appearanceHint => 'Personalizza l\'aspetto, il layout e il comportamento di Luroka.';
 	@override String get livePreview => 'Anteprima dal vivo';
 	@override String get previewHint => 'Guarda come apparirà la tua libreria con le impostazioni attuali.';
@@ -770,6 +780,19 @@ class _Translations$kids$it extends Translations$kids$en {
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get timeLimits => 'Limiti del tempo di utilizzo';
+	@override String get dailyWatchLimit => 'Orario di visione giornaliero';
+	@override String get dailyWatchLimitHint => 'Limita la riproduzione video giornaliera su questo dispositivo.';
+	@override String get noTimeLimit => 'Nessun limite';
+	@override String minutesLimit({required Object minutes}) => '${minutes} minuti';
+	@override String get bedtime => 'Ora di andare a dormire';
+	@override String get bedtimeHint => 'Per usare questo profilo durante questi orari è necessario il PIN genitore.';
+	@override String get bedtimeStart => 'Inizia l\'ora di andare a dormire';
+	@override String get bedtimeEnd => 'L\'ora di andare a dormire finisce';
+	@override String get timeLimitReached => 'Il tempo di visione è finito per oggi';
+	@override String get bedtimeReached => 'È ora di andare a dormire';
+	@override String get timeLimitParentHint => 'Chiedi a un genitore di inserire il proprio PIN per continuare con questa sessione.';
+	@override String get parentUnlock => 'Sblocco genitore';
 	@override String get backupProfile => 'Eseguire il backup del profilo dei bambini';
 	@override String get backupExplain => 'Esegui il backup del nome, del carattere, delle restrizioni, dell\'aspetto e delle esclusioni di visualizzazione locale salvati di questo profilo. I PIN genitori, gli accessi al server, i download e l\'avanzamento della riproduzione sul server non sono inclusi.';
 	@override String get saveBackupFile => 'Salva il file di backup';
@@ -1313,6 +1336,7 @@ class _Translations$settings$it extends Translations$settings$en {
 	@override String get downloadLocationPickerUnavailable => 'La selezione della cartella non è disponibile su questo dispositivo';
 	@override String get downloadOnWifiOnly => 'Scarica solo tramite Wi-Fi';
 	@override String get downloadOnWifiOnlyDescription => 'Impedisci i download quando si utilizza la rete dati cellulare';
+	@override String get downloadWifiScope => 'Si applica a tutti i profili e ai download su questo dispositivo.';
 	@override String get autoRemoveWatchedDownloads => 'Rimuovi automaticamente i download visti';
 	@override String get autoRemoveWatchedDownloadsDescription => 'Elimina automaticamente i download già visti';
 	@override String get cellularDownloadBlocked => 'I download sono bloccati sulla rete mobile. Usa il Wi-Fi o modifica l\'impostazione.';
@@ -1651,8 +1675,8 @@ class _Translations$dashboard$it extends Translations$dashboard$en {
 	@override String episodeLabel({required Object season, required Object episode}) => 'S${season} · E${episode}';
 	@override String get anotherPick => 'Un\'altra scelta';
 	@override String get exploreSeries => 'Esplora le serie';
-	@override String get showFeatured => 'Dettagli del titolo mirati';
-	@override String get showFeaturedDescription => 'Mostra illustrazione, sinossi e informazioni sull\'episodio per la scheda evidenziata';
+	@override String get showFeatured => 'In evidenza nella Home';
+	@override String get showFeaturedDescription => 'Mostra film e programmi in primo piano nella parte superiore della Home.';
 }
 
 // Path: lurokaCatalog
@@ -1753,9 +1777,32 @@ class _Translations$homeLayout$it extends Translations$homeLayout$en {
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageStudios => 'Scegli e ordina gli studi';
+	@override String get manageStudiosDescription => 'Scegli quali studi visualizzare per questo profilo e organizza il loro ordine.';
+	@override String get studioUnavailable => 'Solo gli studi trovati nelle librerie selezionate vengono visualizzati nella Home.';
+	@override String get showAllStudios => 'Mostra tutti gli studi';
+	@override String get hideAllStudios => 'Nascondi tutti gli studi';
+	@override String get reorderStudio => 'Cambia l\'ordine dello studio';
+	@override String get episodeThumbnails => 'Immagini degli episodi in Continua a guardare';
+	@override String get episodeThumbnailsDescription => 'Mostra le immagini degli episodi invece dei poster delle serie o delle stagioni in Continua a guardare e Successivo.';
+	@override String get spotlightSource => 'Origine dei contenuti in evidenza';
+	@override String get spotlightSourceDescription => 'For You utilizza l\'attività di visualizzazione di questo profilo su questo dispositivo, insieme ai preferiti e ai titoli della libreria.';
+	@override String get spotlightForYou => 'Per te';
+	@override String get spotlightForYouDescription => 'Un mix di ciò che stai guardando, preferiti, nuove aggiunte e tendenze, utilizzando l\'attività di visualizzazione di questo profilo su questo dispositivo.';
+	@override String get spotlightTrending => 'Tendenza';
+	@override String get spotlightTrendingDescription => 'Film e programmi popolari nelle tue raccolte.';
+	@override String get spotlightContinue => 'Continua a guardare';
+	@override String get spotlightContinueDescription => 'Titoli che hai iniziato ed episodi che puoi continuare.';
+	@override String get spotlightFavorites => 'Dai tuoi preferiti';
+	@override String get spotlightInspired => 'Ispirato dalla tua visione';
+	@override String get spotlightNextUp => 'Il prossimo passo';
 	@override String get title => 'Personalizza la casa';
 	@override String get description => 'Scegli l\'ordine delle righe e la visibilità per questo profilo. Seleziona una riga per spostarla o nasconderla.';
 	@override String get rows => 'Righe domestiche';
+	@override String get progressLayout => 'Continua a guardare e avanti';
+	@override String get progressCombined => 'Combinati in una riga';
+	@override String get progressSeparate => 'Righe separate';
+	@override String get progressDescription => 'Separa Next Up quando supportato dal server. Gli altri server rimangono uniti.';
 	@override String get visible => 'Visibile';
 	@override String get hidden => 'Nascosto';
 	@override String get showRow => 'Mostra riga';
@@ -1818,6 +1865,8 @@ class _Translations$activityStats$it extends Translations$activityStats$en {
 	@override String get trendTitle => 'Guarda il tempo';
 	@override String get trendToday => 'Oggi';
 	@override String gapDetail({required Object stat, required Object range}) => '${stat} su ${range}';
+	@override String get patternsTitle => 'I tuoi modelli';
+	@override String mostlyKind({required Object kind}) => 'Principalmente ${kind}';
 	@override String get weekdayTitle => 'Entro i giorni feriali';
 	@override String get hoursTitle => 'Per ora del giorno';
 	@override String get amLabel => 'AM';
@@ -1830,6 +1879,8 @@ class _Translations$activityStats$it extends Translations$activityStats$en {
 	@override String get kindOther => 'Altro';
 	@override String get topTitlesTitle => 'I più visti';
 	@override String get sessionsTitle => 'Sessioni recenti';
+	@override String get recentViewingTitle => 'Visualizzazione recente';
+	@override String get recentViewingHint => 'Tempo totale guardato nel periodo selezionato. Le date mostrano l\'ultima visualizzazione.';
 	@override String get showMore => 'Mostra di più';
 	@override String get sessionNoTitle => 'Riproduzione non identificata';
 	@override String get emptyTitle => 'Niente qui ancora';
@@ -2262,6 +2313,7 @@ class _Translations$messages$it extends Translations$messages$en {
 	@override String metadataRefreshStarted({required Object title}) => 'Aggiornamento dei metadati avviato per "${title}"';
 	@override String metadataRefreshFailed({required Object error}) => 'Impossibile aggiornare i metadati: ${error}';
 	@override String get logoutConfirm => 'Vuoi uscire dall\'account?';
+	@override String get logoutDeviceConfirm => 'Disconnettersi da Luroka su questo dispositivo? Tutti i profili, inclusi i profili Bambini, gli account server e i contenuti multimediali scaricati verranno rimossi da questo dispositivo. Potrai accedere di nuovo più tardi.';
 	@override String get noSeasonsFound => 'Nessuna stagione trovata';
 	@override String get seasonsLoadFailed => 'Impossibile caricare le stagioni';
 	@override String get noEpisodesFound => 'Nessun episodio trovato nella prima stagione';
@@ -2392,6 +2444,9 @@ class _Translations$profiles$it extends Translations$profiles$en {
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageProfiles => 'Gestisci i profili';
+	@override String get quickAccess => 'Accesso rapido';
+	@override String get signOutDevice => 'Esci da questo dispositivo';
 	@override String get addLurokaProfile => 'Aggiungi il profilo Luroka';
 	@override String get switchingProfile => 'Cambio profilo…';
 	@override String get deleteThisProfileTitle => 'Eliminare questo profilo?';
@@ -2510,7 +2565,7 @@ class _Translations$accountPreferences$it extends Translations$accountPreference
 	@override String hubSubtitleSingle({required Object account}) => 'Opzioni di audio, sottotitoli e libreria salvate su ${account}';
 	@override String hubSubtitleMultiple({required Object count}) => 'Opzioni di audio, sottotitoli e libreria salvate su ${count} account';
 	@override String get pickAccount => 'Ogni account conserva le proprie preferenze. Scegli quale modificare.';
-	@override String get storedOnAccount => 'Queste opzioni vengono salvate sull\'account stesso, quindi ogni app che vi accede le usa — inclusa Luroka sugli altri tuoi dispositivi.';
+	@override String get storedOnAccount => 'Queste opzioni vengono salvate sull\'account del server e condivise da ogni profilo e app Luroka che utilizza tale account, anche su altri dispositivi.';
 	@override String get noAccounts => 'Nessun account da configurare';
 	@override String get noAccountsHint => 'Accedi a Plex oppure connetti un server Jellyfin o Emby: le preferenze salvate su quell\'account appariranno qui.';
 	@override String get unavailable => 'Impossibile raggiungere questo account';
@@ -3700,6 +3755,108 @@ class _Translations$services$it extends Translations$services$en {
 	@override late final _Translations$services$libraryFilter$it libraryFilter = _Translations$services$libraryFilter$it._(_root);
 }
 
+// Path: offlineRecovery
+class _Translations$offlineRecovery$it extends Translations$offlineRecovery$en {
+	_Translations$offlineRecovery$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'I tuoi server sono offline';
+	@override String get description => 'I tuoi download sono ancora disponibili. Prova a riconnetterti quando il tuo server è tornato o aggiungi un altro server.';
+	@override String get appleTvDescription => 'Luroka non è riuscito a raggiungere i tuoi server multimediali. Prova a riconnetterti quando saranno disponibili o aggiungi un altro server per continuare a guardare.';
+	@override String get kidsDescription => 'Non siamo riusciti a raggiungere il tuo server multimediale. Prova a riconnetterti o chiedi aiuto a un genitore.';
+	@override String get retrying => 'Connessione…';
+	@override String get addServer => 'Aggiungi un server';
+}
+
+// Path: releaseUpdates
+class _Translations$releaseUpdates$it extends Translations$releaseUpdates$en {
+	_Translations$releaseUpdates$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get manualInstructions => 'Scarica l\'archivio della versione da GitHub, estrai APK e installalo sul tuo dispositivo Android.';
+	@override String get tvInstructions => 'Apri questo indirizzo sul tuo telefono o computer oppure scansiona il codice QR per scaricare la versione.';
+	@override String get pressBackAgain => 'Premere nuovamente Indietro per uscire dalla riproduzione';
+}
+
+// Path: profileIntegrations
+class _Translations$profileIntegrations$it extends Translations$profileIntegrations$en {
+	_Translations$profileIntegrations$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Rendi tuo Luroka';
+	@override String get description => 'Connetti i tuoi servizi preferiti per tenere traccia di ciò che guardi e richiedere nuovi film e programmi. Ogni profilo Luroka ha le proprie connessioni.';
+	@override String get step => 'Integrazioni facoltative';
+	@override String get examples => 'Trakt · Simkl · AniList · MyAnimeList · Seerr';
+	@override String get connect => 'Esplora le integrazioni';
+	@override String get later => 'Configura più tardi';
+	@override String get manage => 'Gestire le integrazioni';
+	@override String forProfile({required Object name}) => 'Connessioni per ${name}';
+}
+
+// Path: profileSetupGuide
+class _Translations$profileSetupGuide$it extends Translations$profileSetupGuide$en {
+	_Translations$profileSetupGuide$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Rendi tuo il tuo profilo';
+	@override String get description => 'Scegli l\'aspetto e la sensazione di Luroka per questo profilo su questo dispositivo. Puoi modificare tutto in seguito in Impostazioni.';
+	@override String get appearanceStep => '1 di 2 · Aspetto';
+	@override String get homeStep => '2 di 2 · La schermata Home';
+	@override String get preview => 'Anteprima';
+	@override String get previewTitle => 'La tua casa';
+	@override String get previewPoster => 'Manifesto';
+	@override String get posterArtwork => 'Solo opere d\'arte';
+	@override String get posterWithDetails => 'Mostra i dettagli del poster';
+	@override String get musicDescription => 'Riproduci il tema di un film o di un programma mentre la relativa pagina dei dettagli è aperta, se disponibile.';
+	@override String get moreThemes => 'Più temi';
+	@override String get fewerThemes => 'Meno temi';
+	@override String get spotlightHeading => 'Cosa dovrebbe apparire in Spotlight?';
+	@override String get progressHeading => 'Continua a guardare e avanti';
+	@override String get skip => 'Utilizza le impostazioni predefinite e inizia a guardare';
+	@override String get finish => 'Inizia a guardare';
+	@override String get back => 'Indietro';
+	@override String get kContinue => 'Continua';
+	@override String get chooseLater => 'Scegli le librerie in seguito';
+	@override String get libraryScope => 'Ciò modifica ciò che appare in Luroka per questo profilo; non modifica le autorizzazioni del server.';
+	@override String get createdTitle => 'Profilo creato';
+	@override String get createdDescription => 'Il tuo nuovo profilo è pronto. Il suo proprietario può personalizzarlo la prima volta che lo apre.';
+	@override String get switchProfile => 'Passa a questo profilo';
+	@override String get stayHere => 'Rimani sul profilo attuale';
+}
+
+// Path: animeFavorites
+class _Translations$animeFavorites$it extends Translations$animeFavorites$en {
+	_Translations$animeFavorites$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get filter => 'Anime';
+	@override String get manage => 'Gestisci gli anime';
+	@override String get description => 'Il rilevamento automatico utilizza i nomi delle librerie di anime e i tag o gli ID anime disponibili. Scegli le librerie e correggi i singoli preferiti. Le scelte vengono salvate su questo dispositivo per il tuo profilo.';
+	@override String get libraries => 'Biblioteche di anime';
+	@override String get libraryHint => 'Le librerie denominate Anime vengono riconosciute automaticamente. Seleziona una libreria per modificarne la classificazione.';
+	@override String get titles => 'Titoli preferiti';
+	@override String get titleHint => 'Seleziona un titolo per contrassegnarlo come anime o correggere una corrispondenza automatica.';
+	@override String get automatic => 'Automatico';
+	@override String get include => 'Anime';
+	@override String get exclude => 'Non anime';
+	@override String get automaticIncluded => 'Automatico · Anime';
+	@override String get automaticExcluded => 'Automatico · Non anime';
+	@override String get noLibraries => 'Nessuna libreria collegata disponibile.';
+	@override String get noTitles => 'Nessun film o programma preferito disponibile.';
+	@override String get empty => 'Nessun anime preferito trovato. Controlla le tue librerie di anime o contrassegna un titolo come anime.';
+	@override String get saveFailed => 'Impossibile salvare le impostazioni dell\'anime. Per favore riprova.';
+}
+
 // Path: addServer
 class _Translations$addServer$it extends Translations$addServer$en {
 	_Translations$addServer$it._(TranslationsIt root) : this._root = root, super.internal(root);
@@ -3712,7 +3869,7 @@ class _Translations$addServer$it extends Translations$addServer$en {
 	@override String get serverUrlsHelper => 'Sono consentiti più URL, separati da virgole.';
 	@override String get findServer => 'Trova il server';
 	@override String searchingLocalMediaBrowserServers({required Object product}) => 'Ricerca di server ${product} locali...';
-	@override String localMediaBrowserServers({required Object product}) => 'Server ${product} locali';
+	@override String localMediaBrowserServers({required Object product}) => 'Server ${product} salvati e vicini';
 	@override String get username => 'Nome utente';
 	@override String get password => 'Password';
 	@override String get signIn => 'Accedi';
@@ -4788,6 +4945,9 @@ extension on TranslationsIt {
 			'posterDetails.catalogEpisodeInfoDescription' => 'Mostra il numero degli episodi e la durata media sui poster di Scopri.',
 			'posterDetails.title' => 'Dettagli del manifesto',
 			'posterDetails.description' => 'Mostra il titolo, l\'anno e la valutazione IMDb sotto i poster in Studio, Ricerca, Scopri e Biblioteche. Le valutazioni IMDb mancanti rimangono nascoste. Disattiva per i poster contenenti solo opere d\'arte.',
+			'libraryPolish.compactTvNavigation' => 'Navigazione compatta della libreria',
+			'libraryPolish.compactTvNavigationDescription' => 'Mostra le sezioni della libreria e sfoglia le opzioni in un menu a scorrimento, lasciando più spazio ai poster.',
+			'libraryPolish.openLibraryMenu' => 'Apri il menu della libreria',
 			'libraryPolish.posterDetails' => 'Dettagli del manifesto',
 			'libraryPolish.showPosterDetails' => 'Mostra i dettagli del poster · nome, anno e IMDb',
 			'libraryPolish.hidePosterDetails' => 'Nascondi i dettagli del poster',
@@ -5002,6 +5162,8 @@ extension on TranslationsIt {
 			'tvSettingsV2.simpleAudio' => 'Lingue e aspetto dei sottotitoli',
 			'settingsRedesign.themeEffects' => 'Tema ed effetti',
 			'settingsRedesign.libraryLayout' => 'Disposizione della biblioteca',
+			'settingsRedesign.posterInformation' => 'Informazioni sul manifesto',
+			'settingsRedesign.libraryBehavior' => 'Comportamento della biblioteca',
 			'settingsRedesign.appearanceHint' => 'Personalizza l\'aspetto, il layout e il comportamento di Luroka.',
 			'settingsRedesign.livePreview' => 'Anteprima dal vivo',
 			'settingsRedesign.previewHint' => 'Guarda come apparirà la tua libreria con le impostazioni attuali.',
@@ -5103,6 +5265,19 @@ extension on TranslationsIt {
 			'detailComposition.mediaInformation' => 'Informazioni sui media',
 			'detailComposition.fullFileInformation' => 'Informazioni complete sul file',
 			'detailComposition.castAndCrew' => 'Cast e troupe',
+			'kids.timeLimits' => 'Limiti del tempo di utilizzo',
+			'kids.dailyWatchLimit' => 'Orario di visione giornaliero',
+			'kids.dailyWatchLimitHint' => 'Limita la riproduzione video giornaliera su questo dispositivo.',
+			'kids.noTimeLimit' => 'Nessun limite',
+			'kids.minutesLimit' => ({required Object minutes}) => '${minutes} minuti',
+			'kids.bedtime' => 'Ora di andare a dormire',
+			'kids.bedtimeHint' => 'Per usare questo profilo durante questi orari è necessario il PIN genitore.',
+			'kids.bedtimeStart' => 'Inizia l\'ora di andare a dormire',
+			'kids.bedtimeEnd' => 'L\'ora di andare a dormire finisce',
+			'kids.timeLimitReached' => 'Il tempo di visione è finito per oggi',
+			'kids.bedtimeReached' => 'È ora di andare a dormire',
+			'kids.timeLimitParentHint' => 'Chiedi a un genitore di inserire il proprio PIN per continuare con questa sessione.',
+			'kids.parentUnlock' => 'Sblocco genitore',
 			'kids.backupProfile' => 'Eseguire il backup del profilo dei bambini',
 			'kids.backupExplain' => 'Esegui il backup del nome, del carattere, delle restrizioni, dell\'aspetto e delle esclusioni di visualizzazione locale salvati di questo profilo. I PIN genitori, gli accessi al server, i download e l\'avanzamento della riproduzione sul server non sono inclusi.',
 			'kids.saveBackupFile' => 'Salva il file di backup',
@@ -5187,6 +5362,8 @@ extension on TranslationsIt {
 			'kids.blocked' => 'Questo titolo non è disponibile nel profilo di questo bambino.',
 			'kids.switchProfile' => 'Cambia profilo',
 			'kids.manageFromAdult' => 'Passa a un profilo per adulti per gestire le impostazioni.',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => 'Connetti un server al tuo profilo per adulti prima di aggiungere un profilo per bambini.',
 			'kids.created' => 'Profilo bambino creato',
 			'kids.updated' => 'Profilo bambini aggiornato',
@@ -5205,8 +5382,6 @@ extension on TranslationsIt {
 			'lurokaDiscovery.imdbTv100' => 'IMDb I 100 migliori spettacoli · Istantanea di settembre 2026',
 			'lurokaDiscovery.emmyComedy' => 'Emmy · Vincitori della serie comica · 1971–2026',
 			'lurokaDiscovery.emmys' => 'Emmy · Vincitori della serie drammatica · 1966–2026',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.bafta' => 'BAFTA · Vincitori del miglior film',
 			'lurokaDiscovery.cannes' => 'Cannes · Vincitori della Palma d\'Oro',
 			'lurokaDiscovery.awardsNote' => 'Le raccolte di premi includono la storia degli Oscar come miglior film, vincitori di Emmy dramma/commedia e selezioni ampliate di BAFTA/Cannes. I titoli vincenti ripetuti vengono visualizzati una volta. L\'iscrizione utilizza le storie delle categorie di premi e i fatti Wikidata. IMDb I 100 migliori elenchi di film/spettacoli conservano le istantanee delle classifiche di settembre 2026 da mmdju/imdb-top250-api. Vengono visualizzate solo le corrispondenze nelle librerie online visibili; la dimensione della raccolta dipende dalla disponibilità della biblioteca.',
@@ -5599,6 +5774,7 @@ extension on TranslationsIt {
 			'settings.downloadLocationPickerUnavailable' => 'La selezione della cartella non è disponibile su questo dispositivo',
 			'settings.downloadOnWifiOnly' => 'Scarica solo tramite Wi-Fi',
 			'settings.downloadOnWifiOnlyDescription' => 'Impedisci i download quando si utilizza la rete dati cellulare',
+			'settings.downloadWifiScope' => 'Si applica a tutti i profili e ai download su questo dispositivo.',
 			'settings.autoRemoveWatchedDownloads' => 'Rimuovi automaticamente i download visti',
 			'settings.autoRemoveWatchedDownloadsDescription' => 'Elimina automaticamente i download già visti',
 			'settings.cellularDownloadBlocked' => 'I download sono bloccati sulla rete mobile. Usa il Wi-Fi o modifica l\'impostazione.',
@@ -5700,6 +5876,8 @@ extension on TranslationsIt {
 			'settings.languageAndRegion' => 'Lingua e regione',
 			'settings.startup' => 'Avvio',
 			'settings.display' => 'Schermo',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Libreria e schede',
 			'settings.homeScreen' => 'Schermata iniziale',
 			'settings.navigation' => 'Navigazione',
@@ -5719,8 +5897,6 @@ extension on TranslationsIt {
 			'settings.gestureVolumeSwipeDescription' => 'Scorri verso l\'alto o il basso sul bordo destro per regolare il volume',
 			'settings.gesturePinchToZoom' => 'Pizzica per lo zoom',
 			'settings.gesturePinchToZoomDescription' => 'Pizzica il video per ingrandire o ridurre',
-			_ => null,
-		} ?? switch (path) {
 			'settings.rememberBrightnessLevel' => 'Ricorda il livello di luminosità',
 			'settings.rememberBrightnessLevelDescription' => 'Avvia la riproduzione con la luminosità impostata dall\'ultimo scorrimento',
 			'settings.controls' => 'Controlli',
@@ -5860,8 +6036,8 @@ extension on TranslationsIt {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => 'Un\'altra scelta',
 			'dashboard.exploreSeries' => 'Esplora le serie',
-			'dashboard.showFeatured' => 'Dettagli del titolo mirati',
-			'dashboard.showFeaturedDescription' => 'Mostra illustrazione, sinossi e informazioni sull\'episodio per la scheda evidenziata',
+			'dashboard.showFeatured' => 'In evidenza nella Home',
+			'dashboard.showFeaturedDescription' => 'Mostra film e programmi in primo piano nella parte superiore della Home.',
 			'lurokaCatalog.aboutPerson' => 'SOTTO I RIFLETTORI',
 			'lurokaCatalog.biographyUnavailable' => 'Una biografia non è disponibile da questo server.',
 			'lurokaCatalog.filmography' => 'Film e programmi nelle tue raccolte',
@@ -5917,9 +6093,32 @@ extension on TranslationsIt {
 			'customPerformance.frameBudget' => 'Budget per fotogramma',
 			'customPerformance.processMemory' => 'Memoria del processo dell\'app alla fine del campione',
 			'customPerformance.noFrames' => 'Nessun fotogramma renderizzato è stato catturato. Avvia un altro campione e sfoglia l\'app.',
+			'homeLayout.manageStudios' => 'Scegli e ordina gli studi',
+			'homeLayout.manageStudiosDescription' => 'Scegli quali studi visualizzare per questo profilo e organizza il loro ordine.',
+			'homeLayout.studioUnavailable' => 'Solo gli studi trovati nelle librerie selezionate vengono visualizzati nella Home.',
+			'homeLayout.showAllStudios' => 'Mostra tutti gli studi',
+			'homeLayout.hideAllStudios' => 'Nascondi tutti gli studi',
+			'homeLayout.reorderStudio' => 'Cambia l\'ordine dello studio',
+			'homeLayout.episodeThumbnails' => 'Immagini degli episodi in Continua a guardare',
+			'homeLayout.episodeThumbnailsDescription' => 'Mostra le immagini degli episodi invece dei poster delle serie o delle stagioni in Continua a guardare e Successivo.',
+			'homeLayout.spotlightSource' => 'Origine dei contenuti in evidenza',
+			'homeLayout.spotlightSourceDescription' => 'For You utilizza l\'attività di visualizzazione di questo profilo su questo dispositivo, insieme ai preferiti e ai titoli della libreria.',
+			'homeLayout.spotlightForYou' => 'Per te',
+			'homeLayout.spotlightForYouDescription' => 'Un mix di ciò che stai guardando, preferiti, nuove aggiunte e tendenze, utilizzando l\'attività di visualizzazione di questo profilo su questo dispositivo.',
+			'homeLayout.spotlightTrending' => 'Tendenza',
+			'homeLayout.spotlightTrendingDescription' => 'Film e programmi popolari nelle tue raccolte.',
+			'homeLayout.spotlightContinue' => 'Continua a guardare',
+			'homeLayout.spotlightContinueDescription' => 'Titoli che hai iniziato ed episodi che puoi continuare.',
+			'homeLayout.spotlightFavorites' => 'Dai tuoi preferiti',
+			'homeLayout.spotlightInspired' => 'Ispirato dalla tua visione',
+			'homeLayout.spotlightNextUp' => 'Il prossimo passo',
 			'homeLayout.title' => 'Personalizza la casa',
 			'homeLayout.description' => 'Scegli l\'ordine delle righe e la visibilità per questo profilo. Seleziona una riga per spostarla o nasconderla.',
 			'homeLayout.rows' => 'Righe domestiche',
+			'homeLayout.progressLayout' => 'Continua a guardare e avanti',
+			'homeLayout.progressCombined' => 'Combinati in una riga',
+			'homeLayout.progressSeparate' => 'Righe separate',
+			'homeLayout.progressDescription' => 'Separa Next Up quando supportato dal server. Gli altri server rimangono uniti.',
 			'homeLayout.visible' => 'Visibile',
 			'homeLayout.hidden' => 'Nascosto',
 			'homeLayout.showRow' => 'Mostra riga',
@@ -5961,6 +6160,8 @@ extension on TranslationsIt {
 			'activityStats.trendTitle' => 'Guarda il tempo',
 			'activityStats.trendToday' => 'Oggi',
 			'activityStats.gapDetail' => ({required Object stat, required Object range}) => '${stat} su ${range}',
+			'activityStats.patternsTitle' => 'I tuoi modelli',
+			'activityStats.mostlyKind' => ({required Object kind}) => 'Principalmente ${kind}',
 			'activityStats.weekdayTitle' => 'Entro i giorni feriali',
 			'activityStats.hoursTitle' => 'Per ora del giorno',
 			'activityStats.amLabel' => 'AM',
@@ -5973,6 +6174,8 @@ extension on TranslationsIt {
 			'activityStats.kindOther' => 'Altro',
 			'activityStats.topTitlesTitle' => 'I più visti',
 			'activityStats.sessionsTitle' => 'Sessioni recenti',
+			'activityStats.recentViewingTitle' => 'Visualizzazione recente',
+			'activityStats.recentViewingHint' => 'Tempo totale guardato nel periodo selezionato. Le date mostrano l\'ultima visualizzazione.',
 			'activityStats.showMore' => 'Mostra di più',
 			'activityStats.sessionNoTitle' => 'Riproduzione non identificata',
 			'activityStats.emptyTitle' => 'Niente qui ancora',
@@ -6187,6 +6390,8 @@ extension on TranslationsIt {
 			'accessibility.hue' => 'Tonalità',
 			'accessibility.saturation' => 'Saturazione',
 			'accessibility.brightness' => 'Luminosità',
+			_ => null,
+		} ?? switch (path) {
 			'accessibility.hexColor' => 'Colore esadecimale',
 			'accessibility.expandText' => 'Espandi il testo',
 			'accessibility.collapseText' => 'Comprimi il testo',
@@ -6233,8 +6438,6 @@ extension on TranslationsIt {
 			'videoControls.seekBackwardButton' => ({required Object seconds}) => 'Riavvolgi di ${seconds} secondi',
 			'videoControls.seekForwardButton' => ({required Object seconds}) => 'Avanza di ${seconds} secondi',
 			'videoControls.previousButton' => 'Episodio precedente',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.nextButton' => 'Episodio successivo',
 			'videoControls.previousChapterButton' => 'Capitolo precedente',
 			'videoControls.nextChapterButton' => 'Capitolo successivo',
@@ -6336,6 +6539,7 @@ extension on TranslationsIt {
 			'messages.metadataRefreshStarted' => ({required Object title}) => 'Aggiornamento dei metadati avviato per "${title}"',
 			'messages.metadataRefreshFailed' => ({required Object error}) => 'Impossibile aggiornare i metadati: ${error}',
 			'messages.logoutConfirm' => 'Vuoi uscire dall\'account?',
+			'messages.logoutDeviceConfirm' => 'Disconnettersi da Luroka su questo dispositivo? Tutti i profili, inclusi i profili Bambini, gli account server e i contenuti multimediali scaricati verranno rimossi da questo dispositivo. Potrai accedere di nuovo più tardi.',
 			'messages.noSeasonsFound' => 'Nessuna stagione trovata',
 			'messages.seasonsLoadFailed' => 'Impossibile caricare le stagioni',
 			'messages.noEpisodesFound' => 'Nessun episodio trovato nella prima stagione',
@@ -6421,6 +6625,9 @@ extension on TranslationsIt {
 			'mpvConfig.removeLine' => 'Rimuovi riga',
 			'mpvConfig.embeddedVoHint' => 'vo, gpu-context e gpu-api vengono ignorati su Linux: il video incorporato viene sempre renderizzato tramite vo=libmpv sul piano video e gpu-next (che gli shader di calcolo come ArtCNN richiedono) non può essere eseguito in modalità incorporata.',
 			'dialog.confirmAction' => 'Conferma azione',
+			'profiles.manageProfiles' => 'Gestisci i profili',
+			'profiles.quickAccess' => 'Accesso rapido',
+			'profiles.signOutDevice' => 'Esci da questo dispositivo',
 			'profiles.addLurokaProfile' => 'Aggiungi il profilo Luroka',
 			'profiles.switchingProfile' => 'Cambio profilo…',
 			'profiles.deleteThisProfileTitle' => 'Eliminare questo profilo?',
@@ -6512,7 +6719,7 @@ extension on TranslationsIt {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => 'Opzioni di audio, sottotitoli e libreria salvate su ${account}',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => 'Opzioni di audio, sottotitoli e libreria salvate su ${count} account',
 			'accountPreferences.pickAccount' => 'Ogni account conserva le proprie preferenze. Scegli quale modificare.',
-			'accountPreferences.storedOnAccount' => 'Queste opzioni vengono salvate sull\'account stesso, quindi ogni app che vi accede le usa — inclusa Luroka sugli altri tuoi dispositivi.',
+			'accountPreferences.storedOnAccount' => 'Queste opzioni vengono salvate sull\'account del server e condivise da ogni profilo e app Luroka che utilizza tale account, anche su altri dispositivi.',
 			'accountPreferences.noAccounts' => 'Nessun account da configurare',
 			'accountPreferences.noAccountsHint' => 'Accedi a Plex oppure connetti un server Jellyfin o Emby: le preferenze salvate su quell\'account appariranno qui.',
 			'accountPreferences.unavailable' => 'Impossibile raggiungere questo account',
@@ -6697,6 +6904,8 @@ extension on TranslationsIt {
 			'libraries.sortLabels.dateShared' => 'Data di condivisione',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Data di trasmissione dell\'ultimo episodio',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Data di aggiunta dell\'ultimo episodio',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Data di download',
 			'libraries.sortLabels.size' => 'Dimensione',
 			'libraries.sortLabels.library' => 'Libreria',
@@ -6747,8 +6956,6 @@ extension on TranslationsIt {
 			'about.packageLine' => ({required Object package}) => 'Pacchetto: ${package}',
 			'about.localeLine' => ({required Object locale}) => 'Lingua: ${locale}',
 			'about.copyDetails' => 'Copia i dettagli',
-			_ => null,
-		} ?? switch (path) {
 			'about.detailsCopied' => 'Dettagli dell\'app copiati',
 			'about.detailsCopyFailed' => 'Impossibile copiare i dettagli dell\'app',
 			'about.checkForUpdatesDescription' => 'Cerca su GitHub una versione più recente',
@@ -7211,6 +7418,8 @@ extension on TranslationsIt {
 			'watchTogether.offsetPlusSecond' => '+1 secondo',
 			'watchTogether.participants' => 'Partecipanti',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(n, one: 'Partecipante ${n}', other: 'Partecipanti ${n}', ), 
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'HOST',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (Tu)',
 			'watchTogether.playerIdle' => 'Inattivo',
@@ -7261,8 +7470,6 @@ extension on TranslationsIt {
 			'watchTogether.notices.finished' => 'Finito',
 			'watchTogether.notices.hostChangedTo' => ({required Object name}) => '${name} è ora l\'host',
 			'watchTogether.notices.youAreNowHost' => 'Ora sei l\'host',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.joined' => ({required Object name}) => '${name} si è unito',
 			'watchTogether.notices.left' => ({required Object name}) => '${name} se ne è andato',
 			'watchTogether.notices.controlRefused' => 'Solo l\'host può controllare la riproduzione',
@@ -7725,6 +7932,8 @@ extension on TranslationsIt {
 			'seerr.statusPartiallyAvailable' => 'Disponibile in parte',
 			'seerr.statusRequested' => 'Richiesto',
 			'seerr.statusProcessing' => 'In elaborazione',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Nella lista di blocco',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Impossibile raggiungere ${url}: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'Nessuna istanza Seerr all\'indirizzo ${url} (HTTP ${status})',
@@ -7775,8 +7984,6 @@ extension on TranslationsIt {
 			'services.deviceCode.title' => ({required Object service}) => 'Attiva Luroka su ${service}',
 			'services.deviceCode.instructions' => 'Scansiona il codice QR oppure visita l\'indirizzo qui sotto e inserisci questo codice:',
 			'services.deviceCode.openToActivate' => ({required Object service}) => 'Apri ${service} per attivare',
-			_ => null,
-		} ?? switch (path) {
 			'services.deviceCode.copyCode' => 'Copia il codice di attivazione',
 			'services.deviceCode.waitingForAuthorization' => 'In attesa di autorizzazione…',
 			'services.deviceCode.codeCopied' => 'Codice copiato',
@@ -7797,12 +8004,69 @@ extension on TranslationsIt {
 			'services.libraryFilter.modeHintWhitelist' => 'Sincronizza solo le librerie selezionate qui sotto.',
 			'services.libraryFilter.libraries' => 'Librerie',
 			'services.libraryFilter.noLibraries' => 'Nessuna libreria disponibile',
+			'offlineRecovery.title' => 'I tuoi server sono offline',
+			'offlineRecovery.description' => 'I tuoi download sono ancora disponibili. Prova a riconnetterti quando il tuo server è tornato o aggiungi un altro server.',
+			'offlineRecovery.appleTvDescription' => 'Luroka non è riuscito a raggiungere i tuoi server multimediali. Prova a riconnetterti quando saranno disponibili o aggiungi un altro server per continuare a guardare.',
+			'offlineRecovery.kidsDescription' => 'Non siamo riusciti a raggiungere il tuo server multimediale. Prova a riconnetterti o chiedi aiuto a un genitore.',
+			'offlineRecovery.retrying' => 'Connessione…',
+			'offlineRecovery.addServer' => 'Aggiungi un server',
+			'releaseUpdates.manualInstructions' => 'Scarica l\'archivio della versione da GitHub, estrai APK e installalo sul tuo dispositivo Android.',
+			'releaseUpdates.tvInstructions' => 'Apri questo indirizzo sul tuo telefono o computer oppure scansiona il codice QR per scaricare la versione.',
+			'releaseUpdates.pressBackAgain' => 'Premere nuovamente Indietro per uscire dalla riproduzione',
+			'profileIntegrations.title' => 'Rendi tuo Luroka',
+			'profileIntegrations.description' => 'Connetti i tuoi servizi preferiti per tenere traccia di ciò che guardi e richiedere nuovi film e programmi. Ogni profilo Luroka ha le proprie connessioni.',
+			'profileIntegrations.step' => 'Integrazioni facoltative',
+			'profileIntegrations.examples' => 'Trakt · Simkl · AniList · MyAnimeList · Seerr',
+			'profileIntegrations.connect' => 'Esplora le integrazioni',
+			'profileIntegrations.later' => 'Configura più tardi',
+			'profileIntegrations.manage' => 'Gestire le integrazioni',
+			'profileIntegrations.forProfile' => ({required Object name}) => 'Connessioni per ${name}',
+			'profileSetupGuide.title' => 'Rendi tuo il tuo profilo',
+			'profileSetupGuide.description' => 'Scegli l\'aspetto e la sensazione di Luroka per questo profilo su questo dispositivo. Puoi modificare tutto in seguito in Impostazioni.',
+			'profileSetupGuide.appearanceStep' => '1 di 2 · Aspetto',
+			'profileSetupGuide.homeStep' => '2 di 2 · La schermata Home',
+			'profileSetupGuide.preview' => 'Anteprima',
+			'profileSetupGuide.previewTitle' => 'La tua casa',
+			'profileSetupGuide.previewPoster' => 'Manifesto',
+			'profileSetupGuide.posterArtwork' => 'Solo opere d\'arte',
+			'profileSetupGuide.posterWithDetails' => 'Mostra i dettagli del poster',
+			'profileSetupGuide.musicDescription' => 'Riproduci il tema di un film o di un programma mentre la relativa pagina dei dettagli è aperta, se disponibile.',
+			'profileSetupGuide.moreThemes' => 'Più temi',
+			'profileSetupGuide.fewerThemes' => 'Meno temi',
+			'profileSetupGuide.spotlightHeading' => 'Cosa dovrebbe apparire in Spotlight?',
+			'profileSetupGuide.progressHeading' => 'Continua a guardare e avanti',
+			'profileSetupGuide.skip' => 'Utilizza le impostazioni predefinite e inizia a guardare',
+			'profileSetupGuide.finish' => 'Inizia a guardare',
+			'profileSetupGuide.back' => 'Indietro',
+			'profileSetupGuide.kContinue' => 'Continua',
+			'profileSetupGuide.chooseLater' => 'Scegli le librerie in seguito',
+			'profileSetupGuide.libraryScope' => 'Ciò modifica ciò che appare in Luroka per questo profilo; non modifica le autorizzazioni del server.',
+			'profileSetupGuide.createdTitle' => 'Profilo creato',
+			'profileSetupGuide.createdDescription' => 'Il tuo nuovo profilo è pronto. Il suo proprietario può personalizzarlo la prima volta che lo apre.',
+			'profileSetupGuide.switchProfile' => 'Passa a questo profilo',
+			'profileSetupGuide.stayHere' => 'Rimani sul profilo attuale',
+			'animeFavorites.filter' => 'Anime',
+			'animeFavorites.manage' => 'Gestisci gli anime',
+			'animeFavorites.description' => 'Il rilevamento automatico utilizza i nomi delle librerie di anime e i tag o gli ID anime disponibili. Scegli le librerie e correggi i singoli preferiti. Le scelte vengono salvate su questo dispositivo per il tuo profilo.',
+			'animeFavorites.libraries' => 'Biblioteche di anime',
+			'animeFavorites.libraryHint' => 'Le librerie denominate Anime vengono riconosciute automaticamente. Seleziona una libreria per modificarne la classificazione.',
+			'animeFavorites.titles' => 'Titoli preferiti',
+			'animeFavorites.titleHint' => 'Seleziona un titolo per contrassegnarlo come anime o correggere una corrispondenza automatica.',
+			'animeFavorites.automatic' => 'Automatico',
+			'animeFavorites.include' => 'Anime',
+			'animeFavorites.exclude' => 'Non anime',
+			'animeFavorites.automaticIncluded' => 'Automatico · Anime',
+			'animeFavorites.automaticExcluded' => 'Automatico · Non anime',
+			'animeFavorites.noLibraries' => 'Nessuna libreria collegata disponibile.',
+			'animeFavorites.noTitles' => 'Nessun film o programma preferito disponibile.',
+			'animeFavorites.empty' => 'Nessun anime preferito trovato. Controlla le tue librerie di anime o contrassegna un titolo come anime.',
+			'animeFavorites.saveFailed' => 'Impossibile salvare le impostazioni dell\'anime. Per favore riprova.',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => 'Aggiungi server ${product}',
 			'addServer.serverUrls' => 'URL del server',
 			'addServer.serverUrlsHelper' => 'Sono consentiti più URL, separati da virgole.',
 			'addServer.findServer' => 'Trova il server',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => 'Ricerca di server ${product} locali...',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Server ${product} locali',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Server ${product} salvati e vicini',
 			'addServer.username' => 'Nome utente',
 			'addServer.password' => 'Password',
 			'addServer.signIn' => 'Accedi',

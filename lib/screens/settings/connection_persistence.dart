@@ -54,7 +54,9 @@ Future<void> persistAndBindConnection({
   );
 
   if (firstRunProfile != null) {
+    var initializedHome = false;
     try {
+      initializedHome = await storage.initializeNewProfileHome(firstRunProfile.id);
       final activated = await activeProfiles.activate(firstRunProfile);
       if (!activated) {
         throw StateError('The first-run profile could not be activated');
@@ -73,6 +75,13 @@ Future<void> persistAndBindConnection({
         priorConnection: priorConnection,
         priorActiveProfileId: priorActiveProfileId,
       );
+      if (initializedHome) {
+        try {
+          await storage.removeNewProfileHomeIfUnchanged(firstRunProfile.id);
+        } catch (cleanupError, cleanupStack) {
+          appLogger.e('First-run Home preference compensation failed', error: cleanupError, stackTrace: cleanupStack);
+        }
+      }
       Error.throwWithStackTrace(error, stackTrace);
     }
   }

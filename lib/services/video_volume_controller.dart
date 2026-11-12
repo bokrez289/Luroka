@@ -23,7 +23,7 @@ final class VideoVolumeController implements ValueListenable<double> {
     VideoVolumePersistenceWriter? persistVolume,
     this.onUserChange,
   }) : _settings = settings,
-       _persistVolume = persistVolume ?? ((volume) => settings.write(SettingsService.volume, volume)),
+       _persistVolume = persistVolume ?? settings.captureWriter(SettingsService.volume),
        _desiredVolume = ValueNotifier<double>(_clampForSettings(settings, initialVolume)),
        _confirmedVolume = _clampForSettings(settings, initialVolume),
        _preferredVolume = _initialPreferredVolume(settings),

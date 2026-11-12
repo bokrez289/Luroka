@@ -65,9 +65,11 @@
     "manageHint": "管理此設備上的人員、兒童的安全和觀看活動。",
     "people": "人們",
     "peopleCount": {
+      "one": "$n​人",
       "other": "${n}人"
     },
     "kidsCount": {
+      "one": "$n​子",
       "other": "$n 兒童"
     },
     "you": "你",
@@ -115,6 +117,9 @@
     "description": "在 Studio、搜尋、發現和圖書館的海報下方顯示標題、年份和 IMDb 評級。缺少的 IMDb 評級保持隱藏狀態。對於純藝術作品海報請關閉。"
   },
   "libraryPolish": {
+    "compactTvNavigation": "緊湊的圖書館導航",
+    "compactTvNavigationDescription": "在滑出式選單中顯示庫部分和瀏覽選項，為海報留出更多空間。",
+    "openLibraryMenu": "開啟庫選單",
     "posterDetails": "海報詳情",
     "showPosterDetails": "顯示海報詳細資料·姓名、年份和 IMDb",
     "hidePosterDetails": "隱藏海報詳細信息",
@@ -351,6 +356,8 @@
   "settingsRedesign": {
     "themeEffects": "主題和效果",
     "libraryLayout": "圖書館佈局",
+    "posterInformation": "海報訊息",
+    "libraryBehavior": "圖書館行為",
     "appearanceHint": "自訂 Luroka 的外觀、佈局和行為。",
     "livePreview": "即時預覽",
     "previewHint": "查看您的圖書館在目前設定下的外觀。",
@@ -460,6 +467,19 @@
     "castAndCrew": "演職人員"
   },
   "kids": {
+    "timeLimits": "螢幕時間限制",
+    "dailyWatchLimit": "每日觀看時長",
+    "dailyWatchLimitHint": "每天限制該裝置上的影片播放。",
+    "noTimeLimit": "無限制",
+    "minutesLimit": "${minutes} 分鐘",
+    "bedtime": "就寢時間",
+    "bedtimeHint": "需要家長 PIN 才能在這些時間內使用此設定檔。",
+    "bedtimeStart": "就寢時間開始",
+    "bedtimeEnd": "就寢時間結束",
+    "timeLimitReached": "今天的觀看時間已結束",
+    "bedtimeReached": "睡覺時間到了",
+    "timeLimitParentHint": "請家長輸入 PIN，讓此使用者繼續觀看。",
+    "parentUnlock": "家長解鎖",
     "backupProfile": "備份孩子的個人資料",
     "backupExplain": "備份此設定檔的已儲存名稱、字元、限制、外觀和本機檢視排除。不包括家長 PIN、伺服器登入、下載和伺服器播放進度。",
     "saveBackupFile": "儲存備份文件",
@@ -984,6 +1004,7 @@
     "downloadLocationPickerUnavailable": "此裝置無法選擇資料夾",
     "downloadOnWifiOnly": "僅在 Wi-Fi 連線時下載",
     "downloadOnWifiOnlyDescription": "使用行動網路時不會下載",
+    "downloadWifiScope": "適用於此裝置上的所有使用者設定檔與下載。",
     "autoRemoveWatchedDownloads": "自動移除已觀看的下載內容",
     "autoRemoveWatchedDownloadsDescription": "自動刪除已觀看的下載影片",
     "cellularDownloadBlocked": "使用行動網路時無法下載。請改用 Wi-Fi 或變更設定。",
@@ -1267,8 +1288,8 @@
     "episodeLabel": "S${season} · E${episode}",
     "anotherPick": "另一個選擇",
     "exploreSeries": "探索系列",
-    "showFeatured": "重點標題細節",
-    "showFeaturedDescription": "顯示突出顯示的卡片的藝術作品、摘要和劇集訊息"
+    "showFeatured": "主頁聚焦",
+    "showFeaturedDescription": "在主頁頂部顯示精選電影和節目。"
   },
   "lurokaCatalog": {
     "aboutPerson": "在聚光燈下",
@@ -1334,9 +1355,32 @@
     "noFrames": "未捕捉任何渲染幀。啟動另一個範例並瀏覽該應用程式。"
   },
   "homeLayout": {
+    "manageStudios": "選擇並訂購工作室",
+    "manageStudiosDescription": "選擇此設定檔中顯示的工作室，並安排它們的順序。",
+    "studioUnavailable": "只有在您選擇的庫中找到的工作室才會出現在主頁上。",
+    "showAllStudios": "顯示所有工作室",
+    "hideAllStudios": "隱藏所有工作室",
+    "reorderStudio": "更改工作室順序",
+    "episodeThumbnails": "繼續觀看中的劇集影像",
+    "episodeThumbnailsDescription": "在“繼續觀看”和“下一步”中顯示劇集圖像而不是系列或季海報。",
+    "spotlightSource": "精選內容來源",
+    "spotlightSourceDescription": "「為您推薦」使用該個人資料在此裝置上的檢視活動，以及收藏夾和圖書館標題。",
+    "spotlightForYou": "為你",
+    "spotlightForYouDescription": "使用此個人資料在此裝置上的觀看活動，混合您正在觀看的內容、收藏夾、新增內容和趨勢。",
+    "spotlightTrending": "流行趨勢",
+    "spotlightTrendingDescription": "您圖書館中的熱門電影和節目。",
+    "spotlightContinue": "繼續觀看",
+    "spotlightContinueDescription": "您已開始的標題和可以繼續的劇集。",
+    "spotlightFavorites": "從你的最愛",
+    "spotlightInspired": "受到您的觀看啟發",
+    "spotlightNextUp": "接下來",
     "title": "個人化主頁",
     "description": "選擇此設定檔的行順序和可見性。選擇一行以移動或隱藏它。",
     "rows": "主行",
+    "progressLayout": "繼續觀看並下一步",
+    "progressCombined": "組合成一排",
+    "progressSeparate": "單獨的行",
+    "progressDescription": "當伺服器支援時，單獨的下一個。其他伺服器保持合併。",
     "visible": "可見的",
     "hidden": "隱",
     "showRow": "顯示行",
@@ -1376,6 +1420,7 @@
     "consistency": "一致性",
     "currentStreak": "目前連勝",
     "dayCount": {
+      "one": "$n 天",
       "other": "$n 天"
     },
     "longestStreak": "最長連續紀錄",
@@ -1384,6 +1429,8 @@
     "trendTitle": "觀看時間",
     "trendToday": "今天",
     "gapDetail": "$stat 上 $range",
+    "patternsTitle": "你的模式",
+    "mostlyKind": "大部分是$kind",
     "weekdayTitle": "按工作日",
     "hoursTitle": "按一天中的時間",
     "amLabel": "是",
@@ -1396,6 +1443,8 @@
     "kindOther": "其他",
     "topTitlesTitle": "最受關注",
     "sessionsTitle": "最近的會議",
+    "recentViewingTitle": "最近觀看",
+    "recentViewingHint": "所選時間內的總觀看時間。日期顯示最新觀看次數。",
     "showMore": "顯示更多",
     "sessionNoTitle": "不明播放",
     "emptyTitle": "這裡還什麼都沒有",
@@ -1589,12 +1638,15 @@
     "confirmDeleteTarget": "確定要從您的伺服器永久刪除「${title}」嗎？",
     "deleteMultipleWarning": "這將會刪除所有單集及其檔案。",
     "deleteEpisodeCountWarning": {
+      "one": "這將刪除其中的所有 ${n} 劇集及其檔案。",
       "other": "這會刪除其中全部 ${n} 集及其檔案。"
     },
     "deleteMultiPartWarning": {
+      "one": "該專案儲存為 ${n} 文件，該文件將被刪除。",
       "other": "此項目分散儲存於 ${n} 個檔案中，且全部都會被刪除。"
     },
     "deleteSharedFileHeading": {
+      "one": "${n} 其他劇集儲存在同一檔案中，也將被刪除：",
       "other": "另有 ${n} 集儲存在同一檔案中，也會一併被刪除："
     },
     "deleteScopeUnverifiedProbeFailed": "Luroka 無法確認此操作會刪除哪些檔案，因此刪除範圍可能超出上方所列的項目。請取消後重試，或仍要刪除。",
@@ -1757,6 +1809,7 @@
     "markedAsUnwatchedOffline": "已標記為未觀看（將在連線時同步）",
     "autoRemovedWatchedDownload": "已自動移除：${title}",
     "autoRemovedWatchedDownloads": {
+      "one": "自動刪除${n}觀看下載",
       "other": "已自動移除 ${n} 個已觀看的下載內容"
     },
     "removedFromContinueWatching": "已從「繼續觀看」中移除",
@@ -1790,6 +1843,7 @@
     "metadataRefreshStarted": "已開始重新整理「${title}」的中繼資料",
     "metadataRefreshFailed": "無法重新整理中繼資料：${error}",
     "logoutConfirm": "您確定要登出嗎？",
+    "logoutDeviceConfirm": "在此設備上註銷 Luroka 嗎？所有設定文件，包括兒童設定檔、伺服器帳戶和下載的媒體都將從該裝置中刪除。您可以稍後再次登入。",
     "noSeasonsFound": "找不到季數",
     "seasonsLoadFailed": "無法載入季數",
     "noEpisodesFound": "在第一季中找不到單集",
@@ -1885,6 +1939,9 @@
     "confirmAction": "確認操作"
   },
   "profiles": {
+    "manageProfiles": "管理個人資料",
+    "quickAccess": "快速存取",
+    "signOutDevice": "退出該設備",
     "addLurokaProfile": "新增 Luroka 設定文件",
     "switchingProfile": "正在切換使用者設定檔…",
     "deleteThisProfileTitle": "刪除此使用者設定檔？",
@@ -1982,7 +2039,7 @@
     "hubSubtitleSingle": "已在 ${account} 上儲存音訊、字幕與媒體庫選項",
     "hubSubtitleMultiple": "已在 ${count} 個帳戶上儲存音訊、字幕與媒體庫選項",
     "pickAccount": "每個帳戶都會儲存各自的偏好設定。請選擇要編輯的帳戶。",
-    "storedOnAccount": "這些選項會儲存在帳戶本身，因此登入該帳戶的所有應用程式都會使用它們，包括您其他裝置上的 Luroka。",
+    "storedOnAccount": "這些設定儲存在伺服器帳戶中，使用該帳戶的所有 Luroka 使用者設定檔和應用程式都會共用，包括其他裝置上的應用程式。",
     "noAccounts": "沒有可設定的帳戶",
     "noAccountsHint": "登入 Plex，或連線至 Jellyfin 或 Emby 伺服器，儲存在該帳戶上的偏好設定便會顯示在此處。",
     "unavailable": "無法連線至此帳戶",
@@ -2074,6 +2131,7 @@
     "minutesLeft": "剩餘 ${minutes} 分鐘",
     "moreLikeThis": "更多類似內容",
     "titleCount": {
+      "one": "${n} 標題",
       "other": "${n} 部作品"
     },
     "person": {
@@ -2367,6 +2425,7 @@
       "upcoming": "即將上線"
     },
     "episodeCount": {
+      "one": "${n} 劇集",
       "other": "${n} 集"
     },
     "cast": "演員陣容",
@@ -2381,6 +2440,7 @@
     "inTheseLibraries": "在這些媒體庫中",
     "checkingLibrary": "正在檢查您的媒體庫…",
     "libraryCheckFailed": {
+      "one": "無法檢查 ${n} 伺服器",
       "other": "無法檢查 ${n} 台伺服器"
     },
     "emptyTitle": "這裡還沒有任何內容",
@@ -2423,6 +2483,7 @@
       "favorited": "${n} 人收藏",
       "dropRate": "${percent} 的人棄番",
       "comments": {
+        "one": "${n} 評論",
         "other": "${n} 則留言"
       },
       "votes": "${n} 票",
@@ -2504,6 +2565,7 @@
       "ratings": "評分",
       "schedule": "播出時間",
       "recommendedByUsers": {
+        "one": "${n}用戶推薦",
         "other": "${n} 位使用者推薦"
       },
       "recommendedBy": "由 ${who} 推薦",
@@ -2514,6 +2576,7 @@
       "background": "背景介紹"
     },
     "totalResults": {
+      "one": "${n} 結果",
       "other": "${n} 筆結果"
     }
   },
@@ -2671,6 +2734,7 @@
     "addToQueue": "新增至佇列",
     "discNumber": "CD ${n}",
     "trackCount": {
+      "one": "${n}軌道",
       "other": "${n} 首"
     },
     "nowPlaying": "正在播放",
@@ -2773,6 +2837,7 @@
     "offsetPlusSecond": "+1秒",
     "participants": "參與者",
     "participantCount": {
+      "one": "${n} 參與者",
       "other": "${n} 參與者"
     },
     "hostBadge": "主持人",
@@ -3412,13 +3477,80 @@
       "noLibraries": "沒有可用的媒體庫"
     }
   },
+  "offlineRecovery": {
+    "title": "您的伺服器離線",
+    "description": "您的下載仍然可用。當您的伺服器恢復時嘗試重新連接，或新增另一台伺服器。",
+    "appleTvDescription": "Luroka 無法存取您的媒體伺服器。嘗試在可用時重新連接，或新增另一台伺服器以繼續觀看。",
+    "kidsDescription": "我們無法存取您的媒體伺服器。嘗試重新連接，或向家長尋求協助。",
+    "retrying": "正在連線…",
+    "addServer": "新增伺服器"
+  },
+  "releaseUpdates": {
+    "manualInstructions": "從 GitHub 下載發布存檔，解壓縮 APK，並將其安裝在您的 Android 裝置上。",
+    "tvInstructions": "在手機或電腦上開啟此位址，或掃描二維碼下載版本。",
+    "pressBackAgain": "再次按返回退出播放"
+  },
+  "profileIntegrations": {
+    "title": "打造專屬 Luroka",
+    "description": "連接您喜愛的服務，記錄觀看內容並請求新電影和影集。每個 Luroka 使用者設定檔都有自己的連線。",
+    "step": "可選集成",
+    "examples": "Trakt · Simkl · AniList · MyAnimeList · Seerr",
+    "connect": "探索集成",
+    "later": "稍後設定",
+    "manage": "管理集成",
+    "forProfile": "${name} 的連接"
+  },
+  "profileSetupGuide": {
+    "title": "打造專屬使用者設定檔",
+    "description": "為此裝置上的使用者設定檔選擇 Luroka 的外觀和使用方式。您可以稍後在設定中變更。",
+    "appearanceStep": "1 / 2 · 外觀",
+    "homeStep": "2 / 2 · 您的首頁",
+    "preview": "預覽",
+    "previewTitle": "您的首頁",
+    "previewPoster": "海報",
+    "posterArtwork": "僅顯示海報",
+    "posterWithDetails": "顯示海報詳細信息",
+    "musicDescription": "開啟電影或影集詳細資訊頁面時播放主題音樂（如有）。",
+    "moreThemes": "更多主題",
+    "fewerThemes": "收合主題",
+    "spotlightHeading": "精選區域要顯示什麼內容？",
+    "progressHeading": "繼續觀看與接下來觀看",
+    "skip": "使用預設設定並開始觀看",
+    "finish": "開始觀看",
+    "back": "返回",
+    "continue": "繼續",
+    "chooseLater": "稍後選擇媒體庫",
+    "libraryScope": "這只會變更此使用者設定檔在 Luroka 中顯示的內容，不會變更伺服器權限。",
+    "createdTitle": "使用者設定檔已建立",
+    "createdDescription": "新的使用者設定檔已準備就緒，使用者可在首次開啟時進行個人化設定。",
+    "switchProfile": "切換至此使用者設定檔",
+    "stayHere": "留在目前的使用者設定檔"
+  },
+  "animeFavorites": {
+    "filter": "動漫",
+    "manage": "管理動漫",
+    "description": "自動偵測使用動漫庫名稱和可用的動漫標籤或 ID。選擇圖書館並糾正個人最愛。您的個人資料的選擇將保存在此裝置上。",
+    "libraries": "動漫庫",
+    "libraryHint": "名為 Anime 的庫會自動辨識。選擇一個庫以更改其分類。",
+    "titles": "最喜歡的標題",
+    "titleHint": "選擇一個標題將其標記為動漫或更正自動匹配。",
+    "automatic": "自動",
+    "include": "動漫",
+    "exclude": "不是動漫",
+    "automaticIncluded": "自動·動漫",
+    "automaticExcluded": "自動 · 非動漫",
+    "noLibraries": "沒有可用的連線庫。",
+    "noTitles": "沒有最喜歡的電影或節目。",
+    "empty": "沒有找到最喜歡的動漫。檢查您的動漫庫或將標題標記為動漫。",
+    "saveFailed": "無法儲存您的動漫設定。請再試一次。"
+  },
   "addServer": {
     "addMediaBrowserTitle": "新增 ${product} 伺服器",
     "serverUrls": "伺服器 URL",
     "serverUrlsHelper": "可輸入多個連線網址，以逗號區隔。",
     "findServer": "尋找伺服器",
     "searchingLocalMediaBrowserServers": "正在尋找本機的 ${product} 伺服器…",
-    "localMediaBrowserServers": "本機的 ${product} 伺服器",
+    "localMediaBrowserServers": "已儲存和附近的 ${product} 伺服器",
     "username": "使用者名稱",
     "password": "密碼",
     "signIn": "登入",

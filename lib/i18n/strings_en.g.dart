@@ -141,6 +141,8 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$offlineRecovery$en offlineRecovery = Translations$offlineRecovery$en.internal(_root);
 	late final Translations$releaseUpdates$en releaseUpdates = Translations$releaseUpdates$en.internal(_root);
 	late final Translations$profileIntegrations$en profileIntegrations = Translations$profileIntegrations$en.internal(_root);
+	late final Translations$profileSetupGuide$en profileSetupGuide = Translations$profileSetupGuide$en.internal(_root);
+	late final Translations$animeFavorites$en animeFavorites = Translations$animeFavorites$en.internal(_root);
 	late final Translations$addServer$en addServer = Translations$addServer$en.internal(_root);
 }
 
@@ -514,6 +516,15 @@ class Translations$libraryPolish$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Compact library navigation'
+	String get compactTvNavigation => 'Compact library navigation';
+
+	/// en: 'Show library sections and browse options in a slide-out menu, leaving more room for posters.'
+	String get compactTvNavigationDescription => 'Show library sections and browse options in a slide-out menu, leaving more room for posters.';
+
+	/// en: 'Open library menu'
+	String get openLibraryMenu => 'Open library menu';
 
 	/// en: 'Poster details'
 	String get posterDetails => 'Poster details';
@@ -1255,6 +1266,12 @@ class Translations$settingsRedesign$en {
 
 	/// en: 'Library Layout'
 	String get libraryLayout => 'Library Layout';
+
+	/// en: 'Poster information'
+	String get posterInformation => 'Poster information';
+
+	/// en: 'Library behavior'
+	String get libraryBehavior => 'Library behavior';
 
 	/// en: 'Customize the look, layout and behavior of Luroka.'
 	String get appearanceHint => 'Customize the look, layout and behavior of Luroka.';
@@ -3061,6 +3078,9 @@ class Translations$settings$en {
 	/// en: 'Prevent downloads when on cellular data'
 	String get downloadOnWifiOnlyDescription => 'Prevent downloads when on cellular data';
 
+	/// en: 'Applies to all profiles and downloads on this device.'
+	String get downloadWifiScope => 'Applies to all profiles and downloads on this device.';
+
 	/// en: 'Auto-remove watched downloads'
 	String get autoRemoveWatchedDownloads => 'Auto-remove watched downloads';
 
@@ -3893,11 +3913,11 @@ class Translations$dashboard$en {
 	/// en: 'Explore series'
 	String get exploreSeries => 'Explore series';
 
-	/// en: 'Focused title details'
-	String get showFeatured => 'Focused title details';
+	/// en: 'Home Spotlight'
+	String get showFeatured => 'Home Spotlight';
 
-	/// en: 'Show artwork, synopsis and episode information for the highlighted card'
-	String get showFeaturedDescription => 'Show artwork, synopsis and episode information for the highlighted card';
+	/// en: 'Show featured movies and shows at the top of Home.'
+	String get showFeaturedDescription => 'Show featured movies and shows at the top of Home.';
 }
 
 // Path: lurokaCatalog
@@ -4109,6 +4129,63 @@ class Translations$homeLayout$en {
 
 	// Translations
 
+	/// en: 'Choose and order studios'
+	String get manageStudios => 'Choose and order studios';
+
+	/// en: 'Choose which studios appear for this profile, and arrange their order.'
+	String get manageStudiosDescription => 'Choose which studios appear for this profile, and arrange their order.';
+
+	/// en: 'Only studios found in your selected libraries appear on Home.'
+	String get studioUnavailable => 'Only studios found in your selected libraries appear on Home.';
+
+	/// en: 'Show all studios'
+	String get showAllStudios => 'Show all studios';
+
+	/// en: 'Hide all studios'
+	String get hideAllStudios => 'Hide all studios';
+
+	/// en: 'Change studio order'
+	String get reorderStudio => 'Change studio order';
+
+	/// en: 'Episode images in Continue Watching'
+	String get episodeThumbnails => 'Episode images in Continue Watching';
+
+	/// en: 'Show episode images instead of series or season posters in Continue Watching and Next Up.'
+	String get episodeThumbnailsDescription => 'Show episode images instead of series or season posters in Continue Watching and Next Up.';
+
+	/// en: 'Spotlight source'
+	String get spotlightSource => 'Spotlight source';
+
+	/// en: 'For You uses this profile’s viewing activity on this device, together with favorites and library titles.'
+	String get spotlightSourceDescription => 'For You uses this profile’s viewing activity on this device, together with favorites and library titles.';
+
+	/// en: 'For You'
+	String get spotlightForYou => 'For You';
+
+	/// en: 'A mix of what you’re watching, favorites, new additions and trends, using this profile’s viewing activity on this device.'
+	String get spotlightForYouDescription => 'A mix of what you’re watching, favorites, new additions and trends, using this profile’s viewing activity on this device.';
+
+	/// en: 'Trending'
+	String get spotlightTrending => 'Trending';
+
+	/// en: 'Popular movies and shows in your libraries.'
+	String get spotlightTrendingDescription => 'Popular movies and shows in your libraries.';
+
+	/// en: 'Continue Watching'
+	String get spotlightContinue => 'Continue Watching';
+
+	/// en: 'Titles you’ve started and episodes you can continue.'
+	String get spotlightContinueDescription => 'Titles you’ve started and episodes you can continue.';
+
+	/// en: 'From your favorites'
+	String get spotlightFavorites => 'From your favorites';
+
+	/// en: 'Inspired by your viewing'
+	String get spotlightInspired => 'Inspired by your viewing';
+
+	/// en: 'Next up'
+	String get spotlightNextUp => 'Next up';
+
 	/// en: 'Personalize Home'
 	String get title => 'Personalize Home';
 
@@ -4117,6 +4194,18 @@ class Translations$homeLayout$en {
 
 	/// en: 'Home rows'
 	String get rows => 'Home rows';
+
+	/// en: 'Continue Watching and Next Up'
+	String get progressLayout => 'Continue Watching and Next Up';
+
+	/// en: 'Combined in one row'
+	String get progressCombined => 'Combined in one row';
+
+	/// en: 'Separate rows'
+	String get progressSeparate => 'Separate rows';
+
+	/// en: 'Separate Next Up when supported by the server. Other servers stay combined.'
+	String get progressDescription => 'Separate Next Up when supported by the server. Other servers stay combined.';
 
 	/// en: 'Visible'
 	String get visible => 'Visible';
@@ -4304,6 +4393,12 @@ class Translations$activityStats$en {
 	/// en: 'Recent sessions'
 	String get sessionsTitle => 'Recent sessions';
 
+	/// en: 'Recent viewing'
+	String get recentViewingTitle => 'Recent viewing';
+
+	/// en: 'Total time watched in the selected period. Dates show the latest viewing.'
+	String get recentViewingHint => 'Total time watched in the selected period. Dates show the latest viewing.';
+
 	/// en: 'Show more'
 	String get showMore => 'Show more';
 
@@ -4318,6 +4413,90 @@ class Translations$activityStats$en {
 
 	/// en: 'No playback recorded in this period.'
 	String get noDataInPeriod => 'No playback recorded in this period.';
+
+	/// en: 'Overview'
+	String get overview => 'Overview';
+
+	/// en: 'History'
+	String get history => 'History';
+
+	/// en: 'Patterns'
+	String get patternsTab => 'Patterns';
+
+	/// en: 'Activity is just getting started. Viewing patterns will appear after a few active days.'
+	String get gettingStarted => 'Activity is just getting started. Viewing patterns will appear after a few active days.';
+
+	/// en: 'Monthly recap'
+	String get monthlyRecap => 'Monthly recap';
+
+	/// en: 'Time reflects recorded playback, not titles completed.'
+	String get measurementHint => 'Time reflects recorded playback, not titles completed.';
+
+	/// en: 'Activity comes from this profile’s local Luroka playback ledger. Server watch history and playback in other apps are not included.'
+	String get ledgerScope => 'Activity comes from this profile’s local Luroka playback ledger. Server watch history and playback in other apps are not included.';
+
+	/// en: 'Watched this period'
+	String get watchedPeriod => 'Watched this period';
+
+	/// en: 'Active days'
+	String get activeDays => 'Active days';
+
+	/// en: 'Daily average'
+	String get dailyAverage => 'Daily average';
+
+	/// en: 'Previous period'
+	String get previousPeriod => 'Previous period';
+
+	/// en: 'Not enough history'
+	String get insufficientHistory => 'Not enough history';
+
+	/// en: 'View activity for these dates'
+	String get drillDown => 'View activity for these dates';
+
+	/// en: 'Search viewing history'
+	String get searchHistory => 'Search viewing history';
+
+	/// en: 'All'
+	String get allKinds => 'All';
+
+	/// en: 'Movies'
+	String get moviesFilter => 'Movies';
+
+	/// en: 'Episodes'
+	String get episodesFilter => 'Episodes';
+
+	/// en: 'Dates'
+	String get datesFilter => 'Dates';
+
+	/// en: 'Clear dates'
+	String get clearDates => 'Clear dates';
+
+	/// en: 'No viewing matches these filters.'
+	String get noMatches => 'No viewing matches these filters.';
+
+	/// en: 'View all history'
+	String get allHistory => 'View all history';
+
+	/// en: 'Could not load history. Please try again.'
+	String get historyError => 'Could not load history. Please try again.';
+
+	/// en: '${count} titles played · episodes counted separately'
+	String titlesPlayed({required Object count}) => '${count} titles played · episodes counted separately';
+
+	/// en: '${duration} watched this month'
+	String monthWatched({required Object duration}) => '${duration} watched this month';
+
+	/// en: 'All time: ${total} · Daily average: ${average}'
+	String lifetimeSummary({required Object total, required Object average}) => 'All time: ${total} · Daily average: ${average}';
+
+	/// en: 'Scale: 0 – ${duration}'
+	String chartScale({required Object duration}) => 'Scale: 0 – ${duration}';
+
+	/// en: 'Titles played'
+	String get titlesPlayedLabel => 'Titles played';
+
+	/// en: 'Episodes count separately. Playback time does not indicate completion.'
+	String get playedHint => 'Episodes count separately. Playback time does not indicate completion.';
 }
 
 // Path: search
@@ -5697,6 +5876,15 @@ class Translations$profiles$en {
 
 	// Translations
 
+	/// en: 'Manage profiles'
+	String get manageProfiles => 'Manage profiles';
+
+	/// en: 'Quick access'
+	String get quickAccess => 'Quick access';
+
+	/// en: 'Sign out of this device'
+	String get signOutDevice => 'Sign out of this device';
+
 	/// en: 'Add Luroka profile'
 	String get addLurokaProfile => 'Add Luroka profile';
 
@@ -5997,8 +6185,8 @@ class Translations$accountPreferences$en {
 	/// en: 'Every account stores its own preferences. Pick the one to edit.'
 	String get pickAccount => 'Every account stores its own preferences. Pick the one to edit.';
 
-	/// en: 'These options are saved on the account itself, so every app signed in to it uses them — including Luroka on your other devices.'
-	String get storedOnAccount => 'These options are saved on the account itself, so every app signed in to it uses them — including Luroka on your other devices.';
+	/// en: 'These options are saved on the server account and shared by every Luroka profile and app using that account, including on other devices.'
+	String get storedOnAccount => 'These options are saved on the server account and shared by every Luroka profile and app using that account, including on other devices.';
 
 	/// en: 'No accounts to configure'
 	String get noAccounts => 'No accounts to configure';
@@ -9040,6 +9228,144 @@ class Translations$profileIntegrations$en {
 	String forProfile({required Object name}) => 'Connections for ${name}';
 }
 
+// Path: profileSetupGuide
+class Translations$profileSetupGuide$en {
+	Translations$profileSetupGuide$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Make your profile yours'
+	String get title => 'Make your profile yours';
+
+	/// en: 'Choose how Luroka looks and feels for this profile on this device. You can change everything later in Settings.'
+	String get description => 'Choose how Luroka looks and feels for this profile on this device. You can change everything later in Settings.';
+
+	/// en: '1 of 2 · Look and feel'
+	String get appearanceStep => '1 of 2 · Look and feel';
+
+	/// en: '2 of 2 · Your Home screen'
+	String get homeStep => '2 of 2 · Your Home screen';
+
+	/// en: 'Preview'
+	String get preview => 'Preview';
+
+	/// en: 'Your Home'
+	String get previewTitle => 'Your Home';
+
+	/// en: 'Poster'
+	String get previewPoster => 'Poster';
+
+	/// en: 'Artwork only'
+	String get posterArtwork => 'Artwork only';
+
+	/// en: 'Show poster details'
+	String get posterWithDetails => 'Show poster details';
+
+	/// en: 'Play a movie or show’s theme while its details page is open, when available.'
+	String get musicDescription => 'Play a movie or show’s theme while its details page is open, when available.';
+
+	/// en: 'More themes'
+	String get moreThemes => 'More themes';
+
+	/// en: 'Fewer themes'
+	String get fewerThemes => 'Fewer themes';
+
+	/// en: 'What should appear in Spotlight?'
+	String get spotlightHeading => 'What should appear in Spotlight?';
+
+	/// en: 'Continue Watching and Next Up'
+	String get progressHeading => 'Continue Watching and Next Up';
+
+	/// en: 'Use defaults and start watching'
+	String get skip => 'Use defaults and start watching';
+
+	/// en: 'Start watching'
+	String get finish => 'Start watching';
+
+	/// en: 'Back'
+	String get back => 'Back';
+
+	/// en: 'Continue'
+	String get kContinue => 'Continue';
+
+	/// en: 'Choose libraries later'
+	String get chooseLater => 'Choose libraries later';
+
+	/// en: 'This changes what appears in Luroka for this profile; it does not change server permissions.'
+	String get libraryScope => 'This changes what appears in Luroka for this profile; it does not change server permissions.';
+
+	/// en: 'Profile created'
+	String get createdTitle => 'Profile created';
+
+	/// en: 'Your new profile is ready. Its owner can personalize it the first time they open it.'
+	String get createdDescription => 'Your new profile is ready. Its owner can personalize it the first time they open it.';
+
+	/// en: 'Switch to this profile'
+	String get switchProfile => 'Switch to this profile';
+
+	/// en: 'Stay on current profile'
+	String get stayHere => 'Stay on current profile';
+}
+
+// Path: animeFavorites
+class Translations$animeFavorites$en {
+	Translations$animeFavorites$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Anime'
+	String get filter => 'Anime';
+
+	/// en: 'Manage anime'
+	String get manage => 'Manage anime';
+
+	/// en: 'Automatic detection uses anime library names and available anime tags or IDs. Choose libraries and correct individual favorites. Choices are saved on this device for your profile.'
+	String get description => 'Automatic detection uses anime library names and available anime tags or IDs. Choose libraries and correct individual favorites. Choices are saved on this device for your profile.';
+
+	/// en: 'Anime libraries'
+	String get libraries => 'Anime libraries';
+
+	/// en: 'Libraries named Anime are recognized automatically. Select a library to change its classification.'
+	String get libraryHint => 'Libraries named Anime are recognized automatically. Select a library to change its classification.';
+
+	/// en: 'Favorite titles'
+	String get titles => 'Favorite titles';
+
+	/// en: 'Select a title to mark it as anime or correct an automatic match.'
+	String get titleHint => 'Select a title to mark it as anime or correct an automatic match.';
+
+	/// en: 'Automatic'
+	String get automatic => 'Automatic';
+
+	/// en: 'Anime'
+	String get include => 'Anime';
+
+	/// en: 'Not anime'
+	String get exclude => 'Not anime';
+
+	/// en: 'Automatic · Anime'
+	String get automaticIncluded => 'Automatic · Anime';
+
+	/// en: 'Automatic · Not anime'
+	String get automaticExcluded => 'Automatic · Not anime';
+
+	/// en: 'No connected libraries available.'
+	String get noLibraries => 'No connected libraries available.';
+
+	/// en: 'No favorite movies or shows available.'
+	String get noTitles => 'No favorite movies or shows available.';
+
+	/// en: 'No anime favorites found. Check your anime libraries or mark a title as anime.'
+	String get empty => 'No anime favorites found. Check your anime libraries or mark a title as anime.';
+
+	/// en: 'Couldn't save your anime settings. Please try again.'
+	String get saveFailed => 'Couldn\'t save your anime settings. Please try again.';
+}
+
 // Path: addServer
 class Translations$addServer$en {
 	Translations$addServer$en.internal(this._root);
@@ -9063,8 +9389,8 @@ class Translations$addServer$en {
 	/// en: 'Looking for local ${product} servers...'
 	String searchingLocalMediaBrowserServers({required Object product}) => 'Looking for local ${product} servers...';
 
-	/// en: 'Local ${product} servers'
-	String localMediaBrowserServers({required Object product}) => 'Local ${product} servers';
+	/// en: 'Saved and nearby ${product} servers'
+	String localMediaBrowserServers({required Object product}) => 'Saved and nearby ${product} servers';
 
 	/// en: 'Username'
 	String get username => 'Username';
@@ -11222,6 +11548,9 @@ extension on Translations {
 			'posterDetails.catalogEpisodeInfoDescription' => 'Show episode counts and average duration on Discover posters.',
 			'posterDetails.title' => 'Poster details',
 			'posterDetails.description' => 'Show the title, year and IMDb rating beneath posters across Studio, Search, Discover and Libraries. Missing IMDb ratings stay hidden. Turn off for artwork-only posters.',
+			'libraryPolish.compactTvNavigation' => 'Compact library navigation',
+			'libraryPolish.compactTvNavigationDescription' => 'Show library sections and browse options in a slide-out menu, leaving more room for posters.',
+			'libraryPolish.openLibraryMenu' => 'Open library menu',
 			'libraryPolish.posterDetails' => 'Poster details',
 			'libraryPolish.showPosterDetails' => 'Show poster details · name, year & IMDb',
 			'libraryPolish.hidePosterDetails' => 'Hide poster details',
@@ -11436,6 +11765,8 @@ extension on Translations {
 			'tvSettingsV2.simpleAudio' => 'Languages & subtitle appearance',
 			'settingsRedesign.themeEffects' => 'Theme & Effects',
 			'settingsRedesign.libraryLayout' => 'Library Layout',
+			'settingsRedesign.posterInformation' => 'Poster information',
+			'settingsRedesign.libraryBehavior' => 'Library behavior',
 			'settingsRedesign.appearanceHint' => 'Customize the look, layout and behavior of Luroka.',
 			'settingsRedesign.livePreview' => 'Live Preview',
 			'settingsRedesign.previewHint' => 'See how your library will look with the current settings.',
@@ -11634,13 +11965,13 @@ extension on Translations {
 			'kids.blocked' => 'This title is not available in this kids profile.',
 			'kids.switchProfile' => 'Switch profile',
 			'kids.manageFromAdult' => 'Switch to an adult profile to manage settings.',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => 'Connect a server to your adult profile before adding a kids profile.',
 			'kids.created' => 'Kids profile created',
 			'kids.updated' => 'Kids profile updated',
 			'kids.saveFailed' => 'Could not save parental controls. Please try again.',
 			'kids.kidsBadge' => 'Kids',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.title' => 'Discover',
 			'lurokaDiscovery.chooseLibraryHint' => 'Choose a library to explore',
 			'lurokaDiscovery.chooseCopyHint' => 'Available in multiple libraries. Choose your preferred copy.',
@@ -12046,6 +12377,7 @@ extension on Translations {
 			'settings.downloadLocationPickerUnavailable' => 'Folder selection is not available on this device',
 			'settings.downloadOnWifiOnly' => 'Download on Wi-Fi only',
 			'settings.downloadOnWifiOnlyDescription' => 'Prevent downloads when on cellular data',
+			'settings.downloadWifiScope' => 'Applies to all profiles and downloads on this device.',
 			'settings.autoRemoveWatchedDownloads' => 'Auto-remove watched downloads',
 			'settings.autoRemoveWatchedDownloadsDescription' => 'Delete watched downloads automatically',
 			'settings.cellularDownloadBlocked' => 'Downloads are blocked on cellular. Use Wi-Fi or change the setting.',
@@ -12147,14 +12479,14 @@ extension on Translations {
 			'settings.languageAndRegion' => 'Language & Region',
 			'settings.startup' => 'Startup',
 			'settings.display' => 'Display',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Library & Cards',
 			'settings.homeScreen' => 'Home Screen',
 			'settings.navigation' => 'Navigation',
 			'settings.window' => 'Window',
 			'settings.liveTv' => 'Live TV',
 			'settings.player' => 'Player',
-			_ => null,
-		} ?? switch (path) {
 			'settings.videoAndDisplay' => 'Video & Display',
 			'settings.audio' => 'Audio',
 			'settings.quality' => 'Quality',
@@ -12307,8 +12639,8 @@ extension on Translations {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => 'Another pick',
 			'dashboard.exploreSeries' => 'Explore series',
-			'dashboard.showFeatured' => 'Focused title details',
-			'dashboard.showFeaturedDescription' => 'Show artwork, synopsis and episode information for the highlighted card',
+			'dashboard.showFeatured' => 'Home Spotlight',
+			'dashboard.showFeaturedDescription' => 'Show featured movies and shows at the top of Home.',
 			'lurokaCatalog.aboutPerson' => 'IN THE SPOTLIGHT',
 			'lurokaCatalog.biographyUnavailable' => 'A biography is not available from this server.',
 			'lurokaCatalog.filmography' => 'Movies & shows in your libraries',
@@ -12364,9 +12696,32 @@ extension on Translations {
 			'customPerformance.frameBudget' => 'Per-frame budget',
 			'customPerformance.processMemory' => 'App process memory at sample end',
 			'customPerformance.noFrames' => 'No rendered frames were captured. Start another sample and browse the app.',
+			'homeLayout.manageStudios' => 'Choose and order studios',
+			'homeLayout.manageStudiosDescription' => 'Choose which studios appear for this profile, and arrange their order.',
+			'homeLayout.studioUnavailable' => 'Only studios found in your selected libraries appear on Home.',
+			'homeLayout.showAllStudios' => 'Show all studios',
+			'homeLayout.hideAllStudios' => 'Hide all studios',
+			'homeLayout.reorderStudio' => 'Change studio order',
+			'homeLayout.episodeThumbnails' => 'Episode images in Continue Watching',
+			'homeLayout.episodeThumbnailsDescription' => 'Show episode images instead of series or season posters in Continue Watching and Next Up.',
+			'homeLayout.spotlightSource' => 'Spotlight source',
+			'homeLayout.spotlightSourceDescription' => 'For You uses this profile’s viewing activity on this device, together with favorites and library titles.',
+			'homeLayout.spotlightForYou' => 'For You',
+			'homeLayout.spotlightForYouDescription' => 'A mix of what you’re watching, favorites, new additions and trends, using this profile’s viewing activity on this device.',
+			'homeLayout.spotlightTrending' => 'Trending',
+			'homeLayout.spotlightTrendingDescription' => 'Popular movies and shows in your libraries.',
+			'homeLayout.spotlightContinue' => 'Continue Watching',
+			'homeLayout.spotlightContinueDescription' => 'Titles you’ve started and episodes you can continue.',
+			'homeLayout.spotlightFavorites' => 'From your favorites',
+			'homeLayout.spotlightInspired' => 'Inspired by your viewing',
+			'homeLayout.spotlightNextUp' => 'Next up',
 			'homeLayout.title' => 'Personalize Home',
 			'homeLayout.description' => 'Choose the row order and visibility for this profile. Select a row to move or hide it.',
 			'homeLayout.rows' => 'Home rows',
+			'homeLayout.progressLayout' => 'Continue Watching and Next Up',
+			'homeLayout.progressCombined' => 'Combined in one row',
+			'homeLayout.progressSeparate' => 'Separate rows',
+			'homeLayout.progressDescription' => 'Separate Next Up when supported by the server. Other servers stay combined.',
 			'homeLayout.visible' => 'Visible',
 			'homeLayout.hidden' => 'Hidden',
 			'homeLayout.showRow' => 'Show row',
@@ -12422,11 +12777,41 @@ extension on Translations {
 			'activityStats.kindOther' => 'Other',
 			'activityStats.topTitlesTitle' => 'Most watched',
 			'activityStats.sessionsTitle' => 'Recent sessions',
+			'activityStats.recentViewingTitle' => 'Recent viewing',
+			'activityStats.recentViewingHint' => 'Total time watched in the selected period. Dates show the latest viewing.',
 			'activityStats.showMore' => 'Show more',
 			'activityStats.sessionNoTitle' => 'Unidentified playback',
 			'activityStats.emptyTitle' => 'Nothing here yet',
 			'activityStats.emptyBody' => 'Watch something and your statistics will build up here.',
 			'activityStats.noDataInPeriod' => 'No playback recorded in this period.',
+			'activityStats.overview' => 'Overview',
+			'activityStats.history' => 'History',
+			'activityStats.patternsTab' => 'Patterns',
+			'activityStats.gettingStarted' => 'Activity is just getting started. Viewing patterns will appear after a few active days.',
+			'activityStats.monthlyRecap' => 'Monthly recap',
+			'activityStats.measurementHint' => 'Time reflects recorded playback, not titles completed.',
+			'activityStats.ledgerScope' => 'Activity comes from this profile’s local Luroka playback ledger. Server watch history and playback in other apps are not included.',
+			'activityStats.watchedPeriod' => 'Watched this period',
+			'activityStats.activeDays' => 'Active days',
+			'activityStats.dailyAverage' => 'Daily average',
+			'activityStats.previousPeriod' => 'Previous period',
+			'activityStats.insufficientHistory' => 'Not enough history',
+			'activityStats.drillDown' => 'View activity for these dates',
+			'activityStats.searchHistory' => 'Search viewing history',
+			'activityStats.allKinds' => 'All',
+			'activityStats.moviesFilter' => 'Movies',
+			'activityStats.episodesFilter' => 'Episodes',
+			'activityStats.datesFilter' => 'Dates',
+			'activityStats.clearDates' => 'Clear dates',
+			'activityStats.noMatches' => 'No viewing matches these filters.',
+			'activityStats.allHistory' => 'View all history',
+			'activityStats.historyError' => 'Could not load history. Please try again.',
+			'activityStats.titlesPlayed' => ({required Object count}) => '${count} titles played · episodes counted separately',
+			'activityStats.monthWatched' => ({required Object duration}) => '${duration} watched this month',
+			'activityStats.lifetimeSummary' => ({required Object total, required Object average}) => 'All time: ${total} · Daily average: ${average}',
+			'activityStats.chartScale' => ({required Object duration}) => 'Scale: 0 – ${duration}',
+			'activityStats.titlesPlayedLabel' => 'Titles played',
+			'activityStats.playedHint' => 'Episodes count separately. Playback time does not indicate completion.',
 			'search.hint' => 'Search movies, shows, music...',
 			'search.tryDifferentTerm' => 'Try a different search term',
 			'search.searchYourMedia' => 'Search your media',
@@ -12608,6 +12993,8 @@ extension on Translations {
 			'mediaMenu.deleteMultiPartWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'This item is stored as ${n} file, which will be deleted.', other: 'This item is stored across ${n} files, and all of them will be deleted.', ), 
 			'mediaMenu.deleteSharedFileHeading' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} other episode is stored in the same file and will be deleted too:', other: '${n} other episodes are stored in the same file and will be deleted too:', ), 
 			'mediaMenu.deleteScopeUnverifiedProbeFailed' => 'Luroka could not check which files this will remove, so it may delete more than the item named above. Cancel and try again, or delete anyway.',
+			_ => null,
+		} ?? switch (path) {
 			'mediaMenu.deleteScopeUnverifiedNoFileInfo' => 'Your server did not provide file details for this item, so Luroka cannot check which files this will remove. It may delete more than the item named above.',
 			'mediaMenu.mediaDeletedSuccessfully' => 'Media item deleted successfully',
 			'mediaMenu.mediaFailedToDelete' => 'Failed to delete media item',
@@ -12667,8 +13054,6 @@ extension on Translations {
 			'videoControls.sleepTimerStopAtHeader' => 'Stop at',
 			'videoControls.sleepTimerDurationHeader' => 'Timer',
 			'videoControls.playbackWillPauseAtEnd' => 'Playback will pause at the end of this video',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.stillWatching' => 'Still watching?',
 			'videoControls.pausingIn' => ({required Object seconds}) => 'Pausing in ${seconds}s',
 			'videoControls.continueWatching' => 'Continue',
@@ -12871,6 +13256,9 @@ extension on Translations {
 			'mpvConfig.removeLine' => 'Remove line',
 			'mpvConfig.embeddedVoHint' => 'vo, gpu-context and gpu-api are ignored on Linux: embedded video always renders through vo=libmpv on the video plane, and gpu-next (which compute shaders like ArtCNN need) cannot run embedded.',
 			'dialog.confirmAction' => 'Confirm Action',
+			'profiles.manageProfiles' => 'Manage profiles',
+			'profiles.quickAccess' => 'Quick access',
+			'profiles.signOutDevice' => 'Sign out of this device',
 			'profiles.addLurokaProfile' => 'Add Luroka profile',
 			'profiles.switchingProfile' => 'Switching profile…',
 			'profiles.deleteThisProfileTitle' => 'Delete this profile?',
@@ -12962,7 +13350,7 @@ extension on Translations {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => 'Audio, subtitle and library options saved on ${account}',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => 'Audio, subtitle and library options saved on ${count} accounts',
 			'accountPreferences.pickAccount' => 'Every account stores its own preferences. Pick the one to edit.',
-			'accountPreferences.storedOnAccount' => 'These options are saved on the account itself, so every app signed in to it uses them — including Luroka on your other devices.',
+			'accountPreferences.storedOnAccount' => 'These options are saved on the server account and shared by every Luroka profile and app using that account, including on other devices.',
 			'accountPreferences.noAccounts' => 'No accounts to configure',
 			'accountPreferences.noAccountsHint' => 'Sign in to Plex, or connect a Jellyfin or Emby server, and the preferences stored on that account show up here.',
 			'accountPreferences.unavailable' => 'Can\'t reach this account',
@@ -13119,6 +13507,8 @@ extension on Translations {
 			'libraries.groupings.albums' => 'Albums',
 			'libraries.groupings.tracks' => 'Tracks',
 			'libraries.groupings.folders' => 'Folders',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.filterCategories.genre' => 'Genre',
 			'libraries.filterCategories.year' => 'Year',
 			'libraries.filterCategories.contentRating' => 'Content Rating',
@@ -13181,8 +13571,6 @@ extension on Translations {
 			'about.versionLabel' => ({required Object version}) => 'Version ${version}',
 			'about.appDescription' => 'Your movies, shows, and music from Plex, Jellyfin, and Emby — in one place.',
 			'about.customSource' => 'Source code',
-			_ => null,
-		} ?? switch (path) {
 			'about.basedOnLuroka' => 'Built on the Plezy codebase',
 			'about.viewLicensesDescription' => 'Software and libraries used by Luroka',
 			'about.appSection' => 'App',
@@ -13633,6 +14021,8 @@ extension on Translations {
 			'watchTogether.yourCopy' => 'Your copy',
 			'watchTogether.sharingYourCopy' => 'You\'re sharing your copy',
 			'watchTogether.playingOtherLength' => ({required Object difference}) => 'Playing your copy, ${difference}',
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.mismatchTitle' => 'Your Copy Is a Different Length',
 			'watchTogether.mismatchDescription' => ({required Object difference}) => 'Your closest copy is ${difference} than the room\'s video. It may be another cut or version.',
 			'watchTogether.playAnyway' => 'Play Anyway',
@@ -13695,8 +14085,6 @@ extension on Translations {
 			'watchTogether.playBlockedTitle' => 'Playback didn\'t start',
 			'watchTogether.playBlockedDescription' => 'Press play to start watching with the room.',
 			'watchTogether.notices.pressedPlay' => ({required Object name}) => '${name} pressed play',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.playbackStarted' => 'Playback started',
 			'watchTogether.notices.paused' => ({required Object name}) => '${name} paused',
 			'watchTogether.notices.playbackPaused' => 'Playback paused',
@@ -14147,6 +14535,8 @@ extension on Translations {
 			'seerr.serverUrlHelper' => 'The address of your Seerr instance',
 			'seerr.checkServer' => 'Continue',
 			'seerr.signInWithJellyfin' => 'Sign in with Jellyfin',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.signInWithEmby' => 'Sign in with Emby',
 			'seerr.signInWithLocal' => 'Use a local account',
 			'seerr.email' => 'Email',
@@ -14209,8 +14599,6 @@ extension on Translations {
 			'services.seerrSignInStep' => 'Choose a sign-in method supported by your server.',
 			'services.integrations' => 'Integrations',
 			'services.notConnected' => 'Not connected',
-			_ => null,
-		} ?? switch (path) {
 			'services.connectedAs' => ({required Object username}) => 'Connected as @${username}',
 			'services.scrobble' => 'Track progress automatically',
 			'services.scrobbleDescription' => 'Update your list when you finish an episode or movie.',
@@ -14264,12 +14652,52 @@ extension on Translations {
 			'profileIntegrations.later' => 'Set up later',
 			'profileIntegrations.manage' => 'Manage integrations',
 			'profileIntegrations.forProfile' => ({required Object name}) => 'Connections for ${name}',
+			'profileSetupGuide.title' => 'Make your profile yours',
+			'profileSetupGuide.description' => 'Choose how Luroka looks and feels for this profile on this device. You can change everything later in Settings.',
+			'profileSetupGuide.appearanceStep' => '1 of 2 · Look and feel',
+			'profileSetupGuide.homeStep' => '2 of 2 · Your Home screen',
+			'profileSetupGuide.preview' => 'Preview',
+			'profileSetupGuide.previewTitle' => 'Your Home',
+			'profileSetupGuide.previewPoster' => 'Poster',
+			'profileSetupGuide.posterArtwork' => 'Artwork only',
+			'profileSetupGuide.posterWithDetails' => 'Show poster details',
+			'profileSetupGuide.musicDescription' => 'Play a movie or show’s theme while its details page is open, when available.',
+			'profileSetupGuide.moreThemes' => 'More themes',
+			'profileSetupGuide.fewerThemes' => 'Fewer themes',
+			'profileSetupGuide.spotlightHeading' => 'What should appear in Spotlight?',
+			'profileSetupGuide.progressHeading' => 'Continue Watching and Next Up',
+			'profileSetupGuide.skip' => 'Use defaults and start watching',
+			'profileSetupGuide.finish' => 'Start watching',
+			'profileSetupGuide.back' => 'Back',
+			'profileSetupGuide.kContinue' => 'Continue',
+			'profileSetupGuide.chooseLater' => 'Choose libraries later',
+			'profileSetupGuide.libraryScope' => 'This changes what appears in Luroka for this profile; it does not change server permissions.',
+			'profileSetupGuide.createdTitle' => 'Profile created',
+			'profileSetupGuide.createdDescription' => 'Your new profile is ready. Its owner can personalize it the first time they open it.',
+			'profileSetupGuide.switchProfile' => 'Switch to this profile',
+			'profileSetupGuide.stayHere' => 'Stay on current profile',
+			'animeFavorites.filter' => 'Anime',
+			'animeFavorites.manage' => 'Manage anime',
+			'animeFavorites.description' => 'Automatic detection uses anime library names and available anime tags or IDs. Choose libraries and correct individual favorites. Choices are saved on this device for your profile.',
+			'animeFavorites.libraries' => 'Anime libraries',
+			'animeFavorites.libraryHint' => 'Libraries named Anime are recognized automatically. Select a library to change its classification.',
+			'animeFavorites.titles' => 'Favorite titles',
+			'animeFavorites.titleHint' => 'Select a title to mark it as anime or correct an automatic match.',
+			'animeFavorites.automatic' => 'Automatic',
+			'animeFavorites.include' => 'Anime',
+			'animeFavorites.exclude' => 'Not anime',
+			'animeFavorites.automaticIncluded' => 'Automatic · Anime',
+			'animeFavorites.automaticExcluded' => 'Automatic · Not anime',
+			'animeFavorites.noLibraries' => 'No connected libraries available.',
+			'animeFavorites.noTitles' => 'No favorite movies or shows available.',
+			'animeFavorites.empty' => 'No anime favorites found. Check your anime libraries or mark a title as anime.',
+			'animeFavorites.saveFailed' => 'Couldn\'t save your anime settings. Please try again.',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => 'Add ${product} server',
 			'addServer.serverUrls' => 'Server URLs',
 			'addServer.serverUrlsHelper' => 'Multiple URLs allowed, separated by commas.',
 			'addServer.findServer' => 'Find server',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => 'Looking for local ${product} servers...',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Local ${product} servers',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Saved and nearby ${product} servers',
 			'addServer.username' => 'Username',
 			'addServer.password' => 'Password',
 			'addServer.signIn' => 'Sign in',

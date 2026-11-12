@@ -6,16 +6,17 @@ import '../theme/mono_tokens.dart';
 /// A theme at a glance: its page, a card with text, and the accent. A null
 /// [palette] is System, drawn as Light and Dark halves.
 class PaletteSwatch extends StatelessWidget {
-  const PaletteSwatch({super.key, required this.palette, this.size = 36});
+  const PaletteSwatch({super.key, required this.palette, this.size = 36, this.aspectRatio = 1});
 
   final MonoPalette? palette;
   final double size;
+  final double aspectRatio;
 
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(size * 0.25);
     return Container(
-      width: size,
+      width: size * aspectRatio,
       height: size,
       foregroundDecoration: BoxDecoration(
         borderRadius: radius,
@@ -58,6 +59,31 @@ class _PalettePainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
     canvas.drawRect(Offset.zero & size, Paint()..color = p.bg);
+    if (w > h * 1.3) {
+      // Wide theme choices illustrate the page, spotlight, and poster shelves.
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(Rect.fromLTWH(w * .08, h * .12, w * .84, h * .4), Radius.circular(h * .06)),
+        Paint()..color = p.surface,
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(Rect.fromLTWH(w * .13, h * .22, w * .42, h * .05), const Radius.circular(2)),
+        Paint()..color = p.text,
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(Rect.fromLTWH(w * .13, h * .34, w * .22, h * .08), const Radius.circular(3)),
+        Paint()..color = p.accent,
+      );
+      for (var i = 0; i < 4; i++) {
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromLTWH(w * (.08 + i * .22), h * .61, w * .18, h * .28),
+            Radius.circular(h * .04),
+          ),
+          Paint()..color = Color.lerp(p.surface, p.accent, .08 + i * .06)!,
+        );
+      }
+      return;
+    }
     final card = RRect.fromRectAndRadius(
       Rect.fromLTWH(w * 0.16, h * 0.44, w * 0.68, h * 0.40),
       Radius.circular(w * 0.08),

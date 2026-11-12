@@ -574,6 +574,10 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
         // Eager identity-only: the loading UI shows the new title immediately,
         // while the selection/source state flips with the session commit at
         // the open boundary. Keep these writes inside the rollback boundary.
+        // Finish the old item's accounting before changing the identity. A
+        // paused/resumed or autoplayed episode must never inherit the time
+        // accumulated for the previous title.
+        if (isItemChange) _stopScreenTimeAccounting();
         _currentMetadata = metadata;
         VideoPlayerScreenState._activeRouteGuard.update(this, targetLaunchIdentity);
         _unfocusPlayNextPrompt();

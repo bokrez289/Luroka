@@ -92,8 +92,8 @@ void main() {
     final observer = PlaybackLaunchObserver(isCurrent: () => true);
     final fakePlayer = _ObservedPlayer();
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       testBody: () async {
         final screen = await _pushObservedScreen(tester, db: db, fakePlayer: fakePlayer, observer: observer);
         expect(observer.snapshot()['stage'], 'playing');
@@ -126,8 +126,8 @@ void main() {
     final observer = PlaybackLaunchObserver(isCurrent: () => true);
     final fakePlayer = _ObservedPlayer();
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       testBody: () async {
         final screen = await _pushObservedScreen(tester, db: db, fakePlayer: fakePlayer, observer: observer);
         expect(observer.snapshot()['stage'], 'playing');
@@ -158,8 +158,8 @@ void main() {
     final observer = PlaybackLaunchObserver(isCurrent: () => true);
     final fakePlayer = _ObservedPlayer();
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       testBody: () async {
         final screen = await _pushObservedScreen(tester, db: db, fakePlayer: fakePlayer, observer: observer);
         expect(observer.snapshot()['stage'], 'playing');
@@ -191,8 +191,8 @@ void main() {
     await SettingsService.instance.write(SettingsService.autoPlayNextEpisode, true);
     await SettingsService.instance.write(SettingsService.playNextCountdown, 0);
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       testBody: () async {
         final screen = await _pushObservedScreen(tester, db: db, fakePlayer: fakePlayer, observer: observer);
         expect(observer.snapshot(), containsPair('item', containsPair('itemId', 'observed')));

@@ -4,7 +4,19 @@ mixin _JellyfinLiveTvMethods on _JellyfinClientInternals {
   /// Returns `true` when this server has Live TV configured (channels
   /// available). Probes `/LiveTv/Channels?limit=1`. Used by [MultiServerProvider]
   /// to gate the Live TV menu.
-  Future<bool> hasLiveTv() async {
+  Future<bool>? _liveTvProbe;
+
+  Future<bool> hasLiveTv() {
+    final pending = _liveTvProbe;
+    if (pending != null) return pending;
+    late final Future<bool> request;
+    request = _probeLiveTv().whenComplete(() {
+      if (identical(_liveTvProbe, request)) _liveTvProbe = null;
+    });
+    return _liveTvProbe = request;
+  }
+
+  Future<bool> _probeLiveTv() async {
     try {
       final response = await _http.get(
         '/LiveTv/Channels',

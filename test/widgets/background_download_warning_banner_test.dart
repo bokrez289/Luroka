@@ -12,7 +12,7 @@ import '../test_helpers/prefs.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  const channel = MethodChannel('com.luroka/device.background-warning-test');
+  const channel = MethodChannel('com.plezy/device.background-warning-test');
   late Map<String, Object?> signals;
   late List<MethodCall> calls;
 
@@ -236,8 +236,6 @@ void main() {
 
     expect(find.text(t.downloads.backgroundWarning.linkUnavailable), findsOneWidget);
 
-    await tester.tap(find.text(t.common.ok));
-    await tester.pumpAndSettle();
     await tester.tap(find.text(t.common.close));
     await tester.pumpAndSettle();
     expect(await result, isTrue);

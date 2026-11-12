@@ -31,7 +31,7 @@ import '../test_helpers/theme.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  const adjustmentChannel = MethodChannel('com.luroka/device_adjustment');
+  const adjustmentChannel = MethodChannel('com.plezy/device_adjustment');
 
   late _RecordingPlayer player;
   late PlayerChromeController chrome;

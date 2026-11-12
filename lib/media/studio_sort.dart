@@ -28,7 +28,7 @@ extension StudioSortQuery on StudioSort {
   LibrarySort forBackend(MediaBackend backend) => LibrarySort(
     field: switch (this) {
       StudioSort.titleAscending || StudioSort.titleDescending => backend == MediaBackend.plex ? 'titleSort' : 'title',
-      StudioSort.newest || StudioSort.oldest => backend == MediaBackend.plex ? 'year' : 'productionYear',
+      StudioSort.newest || StudioSort.oldest => 'originallyAvailableAt',
       StudioSort.recentlyAdded => 'addedAt',
       StudioSort.rating => 'rating',
       StudioSort.recentlyAddedEpisode => 'episode.addedAt',
@@ -48,12 +48,19 @@ extension StudioSortQuery on StudioSort {
     final title = (a.titleSort ?? a.displayTitle).toLowerCase().compareTo(
       (b.titleSort ?? b.displayTitle).toLowerCase(),
     );
+    int? releaseDate(MediaItem item) => DateTime.tryParse(
+      item.originallyAvailableAt ?? (item.year == null ? '' : '${item.year}-01-01'),
+    )?.millisecondsSinceEpoch;
     final primary = switch (this) {
       StudioSort.titleAscending => title,
       StudioSort.titleDescending => -title,
-      StudioSort.newest => nullableNumber(a.year, b.year, descending: true),
-      StudioSort.oldest => nullableNumber(a.year, b.year, descending: false),
-      StudioSort.recentlyAdded => nullableNumber(a.addedAt, b.addedAt, descending: true),
+      StudioSort.newest => nullableNumber(releaseDate(a), releaseDate(b), descending: true),
+      StudioSort.oldest => nullableNumber(releaseDate(a), releaseDate(b), descending: false),
+      StudioSort.recentlyAdded => nullableNumber(
+        a.kind == MediaKind.show ? studioEpisodeAddedAt(a) : a.addedAt,
+        b.kind == MediaKind.show ? studioEpisodeAddedAt(b) : b.addedAt,
+        descending: true,
+      ),
       StudioSort.rating => nullableNumber(a.rating, b.rating, descending: true),
       StudioSort.recentlyAddedEpisode => nullableNumber(
         studioEpisodeAddedAt(a),

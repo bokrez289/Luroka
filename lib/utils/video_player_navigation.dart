@@ -216,7 +216,12 @@ Future<void> saveMediaVersionPreferenceFor(
   required List<MediaVersion> versions,
   void Function()? checkCurrent,
 }) async {
-  final settingsService = await SettingsService.getInstance();
+  final existing = SettingsService.instanceOrNull;
+  final revision = existing?.profileSettingsRevision.value;
+  final settingsService = existing ?? await SettingsService.getInstance();
+  if (revision != null && settingsService.profileSettingsRevision.value != revision) {
+    throw StateError('The active profile changed while saving the media version');
+  }
   checkCurrent?.call();
   final pref = index >= 0 && index < versions.length
       ? MediaVersionPreference.forVersion(versions[index], index)
@@ -228,7 +233,12 @@ Future<void> saveMediaVersionPreferenceFor(
 }
 
 Future<void> resetSavedMediaVersionPreferenceFor(MediaItem metadata, {void Function()? checkCurrent}) async {
-  final settingsService = await SettingsService.getInstance();
+  final existing = SettingsService.instanceOrNull;
+  final revision = existing?.profileSettingsRevision.value;
+  final settingsService = existing ?? await SettingsService.getInstance();
+  if (revision != null && settingsService.profileSettingsRevision.value != revision) {
+    throw StateError('The active profile changed while resetting the media version');
+  }
   checkCurrent?.call();
   final updated = {...settingsService.read(SettingsService.mediaVersionPreferences)}
     ..remove(_legacyMediaVersionPreferenceKey(metadata))

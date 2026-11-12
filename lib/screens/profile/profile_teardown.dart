@@ -25,6 +25,7 @@ import '../../providers/playback_state_provider.dart';
 import '../../services/multi_server_manager.dart';
 import '../../services/storage_service.dart';
 import '../../services/profile_appearance_service.dart';
+import '../../services/settings_service.dart';
 import '../../services/system_shelf_service.dart';
 import '../../utils/app_logger.dart';
 import '../../utils/dialogs.dart';
@@ -211,6 +212,9 @@ Future<void> deleteProfile(BuildContext context, Profile profile) async {
     await scope.cleanup.removeAllProfileConnections(profile.id);
     await scope.profileRegistry.remove(profile.id);
     await ProfileAppearanceService.instance.reset(profile.id);
+    await ProfileAppearanceService.instance.completePersonalization(profile.id);
+    await ProfileAppearanceService.instance.completeSourceSelection(profile.id);
+    await SettingsService.instanceOrNull?.deleteProfileSettings(profile.id);
     await scope.storage.clearProfileLastUsed(profile.id);
     await scope.storage.clearUserScopedPreferencesForProfile(profile.id);
 
@@ -397,6 +401,7 @@ Future<void> logoutAllProfiles(BuildContext context) async {
   // Credentials and the signed-out users' server-side preferences go first so
   // nothing below can read them back as the next sign-in's defaults.
   await scope.storage.clearUserData();
+  await SettingsService.instanceOrNull?.clearProfileSettingsForLogout(scope.active.profiles.map((profile) => profile.id));
   accountPreferences.repository.clear();
   scope.multiServer.clearAllConnections();
   // Drop the profile/connection rows so the next sign-in starts clean and

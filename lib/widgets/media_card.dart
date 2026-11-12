@@ -29,6 +29,7 @@ import '../services/settings_service.dart';
 import '../services/kids_profile_service.dart';
 import 'catalog_context_menu.dart';
 import 'settings_builder.dart';
+import 'remaining_episodes_badge.dart';
 import 'watched_indicator.dart';
 import '../utils/content_utils.dart';
 import '../utils/media_image_helper.dart';
@@ -296,6 +297,21 @@ class MediaCard extends StatefulWidget {
 }
 
 class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard> {
+  /// A show poster already carries the series title; identify the playable
+  /// episode instead. This is independent of the general episode-number
+  /// preference because progress shelves need to distinguish episodes.
+  String? _progressEpisodeLabel(Object item) {
+    if (item is! MediaItem || !item.isEpisode || !widget.usesContinueWatchingAction) return null;
+    final mode = widget.episodePosterModeOverride ?? SettingsService.instance.read(SettingsService.episodePosterMode);
+    if (mode == EpisodePosterMode.episodeThumbnail) return null;
+    return formatSeasonEpisodeLabel(item.parentIndex, item.index) ??
+        (item.index != null
+            ? 'E${item.index}'
+            : item.parentIndex != null
+            ? 'S${item.parentIndex}'
+            : null);
+  }
+
   /// Public method to trigger tap action (for keyboard/gamepad SELECT)
   void handleTap() {
     _handleTap(context, _effectiveItemForAction(context));
@@ -448,6 +464,7 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
         SettingsService.showEpisodeNumberOnCards,
         SettingsService.hideSpoilers,
         SettingsService.showUnwatchedCount,
+        SettingsService.showRemainingEpisodes,
         SettingsService.showWatchedIndicators,
         SettingsService.posterDetails,
         SettingsService.catalogEpisodeInfo,
@@ -648,6 +665,19 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
     final tvContinue =
         PlatformDetector.isTV() && widget.cinemaArtwork && widget.isInContinueWatching && item is MediaItem;
     final overlays = <Widget>[
+      if (widget.usesContinueWatchingAction &&
+          item is MediaItem &&
+          item.isEpisode &&
+          SettingsService.instance.read(SettingsService.showRemainingEpisodes))
+        Positioned(
+          left: 6,
+          right: 6,
+          top: 6,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: RemainingEpisodesBadge(key: ValueKey(item.globalKey), item: item),
+          ),
+        ),
       if (tvContinue)
         Positioned.fill(
           child: Align(
@@ -672,7 +702,11 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
           left: 12 * widget.artworkTextScale,
           right: 12 * widget.artworkTextScale,
           bottom: 12 * widget.artworkTextScale,
-          child: _TvContinueArtwork(item: item, scale: widget.artworkTextScale),
+          child: _TvContinueArtwork(
+            item: item,
+            scale: widget.artworkTextScale,
+            episodeLabel: _progressEpisodeLabel(item),
+          ),
         ),
       if (!tvContinue &&
           widget.cinemaArtwork &&
@@ -702,11 +736,12 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                item.raw?['detailChapterStart'] is int
-                    ? item.displayTitle
-                    : widget.showTitleImplied
-                    ? (item.title ?? item.displayTitle)
-                    : item.grandparentTitle ?? item.displayTitle,
+                _progressEpisodeLabel(item) ??
+                    (item.raw?['detailChapterStart'] is int
+                        ? item.displayTitle
+                        : widget.showTitleImplied
+                        ? (item.title ?? item.displayTitle)
+                        : item.grandparentTitle ?? item.displayTitle),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -795,6 +830,7 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
     // Compute actual poster dimensions from card dimensions
     final posterWidth = widget.width != null ? widget.width! - 6 : null;
     final posterHeight = widget.height;
+    final progressEpisodeLabel = _progressEpisodeLabel(item);
 
     // The focus border hugs the poster (captions stay outside it), matching
     // the full-bleed card treatment.
@@ -830,7 +866,11 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
               SizedBox(
                 height: posterHeight != null ? 2 : context.settingsRead(SettingsService.gridSpacing).posterTitleGap,
               ),
-              if (widget.onTap == null && item is MediaItem && !_impliesShowTitle(item) && _hasClickableTitle(item))
+              if (widget.onTap == null &&
+                  progressEpisodeLabel == null &&
+                  item is MediaItem &&
+                  !_impliesShowTitle(item) &&
+                  _hasClickableTitle(item))
                 _ClickableText(
                   text: item.displayTitle,
                   style: TextStyle(
@@ -843,11 +883,13 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
               else
                 ExcludeSemantics(
                   child: Text(
-                    switch (item) {
-                      MediaPlaylist(:final title) => title,
-                      final MediaItem episode when _impliesShowTitle(episode) => episode.title ?? episode.displayTitle,
-                      _ => (item as MediaItem).displayTitle,
-                    },
+                    progressEpisodeLabel ??
+                        switch (item) {
+                          MediaPlaylist(:final title) => title,
+                          final MediaItem episode when _impliesShowTitle(episode) =>
+                            episode.title ?? episode.displayTitle,
+                          _ => (item as MediaItem).displayTitle,
+                        },
                     maxLines: item is MediaPlaylist || (item is MediaItem && item.kind == MediaKind.collection) ? 2 : 1,
                     overflow: .ellipsis,
                     style: TextStyle(
@@ -859,7 +901,12 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
                 ),
               if (item is MediaPlaylist)
                 _MediaCardHelpers.buildPlaylistMeta(context, item)
-              else if (item is MediaItem)
+              else if (item is MediaItem && progressEpisodeLabel != null) ...[
+                if (!(SettingsService.instance.read(SettingsService.hideSpoilers) && item.shouldHideSpoiler) &&
+                    item.title?.trim().isNotEmpty == true &&
+                    item.title != item.grandparentTitle)
+                  _MediaCardHelpers._caption(context, item.title!),
+              ] else if (item is MediaItem)
                 _MediaCardHelpers.buildMetadataSubtitle(
                   context,
                   item,
@@ -1610,9 +1657,10 @@ List<String> _buildCatalogBadgeLabels(CatalogItem? item, DateTime? now) {
 }
 
 class _TvContinueArtwork extends StatelessWidget {
-  const _TvContinueArtwork({required this.item, required this.scale});
+  const _TvContinueArtwork({required this.item, required this.scale, this.episodeLabel});
   final MediaItem item;
   final double scale;
+  final String? episodeLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -1630,7 +1678,7 @@ class _TvContinueArtwork extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          item.isEpisode ? item.grandparentTitle ?? item.displayTitle : item.displayTitle,
+          episodeLabel ?? (item.isEpisode ? item.grandparentTitle ?? item.displayTitle : item.displayTitle),
           key: const ValueKey('tv_continue_title'),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,

@@ -51,6 +51,9 @@ abstract class BaseLibraryTab<T> extends StatefulWidget {
   /// Used to navigate focus back to the tab bar.
   final VoidCallback? onBack;
 
+  /// Optional compact-TV library panel reached from the leading grid edge.
+  final VoidCallback? onNavigateLibraryMenu;
+
   const BaseLibraryTab({
     super.key,
     required this.library,
@@ -60,6 +63,7 @@ abstract class BaseLibraryTab<T> extends StatefulWidget {
     this.isActive = false,
     this.suppressAutoFocus = false,
     this.onBack,
+    this.onNavigateLibraryMenu,
   });
 }
 

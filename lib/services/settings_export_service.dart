@@ -493,6 +493,7 @@ class SettingsExportService {
   /// their original exception types.
   static Future<ImportResult?> importFromFile() async {
     final storage = await StorageService.getInstance();
+    final profileId = storage.getActiveProfileId();
     final uuid = storage.activeUserScope();
     if (uuid == null || uuid.isEmpty) {
       throw const NoUserSignedInException();
@@ -531,7 +532,13 @@ class SettingsExportService {
     }
     final data = decoded;
 
+    if (storage.getActiveProfileId() != profileId) {
+      throw const SettingsExportException('The active profile changed during import');
+    }
     final prefs = (await SettingsService.getInstance()).prefs;
+    if (storage.getActiveProfileId() != profileId) {
+      throw const SettingsExportException('The active profile changed during import');
+    }
     return applyImportMap(data, prefs, currentUserUuid: uuid);
   }
 }

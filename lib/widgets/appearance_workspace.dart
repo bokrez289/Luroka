@@ -9,6 +9,7 @@ import '../media/media_item_types.dart';
 import '../providers/discover_provider.dart';
 import '../services/settings_service.dart' hide ThemeMode;
 import '../utils/provider_extensions.dart';
+import '../utils/grid_size_calculator.dart';
 import '../utils/platform_detector.dart';
 import 'optimized_media_image.dart';
 import 'settings_builder.dart';
@@ -33,6 +34,9 @@ class AppearanceWorkspaceState extends State<AppearanceWorkspace> {
   bool revealSetting(String? id) {
     final library = [
       SettingsService.posterDetails.key,
+      SettingsService.catalogEpisodeInfo.key,
+      SettingsService.showThemeMusic.key,
+      SettingsService.compactTvLibraryNavigation.key,
       SettingsService.viewMode.key,
       SettingsService.libraryDensity.key,
       SettingsService.gridSpacing.key,
@@ -256,16 +260,16 @@ class LibrarySettingsPreview extends StatelessWidget {
             final settings = SettingsService.instance;
             final listView = !forceGrid && settings.read(SettingsService.viewMode) == ViewMode.list;
             final density = settings.read(SettingsService.libraryDensity);
-            final columns = density <= 2
-                ? 5
-                : density >= 4
-                ? 3
-                : 4;
-            final gap = switch (settings.read(SettingsService.gridSpacing)) {
-              GridSpacing.tight => 4.0,
-              GridSpacing.normal => 8.0,
-              GridSpacing.spacious => 12.0,
-            };
+            // Use the actual screen's grid packing, then scale its spacing for
+            // the miniature, rather than guessing three preset column counts.
+            final actualGap = settings.read(SettingsService.gridSpacing).gridGap;
+            final screenWidth = MediaQuery.sizeOf(context).width;
+            final columns = GridSizeCalculator.getColumnCount(
+              (screenWidth - 32).clamp(1.0, double.infinity),
+              GridSizeCalculator.getMaxCrossAxisExtent(context, density),
+              crossAxisSpacing: actualGap,
+            ).clamp(1, 8);
+            final gap = actualGap;
             final colors = Theme.of(context).colorScheme;
             return Container(
               key: const ValueKey('library-settings-preview'),
@@ -296,6 +300,44 @@ class LibrarySettingsPreview extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
                     ),
                   if (!embedded) const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          items.where((item) => item.libraryTitle?.isNotEmpty == true).firstOrNull?.libraryTitle ??
+                              t.libraries.fallbackTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 18, color: colors.onSurface, fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                      Icon(Icons.search_rounded, size: 20, color: colors.onSurfaceVariant),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Text(
+                        t.libraries.all,
+                        style: TextStyle(fontSize: 13, color: colors.primary, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          '${t.libraries.filters}  ·  ${t.libraries.sort}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 13, color: colors.onSurfaceVariant),
+                        ),
+                      ),
+                      Icon(
+                        listView ? Icons.view_list_rounded : Icons.grid_view_rounded,
+                        size: 14,
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),

@@ -6,6 +6,7 @@ import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_hub.dart';
 import 'package:luroka/media/media_item.dart';
 import 'package:luroka/media/media_kind.dart';
+import 'package:luroka/media/home_progress.dart';
 import 'package:luroka/media/media_library.dart';
 import 'package:luroka/media/media_server_client.dart';
 import 'package:luroka/media/server_capabilities.dart';
@@ -70,6 +71,7 @@ class _FakeAggregationService extends DataAggregationService {
   int onDeckCalls = 0;
   int hubCalls = 0;
   int? lastOnDeckLimit;
+  bool lastSplitRows = false;
   int? lastHubLimit;
   Set<String>? lastOnDeckServerIds;
   Set<String>? lastHubsServerIds;
@@ -92,6 +94,7 @@ class _FakeAggregationService extends DataAggregationService {
   @override
   Future<OnDeckAggregationResult> getOnDeckFromAllServers({
     int? limit,
+    bool splitRows = false,
     Set<String>? hiddenLibraryKeys,
     Set<String>? selectedSourceLibraryKeys,
     void Function(OnDeckLibraryResult result)? onPartialLibrary,
@@ -100,6 +103,7 @@ class _FakeAggregationService extends DataAggregationService {
     onDeckCalls++;
     onDeckPartialCallback = onPartialLibrary;
     lastOnDeckLimit = limit;
+    lastSplitRows = splitRows;
     lastOnDeckServerIds = serverIds;
     final started = onDeckStarted;
     if (started != null && !started.isCompleted) started.complete();
@@ -110,7 +114,7 @@ class _FakeAggregationService extends DataAggregationService {
     if (gate != null) await gate;
     final items = onDeckResult();
     return (
-      items: limit != null && items.length > limit ? items.sublist(0, limit) : items,
+      items: limitHomeProgressRows(items, limit, split: splitRows),
       observedItems: [for (final item in items) (item: item, clientScope: null)],
       succeededServerIds: onDeckSucceededServerIds ?? serverIds ?? const {'server_1'},
       cancelledServerIds: onDeckCancelledServerIds,
@@ -273,6 +277,56 @@ void main() {
     await hiddenLibraries.setSelectedSourceLibraries({'server_2:movies'});
     expect(provider.onDeck.map((item) => item.id), ['other']);
     expect(provider.hubs.single.items.map((item) => item.id), ['other']);
+  });
+
+  test('switching to split rows refreshes only playback data and keeps an independent preview for each row', () async {
+    aggregation.onDeckResult = () => [
+      for (var i = 0; i < 20; i++) withHomeProgressRole(_item('resume-$i'), HomeProgressRole.resume),
+      for (var i = 0; i < 20; i++) withHomeProgressRole(_item('next-$i'), HomeProgressRole.nextUp),
+    ];
+    await provider.load();
+    expect(provider.onDeck, hasLength(16));
+    expect(aggregation.lastSplitRows, isFalse);
+    final hubCalls = aggregation.hubCalls;
+    provider.setSplitHomeProgress(true);
+    await provider.refreshContinueWatching(coalesce: true);
+    expect(aggregation.lastSplitRows, isTrue);
+    expect(aggregation.hubCalls, hubCalls);
+    expect(provider.onDeck.where(isHomeNextUp), hasLength(16));
+    expect(provider.onDeck.where((item) => !isHomeNextUp(item)), hasLength(16));
+    expect(provider.hasMoreContinueWatching, isTrue);
+    expect(provider.hasMoreNextUp, isTrue);
+  });
+
+  test('single-item refresh retains Next Up provenance and starting playback moves it to resume', () async {
+    final next = withHomeProgressRole(_item('next'), HomeProgressRole.nextUp);
+    aggregation.onDeckResult = () => [next];
+    await provider.load();
+    client.itemResult = _item('next');
+    await provider.updateItem(next);
+    expect(isHomeNextUp(provider.onDeck.single), isTrue);
+    client.itemResult = _item('next').copyWith(viewOffsetMs: 5000);
+    await provider.updateItem(next);
+    expect(homeProgressRole(provider.onDeck.single), HomeProgressRole.resume);
+  });
+
+  test('changing split mode during Home loading schedules the correct follow-up', () async {
+    final gate = Completer<void>();
+    final started = Completer<void>();
+    aggregation.onDeckGate = gate.future;
+    aggregation.onDeckStarted = started;
+    aggregation.onDeckResult = () => [
+      for (var i = 0; i < 20; i++) withHomeProgressRole(_item('resume-$i'), HomeProgressRole.resume),
+      withHomeProgressRole(_item('next'), HomeProgressRole.nextUp),
+    ];
+    final initial = provider.load();
+    await started.future;
+    provider.setSplitHomeProgress(true);
+    gate.complete();
+    await initial;
+    await provider.refreshContinueWatching(coalesce: true);
+    expect(aggregation.lastSplitRows, isTrue);
+    expect(provider.onDeck.where(isHomeNextUp).map((item) => item.id), ['next']);
   });
 
   test('kids Home receives the first safe library row while another request is still pending', () async {
@@ -1323,12 +1377,14 @@ void main() {
     aggregation.onDeckGate = gate.future;
     aggregation.onDeckStarted = Completer<void>();
     final before = aggregation.onDeckCalls;
-    final first = provider.refreshContinueWatching(coalesce: true);
+    final first = provider.refreshContinueWatching();
     await aggregation.onDeckStarted!.future;
     final second = provider.refreshContinueWatching(coalesce: true);
     gate.complete();
     await Future.wait([first, second]);
     expect(aggregation.onDeckCalls, before + 1);
+    await provider.refreshContinueWatching(coalesce: true);
+    expect(aggregation.onDeckCalls, before + 1, reason: 'a completed pass stays fresh on passive re-entry');
   });
 
   test('passive refresh shares an active full Home load', () async {
@@ -1341,6 +1397,10 @@ void main() {
     gate.complete();
     await Future.wait([load, refresh]);
     expect(aggregation.onDeckCalls, 1);
+    await provider.refreshContinueWatching(coalesce: true);
+    expect(aggregation.onDeckCalls, 1, reason: 'initial Home results seed passive freshness');
+    await provider.refreshContinueWatching();
+    expect(aggregation.onDeckCalls, 2, reason: 'explicit refresh bypasses freshness');
   });
 
   test('online-server deltas arriving mid-pass are unioned into one trailing pass', () async {

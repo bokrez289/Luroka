@@ -7,6 +7,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Requested only after the adult explicitly opens the pairing scanner. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
     <!-- Sideload builds use the APK installer; the Play overlay removes this. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
@@ -70,21 +72,32 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="plezy" android:host="play"/>
                 <data android:scheme="luroka" android:host="play"/>
             </intent-filter>
-            <!-- Deep link for tuning a live TV channel: luroka://live?channel=...&start=beginning|live -->
+            <!-- Deep link for tuning a live TV channel: plezy://live?channel=...&start=beginning|live -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="plezy" android:host="live"/>
                 <data android:scheme="luroka" android:host="live"/>
             </intent-filter>
-            <!-- Watch Together invitation links. -->
+            <!-- Accept Luroka and previous invitation schemes. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="plezy" android:host="watch"/>
+                <data android:scheme="lumora" android:host="watch"/>
                 <data android:scheme="luroka" android:host="watch"/>
+            </intent-filter>
+            <!-- Pairing invitations contain ephemeral capabilities. Never log them. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="luroka" android:host="pair"/>
             </intent-filter>
         </activity>
         <activity
@@ -577,7 +590,7 @@
             </intent-filter>
         </receiver>
         <!-- Setting this stops FlutterLoader from appending its half-of-RAM default after
-             LurokaActivity's shell args, where it would override the low-RAM cap. LurokaActivity
+             PlezyActivity's shell args, where it would override the low-RAM cap. PlezyActivity
              always passes the per-device value; this one applies only if another engine
              initializes Flutter first. -->
         <meta-data

@@ -9,8 +9,10 @@ import '../focus/focus_theme.dart';
 import '../focus/focusable_button.dart';
 import '../focus/key_event_utils.dart';
 import '../i18n/strings.g.dart';
+import '../media/anime_favorites.dart';
 import '../media/media_item.dart';
 import '../media/media_kind.dart';
+import '../media/media_library.dart';
 import '../media/media_server_client.dart';
 import '../media/studio_sort.dart';
 import '../mixins/grid_focus_node_mixin.dart';
@@ -18,6 +20,8 @@ import '../services/home_preview_controller.dart';
 import '../services/settings_service.dart';
 import '../services/storage_service.dart';
 import '../utils/platform_detector.dart';
+import '../utils/error_dialog.dart';
+import '../screens/anime_favorites_settings_screen.dart';
 import '../screens/libraries/content_state_builder.dart';
 import 'app_icon.dart';
 import 'app_menu.dart';
@@ -42,6 +46,8 @@ class FavoritesCatalogView extends StatefulWidget {
     required this.onRefresh,
     required this.onNavigation,
     this.copyCount,
+    this.copiesFor,
+    this.libraries = const [],
   });
 
   final List<MediaItem> items;
@@ -52,6 +58,8 @@ class FavoritesCatalogView extends StatefulWidget {
   final VoidCallback onRefresh;
   final VoidCallback onNavigation;
   final int Function(MediaItem)? copyCount;
+  final List<MediaItem> Function(MediaItem)? copiesFor;
+  final List<MediaLibrary> libraries;
 
   @override
   State<FavoritesCatalogView> createState() => FavoritesCatalogViewState();
@@ -66,16 +74,21 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
     }
   }
 
-  final _filters = List.generate(3, (index) => FocusNode(debugLabel: 'favorites_filter_$index'));
+  final _filters = List.generate(4, (index) => FocusNode(debugLabel: 'favorites_filter_$index'));
   final _overview = FocusNode(debugLabel: 'favorites_overview');
   final _sortFocus = FocusNode(debugLabel: 'favorites_sort');
   final _viewFocus = FocusNode(debugLabel: 'favorites_view');
   final _refreshFocus = FocusNode(debugLabel: 'favorites_refresh');
+  final _animeSettingsFocus = FocusNode(debugLabel: 'favorites_anime_settings');
+  final _animeEmptyFocus = FocusNode(debugLabel: 'favorites_anime_empty_settings');
   final _retryFocus = FocusNode(debugLabel: 'favorites_retry');
   late final HomePreviewController _preview;
   StorageService? _storage;
   List<MediaItem> _visible = const [];
   MediaKind? _kind;
+  bool _animeOnly = false;
+  AnimeFavoritesRules _animeRules = AnimeFavoritesRules();
+  String? _animeProfileId;
   StudioSort _sort = StudioSort.titleAscending;
   bool _list = false;
   bool _viewInitialized = false;
@@ -88,7 +101,9 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
   double _rowExtent = 250;
   Object? _geometry;
 
-  int get _filterIndex => _kind == MediaKind.movie
+  int get _filterIndex => _animeOnly
+      ? 3
+      : _kind == MediaKind.movie
       ? 1
       : _kind == MediaKind.show
       ? 2
@@ -97,7 +112,7 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
   @override
   void initState() {
     super.initState();
-    for (final node in [..._filters, _overview, _sortFocus, _viewFocus, _refreshFocus]) {
+    for (final node in [..._filters, _overview, _sortFocus, _viewFocus, _refreshFocus, _animeSettingsFocus]) {
       node.addListener(_expandPreviewForControls);
     }
     _preview = HomePreviewController(
@@ -124,7 +139,14 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
   void _expandPreviewForControls() {
     if (mounted &&
         _collapsed &&
-        [..._filters, _overview, _sortFocus, _viewFocus, _refreshFocus].any((node) => node.hasFocus)) {
+        [
+          ..._filters,
+          _overview,
+          _sortFocus,
+          _viewFocus,
+          _refreshFocus,
+          _animeSettingsFocus,
+        ].any((node) => node.hasFocus)) {
       setState(() => _collapsed = false);
     }
   }
@@ -134,6 +156,8 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
     if (!mounted) return;
     setState(() {
       _storage = storage;
+      _animeProfileId = storage.getActiveProfileId();
+      _animeRules = _animeProfileId == null ? AnimeFavoritesRules() : storage.getAnimeFavoritesRules(_animeProfileId!);
       _sort = storage.getFavoritesSort(kind: _kind);
       _commitItems();
     });
@@ -142,7 +166,7 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
   @override
   void didUpdateWidget(FavoritesCatalogView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!identical(oldWidget.items, widget.items)) _commitItems();
+    if (!identical(oldWidget.items, widget.items) || !identical(oldWidget.libraries, widget.libraries)) _commitItems();
   }
 
   void setActive(bool active) {
@@ -158,7 +182,11 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
   void _commitItems({bool reset = false}) {
     final hadGridFocus = gridItemFocusNodes.values.any((node) => node.hasFocus);
     final followed = _visible.isEmpty ? null : _visible[_selected.clamp(0, _visible.length - 1)].globalKey;
-    _visible = widget.items.where((item) => _kind == null || item.kind == _kind).toList()..sort(_sort.compare);
+    final libraryTitles = {for (final library in widget.libraries) library.globalKey: library.title};
+    _visible = widget.items.where((item) {
+      if (_animeOnly) return _animeRules.includesTitle(_copiesFor(item), libraryTitles: libraryTitles);
+      return _kind == null || item.kind == _kind;
+    }).toList()..sort(_sort.compare);
     gridContentVersion++;
     reconcileGridFocusNodes({for (final (index, item) in _visible.indexed) item.globalKey: index});
     final followedIndex = _visible.indexWhere((item) => item.globalKey == followed);
@@ -197,13 +225,48 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
     _preview.select(_visible[index], rowTitle: t.libraries.filterCategories.favorites);
   }
 
-  void _filter(MediaKind? kind) {
-    if (_kind == kind) return;
+  List<MediaItem> _copiesFor(MediaItem item) => widget.copiesFor?.call(item) ?? [item];
+
+  void _filter(MediaKind? kind, {bool anime = false}) {
+    if (_kind == kind && _animeOnly == anime) return;
     setState(() {
       _kind = kind;
+      _animeOnly = anime;
       _sort = _storage?.getFavoritesSort(kind: kind) ?? StudioSort.titleAscending;
       _commitItems(reset: true);
     });
+  }
+
+  Future<void> _manageAnime() async {
+    final result = await Navigator.of(context).push<AnimeFavoritesRules>(
+      MaterialPageRoute(
+        builder: (_) => AnimeFavoritesSettingsScreen(
+          rules: _animeRules,
+          libraries: widget.libraries,
+          items: widget.items,
+          copiesFor: _copiesFor,
+        ),
+      ),
+    );
+    if (!mounted || result == null) {
+      if (mounted && _active && (ModalRoute.of(context)?.isCurrent ?? false)) _animeSettingsFocus.requestFocus();
+      return;
+    }
+    try {
+      final storage = _storage ?? await StorageService.getInstance();
+      final profileId = _animeProfileId;
+      if (!mounted || storage.getActiveProfileId() != profileId) return;
+      if (profileId == null) throw StateError('No active profile for anime settings');
+      await storage.saveAnimeFavoritesRules(profileId, result);
+      if (!mounted || storage.getActiveProfileId() != profileId) return;
+      setState(() {
+        _animeRules = result;
+        _commitItems();
+      });
+    } catch (_) {
+      if (mounted) await showErrorDialog(context, t.animeFavorites.saveFailed);
+    }
+    if (mounted && _active && (ModalRoute.of(context)?.isCurrent ?? false)) _animeSettingsFocus.requestFocus();
   }
 
   String _sortLabel(StudioSort value) => switch (value) {
@@ -285,7 +348,11 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
 
   void _focusIndex(int index) {
     if (_visible.isEmpty) {
-      if (widget.errorMessage != null) _retryFocus.requestFocus();
+      if (_animeOnly && widget.errorMessage == null && !widget.loading) {
+        _animeEmptyFocus.requestFocus();
+      } else if (widget.errorMessage != null) {
+        _retryFocus.requestFocus();
+      }
       return;
     }
     final target = index.clamp(0, _visible.length - 1);
@@ -319,20 +386,21 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
     final narrow = !PlatformDetector.isTV() && width < 600;
     final colors = Theme.of(context).colorScheme;
     final chips = <Widget>[
-      for (final (index, (kind, label)) in [
-        (null, t.studios.all),
-        (MediaKind.movie, t.studios.movies),
-        (MediaKind.show, t.studios.shows),
+      for (final (index, (kind, label, anime)) in [
+        (null, t.studios.all, false),
+        (MediaKind.movie, t.studios.movies, false),
+        (MediaKind.show, t.studios.shows, false),
+        (null, t.animeFavorites.filter, true),
       ].indexed)
         FocusableTabChip(
           key: ValueKey('favorites_filter_$index'),
           label: label,
           editorial: true,
-          isSelected: _kind == kind,
+          isSelected: _kind == kind && _animeOnly == anime,
           focusNode: _filters[index],
-          onSelect: () => _filter(kind),
+          onSelect: () => _filter(kind, anime: anime),
           onNavigateLeft: index == 0 ? widget.onNavigation : _filters[index - 1].requestFocus,
-          onNavigateRight: index == 2 ? _sortFocus.requestFocus : _filters[index + 1].requestFocus,
+          onNavigateRight: index == _filters.length - 1 ? _sortFocus.requestFocus : _filters[index + 1].requestFocus,
           onNavigateUp: PlatformDetector.isTV() ? widget.onNavigation : _focusOverview,
           onNavigateDown: narrow ? _sortFocus.requestFocus : () => _focusIndex(0),
         ),
@@ -366,6 +434,7 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
         autoScroll: false,
         onPressed: _toggleView,
         onNavigateLeft: _sortFocus.requestFocus,
+        onNavigateRight: _animeSettingsFocus.requestFocus,
         onNavigateUp: PlatformDetector.isTV()
             ? widget.onNavigation
             : narrow
@@ -404,7 +473,16 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
     _focusGeneration++;
     _preview.dispose();
     _scroll.dispose();
-    for (final node in [..._filters, _overview, _sortFocus, _viewFocus, _refreshFocus, _retryFocus]) {
+    for (final node in [
+      ..._filters,
+      _overview,
+      _sortFocus,
+      _viewFocus,
+      _refreshFocus,
+      _animeSettingsFocus,
+      _animeEmptyFocus,
+      _retryFocus,
+    ]) {
       node.dispose();
     }
     disposeGridFocusNodes();
@@ -450,18 +528,34 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
                             style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                           ),
                         ),
-                        if (widget.items.isNotEmpty || (!widget.loading && widget.errorMessage == null))
+                        if ((viewport.maxWidth >= 400 || textScale <= 1.2) &&
+                            (widget.items.isNotEmpty || (!widget.loading && widget.errorMessage == null)))
                           Text(
                             t.discover.titleCount(n: _visible.length),
                             style: theme.textTheme.labelMedium?.copyWith(color: colors.onSurfaceVariant),
                           ),
                         const SizedBox(width: 12),
                         FocusableButton(
+                          focusNode: _animeSettingsFocus,
+                          autoScroll: false,
+                          onPressed: () => unawaited(_manageAnime()),
+                          onNavigateUp: widget.onNavigation,
+                          onNavigateLeft: _viewFocus.requestFocus,
+                          onNavigateRight: _refreshFocus.requestFocus,
+                          onNavigateDown: focusContent,
+                          child: IconButton(
+                            key: const ValueKey('favorites_anime_settings'),
+                            onPressed: () => unawaited(_manageAnime()),
+                            tooltip: t.animeFavorites.manage,
+                            icon: const AppIcon(Symbols.tune_rounded, size: 22),
+                          ),
+                        ),
+                        FocusableButton(
                           focusNode: _refreshFocus,
                           autoScroll: false,
                           onPressed: widget.onRefresh,
                           onNavigateUp: widget.onNavigation,
-                          onNavigateLeft: widget.onNavigation,
+                          onNavigateLeft: _animeSettingsFocus.requestFocus,
                           onNavigateDown: focusContent,
                           child: IconButton(
                             onPressed: widget.onRefresh,
@@ -568,8 +662,13 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
                               )
                             else if (_visible.isEmpty)
                               SliverEmptyState(
-                                message: t.messages.noItemsAvailable,
+                                message: _animeOnly ? t.animeFavorites.empty : t.messages.noItemsAvailable,
                                 icon: Symbols.favorite_border_rounded,
+                                onAction: _animeOnly ? () => unawaited(_manageAnime()) : null,
+                                actionLabel: _animeOnly ? t.animeFavorites.manage : null,
+                                actionFocusNode: _animeOnly ? _animeEmptyFocus : null,
+                                onActionNavigateUp: focusContent,
+                                onActionBack: widget.onNavigation,
                               )
                             else
                               SliverPadding(

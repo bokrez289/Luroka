@@ -2,6 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/media/studio_brands.dart';
 
 void main() {
+  test('British broadcasters resolve through explicit, non-overlapping aliases', () {
+    expect(studioBrandForName('BBC One')?.key, 'bbc');
+    expect(studioBrandForName('ITV Studios')?.key, 'itv');
+    expect(studioBrandForName('Channel 4')?.key, 'channel-4');
+    expect(studioBrandForName('Channel 5')?.key, 'channel-5');
+    expect(studioBrandForName('Sky Studios')?.key, 'sky');
+  });
   test('only curated brands can appear; unrelated producers are not included', () {
     expect(studioBrandForName('Some Tiny Production Company'), isNull);
     expect(studioBrandForName('Netflix Documentary Unit Somewhere'), isNull);

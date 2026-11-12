@@ -108,6 +108,7 @@ class HubSection extends StatefulWidget {
 
   /// Overrides the global episode artwork mode for this hub.
   final EpisodePosterMode? episodePosterModeOverride;
+  final bool? posterDetailsOverride;
 
   /// Vertical viewport alignment when this hub is focused.
   final double focusScrollAlignment;
@@ -141,6 +142,7 @@ class HubSection extends StatefulWidget {
     this.inset = false,
     this.cardSizing = HubCardSizing.shelf,
     this.episodePosterModeOverride,
+    this.posterDetailsOverride,
     this.focusScrollAlignment = 0.3,
   }) : usesContinueWatchingAction = usesContinueWatchingAction ?? isInContinueWatching;
 
@@ -603,6 +605,7 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
               child: SettingsBuilder(
                 prefs: const [
                   SettingsService.libraryDensity,
+                  SettingsService.homePosterSize,
                   SettingsService.episodePosterMode,
                   SettingsService.gridSpacing,
                   SettingsService.posterDetails,
@@ -611,7 +614,9 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
                   builder: (context, constraints) {
                     final svc = SettingsService.instanceOrNull;
                     if (svc == null) return const SizedBox.shrink();
-                    final density = svc.read(SettingsService.libraryDensity);
+                    final density = svc.read(
+                      widget.streamingHome ? SettingsService.homePosterSize : SettingsService.libraryDensity,
+                    );
                     final EpisodePosterMode episodePosterMode =
                         widget.episodePosterModeOverride ?? svc.read(SettingsService.episodePosterMode);
 
@@ -649,17 +654,15 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
                                       ? 1.75 - LibraryDensity.factor(density) * 0.4
                                       : 2.65 - LibraryDensity.factor(density) * 0.6))
                               .clamp(useWideLayout ? 160.0 : 112.0, useWideLayout ? 420.0 : 260.0)
+                        : widget.streamingHome && isTv && widget.cardBuilder != null
+                        ? constraints.maxWidth / 7.0
                         : widget.streamingHome && isTv
-                        ? widget.cardBuilder != null
-                              ? constraints.maxWidth / 5.2
-                              : MediaGridDelegate.cellWidth(
-                                  context: context,
-                                  availableWidth: constraints.maxWidth,
-                                  density: density,
-                                  useWideAspectRatio: useWideLayout,
-                                )
+                        ? constraints.maxWidth /
+                              (useWideLayout
+                                  ? 4.8 - LibraryDensity.factor(density) * 2.2
+                                  : 8.0 - LibraryDensity.factor(density) * 3.8)
                         : widget.forceWideCards && widget.cardBuilder != null && isTv
-                        ? (constraints.maxWidth / 5.2).clamp(160.0, 260.0)
+                        ? (constraints.maxWidth / (5.8 - LibraryDensity.factor(density) * 2.0)).clamp(160.0, 260.0)
                         : widget.cinemaArtwork && isTv
                         ? (constraints.maxWidth /
                                   (useWideLayout
@@ -692,11 +695,13 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
                             desiredWidth,
                             math.max(
                                       48.0,
-                                      widget.maxPosterHeight! -
+                                      widget.maxPosterHeight! *
+                                              (isTv ? 0.65 + 0.35 * LibraryDensity.factor(density) : 1.0) -
                                           (widget.streamingHome &&
                                                   !useWideLayout &&
                                                   !isSquareHub &&
-                                                  svc.read<bool>(SettingsService.posterDetails)
+                                                  (widget.posterDetailsOverride ??
+                                                      svc.read<bool>(SettingsService.posterDetails))
                                               ? MediaQuery.textScalerOf(context).scale(48)
                                               : 0),
                                     ) *
@@ -711,7 +716,7 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
                         ? posterWidth // 1:1 for music artwork
                         : posterWidth * 1.5; // 2:3 for poster layout
                     final cinemaArtwork = !isSquareHub && !useWideLayout
-                        ? !svc.read<bool>(SettingsService.posterDetails)
+                        ? !(widget.posterDetailsOverride ?? svc.read<bool>(SettingsService.posterDetails))
                         : widget.cinemaArtwork;
 
                     // Rendered gap between neighbouring cards. The row has
@@ -880,7 +885,8 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
                                       MediaCard(
                                         key: _getMediaCardKey(index),
                                         item:
-                                            svc.read<bool>(SettingsService.posterDetails) &&
+                                            (widget.posterDetailsOverride ??
+                                                    svc.read<bool>(SettingsService.posterDetails)) &&
                                                 (item.kind == MediaKind.movie || item.kind == MediaKind.show)
                                             ? item.copyWith(raw: {...?item.raw, 'lurokaLibraryCaptions': true})
                                             : item,

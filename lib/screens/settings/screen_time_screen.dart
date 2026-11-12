@@ -16,7 +16,8 @@ import '../../profiles/profile_avatar.dart';
 import '../../services/kids_profile_service.dart';
 import '../../services/screen_time_analytics.dart';
 import '../../services/screen_time_service.dart';
-import '../../services/viewing_activity_summary.dart';
+import '../../services/viewing_activity_summary.dart' hide formatViewingDuration;
+import '../../services/viewing_activity_summary.dart' as viewing;
 import '../../theme/mono_tokens.dart';
 import '../../utils/formatters.dart';
 import '../../utils/media_navigation_helper.dart';
@@ -29,6 +30,10 @@ import '../../focus/key_event_utils.dart';
 import '../../widgets/optimized_media_image.dart';
 import '../../utils/media_image_helper.dart' show ImageType;
 import 'widgets/viewing_activity_charts.dart';
+
+String _formatViewingDuration(int milliseconds) => milliseconds < 60000
+    ? '${(milliseconds / 1000).round().clamp(0, 60)} ${t.settings.secondsShort}'
+    : viewing.formatViewingDuration(milliseconds);
 
 /// Viewing-activity destination page — a standalone feature, not a settings
 /// sub-page. Designed around a hero header, stat cards, an integrated
@@ -47,7 +52,7 @@ extension _PeriodWindow on _Period {
 
 /// Everything one period render needs, loaded in a single pass.
 class _Snapshot {
-  const _Snapshot({
+  _Snapshot({
     required this.summary,
     required this.period,
     required this.allTimeMs,
@@ -68,6 +73,11 @@ class _Snapshot {
 
   final ViewingActivitySummary summary;
   final _Period period;
+  ScreenTimeDateRange? range;
+  int activeDays = 0;
+  int calendarDays = 1;
+  int titleCount = 0;
+  int? previousMs;
   final int allTimeMs;
   final int periodMs;
   final int dailyAverageMs;
@@ -87,8 +97,8 @@ class _Snapshot {
 class ScreenTimeScreen extends StatefulWidget {
   const ScreenTimeScreen({super.key, this.profileId});
 
-  /// Opens another person's ledger read-only (routed through the shared
-  /// profile-PIN helper by the caller); null watches the active profile.
+  /// Opens an explicitly linked child's ledger read-only; null uses the
+  /// active profile. Callers obtain parent access before opening a child.
   final String? profileId;
 
   @override
@@ -103,11 +113,26 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
   _Period _period = _Period.last30;
   int _selectedSegment = -1;
   int _sessionsShown = _sessionPageSize;
+  int _section = 0;
+  final _historyKey = GlobalKey();
+  final _searchController = TextEditingController();
+  String? _historyError;
+  Future<List<ScreenTimeTopTitle>>? _recapTitles;
+  String _historySearch = '';
+  int? _historyKind;
+  ScreenTimeDateRange? _historyRange;
+  List<ScreenTimeSessionRow>? _historyRows;
+  bool _historyMore = false;
+  bool _historyLoading = false;
+  int _historyGeneration = 0;
+  Timer? _searchTimer;
+
   final _backFocus = FocusNode(debugLabel: 'ViewingActivityBack');
 
   @override
   void initState() {
     super.initState();
+    KidsProfileService.instance.addListener(_policyChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && PlatformDetector.isTV() && (ModalRoute.of(context)?.isCurrent ?? true)) {
         _backFocus.requestFocus();
@@ -117,16 +142,25 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
 
   @override
   void dispose() {
+    KidsProfileService.instance.removeListener(_policyChanged);
+    _searchTimer?.cancel();
+    _searchController.dispose();
+    _historyGeneration++;
     _backFocus.dispose();
     super.dispose();
+  }
+
+  void _policyChanged() {
+    if (mounted && _ownerKey != null) _reload();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final service = context.watch<ScreenTimeService?>();
+    final active = context.watch<ActiveProfileProvider?>();
     final profileId = widget.profileId ?? service?.profileId;
-    final ownerKey = '${widget.profileId != null}:${profileId ?? ''}';
+    final ownerKey = '${widget.profileId != null}:${profileId ?? ''}:${active?.activeId ?? ''}';
     if (_snapshot == null || _ownerKey != ownerKey) {
       _ownerKey = ownerKey;
       _selectedSegment = -1;
@@ -135,17 +169,49 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
     }
   }
 
+  @override
+  void didUpdateWidget(covariant ScreenTimeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.profileId != widget.profileId) {
+      _ownerKey = null;
+      _selectedSegment = -1;
+      _sessionsShown = _sessionPageSize;
+      _reload();
+    }
+  }
+
   void _reload() {
+    _historyGeneration++;
+    _searchTimer?.cancel();
+    _searchController.clear();
+    _historySearch = '';
+    _historyKind = null;
+    _historyRows = null;
+    _historyRange = null;
+    _historyError = null;
+    _recapTitles = null;
+    _historyLoading = false;
     final service = context.read<ScreenTimeService?>();
     final profileId = widget.profileId ?? service?.profileId;
+    final active = context.read<ActiveProfileProvider?>();
+    final allowed = _allowed(active, service, profileId);
     final period = _period;
     final sessionsShown = _sessionsShown;
     setState(() {
       _snapshot = () async {
+        if (!allowed) return null;
         if (widget.profileId == null) await service?.flush();
         return _loadSnapshot(service?.database, profileId, period, sessionsShown);
       }();
     });
+  }
+
+  bool _allowed(ActiveProfileProvider? active, ScreenTimeService? service, String? target) {
+    // An explicitly requested profile must always have a real active owner;
+    // the standalone own-profile screen also works in isolated test hosts.
+    final viewer = active?.activeId ?? (widget.profileId == null ? service?.profileId : null);
+    if (active != null && (active.activeId == null || service?.profileId != active.activeId)) return false;
+    return KidsProfileService.instance.canViewActivity(viewerId: viewer, targetId: target);
   }
 
   void _selectPeriod(_Period period) {
@@ -158,9 +224,48 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
     _reload();
   }
 
-  void _showMoreSessions() {
-    _sessionsShown += _sessionPageSize;
-    _reload();
+  void _showMoreSessions() async {
+    final data = await _snapshot;
+    if (mounted && data != null) await _loadHistory(data, append: true);
+  }
+
+  Future<void> _loadHistory(_Snapshot data, {bool append = false}) async {
+    final service = context.read<ScreenTimeService?>();
+    final active = context.read<ActiveProfileProvider?>();
+    if (!_allowed(active, service, data.summary.profileId) ||
+        data.summary.profileId != (widget.profileId ?? service?.profileId) ||
+        data.period != _period) {
+      return;
+    }
+    final db = service?.database;
+    final range = _historyRange ?? data.range;
+    if (db == null || range == null || (append && _historyLoading)) return;
+    final generation = ++_historyGeneration;
+    final existing = append ? (_historyRows ?? data.sessions) : <ScreenTimeSessionRow>[];
+    setState(() {
+      _historyLoading = true;
+      _historyError = null;
+    });
+    try {
+      final rows = await db.getScreenTimeViewingTotals(
+        profileId: data.summary.profileId,
+        startLocalDate: range.startLocalDate,
+        endLocalDate: range.endLocalDate,
+        search: _historySearch,
+        mediaKind: _historyKind,
+        offset: existing.length,
+        limit: _sessionPageSize + 1,
+      );
+      if (!mounted || generation != _historyGeneration) return;
+      setState(() {
+        _historyRows = [...existing, ...rows.take(_sessionPageSize)];
+        _historyMore = rows.length > _sessionPageSize;
+      });
+    } catch (_) {
+      if (mounted && generation == _historyGeneration) setState(() => _historyError = t.activityStats.historyError);
+    } finally {
+      if (mounted && generation == _historyGeneration) setState(() => _historyLoading = false);
+    }
   }
 
   Future<_Snapshot?> _loadSnapshot(AppDatabase? db, String? profileId, _Period period, int sessionsShown) async {
@@ -216,11 +321,11 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
       ScreenTimeAnalytics.hourOfDayBins(db, profileId, range),
       ScreenTimeAnalytics.kindBreakdown(db, profileId, range),
       ScreenTimeAnalytics.topTitles(db, profileId, range),
-      ScreenTimeAnalytics.sessions(db, profileId, range, pageSize: sessionsShown + 1),
+      ScreenTimeAnalytics.viewingTotals(db, profileId, range, limit: sessionsShown + 1),
       ScreenTimeAnalytics.sessions(db, profileId, range, pageSize: 9999),
     ]);
 
-    return _Snapshot(
+    final snapshot = _Snapshot(
       summary: summary,
       period: period,
       allTimeMs: allTimeMs,
@@ -238,13 +343,34 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
       records: results[1] as ScreenTimeRecords,
       empty: allTimeMs == 0,
     );
+    snapshot.titleCount = await db.countScreenTimeViewedTitles(
+      profileId: profileId,
+      startLocalDate: range.startLocalDate,
+      endLocalDate: range.endLocalDate,
+    );
+    snapshot.range = range;
+    snapshot.calendarDays = series.length.clamp(1, 100000);
+    snapshot.activeDays = series.where((point) => point.durationMs > 0).length;
+    if (period.days case final count?) {
+      final start = DateTime(today.year, today.month, today.day - count * 2 + 1);
+      final end = DateTime(today.year, today.month, today.day - count);
+      if (firstDay != null && !firstDay.isAfter(start)) {
+        snapshot.previousMs = allRows
+            .where(
+              (row) =>
+                  row.localDate.compareTo(localDateKey(start)) >= 0 && row.localDate.compareTo(localDateKey(end)) <= 0,
+            )
+            .fold<int>(0, (sum, row) => sum + row.durationMs);
+      }
+    }
+    return snapshot;
   }
 
   @override
   Widget build(BuildContext context) {
     final active = context.watch<ActiveProfileProvider?>();
     final isTv = PlatformDetector.isTV();
-    final kidsBlocked = KidsProfileService.instance.isActiveKids;
+    final service = context.watch<ScreenTimeService?>();
     final theme = Theme.of(context);
 
     return Focus(
@@ -257,32 +383,32 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
           backgroundColor: theme.scaffoldBackgroundColor,
           elevation: 0,
         ),
-        body: kidsBlocked
-            ? Center(
-                child: Padding(padding: const EdgeInsets.all(32), child: Text(t.family.activityUnavailable)),
-              )
-            : FutureBuilder<_Snapshot?>(
-                future: _snapshot,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState != ConnectionState.done && !snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final data = snapshot.data;
-                  final matchesActive =
-                      widget.profileId != null ||
-                      active?.activeId == null ||
-                      data?.summary.profileId == active?.activeId;
-                  if (data == null || !matchesActive) {
-                    return Center(
-                      child: Padding(padding: const EdgeInsets.all(32), child: Text(t.family.activityUnavailable)),
-                    );
-                  }
-                  if (data.empty) {
-                    return _buildEmptyState(context);
-                  }
-                  return StatsEntranceFade(child: _buildPage(context, data, isTv, active, theme));
-                },
-              ),
+        body: ListenableBuilder(
+          listenable: KidsProfileService.instance,
+          builder: (context, _) => !_allowed(active, service, widget.profileId ?? service?.profileId)
+              ? Center(
+                  child: Padding(padding: const EdgeInsets.all(32), child: Text(t.family.activityUnavailable)),
+                )
+              : FutureBuilder<_Snapshot?>(
+                  future: _snapshot,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done && !snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    final data = snapshot.data;
+                    final matchesActive = data?.summary.profileId == (widget.profileId ?? service?.profileId);
+                    if (data == null || !matchesActive) {
+                      return Center(
+                        child: Padding(padding: const EdgeInsets.all(32), child: Text(t.family.activityUnavailable)),
+                      );
+                    }
+                    if (data.empty) {
+                      return _buildEmptyState(context);
+                    }
+                    return StatsEntranceFade(child: _buildPage(context, data, isTv, active, theme));
+                  },
+                ),
+        ),
       ),
     );
   }
@@ -315,18 +441,103 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
           children: [
             _buildHeroHeader(context, data, isTv, active, theme),
             SizedBox(height: isTv ? 28 : 20),
-            _buildStatCards(context, data, isTv, theme),
-            SizedBox(height: isTv ? 32 : 24),
-            _buildTrendSection(context, data, isTv, theme),
-            if (data.titles.isNotEmpty) ...[
-              SizedBox(height: isTv ? 32 : 24),
-              _buildMostWatched(context, data, isTv, theme),
+            if (isTv) ...[
+              Row(
+                children: [
+                  for (final (index, label) in [
+                    t.activityStats.overview,
+                    t.activityStats.history,
+                    t.activityStats.patternsTab,
+                  ].indexed)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: ChoiceChip(
+                        label: Text(label),
+                        selected: _section == index,
+                        onSelected: (_) => setState(() => _section = index),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 20),
             ],
-            SizedBox(height: isTv ? 32 : 24),
-            _buildSessions(context, data, isTv, theme),
-            SizedBox(height: isTv ? 32 : 24),
-            _buildPatterns(context, data, isTv, theme),
-            SizedBox(height: 16),
+            if (!isTv || _section == 0) ...[
+              _buildStatCards(context, data, isTv, theme),
+              const SizedBox(height: 8),
+              Text(t.activityStats.playedHint, style: theme.textTheme.bodySmall),
+              if (data.previousMs != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text('${t.activityStats.previousPeriod}: ${_formatViewingDuration(data.previousMs!)}'),
+                ),
+              const SizedBox(height: 20),
+              if (isTv && MediaQuery.sizeOf(context).width >= 1100 && MediaQuery.textScalerOf(context).scale(1) < 1.5)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: _buildTrendSection(context, data, true, theme)),
+                    const SizedBox(width: 24),
+                    Expanded(child: _buildSessions(context, data, true, theme)),
+                  ],
+                )
+              else ...[
+                _buildSessions(context, data, isTv, theme),
+                const SizedBox(height: 24),
+                _buildTrendSection(context, data, isTv, theme),
+              ],
+              if (data.titles.isNotEmpty) ...[
+                const SizedBox(height: 24),
+                _buildMostWatched(context, data, isTv, theme),
+              ],
+            ],
+            if (isTv && _section == 1) _buildSessions(context, data, isTv, theme),
+            if (!isTv || _section == 2) ...[
+              const SizedBox(height: 24),
+              if (data.activeDays >= 3)
+                _buildPatterns(context, data, isTv, theme)
+              else
+                Text(t.activityStats.gettingStarted),
+            ],
+            const SizedBox(height: 24),
+            ExpansionTile(
+              title: Text(t.activityStats.monthlyRecap),
+              onExpansionChanged: (expanded) {
+                final db = context.read<ScreenTimeService?>()?.database;
+                if (!expanded || db == null || _recapTitles != null) return;
+                final now = DateTime.now();
+                setState(
+                  () => _recapTitles = ScreenTimeAnalytics.topTitles(
+                    db,
+                    data.summary.profileId,
+                    ScreenTimeAnalytics.range(localDateKey(DateTime(now.year, now.month)), localDateKey(now)),
+                  ),
+                );
+              },
+              children: [
+                ListTile(
+                  title: Text(t.activityStats.monthWatched(duration: _formatViewingDuration(data.summary.monthMs))),
+                  subtitle: Text(t.activityStats.measurementHint),
+                ),
+                FutureBuilder<List<ScreenTimeTopTitle>>(
+                  future: _recapTitles,
+                  builder: (context, snapshot) => Column(
+                    children: [
+                      for (final title in (snapshot.data ?? <ScreenTimeTopTitle>[]).take(3))
+                        ListTile(title: Text(title.title), trailing: Text(_formatViewingDuration(title.durationMs))),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              t.activityStats.lifetimeSummary(
+                total: _formatViewingDuration(data.allTimeMs),
+                average: _formatViewingDuration(data.dailyAverageMs),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(t.activityStats.ledgerScope),
           ],
         ),
       ),
@@ -345,7 +556,7 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
     final profile = _targetProfile(active);
     final name = profile?.displayName ?? t.family.thisProfile;
     final kindLabel = _dominantKindLabel(data);
-    final heroText = formatViewingDuration(data.periodMs);
+    final heroText = _formatViewingDuration(data.periodMs);
     final art = _artworkFor(data.titles.firstOrNull, data);
     final colors = theme.colorScheme;
     final light = theme.brightness == Brightness.light;
@@ -373,7 +584,7 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
                 [
                   heroText,
                   _periodLabelFor(data.period),
-                  if (kindLabel.isNotEmpty) t.activityStats.mostlyKind(kind: kindLabel),
+                  if (kindLabel.isNotEmpty && data.activeDays >= 3) t.activityStats.mostlyKind(kind: kindLabel),
                 ].join(' · '),
                 key: const ValueKey('activity_period_summary'),
                 style: theme.textTheme.bodyLarge?.copyWith(color: colors.onSurfaceVariant),
@@ -387,7 +598,11 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
     return Container(
       key: const ValueKey('activity_hero'),
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(color: colors.surfaceContainerLow, borderRadius: BorderRadius.circular(isTv ? 22 : 18)),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(isTv ? 28 : 18),
+        border: isTv ? Border.all(color: colors.primary.withValues(alpha: .22)) : null,
+      ),
       child: Stack(
         children: [
           if (isTv && art != null)
@@ -424,16 +639,55 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  t.family.activity.toUpperCase(),
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: colors.primary,
-                    letterSpacing: 1.8,
-                    fontWeight: FontWeight.w700,
+                if (isTv) ...[
+                  Text(
+                    t.activityStats.overview.toUpperCase(),
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: colors.primary,
+                      letterSpacing: 2.5,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                SizedBox(height: isTv ? 18 : 12),
-                identity(),
+                  const SizedBox(height: 24),
+                  LayoutBuilder(
+                    builder: (context, bounds) {
+                      if (bounds.maxWidth < 760 || MediaQuery.textScalerOf(context).scale(1) > 1.4) {
+                        return identity();
+                      }
+                      return Row(
+                        children: [
+                          Expanded(flex: 3, child: identity()),
+                          const SizedBox(width: 32),
+                          Container(width: 1, height: 88, color: colors.outlineVariant.withValues(alpha: .6)),
+                          const SizedBox(width: 32),
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  heroText,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.displayMedium?.copyWith(
+                                    fontWeight: FontWeight.w300,
+                                    letterSpacing: -1.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  t.activityStats.watchedPeriod,
+                                  style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ] else
+                  identity(),
                 SizedBox(height: isTv ? 20 : 16),
                 _buildPeriodSelector(context, isTv, theme),
               ],
@@ -446,40 +700,41 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
 
   Widget _buildPeriodSelector(BuildContext context, bool isTv, ThemeData theme) {
     final colors = theme.colorScheme;
-    return Wrap(
-      alignment: isTv ? WrapAlignment.end : WrapAlignment.start,
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        for (final period in _Period.values)
-          FocusableButton(
-            key: ValueKey('activity_period_${period.name}'),
-            borderRadius: 20,
-            onPressed: () => _selectPeriod(period),
-            child: GestureDetector(
-              onTap: () => _selectPeriod(period),
-              child: Semantics(
-                selected: _period == period,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: isTv ? 16 : 12, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: _period == period
-                        ? colors.primaryContainer
-                        : colors.surfaceContainerHighest.withValues(alpha: .65),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    _periodLabelFor(period),
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      color: _period == period ? colors.onPrimaryContainer : colors.onSurfaceVariant,
-                      fontWeight: _period == period ? FontWeight.w600 : FontWeight.w400,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        spacing: 8,
+        children: [
+          for (final period in _Period.values)
+            FocusableButton(
+              key: ValueKey('activity_period_${period.name}'),
+              borderRadius: 20,
+              onPressed: () => _selectPeriod(period),
+              child: GestureDetector(
+                onTap: () => _selectPeriod(period),
+                child: Semantics(
+                  selected: _period == period,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: isTv ? 16 : 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: _period == period
+                          ? colors.primaryContainer
+                          : colors.surfaceContainerHighest.withValues(alpha: .65),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      _periodLabelFor(period),
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: _period == period ? colors.onPrimaryContainer : colors.onSurfaceVariant,
+                        fontWeight: _period == period ? FontWeight.w600 : FontWeight.w400,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -487,14 +742,10 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
 
   Widget _buildStatCards(BuildContext context, _Snapshot data, bool isTv, ThemeData theme) {
     final cards = <_StatCard>[
-      _StatCard(label: t.screenTime.today, value: formatViewingDuration(data.summary.todayMs)),
-      _StatCard(label: t.screenTime.thisWeek, value: formatViewingDuration(data.summary.weekMs)),
-      _StatCard(label: t.screenTime.thisMonth, value: formatViewingDuration(data.summary.monthMs)),
-      _StatCard(
-        label: t.activityStats.heroAllTime,
-        value: formatViewingDuration(data.allTimeMs),
-        subtitle: '${t.activityStats.heroDailyAverage}: ${formatViewingDuration(data.dailyAverageMs)}',
-      ),
+      _StatCard(label: t.activityStats.watchedPeriod, value: _formatViewingDuration(data.periodMs)),
+      _StatCard(label: t.activityStats.activeDays, value: '${data.activeDays}'),
+      _StatCard(label: t.activityStats.titlesPlayedLabel, value: '${data.titleCount}'),
+      _StatCard(label: t.activityStats.dailyAverage, value: _formatViewingDuration(data.periodMs ~/ data.calendarDays)),
     ];
 
     if (isTv) {
@@ -556,13 +807,20 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
         // Heatmap
         Container(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerLow,
+            color: theme.colorScheme.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(12),
           ),
           padding: EdgeInsets.all(isTv ? 20 : 14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                t.activityStats.chartScale(
+                  duration: _formatViewingDuration(
+                    segments.fold<int>(0, (peak, segment) => segment.milliseconds > peak ? segment.milliseconds : peak),
+                  ),
+                ),
+              ),
               StatsDailyBarChart(
                 segments: segments,
                 selectedLabel: selected?.label,
@@ -598,46 +856,64 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
                 const SizedBox(height: 10),
                 Text(
                   t.activityStats.gapDetail(
-                    stat: formatViewingDuration(selected.milliseconds),
+                    stat: _formatViewingDuration(selected.milliseconds),
                     range: statsSegmentDisplayLabel(selected),
                   ),
                   key: const ValueKey('activity_trend_selection'),
                   style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                 ),
               ],
+              if (selected != null)
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _historyRange = (startLocalDate: selected.label, endLocalDate: selected.endKey ?? selected.label);
+                      _section = 1;
+                    });
+                    unawaited(_loadHistory(data));
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      final historyContext = _historyKey.currentContext;
+                      if (mounted && historyContext != null) {
+                        Scrollable.ensureVisible(historyContext, duration: const Duration(milliseconds: 250));
+                      }
+                    });
+                  },
+                  child: Text(t.activityStats.drillDown),
+                ),
               SizedBox(height: isTv ? 18 : 14),
-              Wrap(
-                spacing: isTv ? 16 : 10,
-                runSpacing: 8,
-                children: [
-                  _buildTrendBadge(
-                    context,
-                    icon: Symbols.local_fire_department_rounded,
-                    label: t.activityStats.currentStreak,
-                    value: t.activityStats.dayCount(n: data.streaks.currentDays),
-                    accent: accent,
-                    isTv: isTv,
-                  ),
-                  _buildTrendBadge(
-                    context,
-                    icon: Symbols.emoji_events_rounded,
-                    label: t.activityStats.longestStreak,
-                    value: t.activityStats.dayCount(n: data.streaks.longestDays),
-                    accent: accent,
-                    isTv: isTv,
-                  ),
-                  if (data.records.longestDay.durationMs > 0)
+              if (data.activeDays >= 3)
+                Wrap(
+                  spacing: isTv ? 16 : 10,
+                  runSpacing: 8,
+                  children: [
                     _buildTrendBadge(
                       context,
-                      icon: Symbols.star_rounded,
-                      label: t.activityStats.bestDay,
-                      value:
-                          '${formatViewingDuration(data.records.longestDay.durationMs)} · ${formatAbbreviatedDate(data.records.longestDay.localDate)}',
+                      icon: Symbols.local_fire_department_rounded,
+                      label: t.activityStats.currentStreak,
+                      value: t.activityStats.dayCount(n: data.streaks.currentDays),
                       accent: accent,
                       isTv: isTv,
                     ),
-                ],
-              ),
+                    _buildTrendBadge(
+                      context,
+                      icon: Symbols.emoji_events_rounded,
+                      label: t.activityStats.longestStreak,
+                      value: t.activityStats.dayCount(n: data.streaks.longestDays),
+                      accent: accent,
+                      isTv: isTv,
+                    ),
+                    if (data.records.longestDay.durationMs > 0)
+                      _buildTrendBadge(
+                        context,
+                        icon: Symbols.star_rounded,
+                        label: t.activityStats.bestDay,
+                        value:
+                            '${_formatViewingDuration(data.records.longestDay.durationMs)} · ${formatAbbreviatedDate(data.records.longestDay.localDate)}',
+                        accent: accent,
+                        isTv: isTv,
+                      ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -657,7 +933,7 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isTv ? 18 : 14, vertical: isTv ? 10 : 8),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLow,
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(isTv ? 24 : 20),
         border: Border.all(color: accent.withValues(alpha: 0.3)),
       ),
@@ -712,18 +988,95 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
   // ─── Recent sessions (wide cards) ───────────────────────────
 
   Widget _buildSessions(BuildContext context, _Snapshot data, bool isTv, ThemeData theme) {
+    final preview = isTv && _section == 0;
     return Column(
+      key: _historyKey,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: Text(
-            t.activityStats.sessionsTitle,
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 0.5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                t.activityStats.recentViewingTitle,
+                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 0.5),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                t.activityStats.recentViewingHint,
+                style: theme.textTheme.bodySmall?.copyWith(color: tokens(context).textMuted),
+              ),
+            ],
           ),
         ),
-        for (final session in data.sessions) _buildSessionCard(context, session, isTv, theme),
-        if (data.hasMoreSessions)
+        if (!preview)
+          TextField(
+            controller: _searchController,
+            decoration: InputDecoration(prefixIcon: Icon(Icons.search), hintText: t.activityStats.searchHistory),
+            onChanged: (value) {
+              _historyGeneration++;
+              _historySearch = value.trim();
+              _searchTimer?.cancel();
+              _searchTimer = Timer(const Duration(milliseconds: 300), () => _loadHistory(data));
+            },
+          ),
+        if (!preview)
+          Wrap(
+            spacing: 8,
+            children: [
+              for (final (kind, label) in <(int?, String)>[
+                (null, t.activityStats.allKinds),
+                (0, t.activityStats.moviesFilter),
+                (1, t.activityStats.episodesFilter),
+              ])
+                ChoiceChip(
+                  label: Text(label),
+                  selected: _historyKind == kind,
+                  onSelected: (_) {
+                    setState(() => _historyKind = kind);
+                    unawaited(_loadHistory(data));
+                  },
+                ),
+              ActionChip(
+                label: Text(
+                  _historyRange == null
+                      ? t.activityStats.datesFilter
+                      : '${_historyRange!.startLocalDate} – ${_historyRange!.endLocalDate}',
+                ),
+                onPressed: () async {
+                  final dates = await showDateRangePicker(
+                    context: context,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
+                  if (!mounted || dates == null) return;
+                  setState(
+                    () => _historyRange = (
+                      startLocalDate: localDateKey(dates.start),
+                      endLocalDate: localDateKey(dates.end),
+                    ),
+                  );
+                  unawaited(_loadHistory(data));
+                },
+              ),
+              if (_historyRange != null)
+                ActionChip(
+                  label: Text(t.activityStats.clearDates),
+                  onPressed: () {
+                    setState(() => _historyRange = null);
+                    unawaited(_loadHistory(data));
+                  },
+                ),
+            ],
+          ),
+        if (_historyError != null) TextButton(onPressed: () => _loadHistory(data), child: Text(_historyError!)),
+        if (_historyLoading) const LinearProgressIndicator(),
+        if ((_historyRows ?? data.sessions).isEmpty) Text(t.activityStats.noMatches),
+        for (final session in preview ? data.sessions.take(3) : (_historyRows ?? data.sessions))
+          _buildSessionCard(context, session, isTv, theme),
+        if (preview) TextButton(onPressed: () => setState(() => _section = 1), child: Text(t.activityStats.allHistory)),
+        if (!preview && (_historyRows == null ? data.hasMoreSessions : _historyMore))
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: FocusableButton(
@@ -766,7 +1119,7 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
         ? [session.itemTitle, formatAbbreviatedDate(session.localDate)].whereType<String>().join(' · ')
         : '${formatAbbreviatedDate(session.localDate)} · ${statsKindLabel(kind)}';
 
-    final thumbWidth = isTv ? 180.0 : 120.0;
+    final thumbWidth = isTv ? 200.0 : 88.0;
     final thumbHeight = thumbWidth * 9 / 16;
     final onOpen = _sessionOpened(session);
 
@@ -779,7 +1132,7 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
           onTap: onOpen,
           child: Container(
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerLow,
+              color: theme.colorScheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(12),
             ),
             clipBehavior: Clip.antiAlias,
@@ -807,32 +1160,19 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
                       children: [
                         Text(
                           heading,
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           detail,
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(color: mono.textMuted),
                         ),
+                        Text(_formatViewingDuration(session.durationMs), style: theme.textTheme.labelMedium),
                       ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(right: isTv ? 20 : 14),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      formatViewingDuration(session.durationMs),
-                      style: theme.textTheme.bodyMedium?.copyWith(color: mono.textMuted),
                     ),
                   ),
                 ),
@@ -977,10 +1317,9 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
 // ─── Private widgets ─────────────────────────────────────────
 
 class _StatCard {
-  const _StatCard({required this.label, required this.value, this.subtitle});
+  const _StatCard({required this.label, required this.value});
   final String label;
   final String value;
-  final String? subtitle;
 }
 
 class _StatCardWidget extends StatelessWidget {
@@ -996,7 +1335,7 @@ class _StatCardWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isTv ? 24 : 16, vertical: isTv ? 20 : 14),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLow,
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(isTv ? 16 : 12),
       ),
       child: Column(
@@ -1008,10 +1347,6 @@ class _StatCardWidget extends StatelessWidget {
           ),
           SizedBox(height: isTv ? 8 : 6),
           Text(card.label, style: theme.textTheme.labelMedium?.copyWith(color: mono.textMuted, letterSpacing: 0.5)),
-          if (card.subtitle != null) ...[
-            SizedBox(height: 4),
-            Text(card.subtitle!, style: theme.textTheme.bodySmall?.copyWith(color: mono.textMuted)),
-          ],
         ],
       ),
     );
@@ -1032,7 +1367,7 @@ class _PatternCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(isTv ? 16 : 12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLow,
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(isTv ? 16 : 12),
       ),
       child: Column(

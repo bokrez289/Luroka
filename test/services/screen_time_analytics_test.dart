@@ -34,6 +34,7 @@ void main() {
     String? showTitle,
     int? seasonIndex,
     int? episodeIndex,
+    String? serverKey = 'srv',
   }) => ScreenTimeSessionsCompanion.insert(
     profileId: profileId,
     localDate: localDate,
@@ -41,13 +42,60 @@ void main() {
     endUtcMs: end.millisecondsSinceEpoch,
     durationMs: end.difference(start).inMilliseconds,
     mediaKind: kind.code,
-    serverKey: const Value('srv'),
+    serverKey: Value(serverKey),
     itemKey: Value(itemKey),
     itemTitle: Value(itemTitle),
     showTitle: Value(showTitle),
     seasonIndex: Value(seasonIndex),
     episodeIndex: Value(episodeIndex),
   );
+
+  test('history filters preserve profile scope, literal search, totals and pagination', () async {
+    for (final (profile, title, kind, key) in [
+      ('p1', 'Inside Out', ScreenTimeMediaKind.movie, 'movie'),
+      ('p1', 'Inside Out', ScreenTimeMediaKind.movie, 'movie'),
+      ('p1', '100% Pilot', ScreenTimeMediaKind.episode, 'episode'),
+      ('p2', 'Inside Out', ScreenTimeMediaKind.movie, 'private'),
+    ]) {
+      await db
+          .into(db.screenTimeSessions)
+          .insert(
+            sessionRow(
+              profileId: profile,
+              localDate: '2026-11-11',
+              start: DateTime(2026, 11, 11, 10),
+              end: DateTime(2026, 11, 11, 10, 5),
+              kind: kind,
+              itemKey: key,
+              itemTitle: title,
+            ),
+          );
+    }
+    Future<List<ScreenTimeSessionRow>> query({String search = '', int? kind, int offset = 0}) =>
+        db.getScreenTimeViewingTotals(
+          profileId: 'p1',
+          startLocalDate: '2026-11-11',
+          endLocalDate: '2026-11-11',
+          search: search,
+          mediaKind: kind,
+          offset: offset,
+          limit: 1,
+        );
+    final movies = await query(search: 'inside', kind: 0);
+    expect(movies.single.durationMs, 600000);
+    expect(movies.single.itemKey, 'movie');
+    expect((await query(search: '%')).single.itemKey, 'episode');
+    expect(await query(search: 'inside', kind: 1), isEmpty);
+    expect((await query()).single.itemKey, isNot((await query(offset: 1)).single.itemKey));
+    expect(
+      await db.countScreenTimeViewedTitles(profileId: 'p1', startLocalDate: '2026-11-11', endLocalDate: '2026-11-11'),
+      2,
+    );
+    expect(
+      await db.getScreenTimeViewingTotals(profileId: 'p1', startLocalDate: '2026-11-12', endLocalDate: '2026-11-12'),
+      isEmpty,
+    );
+  });
 
   test('dailySeries zero-fills missing days inside the range', () async {
     await seedDaily('p1', '2026-03-12', 5000);
@@ -56,12 +104,7 @@ void main() {
     final series = await ScreenTimeAnalytics.dailySeries(db, 'p1', range('2026-03-12', '2026-03-15'));
 
     expect(series.length, 4);
-    expect(series.map((point) => point.localDate).toList(), [
-      '2026-03-12',
-      '2026-03-13',
-      '2026-03-14',
-      '2026-03-15',
-    ]);
+    expect(series.map((point) => point.localDate).toList(), ['2026-03-12', '2026-03-13', '2026-03-14', '2026-03-15']);
     expect(series.map((point) => point.durationMs).toList(), [5000, 0, 7000, 0]);
   });
 
@@ -263,12 +306,7 @@ void main() {
       ),
     ]);
 
-    final bins = await ScreenTimeAnalytics.hourOfDayBins(
-      db,
-      'p1',
-      range('2026-03-12', '2026-03-13'),
-      binMinutes: 60,
-    );
+    final bins = await ScreenTimeAnalytics.hourOfDayBins(db, 'p1', range('2026-03-12', '2026-03-13'), binMinutes: 60);
 
     expect(bins[23].durationMs, 600000);
     expect(bins[0].durationMs, 1200000);
@@ -316,5 +354,102 @@ void main() {
       pageSize: 2,
     );
     expect(secondPage.single.itemTitle, 'Movie A');
+  });
+
+  test('viewing totals combine interrupted playback within the selected period without merging identities', () async {
+    await db.addScreenTimeSessions([
+      sessionRow(
+        profileId: 'p1',
+        localDate: '2026-03-12',
+        start: DateTime(2026, 3, 12, 9),
+        end: DateTime(2026, 3, 12, 9, 3),
+        kind: ScreenTimeMediaKind.episode,
+        itemKey: 'ep1',
+        itemTitle: 'Episode 1',
+        showTitle: 'Show',
+        seasonIndex: 1,
+        episodeIndex: 1,
+      ),
+      sessionRow(
+        profileId: 'p1',
+        localDate: '2026-03-12',
+        start: DateTime(2026, 3, 12, 9, 15),
+        end: DateTime(2026, 3, 12, 9, 16),
+        kind: ScreenTimeMediaKind.episode,
+        itemKey: 'ep1',
+        itemTitle: 'Episode 1',
+        showTitle: 'Show',
+        seasonIndex: 1,
+        episodeIndex: 1,
+      ),
+      sessionRow(
+        profileId: 'p1',
+        localDate: '2026-03-13',
+        start: DateTime(2026, 3, 13, 9),
+        end: DateTime(2026, 3, 13, 9, 5),
+        kind: ScreenTimeMediaKind.episode,
+        itemKey: 'ep1',
+        itemTitle: 'Episode 1',
+        showTitle: 'Show',
+        seasonIndex: 1,
+        episodeIndex: 1,
+      ),
+      sessionRow(
+        profileId: 'p1',
+        localDate: '2026-03-13',
+        start: DateTime(2026, 3, 13, 10),
+        end: DateTime(2026, 3, 13, 10, 2),
+        kind: ScreenTimeMediaKind.episode,
+        itemKey: 'ep2',
+        itemTitle: 'Episode 2',
+        showTitle: 'Show',
+      ),
+      sessionRow(
+        profileId: 'p1',
+        localDate: '2026-03-13',
+        start: DateTime(2026, 3, 13, 11),
+        end: DateTime(2026, 3, 13, 11, 2),
+        kind: ScreenTimeMediaKind.episode,
+        itemKey: 'ep1',
+        itemTitle: 'Other server',
+        serverKey: 'different-server',
+      ),
+      for (var i = 0; i < 2; i++)
+        sessionRow(
+          profileId: 'p1',
+          localDate: '2026-03-13',
+          start: DateTime(2026, 3, 13, 12, i * 2),
+          end: DateTime(2026, 3, 13, 12, i * 2 + 1),
+          kind: ScreenTimeMediaKind.episode,
+          itemKey: 'unknown-server',
+          itemTitle: 'Unknown server',
+          serverKey: null,
+        ),
+      sessionRow(
+        profileId: 'p2',
+        localDate: '2026-03-13',
+        start: DateTime(2026, 3, 13, 13),
+        end: DateTime(2026, 3, 13, 14),
+        kind: ScreenTimeMediaKind.episode,
+        itemKey: 'ep1',
+        itemTitle: 'Other profile',
+      ),
+    ]);
+
+    final bothDays = range('2026-03-12', '2026-03-13');
+    final totals = await ScreenTimeAnalytics.viewingTotals(db, 'p1', bothDays);
+    expect(totals, hasLength(5));
+    final combined = totals.singleWhere((row) => row.itemTitle == 'Episode 1');
+    expect(combined.durationMs, const Duration(minutes: 9).inMilliseconds);
+    expect(combined.localDate, '2026-03-13');
+    expect(combined.episodeIndex, 1);
+    expect(totals.where((row) => row.itemTitle == 'Unknown server'), hasLength(2));
+    expect(totals.where((row) => row.itemTitle == 'Other server'), hasLength(1));
+    expect((await ScreenTimeAnalytics.viewingTotals(db, 'p1', bothDays, limit: 2)).length, 2);
+    expect((await ScreenTimeAnalytics.viewingTotals(db, 'p1', bothDays, limit: 2, offset: 2)).length, 2);
+
+    final firstDay = await ScreenTimeAnalytics.viewingTotals(db, 'p1', range('2026-03-12', '2026-03-12'));
+    expect(firstDay.single.durationMs, const Duration(minutes: 4).inMilliseconds);
+    expect(await db.getScreenTimeSessions(profileId: 'p1'), hasLength(7));
   });
 }

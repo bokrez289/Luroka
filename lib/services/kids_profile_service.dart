@@ -110,6 +110,14 @@ class KidsProfileService extends ChangeNotifier {
 
   KidsAvatarKind avatarFor(String id) => KidsAvatarKind.fromId((_children[id] as Map?)?['avatar'] as String?);
   String? parentFor(String id) => (_children[id] as Map?)?['parentId'] as String?;
+
+  /// Viewing activity belongs to the active person. A parent may also view the
+  /// activity of their explicitly linked children; shared server credentials
+  /// do not grant access to another adult's local history.
+  bool canViewActivity({required String? viewerId, required String? targetId}) {
+    if (viewerId == null || targetId == null || isKids(viewerId)) return false;
+    return targetId == viewerId || (isKids(targetId) && parentFor(targetId) == viewerId);
+  }
   bool hideKidsFor(String? id) => ((_data['hideKids'] as Map?)?[id] as bool?) ?? false;
   bool hasHideKidsPreference(String id) => (_data['hideKids'] as Map?)?.containsKey(id) ?? false;
   bool get hasParentPin => (_data['parentPin'] as String?)?.isNotEmpty ?? false;

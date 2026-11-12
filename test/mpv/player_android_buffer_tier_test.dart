@@ -16,8 +16,8 @@ import '../test_helpers/prefs.dart';
 Future<MethodCall> _captureInitialize({required Future<void> Function(PlayerAndroid player) configure}) async {
   late MethodCall initialize;
   await withMockPlayerChannels(
-    methodChannelName: 'com.luroka/exo_player',
-    eventChannelName: 'com.luroka/exo_player/events',
+    methodChannelName: 'com.plezy/exo_player',
+    eventChannelName: 'com.plezy/exo_player/events',
     methodHandler: (call) async {
       if (call.method == 'initialize') initialize = call;
       return call.method == 'initialize' ? true : null;

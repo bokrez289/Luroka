@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/connection/connection.dart';
 import 'package:luroka/connection/connection_registry.dart';
 import 'package:luroka/database/app_database.dart';
+import 'package:luroka/media/home_layout.dart';
 import 'package:luroka/profiles/active_profile_provider.dart';
 import 'package:luroka/profiles/plex_home_service.dart';
 import 'package:luroka/profiles/profile.dart';
@@ -367,6 +368,7 @@ void main() {
     expect(await ConnectionRegistry(db).get(connection.id), isNull);
     expect(await ProfileConnectionRegistry(db).get(newProfile.id, connection.id), isNull);
     expect(storage.getProfileLastUsed(newProfile.id), isNull);
+    expect(storage.getHomeLayout(newProfile.id).spotlightSource, HomeSpotlightSource.trending);
     expect(storage.getActiveProfileId(), priorProfile.id);
     expect(activeProfiles.activeId, priorProfile.id);
     await tester.pumpWidget(const SizedBox.shrink());
@@ -437,6 +439,7 @@ void main() {
     expect(await ConnectionRegistry(db).get(connection.id), isNotNull);
     expect(await ProfileConnectionRegistry(db).get(profile.id, connection.id), isNotNull);
     expect(storage.getActiveProfileId(), profile.id);
+    expect(storage.getHomeLayout(profile.id).spotlightSource, HomeSpotlightSource.forYou);
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
   });

@@ -2,17 +2,22 @@ import 'dart:convert';
 
 import 'media_hub.dart';
 import 'media_item.dart';
+import 'home_progress.dart';
 import 'media_kind.dart';
 
 const homeContinueWatchingId = 'continue_watching';
+const homeNextUpId = 'home.nextup';
 const homePinnedCollectionsId = 'custom_pinned_collections';
 const homeStudiosId = 'custom_studios';
+
+enum HomeSpotlightSource { forYou, trending, continueWatching }
 
 /// Includes library identity: split hubs from two libraries may share an identifier.
 String homeRowKey(MediaHub hub) => jsonEncode([hub.serverId, hub.libraryId, hub.identifier ?? hub.id]);
 
 String get homeContinueWatchingKey =>
     homeRowKey(const MediaHub(id: homeContinueWatchingId, title: '', type: 'mixed', items: []));
+String get homeNextUpKey => homeRowKey(const MediaHub(id: homeNextUpId, title: '', type: 'mixed', items: []));
 
 /// Seasonal recommendation shelves are optional by default, while ordinary
 /// server recommendations and recently-added shelves remain visible.
@@ -34,23 +39,39 @@ List<MediaHub> buildHomeRows({
   List<MediaItem> studios = const [],
   String studiosTitle = 'Studios',
   bool hasMoreContinueWatching = false,
+  bool splitContinueWatching = false,
+  bool hasMoreNextUp = false,
+  String nextUpTitle = 'Next Up',
   bool includeEmpty = false,
-}) => [
-  if (includeEmpty || onDeck.isNotEmpty)
-    MediaHub(
-      id: homeContinueWatchingId,
-      title: continueWatchingTitle,
-      type: 'mixed',
-      items: onDeck,
-      size: onDeck.length + (hasMoreContinueWatching ? 1 : 0),
-      more: hasMoreContinueWatching,
-    ),
-  if (includeEmpty || pins.isNotEmpty)
-    MediaHub(id: homePinnedCollectionsId, title: pinnedTitle, type: 'collection', items: pins, size: pins.length),
-  if (includeEmpty || studios.isNotEmpty)
-    MediaHub(id: homeStudiosId, title: studiosTitle, type: 'studio', items: studios, size: studios.length),
-  ...hubs.where((hub) => includeEmpty || hub.items.isNotEmpty),
-];
+}) {
+  final resume = splitContinueWatching ? onDeck.where((item) => !isHomeNextUp(item)).toList() : onDeck;
+  final nextUp = splitContinueWatching ? onDeck.where(isHomeNextUp).toList() : const <MediaItem>[];
+  return [
+    if (includeEmpty || resume.isNotEmpty)
+      MediaHub(
+        id: homeContinueWatchingId,
+        title: continueWatchingTitle,
+        type: 'mixed',
+        items: resume,
+        size: resume.length + (hasMoreContinueWatching ? 1 : 0),
+        more: hasMoreContinueWatching,
+      ),
+    if (splitContinueWatching && (includeEmpty || nextUp.isNotEmpty))
+      MediaHub(
+        id: homeNextUpId,
+        title: nextUpTitle,
+        type: 'mixed',
+        items: nextUp,
+        size: nextUp.length + (hasMoreNextUp ? 1 : 0),
+        more: hasMoreNextUp,
+      ),
+    if (includeEmpty || pins.isNotEmpty)
+      MediaHub(id: homePinnedCollectionsId, title: pinnedTitle, type: 'collection', items: pins, size: pins.length),
+    if (includeEmpty || studios.isNotEmpty)
+      MediaHub(id: homeStudiosId, title: studiosTitle, type: 'studio', items: studios, size: studios.length),
+    ...hubs.where((hub) => includeEmpty || hub.items.isNotEmpty),
+  ];
+}
 
 /// Local presentation preferences, independent of upstream's fetch/watch state.
 class HomeLayout {
@@ -59,30 +80,60 @@ class HomeLayout {
     Iterable<String> hidden = const [],
     Iterable<String> shown = const [],
     Iterable<MediaItem> pins = const [],
+    this.splitContinueWatching = false,
+    this.spotlightSource = HomeSpotlightSource.trending,
+    Iterable<String> studioOrder = const [],
+    Iterable<String> hiddenStudios = const [],
   }) : order = List.unmodifiable(order.toSet()),
        hidden = Set.unmodifiable(hidden),
        shown = Set.unmodifiable(shown),
-       pins = List.unmodifiable(pins);
+       pins = List.unmodifiable(pins),
+       studioOrder = List.unmodifiable(studioOrder.toSet()),
+       hiddenStudios = Set.unmodifiable(hiddenStudios);
 
   final List<String> order;
   final Set<String> hidden;
   final Set<String> shown;
   final List<MediaItem> pins;
+  final bool splitContinueWatching;
+  final HomeSpotlightSource spotlightSource;
+  final List<String> studioOrder;
+  final Set<String> hiddenStudios;
 
   HomeLayout copyWith({
     Iterable<String>? order,
     Iterable<String>? hidden,
     Iterable<String>? shown,
     Iterable<MediaItem>? pins,
+    bool? splitContinueWatching,
+    HomeSpotlightSource? spotlightSource,
+    Iterable<String>? studioOrder,
+    Iterable<String>? hiddenStudios,
   }) => HomeLayout(
     order: order ?? this.order,
     hidden: hidden ?? this.hidden,
     shown: shown ?? this.shown,
     pins: pins ?? this.pins,
+    splitContinueWatching: splitContinueWatching ?? this.splitContinueWatching,
+    spotlightSource: spotlightSource ?? this.spotlightSource,
+    studioOrder: studioOrder ?? this.studioOrder,
+    hiddenStudios: hiddenStudios ?? this.hiddenStudios,
   );
 
   bool isHidden(MediaHub hub) =>
       hidden.contains(homeRowKey(hub)) || (isSeasonalHomeRow(hub) && !shown.contains(homeRowKey(hub)));
+
+  List<T> arrangeStudios<T>(Iterable<T> studios, String Function(T) keyOf) {
+    final positions = {for (final (index, key) in studioOrder.indexed) key: index};
+    final indexed = studios.indexed.where((entry) => !hiddenStudios.contains(keyOf(entry.$2))).toList();
+    indexed.sort((a, b) {
+      final comparison = (positions[keyOf(a.$2)] ?? studioOrder.length).compareTo(
+        positions[keyOf(b.$2)] ?? studioOrder.length,
+      );
+      return comparison == 0 ? a.$1.compareTo(b.$1) : comparison;
+    });
+    return [for (final entry in indexed) entry.$2];
+  }
 
   List<MediaHub> arrange(List<MediaHub> rows, {bool includeHidden = false}) {
     final positions = {for (final (index, key) in order.indexed) key: index};
@@ -97,10 +148,14 @@ class HomeLayout {
   }
 
   Map<String, dynamic> toJson() => {
-    'version': 1,
+    'version': 2,
     'order': order,
     'hidden': hidden.toList(),
     'shown': shown.toList(),
+    'splitContinueWatching': splitContinueWatching,
+    'spotlightSource': spotlightSource.name,
+    'studioOrder': studioOrder,
+    'hiddenStudios': hiddenStudios.toList(),
     // Only display/navigation metadata; never retain raw server responses.
     'pins': [for (final pin in pins) _pinSnapshot(pin).toJson()],
   };
@@ -131,6 +186,12 @@ class HomeLayout {
       hidden: strings(json['hidden']),
       shown: strings(json['shown']),
       pins: pins,
+      splitContinueWatching: json['splitContinueWatching'] == true,
+      spotlightSource:
+          HomeSpotlightSource.values.where((value) => value.name == json['spotlightSource']).firstOrNull ??
+          HomeSpotlightSource.trending,
+      studioOrder: strings(json['studioOrder']),
+      hiddenStudios: strings(json['hiddenStudios']),
     );
   }
 

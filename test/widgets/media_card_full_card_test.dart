@@ -97,6 +97,36 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  for (final tv in [false, true]) {
+    for (final nextUp in [false, true]) {
+      testWidgets('${tv ? 'TV' : 'phone'} ${nextUp ? 'Next Up' : 'Continue Watching'} show posters identify the episode', (tester) async {
+        TvDetectionService.debugSetAppleTVOverride(tv);
+        final item = testMediaItem(kind: MediaKind.episode, title: 'Episode title', grandparentTitle: 'Show title',
+          parentIndex: 2, index: 4, durationMs: 3600000, viewOffsetMs: 300000);
+        await tester.pumpWidget(_TestApp(child: SizedBox(width: 200, height: 300, child: MediaCard(
+          item: item, viewModeOverride: ViewMode.grid, cinemaArtwork: true, isOffline: true,
+          isInContinueWatching: !nextUp, usesContinueWatchingAction: true,
+          episodePosterModeOverride: EpisodePosterMode.seriesPoster,
+        ))));
+        expect(find.text('S2 E4'), findsOneWidget);
+        expect(find.text('Show title'), findsNothing);
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+
+  testWidgets('progress episode caption remains visible with poster details enabled', (tester) async {
+    final item = testMediaItem(kind: MediaKind.episode, title: 'Episode title', grandparentTitle: 'Show title',
+      parentIndex: 2, index: 4);
+    await tester.pumpWidget(_TestApp(child: SizedBox(width: 200, height: 330, child: MediaCard(
+      item: item, viewModeOverride: ViewMode.grid, isOffline: true, usesContinueWatchingAction: true,
+      episodePosterModeOverride: EpisodePosterMode.seriesPoster,
+    ))));
+    expect(find.text('S2 E4'), findsOneWidget);
+    expect(find.text('Show title'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   test('full bleed grid delegates use image aspect ratios', () {
     expect(MediaGridDelegate.aspectRatioFor(fullBleedImage: true), GridLayoutConstants.fullCardPosterAspectRatio);
     expect(

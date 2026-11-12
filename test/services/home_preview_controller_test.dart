@@ -10,6 +10,7 @@ import 'package:luroka/media/media_rating.dart';
 import 'package:luroka/media/media_server_client.dart';
 import 'package:luroka/services/home_preview_controller.dart';
 import 'package:luroka/services/kids_profile_service.dart';
+import 'package:luroka/utils/media_server_http_client.dart';
 import '../test_helpers/prefs.dart';
 
 class _Client extends Fake implements MediaServerClient {
@@ -28,6 +29,16 @@ class _Client extends Fake implements MediaServerClient {
   }
 }
 
+class _PreviewClient extends _Client implements PreviewMetadataClient {
+  _PreviewClient(super.id);
+  final aborts = <AbortController>[];
+  @override
+  Future<MediaItem?> fetchPreviewItem(String id, {required AbortController abort}) {
+    aborts.add(abort);
+    return Future.any([fetchItem(id), abort.trigger.then<MediaItem?>((_) => null)]);
+  }
+}
+
 MediaItem item(String id, {String server = 'server', String? summary}) => MediaItem(
   id: id,
   backend: MediaBackend.plex,
@@ -39,6 +50,32 @@ MediaItem item(String id, {String server = 'server', String? summary}) => MediaI
 );
 
 void main() {
+  test('preview deadline cancels the transport', () => fakeAsync((clock) {
+    final client = _PreviewClient('server');
+    final controller = HomePreviewController(
+      resolveClient: (_) => client, requestTimeout: const Duration(seconds: 1),
+    );
+    controller.select(item('a'), rowTitle: 'Movies');
+    clock.elapse(const Duration(milliseconds: 220));
+    clock.elapse(const Duration(seconds: 1));
+    expect(client.aborts.single.isAborted, isTrue);
+    expect(controller.value!.item.id, 'a');
+    controller.dispose();
+    clock.flushMicrotasks();
+  }));
+  test('new selection cancels preview transport and starts the settled successor', () => fakeAsync((clock) {
+    final client = _PreviewClient('server');
+    final controller = HomePreviewController(resolveClient: (_) => client);
+    controller.select(item('a'), rowTitle: 'Movies');
+    clock.elapse(const Duration(milliseconds: 220));
+    controller.select(item('b'), rowTitle: 'Movies');
+    expect(client.aborts.first.isAborted, isTrue);
+    clock.elapse(const Duration(milliseconds: 220));
+    expect(client.requests, ['a', 'b']);
+    controller.dispose();
+    expect(client.aborts.last.isAborted, isTrue);
+    clock.flushMicrotasks();
+  }));
   test('kids previews remove a stale safe hero when fresh metadata is mature', () async {
     resetSharedPreferencesForTest();
     final kids = KidsProfileService.instance;
@@ -210,7 +247,7 @@ void main() {
   );
 
   test(
-    'a stalled request times out without blocking the newest selection',
+    'an uncancellable request keeps the gate until it settles',
     () => fakeAsync((clock) {
       final client = _Client('server');
       final controller = HomePreviewController(
@@ -222,9 +259,10 @@ void main() {
       controller.select(item('b'), rowTitle: 'Movies');
       clock.elapse(const Duration(milliseconds: 220));
       clock.elapse(const Duration(seconds: 1));
-      expect(client.requests, ['a', 'b']);
+      expect(client.requests, ['a']);
       client.replies[0].complete(item('a', summary: 'Too late'));
       clock.flushMicrotasks();
+      expect(client.requests, ['a', 'b']);
       expect(controller.value!.item.id, 'b');
       client.replies[1].complete(item('b', summary: 'Current'));
       clock.flushMicrotasks();

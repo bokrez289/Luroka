@@ -13,20 +13,30 @@ import '../focus/focusable_action_bar.dart';
 import '../focus/locked_hub_controller.dart';
 
 import '../media/media_item.dart';
+import '../media/catalog_item_ref.dart';
 import '../media/media_server_client.dart';
 import '../media/media_hub.dart';
 import '../media/media_kind.dart';
+import '../media/media_backend.dart';
 import '../media/home_layout.dart';
+import '../media/home_progress.dart';
+import '../models/catalog/catalog_item.dart' show CatalogSourceId;
 import '../utils/media_image_helper.dart';
 import '../widgets/system_clock.dart';
 import '../providers/discover_provider.dart';
 import '../providers/trending_spotlight_provider.dart';
 import '../providers/home_layout_provider.dart';
+import '../providers/home_favorites_snapshot.dart';
+import '../providers/home_taste_provider.dart';
+import '../providers/catalog_sources_provider.dart';
+import '../providers/libraries_provider.dart';
+import '../providers/watch_state_store.dart';
 import '../providers/studios_provider.dart';
 import '../providers/hidden_libraries_provider.dart';
 import '../providers/multi_server_provider.dart';
 import '../widgets/home_dashboard.dart';
 import '../widgets/app_menu.dart';
+import '../widgets/profile_menu.dart';
 import '../widgets/profile_switching_overlay.dart';
 import 'profile/profile_switch_screen.dart';
 import 'downloads/downloads_screen.dart';
@@ -54,8 +64,10 @@ import '../navigation/settings_shortcut.dart';
 import '../navigation/main_screen_scope.dart' show HomeScrollToTop;
 import '../watch_together/watch_together.dart';
 import 'settings/home_layout_screen.dart';
+import 'profile/family_settings_screen.dart';
 import 'studio_browser_screen.dart';
 import 'studios_screen.dart';
+import 'video_player_screen.dart' show VideoPlayerScreenState;
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({super.key});
@@ -72,6 +84,16 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   /// the build code reading naturally.
   late final DiscoverProvider _discover;
   TrendingSpotlightProvider? _trending;
+  HomeFavoritesSnapshot? _favoriteSnapshot;
+  HomeTasteProvider? _homeTaste;
+  CatalogSourcesProvider? _catalogSources;
+  WatchStateStore? _watchState;
+  int? _lastTasteWatchRevision;
+  Timer? _personalSpotlightTimer;
+  Future<void>? _waitingForHomeBeforePersonalSpotlight;
+  bool _appForeground = true;
+  Object? _filteredFavoritesKey;
+  List<MediaItem> _filteredFavorites = const [];
   late final HomeLayoutProvider? _homeLayout;
   late final StudiosProvider? _studios;
   late final HiddenLibrariesProvider? _hiddenLibraries;
@@ -79,8 +101,16 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   final HomeLayout _defaultHomeLayout = HomeLayout();
   int _seenLoadGeneration = 0;
 
-  List<MediaItem> get _onDeck =>
-      _homeLayout?.layout.hidden.contains(homeContinueWatchingKey) == true ? const [] : _discover.onDeck;
+  List<MediaItem> get _onDeck {
+    final layout = _homeLayout?.layout ?? _defaultHomeLayout;
+    final items = _discover.onDeck;
+    final hideContinue = layout.hidden.contains(homeContinueWatchingKey);
+    if (!layout.splitContinueWatching) return hideContinue ? const [] : items;
+    final hideNext = layout.hidden.contains(homeNextUpKey);
+    if (!hideContinue && !hideNext) return items;
+    return items.where((item) => isHomeNextUp(item) ? !hideNext : !hideContinue).toList();
+  }
+
   List<MediaHub> get _hubs => _discover.hubs;
   bool get _hasMoreContinueWatching => _discover.hasMoreContinueWatching;
   bool get _isLoading => _discover.isLoading;
@@ -129,13 +159,17 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       _discover.onDeck,
       _hubs,
       _hasMoreContinueWatching,
+      _discover.hasMoreNextUp,
       layout,
       Object.hashAllUnordered(online),
       Object.hashAllUnordered(hidden),
       binding,
       t.discover.continueWatching,
+      t.discover.nextUp,
       t.homeLayout.pinnedCollections,
       _studios?.groups,
+      _studios?.hasMore,
+      _studios?.failed,
       t.studios.title,
     );
     if (_rowsCache != null && key == _rowsCacheKey) return _rowsCache!;
@@ -153,7 +187,20 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         continueWatchingTitle: t.discover.continueWatching,
         pinnedTitle: t.homeLayout.pinnedCollections,
         hasMoreContinueWatching: _hasMoreContinueWatching,
-        studios: _studios?.groups.map((group) => group.homeItem).toList() ?? const [],
+        splitContinueWatching: layout.splitContinueWatching,
+        hasMoreNextUp: _discover.hasMoreNextUp,
+        nextUpTitle: t.discover.nextUp,
+        studios: [
+          ...layout.arrangeStudios(_studios?.groups ?? const [], (group) => group.key).map((group) => group.homeItem),
+          if (_studios?.hasMore == true || _studios?.failed == true)
+            MediaItem(
+              id: 'studio-directory',
+              backend: MediaBackend.plex,
+              kind: MediaKind.collection,
+              title: t.activityStats.showMore,
+              raw: const {'customStudio': 'studio-directory'},
+            ),
+        ],
         studiosTitle: t.studios.title,
       ),
     );
@@ -257,8 +304,16 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     _hiddenLibraries?.addListener(_onHomeLayoutChanged);
     _multiServer.addOnlineServersListener(_onHomeServersChanged);
     _discover = context.read<DiscoverProvider>();
+    _discover.setSplitHomeProgress(_homeLayout?.layout.splitContinueWatching ?? false);
     _seenLoadGeneration = _discover.loadGeneration;
     _discover.addListener(_onDiscoverChanged);
+    _favoriteSnapshot = context.read<HomeFavoritesSnapshot?>();
+    _homeTaste = context.read<HomeTasteProvider?>();
+    _catalogSources = context.read<CatalogSourcesProvider?>();
+    _catalogSources?.addListener(_schedulePersonalSpotlight);
+    _watchState = context.read<WatchStateStore?>();
+    _lastTasteWatchRevision = _watchState?.observationWatermark;
+    _watchState?.addListener(_onFavoriteWatchStateChanged);
     _trending = context.read<TrendingSpotlightProvider?>();
     _trending?.addListener(_onHomeLayoutChanged);
     _trending?.updateLibraryItems(_hubs.expand((hub) => hub.items));
@@ -267,6 +322,141 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   }
 
   Future<void>? _waitingForHomeBeforeStudios;
+
+  bool _canLoadPersonalSpotlight() {
+    if (!mounted ||
+        !_isTabVisible ||
+        !_appForeground ||
+        _isLoading ||
+        _areHubsLoading ||
+        KidsProfileService.instance.isActiveKids ||
+        _homeLayout?.profileId == null ||
+        _homeLayout?.layout.spotlightSource != HomeSpotlightSource.forYou ||
+        !SettingsService.instance.read(SettingsService.showHeroSection) ||
+        VideoPlayerScreenState.activeGlobalKey != null ||
+        !(ModalRoute.of(context)?.isCurrent ?? true)) {
+      return false;
+    }
+    final active = context.read<ActiveProfileProvider>();
+    return !active.isBinding && active.activeId == _homeLayout!.profileId;
+  }
+
+  void _onFavoriteWatchStateChanged() {
+    if (!mounted || _homeLayout?.layout.spotlightSource != HomeSpotlightSource.forYou) return;
+    final revision = _watchState?.observationWatermark;
+    if (revision != _lastTasteWatchRevision) {
+      _lastTasteWatchRevision = revision;
+      _homeTaste?.invalidate();
+      _schedulePersonalSpotlight();
+    }
+    if (_favoriteSnapshot?.items.isEmpty ?? true) return;
+    _filteredFavoritesKey = null;
+    setState(() {});
+  }
+
+  void _schedulePersonalSpotlight() {
+    if (!_canLoadPersonalSpotlight()) {
+      _personalSpotlightTimer?.cancel();
+      _personalSpotlightTimer = null;
+      _favoriteSnapshot?.cancelBackground();
+      _homeTaste?.cancelPending();
+      return;
+    }
+    final homeLoad = _discover.activeLoad;
+    if (homeLoad != null) {
+      if (!identical(_waitingForHomeBeforePersonalSpotlight, homeLoad)) {
+        _waitingForHomeBeforePersonalSpotlight = homeLoad;
+        void resume() {
+          if (identical(_waitingForHomeBeforePersonalSpotlight, homeLoad)) {
+            _waitingForHomeBeforePersonalSpotlight = null;
+          }
+          if (mounted) _schedulePersonalSpotlight();
+        }
+
+        unawaited(homeLoad.then((_) => resume(), onError: (Object error, StackTrace stack) => resume()));
+      }
+      return;
+    }
+    if (_personalSpotlightTimer != null) return;
+    _personalSpotlightTimer = Timer(const Duration(seconds: 2), () {
+      _personalSpotlightTimer = null;
+      if (!_canLoadPersonalSpotlight() || _discover.activeLoad != null) return;
+      final hasGenres =
+          _onDeck.any((item) => item.genres?.isNotEmpty == true) ||
+          _rows.any((row) => row.items.any((item) => item.genres?.isNotEmpty == true));
+      if (hasGenres) {
+        unawaited(_homeTaste?.ensureFresh(canRun: () => _canLoadPersonalSpotlight() && _discover.activeLoad == null));
+      }
+      final snapshot = _favoriteSnapshot;
+      if (snapshot == null) return;
+      final hidden = _hiddenLibraries;
+      final online = _multiServer.onlineServerIds.toSet();
+      final libraries = context.read<LibrariesProvider>().libraries;
+      final targets = <HomeFavoriteLibrary>[
+        for (final library in libraries)
+          if (library.serverId != null &&
+              online.contains(library.serverId) &&
+              !(hidden?.hiddenLibraryKeys.contains(library.globalKey) ?? false))
+            if (_multiServer.getClientForServer(ServerId(library.serverId!)) case final client?)
+              (library: library, client: client),
+      ];
+      final plex = _catalogSources?.connectedSources.where((source) => source.id == CatalogSourceId.plex).firstOrNull;
+      final libraryKeys = {for (final target in targets) target.library.globalKey};
+      final clientScopes = {for (final target in targets) target.library.globalKey: target.client.cacheServerId};
+      bool current() {
+        if (!_canLoadPersonalSpotlight() || _discover.activeLoad != null) return false;
+        final nowOnline = _multiServer.onlineServerIds.toSet();
+        final nowHidden = _hiddenLibraries?.hiddenLibraryKeys ?? const <String>{};
+        final currentKeys = {
+          for (final library in context.read<LibrariesProvider>().libraries)
+            if (library.serverId != null &&
+                nowOnline.contains(library.serverId) &&
+                !nowHidden.contains(library.globalKey))
+              if (_multiServer.getClientForServer(ServerId(library.serverId!)) != null) library.globalKey,
+        };
+        if (libraryKeys.length != currentKeys.length || !libraryKeys.containsAll(currentKeys)) return false;
+        for (final target in targets) {
+          if (!identical(_multiServer.getClientForServer(ServerId(target.library.serverId!)), target.client)) {
+            return false;
+          }
+          if (target.client.cacheServerId != clientScopes[target.library.globalKey]) return false;
+        }
+        return identical(
+          plex,
+          _catalogSources?.connectedSources.where((source) => source.id == CatalogSourceId.plex).firstOrNull,
+        );
+      }
+
+      unawaited(snapshot.ensureBackground(libraries: targets, plexWatchlist: plex, canRun: current));
+    });
+  }
+
+  List<MediaItem> _spotlightFavorites(BuildContext context) {
+    if (_homeLayout?.layout.spotlightSource != HomeSpotlightSource.forYou) return const [];
+    final snapshot = context.watch<HomeFavoritesSnapshot?>()?.items ?? const <MediaItem>[];
+    final hidden = _hiddenLibraries;
+    final online = _multiServer.onlineServerIds.toSet();
+    final key = (
+      snapshot,
+      _watchState?.observationWatermark,
+      hidden?.isInitialized,
+      Object.hashAllUnordered(hidden?.hiddenLibraryKeys ?? const <String>{}),
+      Object.hashAllUnordered(hidden?.selectedSourceLibraries ?? const <String>{}),
+      hidden?.hasSourceSelection,
+      Object.hashAllUnordered(online),
+    );
+    if (_filteredFavoritesKey == key) return _filteredFavorites;
+    _filteredFavoritesKey = key;
+    return _filteredFavorites = [
+      for (final item in snapshot)
+        if (item.isCatalogItem ||
+            (hidden?.isInitialized != false &&
+                online.contains(item.serverId) &&
+                (hidden?.allowsItem(item) ?? true) &&
+                KidsProfileService.instance.allows(item)))
+          item.isCatalogItem ? item : (_watchState?.apply(item) ?? item),
+    ];
+  }
 
   void _startStudiosWhenHomeReady() {
     if (!mounted || !_isTabVisible || _isLoading || _areHubsLoading || KidsProfileService.instance.isActiveKids) return;
@@ -293,13 +483,20 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   }
 
   void _onHomeServersChanged(Set<String> _) {
-    if (_homeLayout?.layout.pins.isNotEmpty == true) _onHomeLayoutChanged();
+    _onHomeLayoutChanged();
   }
 
   void _onHomeLayoutChanged() {
     if (!mounted) return;
+    _discover.setSplitHomeProgress(_homeLayout?.layout.splitContinueWatching ?? false);
+    if (_homeLayout?.layout.spotlightSource == HomeSpotlightSource.forYou &&
+        _lastTasteWatchRevision != _watchState?.observationWatermark) {
+      _lastTasteWatchRevision = _watchState?.observationWatermark;
+      _homeTaste?.invalidate();
+    }
     setState(() {});
     _startStudiosWhenHomeReady();
+    _schedulePersonalSpotlight();
     _applyPendingTvBrowseRailFocus();
   }
 
@@ -357,6 +554,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       setState(() {});
     }
     _startStudiosWhenHomeReady();
+    _schedulePersonalSpotlight();
     _applyPendingTvBrowseRailFocus();
 
     // On initial load, focus content so the user doesn't start on the toolbar
@@ -373,6 +571,11 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   @override
   void dispose() {
+    _personalSpotlightTimer?.cancel();
+    _favoriteSnapshot?.cancelBackground();
+    _homeTaste?.cancelPending();
+    _catalogSources?.removeListener(_schedulePersonalSpotlight);
+    _watchState?.removeListener(_onFavoriteWatchStateChanged);
     _studios?.removeListener(_onHomeLayoutChanged);
     _homeLayout?.removeListener(_onHomeLayoutChanged);
     _hiddenLibraries?.removeListener(_onHomeLayoutChanged);
@@ -385,6 +588,13 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    _appForeground = state == AppLifecycleState.resumed;
+    if (!_appForeground) {
+      _personalSpotlightTimer?.cancel();
+      _personalSpotlightTimer = null;
+      _favoriteSnapshot?.cancelBackground();
+      _homeTaste?.cancelPending();
+    }
     if (state == AppLifecycleState.resumed) {
       // Stale hubs refetch on every resume — cheap timestamp check, and a
       // desktop window-focus gain after hours away should refresh too.
@@ -394,12 +604,17 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       if (!startedFullPass && (Platform.isIOS || Platform.isAndroid)) {
         unawaited(_discover.refreshContinueWatching(coalesce: true));
       }
+      _schedulePersonalSpotlight();
     }
   }
 
   @override
   void onTabHidden() {
     _isTabVisible = false;
+    _personalSpotlightTimer?.cancel();
+    _personalSpotlightTimer = null;
+    _favoriteSnapshot?.cancelBackground();
+    _homeTaste?.cancelPending();
     _dashboardKey.currentState?.setPreviewActive(false);
     _pendingDashboardContentFocus = false;
   }
@@ -413,6 +628,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     _discover.refreshIfStale();
     _trending?.ensureFresh();
     _startStudiosWhenHomeReady();
+    _schedulePersonalSpotlight();
   }
 
   @override
@@ -432,6 +648,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   Future<void> _refreshFromToolbar() async {
     _studios?.refresh();
+    _homeTaste?.invalidate();
     final homeRefresh = _discover.refreshNow();
     await _trending?.refresh(force: true);
     final outcome = await homeRefresh;
@@ -504,13 +721,11 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   }
 
   /// Build the [FocusableAction] wrapping the user menu.
-  /// Pulls live state from [ActiveProfileProvider]; the menu reuses
-  /// [_userMenuItems] for the menu contents so d-pad and tap paths
-  /// stay in sync.
+  /// Pulls live state from [ActiveProfileProvider]; d-pad and tap paths share
+  /// the same menu entries.
   FocusableAction _buildUserMenuAction(BuildContext context) {
     final activeProvider = context.watch<ActiveProfileProvider>();
     final active = activeProvider.active;
-    final profiles = activeProvider.pickerProfiles;
 
     return FocusableAction(
       debugLabel: 'HomeProfile',
@@ -530,51 +745,20 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         adaptiveSheet: true,
         anchorAlignment: AppMenuAnchorAlignment.end,
         onSelected: (value) => unawaited(_handleUserMenuAction(context, value)),
-        entriesBuilder: (context) =>
-            _userMenuItems(context, activeProfile: active, profiles: profiles, activeProvider: activeProvider),
+        entriesBuilder: (context) => buildProfileMenuEntries(
+          provider: activeProvider,
+          isKids: KidsProfileService.instance.isActiveKids,
+          showDownloads: PlatformDetector.isMobile(context),
+          showLiveTv:
+              PlatformDetector.isMobile(context) &&
+              _multiServer.hasLiveTv &&
+              SettingsService.instance.read(SettingsService.showLiveTvTab),
+          showWatchTogether: true,
+          showCustomizeHome: _homeLayout?.profileId != null,
+          showDirectProfiles: !PlatformDetector.isMobile(context),
+        ),
       ),
     );
-  }
-
-  List<AppMenuEntry<String>> _userMenuItems(
-    BuildContext context, {
-    required Profile? activeProfile,
-    required List<Profile> profiles,
-    required ActiveProfileProvider activeProvider,
-  }) {
-    final theme = Theme.of(context);
-    final switchable = PlatformDetector.isMobile(context)
-        ? <Profile>[]
-        : profiles.where((p) => p.id != activeProfile?.id).toList();
-
-    return [
-      for (final p in switchable)
-        AppMenuItem<String>(
-          value: 'profile:${p.id}',
-          leading: ProfileAvatar(profile: p, size: 24, avatarUrl: activeProvider.avatarUrlFor(p.id)),
-          label: p.displayName,
-          trailing: p.isPinProtected
-              ? AppIcon(Symbols.lock_rounded, fill: 1, size: 14, color: theme.colorScheme.onSurfaceVariant)
-              : null,
-        ),
-      if (switchable.isNotEmpty) const AppMenuDivider(),
-      if (activeProfile != null && !KidsProfileService.instance.isActiveKids)
-        AppMenuItem<String>(value: 'activity', icon: Symbols.insights_rounded, label: t.family.activity),
-      if (activeProfile != null && !KidsProfileService.instance.isActiveKids)
-        AppMenuItem<String>(value: 'sources', icon: Symbols.video_library_rounded, label: t.sourceLibraries.title),
-      if (PlatformDetector.isMobile(context) && !KidsProfileService.instance.isActiveKids) ...[
-        AppMenuItem<String>(value: 'downloads', icon: Symbols.download_rounded, label: t.navigation.downloads),
-        if (_multiServer.hasLiveTv && SettingsService.instance.read(SettingsService.showLiveTvTab))
-          AppMenuItem<String>(value: 'live_tv', icon: Symbols.live_tv_rounded, label: t.navigation.liveTv),
-        const AppMenuDivider(),
-      ],
-      if (!KidsProfileService.instance.isActiveKids)
-        AppMenuItem<String>(value: 'together', icon: Symbols.group_rounded, label: t.watchTogether.title),
-      AppMenuItem<String>(value: 'manage_profiles', icon: Symbols.group_rounded, label: t.profiles.sectionTitle),
-      AppMenuItem<String>(value: 'settings', icon: Symbols.settings_rounded, label: t.common.settings),
-      if (!KidsProfileService.instance.isActiveKids)
-        AppMenuItem<String>(value: 'logout', icon: Symbols.logout_rounded, label: t.common.logout),
-    ];
   }
 
   Future<void> _handleUserMenuAction(BuildContext context, String value) async {
@@ -606,8 +790,16 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       unawaited(_handleLogout());
       return;
     }
-    if (value == 'manage_profiles') {
+    if (value == 'switch_profile') {
       _handleSwitchProfile(context);
+      return;
+    }
+    if (value == 'manage_profiles') {
+      await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const FamilySettingsScreen()));
+      return;
+    }
+    if (value == 'customize_home') {
+      _openHomeLayout();
       return;
     }
     if (value == 'settings') {
@@ -790,11 +982,13 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         SettingsService.showServerNameOnHubs,
         SettingsService.showHeroSection,
         SettingsService.homeHeroSize,
+        SettingsService.homePosterSize,
         SettingsService.fireStickMode,
         SettingsService.visualEffects,
         SettingsService.hideSpoilers,
         SettingsService.libraryDensity,
         SettingsService.episodePosterMode,
+        SettingsService.homeEpisodeThumbnails,
       ],
       builder: (context) => _buildContent(context),
     );
@@ -837,8 +1031,18 @@ class _DiscoverScreenState extends State<DiscoverScreen>
             if (key is String) _studios?.warmStudio(key);
           },
           onDeck: _onDeck,
+          onlineServerIds: _multiServer.onlineServerIds.toSet(),
+          favoriteSnapshot: _spotlightFavorites(context),
+          viewingSignals:
+              (_homeLayout?.layout.spotlightSource == HomeSpotlightSource.forYou &&
+                  !KidsProfileService.instance.isActiveKids)
+              ? context.watch<HomeTasteProvider?>()?.signals ?? const []
+              : const [],
+          spotlightSource: _homeLayout?.layout.spotlightSource ?? HomeSpotlightSource.trending,
           trendingItems: _trending?.items ?? const [],
-          featureLoading: _trending?.loading ?? false,
+          featureLoading:
+              (_homeLayout?.layout.spotlightSource ?? HomeSpotlightSource.trending) == HomeSpotlightSource.trending &&
+              (_trending?.loading ?? false),
           weeklyTrends: _trending?.usesWeeklyTrends ?? false,
           toolbar: _buildOverlaidAppBar(),
           showToolbar: !PlatformDetector.isTV(),
@@ -847,21 +1051,42 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           onPlay: (item) async {
             if (item.kind == MediaKind.show) {
               await _playFeaturedShow(item);
+              if (mounted) {
+                _homeTaste?.invalidate();
+                _schedulePersonalSpotlight();
+              }
               return;
             }
             final refresh = await navigateToVideoPlayer(context, metadata: item);
             if (mounted && refresh == true) await _discover.updateItem(item);
+            if (mounted) {
+              _homeTaste?.invalidate();
+              _schedulePersonalSpotlight();
+            }
           },
           onDetails: (item) => item.kind == MediaKind.collection || item.kind.isMusic
               ? navigateToMediaItem(context, item, onRefresh: _discover.updateItem)
               : navigateToMediaItemDetails(context, item, onRefresh: _discover.updateItem),
-          onResume: (item) => navigateToMediaItem(context, item, playDirectly: true, onRefresh: _discover.updateItem),
+          onResume: (item) async {
+            await navigateToMediaItem(context, item, playDirectly: true, onRefresh: _discover.updateItem);
+            if (mounted) {
+              _homeTaste?.invalidate();
+              _schedulePersonalSpotlight();
+            }
+          },
           onSidebar: _navigateToSidebar,
           onToolbar: _focusTopActions,
           onRefresh: _discover.updateItem,
           onRemoveFromContinueWatching: _discover.refreshContinueWatching,
           loadMoreItems: (hub) => hub.id == homeContinueWatchingId
-              ? _discover.loadAllContinueWatching
+              ? () async {
+                  final items = await _discover.loadAllContinueWatching();
+                  return (_homeLayout?.layout.splitContinueWatching ?? false)
+                      ? items.where((item) => !isHomeNextUp(item)).toList()
+                      : items;
+                }
+              : hub.id == homeNextUpId
+              ? () async => (await _discover.loadAllContinueWatching()).where(isHomeNextUp).toList()
               : hub.id == homePinnedCollectionsId
               ? () async => hub.items
               : null,
@@ -880,6 +1105,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   void _openStudio(MediaItem item) {
     final key = item.raw?['customStudio'];
+    if (key == 'studio-directory') {
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StudiosScreen()));
+      return;
+    }
     if (key is! String || _studios?.group(key) == null) return;
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => StudioBrowserScreen(studioKey: key)));
   }

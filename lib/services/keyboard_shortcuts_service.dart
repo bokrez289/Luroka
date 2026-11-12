@@ -116,7 +116,11 @@ class KeyboardShortcutsService extends ChangeNotifier {
   }
 
   Future<void> setHotkey(String action, HotKey? hotkey) {
+    final revision = _settingsService.profileSettingsRevision.value;
     return _serializeShortcutMutation(() async {
+      if (_settingsService.profileSettingsRevision.value != revision) {
+        throw StateError('The active profile changed while updating shortcuts');
+      }
       if (ShortcutAction.fromId(action) == null) throw const FormatException('Unknown shortcut action');
       final conflict = hotkey == null ? null : getActionForHotkey(hotkey);
       if (conflict != null && conflict != action) throw HotkeyConflictException(conflict);
@@ -134,7 +138,11 @@ class KeyboardShortcutsService extends ChangeNotifier {
   }
 
   Future<void> resetToDefaults({void Function()? checkCurrent}) {
+    final revision = _settingsService.profileSettingsRevision.value;
     return _serializeShortcutMutation(() async {
+      if (_settingsService.profileSettingsRevision.value != revision) {
+        throw StateError('The active profile changed while updating shortcuts');
+      }
       checkCurrent?.call();
       await _settingsService.reset(SettingsService.keyboardHotkeys, checkCurrent: checkCurrent);
     });
@@ -142,7 +150,11 @@ class KeyboardShortcutsService extends ChangeNotifier {
 
   Future<void> replaceHotkeys(Map<String, HotKey?> hotkeys, {void Function()? checkCurrent}) {
     validateHotkeys(hotkeys);
+    final revision = _settingsService.profileSettingsRevision.value;
     return _serializeShortcutMutation(() async {
+      if (_settingsService.profileSettingsRevision.value != revision) {
+        throw StateError('The active profile changed while updating shortcuts');
+      }
       checkCurrent?.call();
       await _settingsService.write(SettingsService.keyboardHotkeys, hotkeys, checkCurrent: checkCurrent);
     });

@@ -111,6 +111,8 @@ class LurokaActivity : FlutterActivity() {
   private val APP_EXIT_CHANNEL = "com.luroka/app_exit"
   private val CAR_RESTRICTIONS_CHANNEL = "com.luroka/car_restrictions"
   private val ASSISTIVE_TECHNOLOGY_CHANNEL = "com.luroka/assistive_technology"
+  private var pairingLinkChannel: MethodChannel? = null
+  private var pendingPairingLink: String? = null
   private var watchNextPlugin: WatchNextPlugin? = null
   private var carRestrictions: CarRestrictionsMonitor? = null
   private var carRestrictionsChannel: MethodChannel? = null
@@ -582,6 +584,7 @@ class LurokaActivity : FlutterActivity() {
     val launchedFromHistory = (intent?.flags ?: 0) and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY != 0
     if (savedInstanceState == null && !launchedFromHistory) {
       handleWatchNextIntent(intent)
+      handlePairingIntent(intent)
     }
   }
 
@@ -589,6 +592,7 @@ class LurokaActivity : FlutterActivity() {
     super.onNewIntent(intent)
     // Handle Watch Next deep link when app is already running
     handleWatchNextIntent(intent)
+    handlePairingIntent(intent)
   }
 
   override fun dispatchKeyEvent(event: KeyEvent): Boolean {
@@ -626,6 +630,9 @@ class LurokaActivity : FlutterActivity() {
     assistiveTechnology?.release()
     assistiveTechnology = null
     assistiveTechnologyChannel = null
+    pairingLinkChannel?.setMethodCallHandler(null)
+    pairingLinkChannel = null
+    pendingPairingLink = null
     activityStarted = false
     flutterSurfaceReconnectPending = false
     flutterTextureView = null
@@ -638,6 +645,23 @@ class LurokaActivity : FlutterActivity() {
       // Notify the plugin to send event to Flutter
       watchNextPlugin?.notifyDeepLink(contentId)
     }
+  }
+
+  private fun handlePairingIntent(intent: Intent?) {
+    val uri = intent?.data ?: return
+    if (intent.action != Intent.ACTION_VIEW || uri.scheme != "luroka" || uri.host != "pair" ||
+        !uri.path.isNullOrEmpty() || uri.query != null || uri.userInfo != null || uri.port != -1) return
+    val fragment = uri.fragment ?: return
+    if (!Regex("^v1\\.[A-Za-z0-9_-]{43}\\.[A-Za-z0-9_-]{43}$").matches(fragment)) return
+    val link = uri.toString()
+    pendingPairingLink = link
+    pairingLinkChannel?.invokeMethod("onInvitation", link, object : MethodChannel.Result {
+      override fun success(result: Any?) {
+        if (result == true && pendingPairingLink == link) pendingPairingLink = null
+      }
+      override fun error(code: String, message: String?, details: Any?) = Unit
+      override fun notImplemented() = Unit
+    })
   }
 
   // Connects the car UX-restriction monitor on first use, retrying while the platform signal is
@@ -872,6 +896,16 @@ class LurokaActivity : FlutterActivity() {
 
   override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
+    pairingLinkChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.luroka/pairing_links")
+    pairingLinkChannel?.setMethodCallHandler { call, result ->
+      if (call.method == "takeInitialInvitation") {
+        val link = pendingPairingLink
+        pendingPairingLink = null
+        result.success(link)
+      } else {
+        result.notImplemented()
+      }
+    }
     trailerChannel.register(flutterEngine)
     UpdateChannel(this).register(flutterEngine)
     flutterEngine.plugins.add(MpvPlayerPlugin())

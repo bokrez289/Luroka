@@ -9,7 +9,7 @@ import '../test_helpers/prefs.dart';
 void main() {
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
 
-  /// Answers `com.luroka/device` with [reply] and records each call. A null
+  /// Answers `com.plezy/device` with [reply] and records each call. A null
   /// [reply] leaves the method unimplemented, which is what desktop and a
   /// stale native build look like.
   List<String> stubProbe(Object? reply) {

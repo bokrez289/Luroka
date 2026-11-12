@@ -137,6 +137,11 @@ class TranslationsNl extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$trakt$nl trakt = _Translations$trakt$nl._(_root);
 	@override late final _Translations$seerr$nl seerr = _Translations$seerr$nl._(_root);
 	@override late final _Translations$services$nl services = _Translations$services$nl._(_root);
+	@override late final _Translations$offlineRecovery$nl offlineRecovery = _Translations$offlineRecovery$nl._(_root);
+	@override late final _Translations$releaseUpdates$nl releaseUpdates = _Translations$releaseUpdates$nl._(_root);
+	@override late final _Translations$profileIntegrations$nl profileIntegrations = _Translations$profileIntegrations$nl._(_root);
+	@override late final _Translations$profileSetupGuide$nl profileSetupGuide = _Translations$profileSetupGuide$nl._(_root);
+	@override late final _Translations$animeFavorites$nl animeFavorites = _Translations$animeFavorites$nl._(_root);
 	@override late final _Translations$addServer$nl addServer = _Translations$addServer$nl._(_root);
 }
 
@@ -320,6 +325,9 @@ class _Translations$libraryPolish$nl extends Translations$libraryPolish$en {
 	final TranslationsNl _root; // ignore: unused_field
 
 	// Translations
+	@override String get compactTvNavigation => 'Compacte bibliotheeknavigatie';
+	@override String get compactTvNavigationDescription => 'Toon bibliotheeksecties en blader door opties in een uitschuifmenu, waardoor er meer ruimte overblijft voor posters.';
+	@override String get openLibraryMenu => 'Bibliotheekmenu openen';
 	@override String get posterDetails => 'Posterdetails';
 	@override String get showPosterDetails => 'Toon posterdetails · naam, jaartal & IMDb';
 	@override String get hidePosterDetails => 'Posterdetails verbergen';
@@ -633,6 +641,8 @@ class _Translations$settingsRedesign$nl extends Translations$settingsRedesign$en
 	// Translations
 	@override String get themeEffects => 'Thema & effecten';
 	@override String get libraryLayout => 'Indeling van de bibliotheek';
+	@override String get posterInformation => 'Posterinformatie';
+	@override String get libraryBehavior => 'Bibliotheekgedrag';
 	@override String get appearanceHint => 'Pas het uiterlijk, de lay-out en het gedrag van Luroka aan.';
 	@override String get livePreview => 'Live voorbeeld';
 	@override String get previewHint => 'Bekijk hoe uw bibliotheek eruit zal zien met de huidige instellingen.';
@@ -770,6 +780,19 @@ class _Translations$kids$nl extends Translations$kids$en {
 	final TranslationsNl _root; // ignore: unused_field
 
 	// Translations
+	@override String get timeLimits => 'Schermtijdlimieten';
+	@override String get dailyWatchLimit => 'Dagelijkse kijktijd';
+	@override String get dailyWatchLimitHint => 'Beperkt het afspelen van video\'s elke dag op dit apparaat.';
+	@override String get noTimeLimit => 'Geen limiet';
+	@override String minutesLimit({required Object minutes}) => '${minutes} minuten';
+	@override String get bedtime => 'Bedtijd';
+	@override String get bedtimeHint => 'Om dit profiel tijdens deze uren te gebruiken, is de pincode van een ouder nodig.';
+	@override String get bedtimeStart => 'Bedtijd begint';
+	@override String get bedtimeEnd => 'Bedtijd is voorbij';
+	@override String get timeLimitReached => 'De kijktijd is voorbij voor vandaag';
+	@override String get bedtimeReached => 'Het is bedtijd';
+	@override String get timeLimitParentHint => 'Vraag een ouder om zijn PIN in te voeren om door te gaan met deze sessie.';
+	@override String get parentUnlock => 'Ouderontgrendeling';
 	@override String get backupProfile => 'Maak een back-up van het kinderprofiel';
 	@override String get backupExplain => 'Maak een back-up van de opgeslagen naam, het karakter, de beperkingen, het uiterlijk en de lokale weergave-uitsluitingen van dit profiel. Parent-PIN\'s, serveraanmeldingen, downloads en voortgang van het afspelen van de server zijn niet inbegrepen.';
 	@override String get saveBackupFile => 'Back-upbestand opslaan';
@@ -1313,6 +1336,7 @@ class _Translations$settings$nl extends Translations$settings$en {
 	@override String get downloadLocationPickerUnavailable => 'Mapselectie is niet beschikbaar op dit apparaat';
 	@override String get downloadOnWifiOnly => 'Alleen via wifi downloaden';
 	@override String get downloadOnWifiOnlyDescription => 'Voorkom downloads bij gebruik van mobiele data';
+	@override String get downloadWifiScope => 'Geldt voor alle profielen en downloads op dit apparaat.';
 	@override String get autoRemoveWatchedDownloads => 'Bekeken downloads automatisch verwijderen';
 	@override String get autoRemoveWatchedDownloadsDescription => 'Bekeken downloads automatisch verwijderen';
 	@override String get cellularDownloadBlocked => 'Downloads via een mobiel netwerk zijn geblokkeerd. Gebruik wifi of wijzig de instelling.';
@@ -1651,8 +1675,8 @@ class _Translations$dashboard$nl extends Translations$dashboard$en {
 	@override String episodeLabel({required Object season, required Object episode}) => 'S${season} · E${episode}';
 	@override String get anotherPick => 'Nog een keuze';
 	@override String get exploreSeries => 'Ontdek series';
-	@override String get showFeatured => 'Gerichte titeldetails';
-	@override String get showFeaturedDescription => 'Toon artwork, synopsis en afleveringsinformatie voor de gemarkeerde kaart';
+	@override String get showFeatured => 'Uitgelicht op Home';
+	@override String get showFeaturedDescription => 'Toon aanbevolen films en series bovenaan Home.';
 }
 
 // Path: lurokaCatalog
@@ -1753,9 +1777,32 @@ class _Translations$homeLayout$nl extends Translations$homeLayout$en {
 	final TranslationsNl _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageStudios => 'Studio\'s kiezen en bestellen';
+	@override String get manageStudiosDescription => 'Kies welke studio\'s voor dit profiel verschijnen en regel de volgorde ervan.';
+	@override String get studioUnavailable => 'Alleen studio\'s uit de door jou geselecteerde bibliotheken verschijnen op Home.';
+	@override String get showAllStudios => 'Toon alle studio\'s';
+	@override String get hideAllStudios => 'Verberg alle studio\'s';
+	@override String get reorderStudio => 'Wijzig de studiovolgorde';
+	@override String get episodeThumbnails => 'Afleveringsafbeeldingen in Verder kijken';
+	@override String get episodeThumbnailsDescription => 'Toon afleveringsafbeeldingen in plaats van series of seizoensposters in Verder kijken en Volgende omhoog.';
+	@override String get spotlightSource => 'Bron voor uitgelichte inhoud';
+	@override String get spotlightSourceDescription => 'For You gebruikt de kijkactiviteit van dit profiel op dit apparaat, samen met favorieten en bibliotheektitels.';
+	@override String get spotlightForYou => 'Voor jou';
+	@override String get spotlightForYouDescription => 'Een mix van wat je kijkt, favorieten, nieuwe toevoegingen en trends, op basis van de kijkactiviteit van dit profiel op dit apparaat.';
+	@override String get spotlightTrending => 'Populair';
+	@override String get spotlightTrendingDescription => 'Populaire films en programma\'s in uw bibliotheken.';
+	@override String get spotlightContinue => 'Ga door met kijken';
+	@override String get spotlightContinueDescription => 'Titels waarmee je bent begonnen en afleveringen die je kunt voortzetten.';
+	@override String get spotlightFavorites => 'Van je favorieten';
+	@override String get spotlightInspired => 'Geïnspireerd door uw kijkervaring';
+	@override String get spotlightNextUp => 'Volgende';
 	@override String get title => 'Personaliseer thuis';
 	@override String get description => 'Kies de rijvolgorde en zichtbaarheid voor dit profiel. Selecteer een rij om deze te verplaatsen of te verbergen.';
 	@override String get rows => 'Thuisrijen';
+	@override String get progressLayout => 'Ga door met kijken en ga verder';
+	@override String get progressCombined => 'Gecombineerd in één rij';
+	@override String get progressSeparate => 'Aparte rijen';
+	@override String get progressDescription => 'Scheid Next Up indien ondersteund door de server. Andere servers blijven gecombineerd.';
 	@override String get visible => 'Zichtbaar';
 	@override String get hidden => 'Verborgen';
 	@override String get showRow => 'Rij weergeven';
@@ -1818,6 +1865,8 @@ class _Translations$activityStats$nl extends Translations$activityStats$en {
 	@override String get trendTitle => 'Kijk naar de tijd';
 	@override String get trendToday => 'Vandaag';
 	@override String gapDetail({required Object stat, required Object range}) => '${stat} op ${range}';
+	@override String get patternsTitle => 'Jouw patronen';
+	@override String mostlyKind({required Object kind}) => 'Meestal ${kind}';
 	@override String get weekdayTitle => 'Op weekdag';
 	@override String get hoursTitle => 'Op tijdstip van de dag';
 	@override String get amLabel => 'BEN';
@@ -1830,6 +1879,8 @@ class _Translations$activityStats$nl extends Translations$activityStats$en {
 	@override String get kindOther => 'Anders';
 	@override String get topTitlesTitle => 'Meest bekeken';
 	@override String get sessionsTitle => 'Recente sessies';
+	@override String get recentViewingTitle => 'Recente bezichtiging';
+	@override String get recentViewingHint => 'Totale bekeken tijd in de geselecteerde periode. Datums tonen de laatste bezichtiging.';
 	@override String get showMore => 'Laat meer zien';
 	@override String get sessionNoTitle => 'Ongeïdentificeerd afspelen';
 	@override String get emptyTitle => 'Hier nog niets';
@@ -2262,6 +2313,7 @@ class _Translations$messages$nl extends Translations$messages$en {
 	@override String metadataRefreshStarted({required Object title}) => 'Vernieuwen van metadata gestart voor "${title}"';
 	@override String metadataRefreshFailed({required Object error}) => 'Metadata vernieuwen mislukt: ${error}';
 	@override String get logoutConfirm => 'Weet je zeker dat je wilt uitloggen?';
+	@override String get logoutDeviceConfirm => 'Uitloggen bij Luroka op dit apparaat? Alle profielen, inclusief kinderprofielen, serveraccounts en gedownloade media, worden van dit apparaat verwijderd. U kunt zich later opnieuw aanmelden.';
 	@override String get noSeasonsFound => 'Geen seizoenen gevonden';
 	@override String get seasonsLoadFailed => 'Kan seizoenen niet laden';
 	@override String get noEpisodesFound => 'Geen afleveringen gevonden in eerste seizoen';
@@ -2392,6 +2444,9 @@ class _Translations$profiles$nl extends Translations$profiles$en {
 	final TranslationsNl _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageProfiles => 'Beheer profielen';
+	@override String get quickAccess => 'Snelle toegang';
+	@override String get signOutDevice => 'Meld u af bij dit apparaat';
 	@override String get addLurokaProfile => 'Luroka-profiel toevoegen';
 	@override String get switchingProfile => 'Profiel wisselen…';
 	@override String get deleteThisProfileTitle => 'Dit profiel verwijderen?';
@@ -2510,7 +2565,7 @@ class _Translations$accountPreferences$nl extends Translations$accountPreference
 	@override String hubSubtitleSingle({required Object account}) => 'Audio-, ondertitel- en bibliotheekopties opgeslagen op ${account}';
 	@override String hubSubtitleMultiple({required Object count}) => 'Audio-, ondertitel- en bibliotheekopties opgeslagen op ${count} accounts';
 	@override String get pickAccount => 'Elk account slaat zijn eigen voorkeuren op. Kies het account dat je wilt bewerken.';
-	@override String get storedOnAccount => 'Deze opties worden op het account zelf opgeslagen, zodat elke app die ermee is aangemeld ze gebruikt — ook Luroka op je andere apparaten.';
+	@override String get storedOnAccount => 'Deze opties worden opgeslagen op het serveraccount en gedeeld door elk Luroka-profiel en elke app die dat account gebruikt, ook op andere apparaten.';
 	@override String get noAccounts => 'Geen accounts om te configureren';
 	@override String get noAccountsHint => 'Log in bij Plex of verbind een Jellyfin- of Emby-server en de voorkeuren die op dat account zijn opgeslagen, verschijnen hier.';
 	@override String get unavailable => 'Dit account is niet bereikbaar';
@@ -3167,7 +3222,7 @@ class _Translations$watchTogether$nl extends Translations$watchTogether$en {
 	@override String get matchMatched => 'Heeft het filmpje';
 	@override String get matchMismatched => 'Verschillende lengte';
 	@override String get matchUnavailable => 'Heeft het filmpje niet';
-	@override String participantOffset({required Object offset}) => 'Offset ${offset}';
+	@override String participantOffset({required Object offset}) => 'Verschuiving ${offset}';
 	@override String get makeHost => 'Tot host maken';
 	@override String get makeHostQuestion => 'Host overdragen?';
 	@override String makeHostConfirm({required Object name}) => '${name} bedient dan het afspelen en de sessie voor iedereen.';
@@ -3700,6 +3755,108 @@ class _Translations$services$nl extends Translations$services$en {
 	@override late final _Translations$services$libraryFilter$nl libraryFilter = _Translations$services$libraryFilter$nl._(_root);
 }
 
+// Path: offlineRecovery
+class _Translations$offlineRecovery$nl extends Translations$offlineRecovery$en {
+	_Translations$offlineRecovery$nl._(TranslationsNl root) : this._root = root, super.internal(root);
+
+	final TranslationsNl _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Uw servers zijn offline';
+	@override String get description => 'Je downloads zijn nog steeds beschikbaar. Probeer opnieuw verbinding te maken wanneer uw server terug is, of voeg een andere server toe.';
+	@override String get appleTvDescription => 'Luroka kan uw mediaservers niet bereiken. Probeer opnieuw verbinding te maken wanneer ze beschikbaar zijn, of voeg een andere server toe om door te gaan met kijken.';
+	@override String get kidsDescription => 'We konden uw mediaserver niet bereiken. Probeer opnieuw verbinding te maken of vraag een ouder om hulp.';
+	@override String get retrying => 'Verbinden…';
+	@override String get addServer => 'Voeg een server toe';
+}
+
+// Path: releaseUpdates
+class _Translations$releaseUpdates$nl extends Translations$releaseUpdates$en {
+	_Translations$releaseUpdates$nl._(TranslationsNl root) : this._root = root, super.internal(root);
+
+	final TranslationsNl _root; // ignore: unused_field
+
+	// Translations
+	@override String get manualInstructions => 'Download het releasearchief van GitHub, pak de APK uit en installeer deze op uw Android-apparaat.';
+	@override String get tvInstructions => 'Open dit adres op uw telefoon of computer, of scan de QR-code om de release te downloaden.';
+	@override String get pressBackAgain => 'Druk nogmaals op Terug om het afspelen af te sluiten';
+}
+
+// Path: profileIntegrations
+class _Translations$profileIntegrations$nl extends Translations$profileIntegrations$en {
+	_Translations$profileIntegrations$nl._(TranslationsNl root) : this._root = root, super.internal(root);
+
+	final TranslationsNl _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Maak Luroka van u';
+	@override String get description => 'Verbind uw favoriete diensten om bij te houden wat u kijkt en om nieuwe films en programma\'s aan te vragen. Elk Luroka-profiel heeft zijn eigen aansluitingen.';
+	@override String get step => 'Optionele integraties';
+	@override String get examples => 'Trakt · Simkl · AniList · MyAnimeList · Seerr';
+	@override String get connect => 'Ontdek integraties';
+	@override String get later => 'Later instellen';
+	@override String get manage => 'Beheer integraties';
+	@override String forProfile({required Object name}) => 'Aansluitingen voor ${name}';
+}
+
+// Path: profileSetupGuide
+class _Translations$profileSetupGuide$nl extends Translations$profileSetupGuide$en {
+	_Translations$profileSetupGuide$nl._(TranslationsNl root) : this._root = root, super.internal(root);
+
+	final TranslationsNl _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Maak uw profiel van u';
+	@override String get description => 'Kies hoe Luroka eruitziet en aanvoelt voor dit profiel op dit apparaat. Je kunt alles later wijzigen in Instellingen.';
+	@override String get appearanceStep => '1 van 2 · Uiterlijk';
+	@override String get homeStep => '2 van 2 · Je startscherm';
+	@override String get preview => 'Voorbeeld';
+	@override String get previewTitle => 'Jouw huis';
+	@override String get previewPoster => 'Affiche';
+	@override String get posterArtwork => 'Alleen kunstwerken';
+	@override String get posterWithDetails => 'Posterdetails tonen';
+	@override String get musicDescription => 'Speel het thema van een film of programma af terwijl de detailpagina geopend is, indien beschikbaar.';
+	@override String get moreThemes => 'Meer thema\'s';
+	@override String get fewerThemes => 'Minder thema\'s';
+	@override String get spotlightHeading => 'Wat moet er in Spotlight verschijnen?';
+	@override String get progressHeading => 'Ga door met kijken en ga verder';
+	@override String get skip => 'Gebruik de standaardinstellingen en begin met kijken';
+	@override String get finish => 'Begin met kijken';
+	@override String get back => 'Terug';
+	@override String get kContinue => 'Ga door';
+	@override String get chooseLater => 'Kies later bibliotheken';
+	@override String get libraryScope => 'Dit verandert wat er in Luroka verschijnt voor dit profiel; het verandert de serverrechten niet.';
+	@override String get createdTitle => 'Profiel aangemaakt';
+	@override String get createdDescription => 'Je nieuwe profiel is klaar. De eigenaar kan het personaliseren zodra hij het voor de eerste keer opent.';
+	@override String get switchProfile => 'Schakel over naar dit profiel';
+	@override String get stayHere => 'Blijf op het huidige profiel';
+}
+
+// Path: animeFavorites
+class _Translations$animeFavorites$nl extends Translations$animeFavorites$en {
+	_Translations$animeFavorites$nl._(TranslationsNl root) : this._root = root, super.internal(root);
+
+	final TranslationsNl _root; // ignore: unused_field
+
+	// Translations
+	@override String get filter => 'Anime';
+	@override String get manage => 'Beheer anime';
+	@override String get description => 'Automatische detectie maakt gebruik van anime-bibliotheeknamen en beschikbare anime-tags of ID\'s. Kies bibliotheken en corrigeer individuele favorieten. Keuzes worden op dit apparaat opgeslagen voor uw profiel.';
+	@override String get libraries => 'Anime-bibliotheken';
+	@override String get libraryHint => 'Bibliotheken met de naam Anime worden automatisch herkend. Selecteer een bibliotheek om de classificatie ervan te wijzigen.';
+	@override String get titles => 'Favoriete titels';
+	@override String get titleHint => 'Selecteer een titel om deze als anime te markeren of corrigeer een automatische match.';
+	@override String get automatic => 'Automatisch';
+	@override String get include => 'Anime';
+	@override String get exclude => 'Niet anime';
+	@override String get automaticIncluded => 'Automatisch · Anime';
+	@override String get automaticExcluded => 'Automatisch · Geen anime';
+	@override String get noLibraries => 'Geen aangesloten bibliotheken beschikbaar.';
+	@override String get noTitles => 'Er zijn geen favoriete films of programma\'s beschikbaar.';
+	@override String get empty => 'Geen anime-favorieten gevonden. Controleer je anime-bibliotheken of markeer een titel als anime.';
+	@override String get saveFailed => 'Kan je anime-instellingen niet opslaan. Probeer het opnieuw.';
+}
+
 // Path: addServer
 class _Translations$addServer$nl extends Translations$addServer$en {
 	_Translations$addServer$nl._(TranslationsNl root) : this._root = root, super.internal(root);
@@ -3712,7 +3869,7 @@ class _Translations$addServer$nl extends Translations$addServer$en {
 	@override String get serverUrlsHelper => 'Meerdere URL\'s toegestaan, gescheiden door komma\'s.';
 	@override String get findServer => 'Server zoeken';
 	@override String searchingLocalMediaBrowserServers({required Object product}) => 'Zoeken naar lokale ${product}-servers...';
-	@override String localMediaBrowserServers({required Object product}) => 'Lokale ${product}-servers';
+	@override String localMediaBrowserServers({required Object product}) => 'Opgeslagen en nabijgelegen ${product}-servers';
 	@override String get username => 'Gebruikersnaam';
 	@override String get password => 'Wachtwoord';
 	@override String get signIn => 'Inloggen';
@@ -4788,6 +4945,9 @@ extension on TranslationsNl {
 			'posterDetails.catalogEpisodeInfoDescription' => 'Toon het aantal afleveringen en de gemiddelde duur op Ontdek-posters.',
 			'posterDetails.title' => 'Posterdetails',
 			'posterDetails.description' => 'Toon de titel, het jaartal en de IMDb-beoordeling onder posters in Studio, Zoeken, Ontdekken en Bibliotheken. Ontbrekende IMDb-beoordelingen blijven verborgen. Schakel dit uit voor posters die alleen illustraties bevatten.',
+			'libraryPolish.compactTvNavigation' => 'Compacte bibliotheeknavigatie',
+			'libraryPolish.compactTvNavigationDescription' => 'Toon bibliotheeksecties en blader door opties in een uitschuifmenu, waardoor er meer ruimte overblijft voor posters.',
+			'libraryPolish.openLibraryMenu' => 'Bibliotheekmenu openen',
 			'libraryPolish.posterDetails' => 'Posterdetails',
 			'libraryPolish.showPosterDetails' => 'Toon posterdetails · naam, jaartal & IMDb',
 			'libraryPolish.hidePosterDetails' => 'Posterdetails verbergen',
@@ -5002,6 +5162,8 @@ extension on TranslationsNl {
 			'tvSettingsV2.simpleAudio' => 'Talen en weergave van ondertitels',
 			'settingsRedesign.themeEffects' => 'Thema & effecten',
 			'settingsRedesign.libraryLayout' => 'Indeling van de bibliotheek',
+			'settingsRedesign.posterInformation' => 'Posterinformatie',
+			'settingsRedesign.libraryBehavior' => 'Bibliotheekgedrag',
 			'settingsRedesign.appearanceHint' => 'Pas het uiterlijk, de lay-out en het gedrag van Luroka aan.',
 			'settingsRedesign.livePreview' => 'Live voorbeeld',
 			'settingsRedesign.previewHint' => 'Bekijk hoe uw bibliotheek eruit zal zien met de huidige instellingen.',
@@ -5103,6 +5265,19 @@ extension on TranslationsNl {
 			'detailComposition.mediaInformation' => 'Media-informatie',
 			'detailComposition.fullFileInformation' => 'Volledige bestandsinformatie',
 			'detailComposition.castAndCrew' => 'Cast en crew',
+			'kids.timeLimits' => 'Schermtijdlimieten',
+			'kids.dailyWatchLimit' => 'Dagelijkse kijktijd',
+			'kids.dailyWatchLimitHint' => 'Beperkt het afspelen van video\'s elke dag op dit apparaat.',
+			'kids.noTimeLimit' => 'Geen limiet',
+			'kids.minutesLimit' => ({required Object minutes}) => '${minutes} minuten',
+			'kids.bedtime' => 'Bedtijd',
+			'kids.bedtimeHint' => 'Om dit profiel tijdens deze uren te gebruiken, is de pincode van een ouder nodig.',
+			'kids.bedtimeStart' => 'Bedtijd begint',
+			'kids.bedtimeEnd' => 'Bedtijd is voorbij',
+			'kids.timeLimitReached' => 'De kijktijd is voorbij voor vandaag',
+			'kids.bedtimeReached' => 'Het is bedtijd',
+			'kids.timeLimitParentHint' => 'Vraag een ouder om zijn PIN in te voeren om door te gaan met deze sessie.',
+			'kids.parentUnlock' => 'Ouderontgrendeling',
 			'kids.backupProfile' => 'Maak een back-up van het kinderprofiel',
 			'kids.backupExplain' => 'Maak een back-up van de opgeslagen naam, het karakter, de beperkingen, het uiterlijk en de lokale weergave-uitsluitingen van dit profiel. Parent-PIN\'s, serveraanmeldingen, downloads en voortgang van het afspelen van de server zijn niet inbegrepen.',
 			'kids.saveBackupFile' => 'Back-upbestand opslaan',
@@ -5187,6 +5362,8 @@ extension on TranslationsNl {
 			'kids.blocked' => 'Deze titel is niet beschikbaar in dit kinderprofiel.',
 			'kids.switchProfile' => 'Profiel wisselen',
 			'kids.manageFromAdult' => 'Schakel over naar een volwassen profiel om de instellingen te beheren.',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => 'Verbind een server met uw volwassenprofiel voordat u een kinderprofiel toevoegt.',
 			'kids.created' => 'Kinderprofiel aangemaakt',
 			'kids.updated' => 'Kinderprofiel bijgewerkt',
@@ -5205,8 +5382,6 @@ extension on TranslationsNl {
 			'lurokaDiscovery.imdbTv100' => 'IMDb Top 100 shows · Momentopname van september 2026',
 			'lurokaDiscovery.emmyComedy' => 'Emmy\'s · Winnaars van de comedyserie · 1971–2026',
 			'lurokaDiscovery.emmys' => 'Emmy\'s · Winnaars van dramaseries · 1966–2026',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.bafta' => 'BAFTA · Winnaars voor beste film',
 			'lurokaDiscovery.cannes' => 'Cannes · Palme d’Or-winnaars',
 			'lurokaDiscovery.awardsNote' => 'Awardcollecties omvatten Oscar Best Picture-geschiedenis, Emmy-drama-/komediewinnaars en uitgebreide BAFTA/Cannes-selecties. Herhaalde winnende titels verschijnen één keer. Het lidmaatschap maakt gebruik van de geschiedenis van de prijscategorieën en Wikidata-feiten. IMDb Top 100 film-/showlijsten behouden hitlijsten uit september 2026 van mmdju/imdb-top250-api. Alleen overeenkomsten in uw zichtbare, online bibliotheken verschijnen; De omvang van de collectie is afhankelijk van de beschikbaarheid van de bibliotheek.',
@@ -5599,6 +5774,7 @@ extension on TranslationsNl {
 			'settings.downloadLocationPickerUnavailable' => 'Mapselectie is niet beschikbaar op dit apparaat',
 			'settings.downloadOnWifiOnly' => 'Alleen via wifi downloaden',
 			'settings.downloadOnWifiOnlyDescription' => 'Voorkom downloads bij gebruik van mobiele data',
+			'settings.downloadWifiScope' => 'Geldt voor alle profielen en downloads op dit apparaat.',
 			'settings.autoRemoveWatchedDownloads' => 'Bekeken downloads automatisch verwijderen',
 			'settings.autoRemoveWatchedDownloadsDescription' => 'Bekeken downloads automatisch verwijderen',
 			'settings.cellularDownloadBlocked' => 'Downloads via een mobiel netwerk zijn geblokkeerd. Gebruik wifi of wijzig de instelling.',
@@ -5700,6 +5876,8 @@ extension on TranslationsNl {
 			'settings.languageAndRegion' => 'Taal en regio',
 			'settings.startup' => 'Opstarten',
 			'settings.display' => 'Weergave',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Bibliotheek en kaarten',
 			'settings.homeScreen' => 'Startscherm',
 			'settings.navigation' => 'Navigatie',
@@ -5719,8 +5897,6 @@ extension on TranslationsNl {
 			'settings.gestureVolumeSwipeDescription' => 'Veeg op de rechterrand omhoog of omlaag om het volume aan te passen',
 			'settings.gesturePinchToZoom' => 'Knijpen om te zoomen',
 			'settings.gesturePinchToZoomDescription' => 'Knijp op de video om in of uit te zoomen',
-			_ => null,
-		} ?? switch (path) {
 			'settings.rememberBrightnessLevel' => 'Helderheidsniveau onthouden',
 			'settings.rememberBrightnessLevelDescription' => 'Start het afspelen met de helderheid die met de laatste veeg is ingesteld',
 			'settings.controls' => 'Bediening',
@@ -5860,8 +6036,8 @@ extension on TranslationsNl {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => 'Nog een keuze',
 			'dashboard.exploreSeries' => 'Ontdek series',
-			'dashboard.showFeatured' => 'Gerichte titeldetails',
-			'dashboard.showFeaturedDescription' => 'Toon artwork, synopsis en afleveringsinformatie voor de gemarkeerde kaart',
+			'dashboard.showFeatured' => 'Uitgelicht op Home',
+			'dashboard.showFeaturedDescription' => 'Toon aanbevolen films en series bovenaan Home.',
 			'lurokaCatalog.aboutPerson' => 'IN DE SPOTLIGHT',
 			'lurokaCatalog.biographyUnavailable' => 'Er is geen biografie beschikbaar op deze server.',
 			'lurokaCatalog.filmography' => 'Films en series in uw bibliotheken',
@@ -5917,9 +6093,32 @@ extension on TranslationsNl {
 			'customPerformance.frameBudget' => 'Budget per frame',
 			'customPerformance.processMemory' => 'App-procesgeheugen aan het einde van het voorbeeld',
 			'customPerformance.noFrames' => 'Er zijn geen gerenderde frames vastgelegd. Start nog een voorbeeld en blader door de app.',
+			'homeLayout.manageStudios' => 'Studio\'s kiezen en bestellen',
+			'homeLayout.manageStudiosDescription' => 'Kies welke studio\'s voor dit profiel verschijnen en regel de volgorde ervan.',
+			'homeLayout.studioUnavailable' => 'Alleen studio\'s uit de door jou geselecteerde bibliotheken verschijnen op Home.',
+			'homeLayout.showAllStudios' => 'Toon alle studio\'s',
+			'homeLayout.hideAllStudios' => 'Verberg alle studio\'s',
+			'homeLayout.reorderStudio' => 'Wijzig de studiovolgorde',
+			'homeLayout.episodeThumbnails' => 'Afleveringsafbeeldingen in Verder kijken',
+			'homeLayout.episodeThumbnailsDescription' => 'Toon afleveringsafbeeldingen in plaats van series of seizoensposters in Verder kijken en Volgende omhoog.',
+			'homeLayout.spotlightSource' => 'Bron voor uitgelichte inhoud',
+			'homeLayout.spotlightSourceDescription' => 'For You gebruikt de kijkactiviteit van dit profiel op dit apparaat, samen met favorieten en bibliotheektitels.',
+			'homeLayout.spotlightForYou' => 'Voor jou',
+			'homeLayout.spotlightForYouDescription' => 'Een mix van wat je kijkt, favorieten, nieuwe toevoegingen en trends, op basis van de kijkactiviteit van dit profiel op dit apparaat.',
+			'homeLayout.spotlightTrending' => 'Populair',
+			'homeLayout.spotlightTrendingDescription' => 'Populaire films en programma\'s in uw bibliotheken.',
+			'homeLayout.spotlightContinue' => 'Ga door met kijken',
+			'homeLayout.spotlightContinueDescription' => 'Titels waarmee je bent begonnen en afleveringen die je kunt voortzetten.',
+			'homeLayout.spotlightFavorites' => 'Van je favorieten',
+			'homeLayout.spotlightInspired' => 'Geïnspireerd door uw kijkervaring',
+			'homeLayout.spotlightNextUp' => 'Volgende',
 			'homeLayout.title' => 'Personaliseer thuis',
 			'homeLayout.description' => 'Kies de rijvolgorde en zichtbaarheid voor dit profiel. Selecteer een rij om deze te verplaatsen of te verbergen.',
 			'homeLayout.rows' => 'Thuisrijen',
+			'homeLayout.progressLayout' => 'Ga door met kijken en ga verder',
+			'homeLayout.progressCombined' => 'Gecombineerd in één rij',
+			'homeLayout.progressSeparate' => 'Aparte rijen',
+			'homeLayout.progressDescription' => 'Scheid Next Up indien ondersteund door de server. Andere servers blijven gecombineerd.',
 			'homeLayout.visible' => 'Zichtbaar',
 			'homeLayout.hidden' => 'Verborgen',
 			'homeLayout.showRow' => 'Rij weergeven',
@@ -5961,6 +6160,8 @@ extension on TranslationsNl {
 			'activityStats.trendTitle' => 'Kijk naar de tijd',
 			'activityStats.trendToday' => 'Vandaag',
 			'activityStats.gapDetail' => ({required Object stat, required Object range}) => '${stat} op ${range}',
+			'activityStats.patternsTitle' => 'Jouw patronen',
+			'activityStats.mostlyKind' => ({required Object kind}) => 'Meestal ${kind}',
 			'activityStats.weekdayTitle' => 'Op weekdag',
 			'activityStats.hoursTitle' => 'Op tijdstip van de dag',
 			'activityStats.amLabel' => 'BEN',
@@ -5973,6 +6174,8 @@ extension on TranslationsNl {
 			'activityStats.kindOther' => 'Anders',
 			'activityStats.topTitlesTitle' => 'Meest bekeken',
 			'activityStats.sessionsTitle' => 'Recente sessies',
+			'activityStats.recentViewingTitle' => 'Recente bezichtiging',
+			'activityStats.recentViewingHint' => 'Totale bekeken tijd in de geselecteerde periode. Datums tonen de laatste bezichtiging.',
 			'activityStats.showMore' => 'Laat meer zien',
 			'activityStats.sessionNoTitle' => 'Ongeïdentificeerd afspelen',
 			'activityStats.emptyTitle' => 'Hier nog niets',
@@ -6187,6 +6390,8 @@ extension on TranslationsNl {
 			'accessibility.hue' => 'Tint',
 			'accessibility.saturation' => 'Verzadiging',
 			'accessibility.brightness' => 'Helderheid',
+			_ => null,
+		} ?? switch (path) {
 			'accessibility.hexColor' => 'Hexkleur',
 			'accessibility.expandText' => 'Tekst uitvouwen',
 			'accessibility.collapseText' => 'Tekst samenvouwen',
@@ -6233,8 +6438,6 @@ extension on TranslationsNl {
 			'videoControls.seekBackwardButton' => ({required Object seconds}) => '${seconds} seconden terugspoelen',
 			'videoControls.seekForwardButton' => ({required Object seconds}) => '${seconds} seconden vooruitspoelen',
 			'videoControls.previousButton' => 'Vorige aflevering',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.nextButton' => 'Volgende aflevering',
 			'videoControls.previousChapterButton' => 'Vorig hoofdstuk',
 			'videoControls.nextChapterButton' => 'Volgend hoofdstuk',
@@ -6336,6 +6539,7 @@ extension on TranslationsNl {
 			'messages.metadataRefreshStarted' => ({required Object title}) => 'Vernieuwen van metadata gestart voor "${title}"',
 			'messages.metadataRefreshFailed' => ({required Object error}) => 'Metadata vernieuwen mislukt: ${error}',
 			'messages.logoutConfirm' => 'Weet je zeker dat je wilt uitloggen?',
+			'messages.logoutDeviceConfirm' => 'Uitloggen bij Luroka op dit apparaat? Alle profielen, inclusief kinderprofielen, serveraccounts en gedownloade media, worden van dit apparaat verwijderd. U kunt zich later opnieuw aanmelden.',
 			'messages.noSeasonsFound' => 'Geen seizoenen gevonden',
 			'messages.seasonsLoadFailed' => 'Kan seizoenen niet laden',
 			'messages.noEpisodesFound' => 'Geen afleveringen gevonden in eerste seizoen',
@@ -6421,6 +6625,9 @@ extension on TranslationsNl {
 			'mpvConfig.removeLine' => 'Regel verwijderen',
 			'mpvConfig.embeddedVoHint' => 'vo, gpu-context en gpu-api worden genegeerd op Linux: ingebedde video wordt altijd weergegeven via vo=libmpv op het videovlak, en gpu-next (nodig voor compute-shaders zoals ArtCNN) kan niet ingebed draaien.',
 			'dialog.confirmAction' => 'Bevestig actie',
+			'profiles.manageProfiles' => 'Beheer profielen',
+			'profiles.quickAccess' => 'Snelle toegang',
+			'profiles.signOutDevice' => 'Meld u af bij dit apparaat',
 			'profiles.addLurokaProfile' => 'Luroka-profiel toevoegen',
 			'profiles.switchingProfile' => 'Profiel wisselen…',
 			'profiles.deleteThisProfileTitle' => 'Dit profiel verwijderen?',
@@ -6512,7 +6719,7 @@ extension on TranslationsNl {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => 'Audio-, ondertitel- en bibliotheekopties opgeslagen op ${account}',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => 'Audio-, ondertitel- en bibliotheekopties opgeslagen op ${count} accounts',
 			'accountPreferences.pickAccount' => 'Elk account slaat zijn eigen voorkeuren op. Kies het account dat je wilt bewerken.',
-			'accountPreferences.storedOnAccount' => 'Deze opties worden op het account zelf opgeslagen, zodat elke app die ermee is aangemeld ze gebruikt — ook Luroka op je andere apparaten.',
+			'accountPreferences.storedOnAccount' => 'Deze opties worden opgeslagen op het serveraccount en gedeeld door elk Luroka-profiel en elke app die dat account gebruikt, ook op andere apparaten.',
 			'accountPreferences.noAccounts' => 'Geen accounts om te configureren',
 			'accountPreferences.noAccountsHint' => 'Log in bij Plex of verbind een Jellyfin- of Emby-server en de voorkeuren die op dat account zijn opgeslagen, verschijnen hier.',
 			'accountPreferences.unavailable' => 'Dit account is niet bereikbaar',
@@ -6697,6 +6904,8 @@ extension on TranslationsNl {
 			'libraries.sortLabels.dateShared' => 'Gedeeld op',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Laatste afleveringsuitzending',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Datum laatst toegevoegde aflevering',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Gedownload op',
 			'libraries.sortLabels.size' => 'Grootte',
 			'libraries.sortLabels.library' => 'Bibliotheek',
@@ -6747,8 +6956,6 @@ extension on TranslationsNl {
 			'about.packageLine' => ({required Object package}) => 'Pakket: ${package}',
 			'about.localeLine' => ({required Object locale}) => 'Taal: ${locale}',
 			'about.copyDetails' => 'Kopieer gegevens',
-			_ => null,
-		} ?? switch (path) {
 			'about.detailsCopied' => 'App-gegevens gekopieerd',
 			'about.detailsCopyFailed' => 'Kan app-gegevens niet kopiëren',
 			'about.checkForUpdatesDescription' => 'Controleer GitHub voor een nieuwere release',
@@ -7211,6 +7418,8 @@ extension on TranslationsNl {
 			'watchTogether.offsetPlusSecond' => '+1 sec',
 			'watchTogether.participants' => 'Deelnemers',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('nl'))(n, one: '${n} deelnemer', other: '${n}-deelnemers', ), 
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'HOST',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (jij)',
 			'watchTogether.playerIdle' => 'Inactief',
@@ -7221,7 +7430,7 @@ extension on TranslationsNl {
 			'watchTogether.matchMatched' => 'Heeft het filmpje',
 			'watchTogether.matchMismatched' => 'Verschillende lengte',
 			'watchTogether.matchUnavailable' => 'Heeft het filmpje niet',
-			'watchTogether.participantOffset' => ({required Object offset}) => 'Offset ${offset}',
+			'watchTogether.participantOffset' => ({required Object offset}) => 'Verschuiving ${offset}',
 			'watchTogether.makeHost' => 'Tot host maken',
 			'watchTogether.makeHostQuestion' => 'Host overdragen?',
 			'watchTogether.makeHostConfirm' => ({required Object name}) => '${name} bedient dan het afspelen en de sessie voor iedereen.',
@@ -7261,8 +7470,6 @@ extension on TranslationsNl {
 			'watchTogether.notices.finished' => 'Klaar',
 			'watchTogether.notices.hostChangedTo' => ({required Object name}) => '${name} is nu de host',
 			'watchTogether.notices.youAreNowHost' => 'Jij bent nu de host',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.joined' => ({required Object name}) => '${name} is toegetreden',
 			'watchTogether.notices.left' => ({required Object name}) => '${name} heeft de sessie verlaten',
 			'watchTogether.notices.controlRefused' => 'Alleen de host kan het afspelen regelen',
@@ -7725,6 +7932,8 @@ extension on TranslationsNl {
 			'seerr.statusPartiallyAvailable' => 'Gedeeltelijk beschikbaar',
 			'seerr.statusRequested' => 'Aangevraagd',
 			'seerr.statusProcessing' => 'Verwerken',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Op de blokkeerlijst',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Kon ${url} niet bereiken: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'Geen Seerr-instantie op ${url} (HTTP ${status})',
@@ -7775,8 +7984,6 @@ extension on TranslationsNl {
 			'services.deviceCode.title' => ({required Object service}) => 'Luroka activeren op ${service}',
 			'services.deviceCode.instructions' => 'Scan de QR-code of ga naar het onderstaande adres en voer deze code in:',
 			'services.deviceCode.openToActivate' => ({required Object service}) => 'Open ${service} om te activeren',
-			_ => null,
-		} ?? switch (path) {
 			'services.deviceCode.copyCode' => 'Activeringscode kopiëren',
 			'services.deviceCode.waitingForAuthorization' => 'Wachten op autorisatie…',
 			'services.deviceCode.codeCopied' => 'Code gekopieerd',
@@ -7797,12 +8004,69 @@ extension on TranslationsNl {
 			'services.libraryFilter.modeHintWhitelist' => 'Synchroniseer alleen de hieronder aangevinkte bibliotheken.',
 			'services.libraryFilter.libraries' => 'Bibliotheken',
 			'services.libraryFilter.noLibraries' => 'Geen bibliotheken beschikbaar',
+			'offlineRecovery.title' => 'Uw servers zijn offline',
+			'offlineRecovery.description' => 'Je downloads zijn nog steeds beschikbaar. Probeer opnieuw verbinding te maken wanneer uw server terug is, of voeg een andere server toe.',
+			'offlineRecovery.appleTvDescription' => 'Luroka kan uw mediaservers niet bereiken. Probeer opnieuw verbinding te maken wanneer ze beschikbaar zijn, of voeg een andere server toe om door te gaan met kijken.',
+			'offlineRecovery.kidsDescription' => 'We konden uw mediaserver niet bereiken. Probeer opnieuw verbinding te maken of vraag een ouder om hulp.',
+			'offlineRecovery.retrying' => 'Verbinden…',
+			'offlineRecovery.addServer' => 'Voeg een server toe',
+			'releaseUpdates.manualInstructions' => 'Download het releasearchief van GitHub, pak de APK uit en installeer deze op uw Android-apparaat.',
+			'releaseUpdates.tvInstructions' => 'Open dit adres op uw telefoon of computer, of scan de QR-code om de release te downloaden.',
+			'releaseUpdates.pressBackAgain' => 'Druk nogmaals op Terug om het afspelen af te sluiten',
+			'profileIntegrations.title' => 'Maak Luroka van u',
+			'profileIntegrations.description' => 'Verbind uw favoriete diensten om bij te houden wat u kijkt en om nieuwe films en programma\'s aan te vragen. Elk Luroka-profiel heeft zijn eigen aansluitingen.',
+			'profileIntegrations.step' => 'Optionele integraties',
+			'profileIntegrations.examples' => 'Trakt · Simkl · AniList · MyAnimeList · Seerr',
+			'profileIntegrations.connect' => 'Ontdek integraties',
+			'profileIntegrations.later' => 'Later instellen',
+			'profileIntegrations.manage' => 'Beheer integraties',
+			'profileIntegrations.forProfile' => ({required Object name}) => 'Aansluitingen voor ${name}',
+			'profileSetupGuide.title' => 'Maak uw profiel van u',
+			'profileSetupGuide.description' => 'Kies hoe Luroka eruitziet en aanvoelt voor dit profiel op dit apparaat. Je kunt alles later wijzigen in Instellingen.',
+			'profileSetupGuide.appearanceStep' => '1 van 2 · Uiterlijk',
+			'profileSetupGuide.homeStep' => '2 van 2 · Je startscherm',
+			'profileSetupGuide.preview' => 'Voorbeeld',
+			'profileSetupGuide.previewTitle' => 'Jouw huis',
+			'profileSetupGuide.previewPoster' => 'Affiche',
+			'profileSetupGuide.posterArtwork' => 'Alleen kunstwerken',
+			'profileSetupGuide.posterWithDetails' => 'Posterdetails tonen',
+			'profileSetupGuide.musicDescription' => 'Speel het thema van een film of programma af terwijl de detailpagina geopend is, indien beschikbaar.',
+			'profileSetupGuide.moreThemes' => 'Meer thema\'s',
+			'profileSetupGuide.fewerThemes' => 'Minder thema\'s',
+			'profileSetupGuide.spotlightHeading' => 'Wat moet er in Spotlight verschijnen?',
+			'profileSetupGuide.progressHeading' => 'Ga door met kijken en ga verder',
+			'profileSetupGuide.skip' => 'Gebruik de standaardinstellingen en begin met kijken',
+			'profileSetupGuide.finish' => 'Begin met kijken',
+			'profileSetupGuide.back' => 'Terug',
+			'profileSetupGuide.kContinue' => 'Ga door',
+			'profileSetupGuide.chooseLater' => 'Kies later bibliotheken',
+			'profileSetupGuide.libraryScope' => 'Dit verandert wat er in Luroka verschijnt voor dit profiel; het verandert de serverrechten niet.',
+			'profileSetupGuide.createdTitle' => 'Profiel aangemaakt',
+			'profileSetupGuide.createdDescription' => 'Je nieuwe profiel is klaar. De eigenaar kan het personaliseren zodra hij het voor de eerste keer opent.',
+			'profileSetupGuide.switchProfile' => 'Schakel over naar dit profiel',
+			'profileSetupGuide.stayHere' => 'Blijf op het huidige profiel',
+			'animeFavorites.filter' => 'Anime',
+			'animeFavorites.manage' => 'Beheer anime',
+			'animeFavorites.description' => 'Automatische detectie maakt gebruik van anime-bibliotheeknamen en beschikbare anime-tags of ID\'s. Kies bibliotheken en corrigeer individuele favorieten. Keuzes worden op dit apparaat opgeslagen voor uw profiel.',
+			'animeFavorites.libraries' => 'Anime-bibliotheken',
+			'animeFavorites.libraryHint' => 'Bibliotheken met de naam Anime worden automatisch herkend. Selecteer een bibliotheek om de classificatie ervan te wijzigen.',
+			'animeFavorites.titles' => 'Favoriete titels',
+			'animeFavorites.titleHint' => 'Selecteer een titel om deze als anime te markeren of corrigeer een automatische match.',
+			'animeFavorites.automatic' => 'Automatisch',
+			'animeFavorites.include' => 'Anime',
+			'animeFavorites.exclude' => 'Niet anime',
+			'animeFavorites.automaticIncluded' => 'Automatisch · Anime',
+			'animeFavorites.automaticExcluded' => 'Automatisch · Geen anime',
+			'animeFavorites.noLibraries' => 'Geen aangesloten bibliotheken beschikbaar.',
+			'animeFavorites.noTitles' => 'Er zijn geen favoriete films of programma\'s beschikbaar.',
+			'animeFavorites.empty' => 'Geen anime-favorieten gevonden. Controleer je anime-bibliotheken of markeer een titel als anime.',
+			'animeFavorites.saveFailed' => 'Kan je anime-instellingen niet opslaan. Probeer het opnieuw.',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => '${product}-server toevoegen',
 			'addServer.serverUrls' => 'Server-URL\'s',
 			'addServer.serverUrlsHelper' => 'Meerdere URL\'s toegestaan, gescheiden door komma\'s.',
 			'addServer.findServer' => 'Server zoeken',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => 'Zoeken naar lokale ${product}-servers...',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Lokale ${product}-servers',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Opgeslagen en nabijgelegen ${product}-servers',
 			'addServer.username' => 'Gebruikersnaam',
 			'addServer.password' => 'Wachtwoord',
 			'addServer.signIn' => 'Inloggen',

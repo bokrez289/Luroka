@@ -26,6 +26,7 @@ import '../../services/kids_profile_service.dart';
 import '../profile/kids_settings_screen.dart';
 import '../profile/family_settings_screen.dart';
 import '../profile/full_backup_actions.dart';
+import '../profile/cloud_backup_actions.dart';
 import '../../services/download_storage_service.dart';
 import '../../services/file_picker_service.dart';
 import '../../services/saf_storage_service.dart';
@@ -170,12 +171,12 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
   }
 
   /// Focus key of the first tile: Supporter in purchasable builds, the
-  /// Liberapay link in donation builds (never both), else General.
+  /// Liberapay link in donation builds (never both), else Playback.
   static String get _topTileKey => supporterBuildMode == SupporterMode.iap
       ? _kSupporter
       : DonationService.isEnabled
       ? _kDonate
-      : _kGeneral;
+      : _kPlayback;
 
   void _navigateToSidebar() {
     MainScreenFocusScope.focusSidebarOf(context);
@@ -230,10 +231,10 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
                       SupporterSettingsTile(focusNode: _focusTracker.get(_kSupporter))
                     else if (DonationService.isEnabled)
                       _buildDonateTile(),
+                    _buildPlaybackTile(),
+                    _buildAppearanceTile(),
                     _buildGeneralTile(),
                     _buildFamilyTile(),
-                    _buildAppearanceTile(),
-                    _buildPlaybackTile(),
                     if (hasLibraries) _buildManageLibrariesTile(sheetContext),
                     _buildServicesTile(),
                   ],
@@ -316,7 +317,8 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
           settings.SettingsService.homeShelfItemCount.key,
           'continue watching recently added 16 32 48',
         ),
-        search('appearance', t.tvLayout.screenMargins, settings.SettingsService.tvScreenMargin.key),
+        if (PlatformDetector.isTV())
+          search('appearance', t.tvLayout.screenMargins, settings.SettingsService.tvScreenMargin.key),
         search('appearance', t.settings.hideSpoilers, settings.SettingsService.hideSpoilers.key),
         search('appearance', t.settings.showWatchedIndicators, settings.SettingsService.showWatchedIndicators.key),
         search('appearance', t.settings.libraryAndCards, null, 'posters size density artwork'),
@@ -399,6 +401,7 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
             child: Column(
               children: [
                 _buildConnectionsSection(context),
+                _buildBackupSection(),
                 const SizedBox(height: 16),
                 SettingsGroup(children: [if (hasLibraries) _buildManageLibrariesTile(context), _buildServicesTile()]),
               ],
@@ -501,7 +504,7 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
       IconData icon,
       String description,
       WidgetBuilder builder, {
-      bool preview = true,
+      bool preview = false,
       FocusNode? firstFocus,
     }) => TvSettingsCategory(
       id: id,
@@ -518,6 +521,11 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
       key: _tvHubKey,
       onExitLeft: PlatformDetector.isTV() ? _navigateToSidebar : () => Navigator.of(context).maybePop(),
       searchEntries: [
+        TvSettingsSearchEntry(
+          categoryId: 'backup',
+          title: t.settings.backup,
+          keywords: 'cloud backup restore recovery profiles accounts delete',
+        ),
         TvSettingsSearchEntry(
           categoryId: 'playback',
           title: t.settings.hardwareDecoding,
@@ -553,12 +561,65 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
           advanced: true,
           keywords: 'logs diagnostics backup',
         ),
-        search('appearance', t.settings.theme, t.settings.theme, 'theme colors'),
-        search('appearance', t.tvLayout.screenMargins, settings.SettingsService.tvScreenMargin.key),
-        search('library', t.tvSettingsV2.posterSize, settings.SettingsService.libraryDensity.key, 'density size'),
+        search('appearance', t.settings.theme, settings.SettingsService.themeMode.key, 'theme colors'),
+        if (PlatformDetector.isTV())
+          search('appearance', t.tvLayout.screenMargins, settings.SettingsService.tvScreenMargin.key),
+        search('appearance', t.settings.visualEffects, settings.SettingsService.visualEffects.key, 'animations motion'),
+        search(
+          'library',
+          PlatformDetector.isTV() ? t.tvSettingsV2.posterSize : t.settings.libraryDensity,
+          settings.SettingsService.libraryDensity.key,
+          'density poster size',
+        ),
         search('library', t.settings.gridSpacing, settings.SettingsService.gridSpacing.key),
+        if (PlatformDetector.isTV())
+          search(
+            'library',
+            t.libraryPolish.compactTvNavigation,
+            settings.SettingsService.compactTvLibraryNavigation.key,
+            'compact TV library sidebar side menu slide out navigation emby style',
+          ),
+        search(
+          'library',
+          t.posterDetails.title,
+          settings.SettingsService.posterDetails.key,
+          'poster captions titles ratings',
+        ),
+        search(
+          'library',
+          t.posterDetails.catalogEpisodeInfo,
+          settings.SettingsService.catalogEpisodeInfo.key,
+          'episode runtime discover',
+        ),
+        search(
+          'library',
+          t.posterDetails.showThemeMusic,
+          settings.SettingsService.showThemeMusic.key,
+          'music details sound',
+        ),
         search('library', t.settings.hideSpoilers, settings.SettingsService.hideSpoilers.key),
         search('library', t.settings.showWatchedIndicators, settings.SettingsService.showWatchedIndicators.key),
+        TvSettingsSearchEntry(
+          categoryId: 'library',
+          title: t.settings.viewMode,
+          settingId: settings.SettingsService.viewMode.key,
+          advanced: true,
+          keywords: 'grid list layout',
+        ),
+        TvSettingsSearchEntry(
+          categoryId: 'library',
+          title: t.settings.episodePosterMode,
+          settingId: settings.SettingsService.episodePosterMode.key,
+          advanced: true,
+          keywords: 'episode thumbnail season poster',
+        ),
+        TvSettingsSearchEntry(
+          categoryId: 'library',
+          title: t.settings.showEpisodeNumberOnCards,
+          settingId: settings.SettingsService.showEpisodeNumberOnCards.key,
+          advanced: true,
+          keywords: 'episode number poster card',
+        ),
         search(
           'home',
           t.settingsRedesign.showLiveTv,
@@ -571,18 +632,82 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
           settings.SettingsService.homeShelfItemCount.key,
           'continue watching recently added',
         ),
-        search('home', t.homeLayout.title, null, 'reorder hide source libraries'),
+        if (context.watch<HomeLayoutProvider?>()?.profileId != null)
+          search(
+            'home',
+            t.homeLayout.title,
+            'customize_home',
+            'reorder hide rows next up continue watching source libraries spotlight source for you trending',
+          ),
+        search('home', t.dashboard.showFeatured, settings.SettingsService.showHeroSection.key, 'spotlight hero banner'),
+        search(
+          'home',
+          t.settings.continueWatchingAction,
+          settings.SettingsService.continueWatchingAction.key,
+          'resume play details',
+        ),
+        search('home', t.settings.episodeAction, settings.SettingsService.episodeAction.key, 'play details'),
         search('playback', t.settings.autoPlayNextEpisode, settings.SettingsService.autoPlayNextEpisode.key),
         search('playback', t.settings.skipIntroMode, settings.SettingsService.skipIntroMode.key),
         search('playback', t.settings.skipCreditsMode, settings.SettingsService.skipCreditsMode.key),
+        search(
+          'playback',
+          t.settings.smallSkipDuration,
+          settings.SettingsService.seekTimeSmall.key,
+          'seek rewind forward',
+        ),
+        search(
+          'playback',
+          t.settings.largeSkipDuration,
+          settings.SettingsService.seekTimeLarge.key,
+          'seek rewind forward',
+        ),
+        search('playback', t.settings.rewindOnResume, settings.SettingsService.rewindOnResume.key),
         search('audio', t.settings.subtitleStyling, t.settings.subtitleStyling, 'captions font size color'),
-        search('audio', t.accountPreferences.sectionTitle, null, 'audio subtitle language'),
+        if (context.select<AccountPreferencesController, bool>((c) => c.accounts.isNotEmpty))
+          search('audio', t.accountPreferences.sectionTitle, null, 'audio subtitle language'),
         search('household', t.family.people, null, 'profiles kids family'),
         search('connections', t.serversAccounts.title, null, 'servers accounts services'),
-        search('downloads', t.settings.downloadOnWifiOnly, settings.SettingsService.downloadOnWifiOnly.key),
+        if (!PlatformDetector.isAppleTV())
+          search('downloads', t.settings.downloadOnWifiOnly, settings.SettingsService.downloadOnWifiOnly.key),
         search('general', t.settings.language, null, 'language region'),
       ],
       categories: [
+        page(
+          'playback',
+          t.tvSettingsV2.playback,
+          Symbols.play_circle_rounded,
+          t.settings.videoPlaybackDescription,
+          (_) => const PlaybackSettingsScreen(view: PlaybackSettingsView.everyday),
+        ),
+        page(
+          'audio',
+          t.lurokaWorkspace.audioSubtitles,
+          Symbols.subtitles_rounded,
+          t.lurokaWorkspace.audioDescription,
+          (context) => PlaybackSettingsScreen(
+            view: PlaybackSettingsView.audio,
+            accountPreferences: context.select<AccountPreferencesController, bool>((c) => c.accounts.isNotEmpty)
+                ? _buildAccountPreferencesTile(context)
+                : null,
+          ),
+        ),
+        page(
+          'home',
+          t.tvSettingsV2.homeNavigation,
+          Symbols.home_rounded,
+          t.tvSettingsV2.homeHint,
+          (_) => const AppearanceSettingsScreen(section: AppearanceSettingsSection.home),
+          preview: true,
+        ),
+        page(
+          'library',
+          t.tvSettingsV2.libraryCards,
+          Symbols.grid_view_rounded,
+          t.tvSettingsV2.libraryHint,
+          (_) => const AppearanceSettingsScreen(section: AppearanceSettingsSection.library),
+          preview: true,
+        ),
         page(
           'appearance',
           t.settings.appearance,
@@ -604,54 +729,15 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
                 ),
             ],
           ),
+          preview: true,
         ),
         page(
-          'home',
-          t.tvSettingsV2.homeNavigation,
-          Symbols.home_rounded,
-          t.tvSettingsV2.homeHint,
-          (context) => AppearanceSettingsScreen(
-            section: AppearanceSettingsSection.home,
-            extraChildren: [
-              if (context.watch<HomeLayoutProvider?>()?.profileId != null)
-                SettingsGroup(
-                  children: [
-                    SettingNavigationTile(
-                      icon: Symbols.dashboard_customize_rounded,
-                      title: t.homeLayout.title,
-                      subtitle: t.homeLayout.description,
-                      destinationBuilder: (_) => const HomeLayoutScreen(includeSpotlight: false),
-                    ),
-                  ],
-                ),
-            ],
-          ),
-        ),
-        page(
-          'library',
-          t.tvSettingsV2.libraryCards,
-          Symbols.grid_view_rounded,
-          t.tvSettingsV2.libraryHint,
-          (_) => const AppearanceSettingsScreen(section: AppearanceSettingsSection.library),
-        ),
-        page(
-          'playback',
-          t.tvSettingsV2.playback,
-          Symbols.play_circle_rounded,
-          t.settings.videoPlaybackDescription,
-          (_) => const PlaybackSettingsScreen(view: PlaybackSettingsView.everyday),
-        ),
-        page(
-          'audio',
-          t.lurokaWorkspace.audioSubtitles,
-          Symbols.subtitles_rounded,
-          t.lurokaWorkspace.audioDescription,
-          (context) => PlaybackSettingsScreen(
-            view: PlaybackSettingsView.audio,
-            accountPreferences: context.select<AccountPreferencesController, bool>((c) => c.accounts.isNotEmpty)
-                ? _buildAccountPreferencesTile(context)
-                : null,
-          ),
+          'backup',
+          t.settings.backup,
+          Symbols.cloud_upload_rounded,
+          'Create, restore or delete an encrypted backup',
+          (_) => SingleChildScrollView(child: _buildBackupSection()),
+          preview: false,
         ),
         page(
           'connections',
@@ -906,7 +992,7 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
           pref: settings.SettingsService.downloadOnWifiOnly,
           icon: Symbols.wifi_rounded,
           title: t.settings.downloadOnWifiOnly,
-          subtitle: t.settings.downloadOnWifiOnlyDescription,
+          subtitle: '${t.settings.downloadOnWifiOnlyDescription} ${t.settings.downloadWifiScope}',
         ),
         SettingSwitchTile(
           focusNode: _focusTracker.get(_kAutoRemoveWatchedDownloads),
@@ -1079,28 +1165,52 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
     return SettingsGroup(
       title: t.settings.backup,
       children: [
-        SettingNavigationTile(
-          icon: Symbols.lock_rounded,
-          title: 'Back up profiles and accounts',
-          subtitle: 'Save an encrypted backup including server logins and local history',
-          onTap: () => unawaited(exportFullBackup(context)),
-        ),
-        SettingNavigationTile(
-          focusNode: _focusTracker.get(_kExportSettings),
-          icon: Symbols.upload_rounded,
-          title: t.settings.exportSettings,
-          subtitle: t.settings.exportSettingsDescription,
-          onTap: _handleExportSettings,
-        ),
-        SettingNavigationTile(
-          focusNode: _focusTracker.get(_kImportSettings),
-          icon: Symbols.download_rounded,
-          title: t.settings.importSettings,
-          subtitle: t.settings.importSettingsDescription,
-          onTap: _showImportSettingsDialog,
-        ),
-        // TODO: Cloud settings sync/backup goes here once a
-        // sync backend exists (iCloud on Apple platforms, or the relay).
+        if (cloudBackupEnabled)
+          SettingNavigationTile(
+            icon: Symbols.cloud_upload_rounded,
+            title: 'Encrypted cloud backup',
+            subtitle: 'Choose profiles and securely store a backup for 90 days',
+            onTap: () => unawaited(showCloudBackupCreation(context)),
+          ),
+        if (cloudBackupEnabled)
+          SettingNavigationTile(
+            icon: Symbols.cloud_download_rounded,
+            title: 'Restore cloud backup',
+            subtitle: 'Restore using your recovery code',
+            onTap: () async {
+              await showCloudBackupRestore(context);
+            },
+          ),
+        if (cloudBackupEnabled)
+          SettingNavigationTile(
+            icon: Symbols.cloud_off_rounded,
+            title: 'Delete cloud backup',
+            subtitle: 'Delete a backup using its recovery code',
+            onTap: () => unawaited(showCloudBackupDeletion(context)),
+          ),
+        if (!PlatformDetector.isTV() || PlatformDetector.isDesktopOS())
+          SettingNavigationTile(
+            icon: Symbols.lock_rounded,
+            title: 'Back up profiles and accounts',
+            subtitle: 'Save an encrypted backup including server logins and local history',
+            onTap: () => unawaited(exportFullBackup(context)),
+          ),
+        if (!PlatformDetector.isTV() || PlatformDetector.isDesktopOS())
+          SettingNavigationTile(
+            focusNode: _focusTracker.get(_kExportSettings),
+            icon: Symbols.upload_rounded,
+            title: t.settings.exportSettings,
+            subtitle: t.settings.exportSettingsDescription,
+            onTap: _handleExportSettings,
+          ),
+        if (!PlatformDetector.isTV() || PlatformDetector.isDesktopOS())
+          SettingNavigationTile(
+            focusNode: _focusTracker.get(_kImportSettings),
+            icon: Symbols.download_rounded,
+            title: t.settings.importSettings,
+            subtitle: t.settings.importSettingsDescription,
+            onTap: _showImportSettingsDialog,
+          ),
       ],
     );
   }

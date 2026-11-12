@@ -137,6 +137,11 @@ class TranslationsHu extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$trakt$hu trakt = _Translations$trakt$hu._(_root);
 	@override late final _Translations$seerr$hu seerr = _Translations$seerr$hu._(_root);
 	@override late final _Translations$services$hu services = _Translations$services$hu._(_root);
+	@override late final _Translations$offlineRecovery$hu offlineRecovery = _Translations$offlineRecovery$hu._(_root);
+	@override late final _Translations$releaseUpdates$hu releaseUpdates = _Translations$releaseUpdates$hu._(_root);
+	@override late final _Translations$profileIntegrations$hu profileIntegrations = _Translations$profileIntegrations$hu._(_root);
+	@override late final _Translations$profileSetupGuide$hu profileSetupGuide = _Translations$profileSetupGuide$hu._(_root);
+	@override late final _Translations$animeFavorites$hu animeFavorites = _Translations$animeFavorites$hu._(_root);
 	@override late final _Translations$addServer$hu addServer = _Translations$addServer$hu._(_root);
 }
 
@@ -320,6 +325,9 @@ class _Translations$libraryPolish$hu extends Translations$libraryPolish$en {
 	final TranslationsHu _root; // ignore: unused_field
 
 	// Translations
+	@override String get compactTvNavigation => 'Kompakt könyvtári navigáció';
+	@override String get compactTvNavigationDescription => 'A kicsúsztatható menüben megjelenítheti a könyvtár szakaszait és böngészhet a lehetőségek között, így több hely marad a posztereknek.';
+	@override String get openLibraryMenu => 'Nyissa meg a könyvtár menüt';
 	@override String get posterDetails => 'Plakát részletei';
 	@override String get showPosterDetails => 'A plakát részleteinek megjelenítése · név, év és IMDb';
 	@override String get hidePosterDetails => 'A plakát részleteinek elrejtése';
@@ -633,6 +641,8 @@ class _Translations$settingsRedesign$hu extends Translations$settingsRedesign$en
 	// Translations
 	@override String get themeEffects => 'Téma és effektusok';
 	@override String get libraryLayout => 'Könyvtár elrendezése';
+	@override String get posterInformation => 'Plakát információk';
+	@override String get libraryBehavior => 'Könyvtári viselkedés';
 	@override String get appearanceHint => 'Testreszabhatja a Luroka megjelenését, elrendezését és viselkedését.';
 	@override String get livePreview => 'Élő előnézet';
 	@override String get previewHint => 'Tekintse meg, hogyan fog kinézni könyvtára a jelenlegi beállításokkal.';
@@ -770,6 +780,19 @@ class _Translations$kids$hu extends Translations$kids$en {
 	final TranslationsHu _root; // ignore: unused_field
 
 	// Translations
+	@override String get timeLimits => 'Képernyőidő-korlátok';
+	@override String get dailyWatchLimit => 'Napi nézési idő';
+	@override String get dailyWatchLimitHint => 'Naponta korlátozza a videolejátszást ezen az eszközön.';
+	@override String get noTimeLimit => 'Nincs korlátozás';
+	@override String minutesLimit({required Object minutes}) => '${minutes} perc';
+	@override String get bedtime => 'Lefekvés';
+	@override String get bedtimeHint => 'A profil használatához ezekben az órákban egy szülő PIN szükséges.';
+	@override String get bedtimeStart => 'Elkezdődik a lefekvés';
+	@override String get bedtimeEnd => 'Lefekvés véget ér';
+	@override String get timeLimitReached => 'A nézési idő mára lejárt';
+	@override String get bedtimeReached => 'Lefekvés ideje van';
+	@override String get timeLimitParentHint => 'Kérje meg a szülőt, hogy adja meg PIN értékét, hogy folytathassa ezt a foglalkozást.';
+	@override String get parentUnlock => 'Szülői feloldás';
 	@override String get backupProfile => 'Gyermekprofil biztonsági mentése';
 	@override String get backupExplain => 'Készítsen biztonsági másolatot a profil mentett nevéről, karakteréről, korlátozásairól, megjelenéséről és a helyi megtekintési kizárásokról. A szülői PIN-kódokat, a szerverbejelentkezéseket, a letöltéseket és a szerver lejátszási folyamatát nem tartalmazza.';
 	@override String get saveBackupFile => 'Mentse a biztonsági másolat fájlt';
@@ -1313,6 +1336,7 @@ class _Translations$settings$hu extends Translations$settings$en {
 	@override String get downloadLocationPickerUnavailable => 'A mappaválasztás ezen az eszközön nem érhető el';
 	@override String get downloadOnWifiOnly => 'Letöltés csak Wi-Fi-n';
 	@override String get downloadOnWifiOnlyDescription => 'Letöltések megakadályozása mobiladat-használat esetén';
+	@override String get downloadWifiScope => 'Az eszköz összes profiljára és letöltésére vonatkozik.';
 	@override String get autoRemoveWatchedDownloads => 'Megnézett letöltések automatikus eltávolítása';
 	@override String get autoRemoveWatchedDownloadsDescription => 'A megnézett letöltések automatikus törlése';
 	@override String get cellularDownloadBlocked => 'A letöltések mobilhálózaton le vannak tiltva. Használj Wi-Fi-t, vagy módosítsd a beállítást.';
@@ -1651,8 +1675,8 @@ class _Translations$dashboard$hu extends Translations$dashboard$en {
 	@override String episodeLabel({required Object season, required Object episode}) => 'S${season} · E${episode}';
 	@override String get anotherPick => 'Egy másik választás';
 	@override String get exploreSeries => 'Fedezze fel a sorozatokat';
-	@override String get showFeatured => 'Kiemelt címrészletek';
-	@override String get showFeaturedDescription => 'Mutassa meg a kiemelt kártya grafikáját, szinopszisát és epizódinformációit';
+	@override String get showFeatured => 'Otthoni reflektorfény';
+	@override String get showFeaturedDescription => 'Kiemelt filmek és műsorok megjelenítése a Kezdőlap tetején.';
 }
 
 // Path: lurokaCatalog
@@ -1753,9 +1777,32 @@ class _Translations$homeLayout$hu extends Translations$homeLayout$en {
 	final TranslationsHu _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageStudios => 'Válasszon és rendeljen stúdiókat';
+	@override String get manageStudiosDescription => 'Válassza ki, hogy mely stúdiók jelenjenek meg ehhez a profilhoz, és rendezze a sorrendjüket.';
+	@override String get studioUnavailable => 'Csak a kiválasztott könyvtárakban található stúdiók jelennek meg a Kezdőlapon.';
+	@override String get showAllStudios => 'Az összes stúdió megjelenítése';
+	@override String get hideAllStudios => 'Az összes stúdió elrejtése';
+	@override String get reorderStudio => 'Stúdiórend módosítása';
+	@override String get episodeThumbnails => 'Epizódképek a Megtekintés folytatásában';
+	@override String get episodeThumbnailsDescription => 'Epizódképek megjelenítése sorozatok vagy évadok poszterei helyett a Megtekintés folytatásában és a Következőben.';
+	@override String get spotlightSource => 'Kiemelt tartalom forrása';
+	@override String get spotlightSourceDescription => 'A For You a profil megtekintési tevékenységét használja ezen az eszközön, a kedvencekkel és könyvtárcímekkel együtt.';
+	@override String get spotlightForYou => 'Neked';
+	@override String get spotlightForYouDescription => 'A megtekintett tartalmak, a kedvencek, az új kiegészítések és a trendek keveréke a profil ezen az eszközön végzett megtekintési tevékenységével.';
+	@override String get spotlightTrending => 'Felkapott';
+	@override String get spotlightTrendingDescription => 'Népszerű filmek és műsorok a könyvtáraidban.';
+	@override String get spotlightContinue => 'Folytassa a nézést';
+	@override String get spotlightContinueDescription => 'Elkezdett címek és folytatható epizódok.';
+	@override String get spotlightFavorites => 'A kedvenceid közül';
+	@override String get spotlightInspired => 'A megtekintésed ihlette';
+	@override String get spotlightNextUp => 'Következő';
 	@override String get title => 'Az otthon személyre szabása';
 	@override String get description => 'Válassza ki a profil sorrendjét és láthatóságát. Válasszon egy sort az áthelyezéséhez vagy elrejtéséhez.';
 	@override String get rows => 'Kezdőlap sorok';
+	@override String get progressLayout => 'Folytassa a megtekintést és a Következő oldalt';
+	@override String get progressCombined => 'Egy sorban kombinálva';
+	@override String get progressSeparate => 'Külön sorok';
+	@override String get progressDescription => 'Külön Következő fel, ha a szerver támogatja. A többi szerver kombinálva marad.';
 	@override String get visible => 'Látható';
 	@override String get hidden => 'Rejtett';
 	@override String get showRow => 'Sor megjelenítése';
@@ -1818,6 +1865,8 @@ class _Translations$activityStats$hu extends Translations$activityStats$en {
 	@override String get trendTitle => 'Nézési idő';
 	@override String get trendToday => 'Ma';
 	@override String gapDetail({required Object stat, required Object range}) => '${stat} a ${range}-n';
+	@override String get patternsTitle => 'A mintáid';
+	@override String mostlyKind({required Object kind}) => 'Többnyire ${kind}';
 	@override String get weekdayTitle => 'Hétköznapra';
 	@override String get hoursTitle => 'Napszak szerint';
 	@override String get amLabel => 'AM';
@@ -1830,6 +1879,8 @@ class _Translations$activityStats$hu extends Translations$activityStats$en {
 	@override String get kindOther => 'Egyéb';
 	@override String get topTitlesTitle => 'A legtöbben nézték';
 	@override String get sessionsTitle => 'Legutóbbi ülések';
+	@override String get recentViewingTitle => 'Legutóbbi megtekintés';
+	@override String get recentViewingHint => 'Teljes megtekintési idő a kiválasztott időszakban. A dátumok a legutóbbi megtekintést mutatják.';
 	@override String get showMore => 'Mutass többet';
 	@override String get sessionNoTitle => 'Azonosítatlan lejátszás';
 	@override String get emptyTitle => 'Itt még semmi';
@@ -2262,6 +2313,7 @@ class _Translations$messages$hu extends Translations$messages$en {
 	@override String metadataRefreshStarted({required Object title}) => 'Metaadatok frissítése elindítva a következőhöz: "${title}"';
 	@override String metadataRefreshFailed({required Object error}) => 'Nem sikerült a metaadatok frissítése: ${error}';
 	@override String get logoutConfirm => 'Biztosan ki szeretnél jelentkezni?';
+	@override String get logoutDeviceConfirm => 'Kijelentkezik a Luroka alkalmazásból ezen az eszközön? Minden profil, beleértve a Kids-profilokat, a szerverfiókokat és a letöltött médiát is eltávolítja erről az eszközről. Később újra bejelentkezhet.';
 	@override String get noSeasonsFound => 'Nem találhatók évadok';
 	@override String get seasonsLoadFailed => 'Nem sikerült az évadok betöltése';
 	@override String get noEpisodesFound => 'Nem találhatók epizódok az első évadban';
@@ -2392,6 +2444,9 @@ class _Translations$profiles$hu extends Translations$profiles$en {
 	final TranslationsHu _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageProfiles => 'Profilok kezelése';
+	@override String get quickAccess => 'Gyors hozzáférés';
+	@override String get signOutDevice => 'Jelentkezzen ki erről az eszközről';
 	@override String get addLurokaProfile => 'Luroka profil hozzáadása';
 	@override String get switchingProfile => 'Profilváltás…';
 	@override String get deleteThisProfileTitle => 'Törlöd ezt a profilt?';
@@ -2510,7 +2565,7 @@ class _Translations$accountPreferences$hu extends Translations$accountPreference
 	@override String hubSubtitleSingle({required Object account}) => 'Hang-, felirat- és könyvtárbeállítások mentve a(z) ${account} fiókra';
 	@override String hubSubtitleMultiple({required Object count}) => 'Hang-, felirat- és könyvtárbeállítások mentve ${count} fiókra';
 	@override String get pickAccount => 'Minden fiók a saját beállításait tárolja. Válaszd ki a szerkesztendőt.';
-	@override String get storedOnAccount => 'Ezek a beállítások magán a fiókon tárolódnak, így minden bejelentkezett alkalmazás használja őket — beleértve a Lurokat a többi eszközödön.';
+	@override String get storedOnAccount => 'Ezeket a beállításokat a rendszer a szerverfiókban menti, és megosztja minden, a fiókot használó Luroka profillal és alkalmazással, beleértve a többi eszközt is.';
 	@override String get noAccounts => 'Nincs beállítható fiók';
 	@override String get noAccountsHint => 'Jelentkezz be a Plexbe, vagy csatlakoztass egy Jellyfin- vagy Emby-szervert, és az azon a fiókon tárolt beállítások itt jelennek meg.';
 	@override String get unavailable => 'Ez a fiók nem érhető el';
@@ -3700,6 +3755,108 @@ class _Translations$services$hu extends Translations$services$en {
 	@override late final _Translations$services$libraryFilter$hu libraryFilter = _Translations$services$libraryFilter$hu._(_root);
 }
 
+// Path: offlineRecovery
+class _Translations$offlineRecovery$hu extends Translations$offlineRecovery$en {
+	_Translations$offlineRecovery$hu._(TranslationsHu root) : this._root = root, super.internal(root);
+
+	final TranslationsHu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'A szerverei offline állapotban vannak';
+	@override String get description => 'A letöltések továbbra is elérhetők. Próbáljon meg újra csatlakozni, amikor a szerver visszatér, vagy adjon hozzá egy másik szervert.';
+	@override String get appleTvDescription => 'A Luroka nem tudta elérni a médiaszervereket. Próbáljon meg újra csatlakozni, amikor elérhetők, vagy adjon hozzá egy másik szervert a megtekintés folytatásához.';
+	@override String get kidsDescription => 'Nem tudtuk elérni a médiaszerverét. Próbáljon újra csatlakozni, vagy kérjen segítséget egy szülőtől.';
+	@override String get retrying => 'Csatlakozás…';
+	@override String get addServer => 'Szerver hozzáadása';
+}
+
+// Path: releaseUpdates
+class _Translations$releaseUpdates$hu extends Translations$releaseUpdates$en {
+	_Translations$releaseUpdates$hu._(TranslationsHu root) : this._root = root, super.internal(root);
+
+	final TranslationsHu _root; // ignore: unused_field
+
+	// Translations
+	@override String get manualInstructions => 'Töltse le a kiadási archívumot a GitHub webhelyről, csomagolja ki a APK fájlt, és telepítse a Android eszközére.';
+	@override String get tvInstructions => 'Nyissa meg ezt a címet telefonján vagy számítógépén, vagy olvassa be a QR-kódot a kiadás letöltéséhez.';
+	@override String get pressBackAgain => 'Nyomja meg ismét a Vissza gombot a lejátszásból való kilépéshez';
+}
+
+// Path: profileIntegrations
+class _Translations$profileIntegrations$hu extends Translations$profileIntegrations$en {
+	_Translations$profileIntegrations$hu._(TranslationsHu root) : this._root = root, super.internal(root);
+
+	final TranslationsHu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Legyen a Luroka a magáé';
+	@override String get description => 'Csatlakoztassa kedvenc szolgáltatásait, hogy nyomon kövesse, mit néz, és kérjen új filmeket és műsorokat. Minden Luroka profilnak saját csatlakozásai vannak.';
+	@override String get step => 'Választható integrációk';
+	@override String get examples => 'Trakt · Simkl · AniList · MyAnimeList · Seerr';
+	@override String get connect => 'Fedezze fel az integrációkat';
+	@override String get later => 'Állítsa be később';
+	@override String get manage => 'Integrációk kezelése';
+	@override String forProfile({required Object name}) => '${name} csatlakozások';
+}
+
+// Path: profileSetupGuide
+class _Translations$profileSetupGuide$hu extends Translations$profileSetupGuide$en {
+	_Translations$profileSetupGuide$hu._(TranslationsHu root) : this._root = root, super.internal(root);
+
+	final TranslationsHu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Tedd sajátoddá profilodat';
+	@override String get description => 'Válassza ki, hogy a Luroka hogyan nézzen ki és érezzen ezt a profilt ezen az eszközön. Később mindent módosíthat a Beállításokban.';
+	@override String get appearanceStep => '1 / 2 · Megjelenés';
+	@override String get homeStep => '2/2 · A kezdőképernyő';
+	@override String get preview => 'Előnézet';
+	@override String get previewTitle => 'Az Ön Otthona';
+	@override String get previewPoster => 'Plakát';
+	@override String get posterArtwork => 'Csak műalkotás';
+	@override String get posterWithDetails => 'A plakát részleteinek megjelenítése';
+	@override String get musicDescription => 'Játssz le egy filmet vagy műsort, miközben a részletes oldal meg van nyitva, ha elérhető.';
+	@override String get moreThemes => 'További témák';
+	@override String get fewerThemes => 'Kevesebb téma';
+	@override String get spotlightHeading => 'Mi jelenjen meg a Spotlightban?';
+	@override String get progressHeading => 'Folytassa a megtekintést és a Következő oldalt';
+	@override String get skip => 'Használja az alapértelmezett beállításokat, és kezdje el nézni';
+	@override String get finish => 'Kezdje el nézni';
+	@override String get back => 'Vissza';
+	@override String get kContinue => 'Folytatás';
+	@override String get chooseLater => 'Válasszon később könyvtárakat';
+	@override String get libraryScope => 'Ez megváltoztatja, hogy mi jelenik meg a Lurokában ezen a profilon; a szerver engedélyeit nem módosítja.';
+	@override String get createdTitle => 'Profil létrehozva';
+	@override String get createdDescription => 'Elkészült az új profilod. Tulajdonosa az első kinyitáskor személyre szabhatja.';
+	@override String get switchProfile => 'Váltás erre a profilra';
+	@override String get stayHere => 'Maradjon az aktuális profilnál';
+}
+
+// Path: animeFavorites
+class _Translations$animeFavorites$hu extends Translations$animeFavorites$en {
+	_Translations$animeFavorites$hu._(TranslationsHu root) : this._root = root, super.internal(root);
+
+	final TranslationsHu _root; // ignore: unused_field
+
+	// Translations
+	@override String get filter => 'Anime';
+	@override String get manage => 'Anime kezelése';
+	@override String get description => 'Az automatikus felismerés animekönyvtár-neveket és elérhető animecímkéket vagy azonosítókat használ. Válasszon könyvtárakat, és javítsa ki az egyéni kedvenceket. A választásokat a rendszer ezen az eszközön menti profiljához.';
+	@override String get libraries => 'Anime könyvtárak';
+	@override String get libraryHint => 'Az Anime nevű könyvtárakat a rendszer automatikusan felismeri. Válasszon ki egy könyvtárat a besorolás módosításához.';
+	@override String get titles => 'Kedvenc címek';
+	@override String get titleHint => 'Válasszon ki egy címet, hogy animeként jelölje meg, vagy javítsa ki az automatikus egyezést.';
+	@override String get automatic => 'Automatikus';
+	@override String get include => 'Anime';
+	@override String get exclude => 'Nem anime';
+	@override String get automaticIncluded => 'Automatikus · Anime';
+	@override String get automaticExcluded => 'Automatikus · Nem anime';
+	@override String get noLibraries => 'Nincsenek csatlakoztatott könyvtárak.';
+	@override String get noTitles => 'Nincsenek kedvenc filmek vagy műsorok.';
+	@override String get empty => 'Nem található kedvenc anime. Nézze meg animekönyvtárait, vagy jelöljön meg egy címet animeként.';
+	@override String get saveFailed => 'Nem sikerült menteni az anime beállításait. Kérjük, próbálja újra.';
+}
+
 // Path: addServer
 class _Translations$addServer$hu extends Translations$addServer$en {
 	_Translations$addServer$hu._(TranslationsHu root) : this._root = root, super.internal(root);
@@ -3712,7 +3869,7 @@ class _Translations$addServer$hu extends Translations$addServer$en {
 	@override String get serverUrlsHelper => 'Több URL is megadható, vesszővel elválasztva.';
 	@override String get findServer => 'Szerver keresése';
 	@override String searchingLocalMediaBrowserServers({required Object product}) => 'Helyi ${product} szerverek keresése...';
-	@override String localMediaBrowserServers({required Object product}) => 'Helyi ${product} szerverek';
+	@override String localMediaBrowserServers({required Object product}) => 'Mentett és közeli ${product} szerverek';
 	@override String get username => 'Felhasználónév';
 	@override String get password => 'Jelszó';
 	@override String get signIn => 'Bejelentkezés';
@@ -4788,6 +4945,9 @@ extension on TranslationsHu {
 			'posterDetails.catalogEpisodeInfoDescription' => 'Az epizódszámok és az átlagos időtartam megjelenítése a Felfedezés-plakátokon.',
 			'posterDetails.title' => 'Plakát részletei',
 			'posterDetails.description' => 'Mutassa meg a címet, az évet és a IMDb értékelést a Studio, Search, Felfedezés és Libraries plakátok alatt. A hiányzó IMDb értékelések rejtve maradnak. Kapcsolja ki a csak műalkotásokat tartalmazó posztereknél.',
+			'libraryPolish.compactTvNavigation' => 'Kompakt könyvtári navigáció',
+			'libraryPolish.compactTvNavigationDescription' => 'A kicsúsztatható menüben megjelenítheti a könyvtár szakaszait és böngészhet a lehetőségek között, így több hely marad a posztereknek.',
+			'libraryPolish.openLibraryMenu' => 'Nyissa meg a könyvtár menüt',
 			'libraryPolish.posterDetails' => 'Plakát részletei',
 			'libraryPolish.showPosterDetails' => 'A plakát részleteinek megjelenítése · név, év és IMDb',
 			'libraryPolish.hidePosterDetails' => 'A plakát részleteinek elrejtése',
@@ -5002,6 +5162,8 @@ extension on TranslationsHu {
 			'tvSettingsV2.simpleAudio' => 'Nyelvek és feliratok megjelenése',
 			'settingsRedesign.themeEffects' => 'Téma és effektusok',
 			'settingsRedesign.libraryLayout' => 'Könyvtár elrendezése',
+			'settingsRedesign.posterInformation' => 'Plakát információk',
+			'settingsRedesign.libraryBehavior' => 'Könyvtári viselkedés',
 			'settingsRedesign.appearanceHint' => 'Testreszabhatja a Luroka megjelenését, elrendezését és viselkedését.',
 			'settingsRedesign.livePreview' => 'Élő előnézet',
 			'settingsRedesign.previewHint' => 'Tekintse meg, hogyan fog kinézni könyvtára a jelenlegi beállításokkal.',
@@ -5103,6 +5265,19 @@ extension on TranslationsHu {
 			'detailComposition.mediaInformation' => 'Médiainformációk',
 			'detailComposition.fullFileInformation' => 'Teljes fájlinformáció',
 			'detailComposition.castAndCrew' => 'Szereplők és stáb',
+			'kids.timeLimits' => 'Képernyőidő-korlátok',
+			'kids.dailyWatchLimit' => 'Napi nézési idő',
+			'kids.dailyWatchLimitHint' => 'Naponta korlátozza a videolejátszást ezen az eszközön.',
+			'kids.noTimeLimit' => 'Nincs korlátozás',
+			'kids.minutesLimit' => ({required Object minutes}) => '${minutes} perc',
+			'kids.bedtime' => 'Lefekvés',
+			'kids.bedtimeHint' => 'A profil használatához ezekben az órákban egy szülő PIN szükséges.',
+			'kids.bedtimeStart' => 'Elkezdődik a lefekvés',
+			'kids.bedtimeEnd' => 'Lefekvés véget ér',
+			'kids.timeLimitReached' => 'A nézési idő mára lejárt',
+			'kids.bedtimeReached' => 'Lefekvés ideje van',
+			'kids.timeLimitParentHint' => 'Kérje meg a szülőt, hogy adja meg PIN értékét, hogy folytathassa ezt a foglalkozást.',
+			'kids.parentUnlock' => 'Szülői feloldás',
 			'kids.backupProfile' => 'Gyermekprofil biztonsági mentése',
 			'kids.backupExplain' => 'Készítsen biztonsági másolatot a profil mentett nevéről, karakteréről, korlátozásairól, megjelenéséről és a helyi megtekintési kizárásokról. A szülői PIN-kódokat, a szerverbejelentkezéseket, a letöltéseket és a szerver lejátszási folyamatát nem tartalmazza.',
 			'kids.saveBackupFile' => 'Mentse a biztonsági másolat fájlt',
@@ -5187,6 +5362,8 @@ extension on TranslationsHu {
 			'kids.blocked' => 'Ez a cím nem érhető el ebben a gyerekprofilban.',
 			'kids.switchProfile' => 'Profil váltása',
 			'kids.manageFromAdult' => 'A beállítások kezeléséhez váltson felnőtt profilra.',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => 'Csatlakoztasson egy szervert a felnőtt profilhoz, mielőtt hozzáadna egy gyerekprofilt.',
 			'kids.created' => 'Gyermekprofil létrehozva',
 			'kids.updated' => 'A gyerekek profilja frissítve',
@@ -5205,8 +5382,6 @@ extension on TranslationsHu {
 			'lurokaDiscovery.imdbTv100' => 'IMDb Top 100 bemutató · 2026. szeptemberi pillanatkép',
 			'lurokaDiscovery.emmyComedy' => 'Emmy-díj · Vígjátéksorozat nyertesei · 1971–2026',
 			'lurokaDiscovery.emmys' => 'Emmy-díj · Drámasorozat nyertesei · 1966–2026',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.bafta' => 'BAFTA · A legjobb film díjazottak',
 			'lurokaDiscovery.cannes' => 'Cannes · Arany Pálma-díjasok',
 			'lurokaDiscovery.awardsNote' => 'A díjgyűjtemények között szerepel a legjobb film történetében Oscar-díj, az Emmy-dráma/vígjáték nyertesei, valamint a kibővített BAFTA/Cannes-válogatás. Az ismétlődő nyertes címek egyszer jelennek meg. A tagság díjkategória-előzményeket és Wikidata-tényeket használ. A IMDb A 100 legjobb film/műsor listája megőrzi az mmdju/imdb-top250-api 2026. szeptemberi chart-pillanatfelvételeit. Csak a látható, online könyvtárak egyezései jelennek meg; A gyűjtemény mérete a könyvtár elérhetőségétől függ.',
@@ -5599,6 +5774,7 @@ extension on TranslationsHu {
 			'settings.downloadLocationPickerUnavailable' => 'A mappaválasztás ezen az eszközön nem érhető el',
 			'settings.downloadOnWifiOnly' => 'Letöltés csak Wi-Fi-n',
 			'settings.downloadOnWifiOnlyDescription' => 'Letöltések megakadályozása mobiladat-használat esetén',
+			'settings.downloadWifiScope' => 'Az eszköz összes profiljára és letöltésére vonatkozik.',
 			'settings.autoRemoveWatchedDownloads' => 'Megnézett letöltések automatikus eltávolítása',
 			'settings.autoRemoveWatchedDownloadsDescription' => 'A megnézett letöltések automatikus törlése',
 			'settings.cellularDownloadBlocked' => 'A letöltések mobilhálózaton le vannak tiltva. Használj Wi-Fi-t, vagy módosítsd a beállítást.',
@@ -5700,6 +5876,8 @@ extension on TranslationsHu {
 			'settings.languageAndRegion' => 'Nyelv és régió',
 			'settings.startup' => 'Indítás',
 			'settings.display' => 'Kijelző',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Könyvtár és kártyák',
 			'settings.homeScreen' => 'Kezdőképernyő',
 			'settings.navigation' => 'Navigáció',
@@ -5719,8 +5897,6 @@ extension on TranslationsHu {
 			'settings.gestureVolumeSwipeDescription' => 'Húzd felfelé vagy lefelé a jobb szélén a hangerő beállításához',
 			'settings.gesturePinchToZoom' => 'Csípés a nagyításhoz',
 			'settings.gesturePinchToZoomDescription' => 'Csípj a videóra a nagyításhoz vagy kicsinyítéshez',
-			_ => null,
-		} ?? switch (path) {
 			'settings.rememberBrightnessLevel' => 'Fényerőszint megjegyzése',
 			'settings.rememberBrightnessLevelDescription' => 'A lejátszás az utolsó húzással beállított fényerővel indul',
 			'settings.controls' => 'Vezérlők',
@@ -5860,8 +6036,8 @@ extension on TranslationsHu {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => 'Egy másik választás',
 			'dashboard.exploreSeries' => 'Fedezze fel a sorozatokat',
-			'dashboard.showFeatured' => 'Kiemelt címrészletek',
-			'dashboard.showFeaturedDescription' => 'Mutassa meg a kiemelt kártya grafikáját, szinopszisát és epizódinformációit',
+			'dashboard.showFeatured' => 'Otthoni reflektorfény',
+			'dashboard.showFeaturedDescription' => 'Kiemelt filmek és műsorok megjelenítése a Kezdőlap tetején.',
 			'lurokaCatalog.aboutPerson' => 'REKLÉTKÖRBE',
 			'lurokaCatalog.biographyUnavailable' => 'Életrajz nem érhető el erről a szerverről.',
 			'lurokaCatalog.filmography' => 'Filmek és műsorok a könyvtáradban',
@@ -5917,9 +6093,32 @@ extension on TranslationsHu {
 			'customPerformance.frameBudget' => 'Képkockánkénti költségvetés',
 			'customPerformance.processMemory' => 'Alkalmazás folyamatmemória a minta végén',
 			'customPerformance.noFrames' => 'Nem készült renderelt képkockák rögzítése. Indítson el egy másik mintát, és böngésszen az alkalmazásban.',
+			'homeLayout.manageStudios' => 'Válasszon és rendeljen stúdiókat',
+			'homeLayout.manageStudiosDescription' => 'Válassza ki, hogy mely stúdiók jelenjenek meg ehhez a profilhoz, és rendezze a sorrendjüket.',
+			'homeLayout.studioUnavailable' => 'Csak a kiválasztott könyvtárakban található stúdiók jelennek meg a Kezdőlapon.',
+			'homeLayout.showAllStudios' => 'Az összes stúdió megjelenítése',
+			'homeLayout.hideAllStudios' => 'Az összes stúdió elrejtése',
+			'homeLayout.reorderStudio' => 'Stúdiórend módosítása',
+			'homeLayout.episodeThumbnails' => 'Epizódképek a Megtekintés folytatásában',
+			'homeLayout.episodeThumbnailsDescription' => 'Epizódképek megjelenítése sorozatok vagy évadok poszterei helyett a Megtekintés folytatásában és a Következőben.',
+			'homeLayout.spotlightSource' => 'Kiemelt tartalom forrása',
+			'homeLayout.spotlightSourceDescription' => 'A For You a profil megtekintési tevékenységét használja ezen az eszközön, a kedvencekkel és könyvtárcímekkel együtt.',
+			'homeLayout.spotlightForYou' => 'Neked',
+			'homeLayout.spotlightForYouDescription' => 'A megtekintett tartalmak, a kedvencek, az új kiegészítések és a trendek keveréke a profil ezen az eszközön végzett megtekintési tevékenységével.',
+			'homeLayout.spotlightTrending' => 'Felkapott',
+			'homeLayout.spotlightTrendingDescription' => 'Népszerű filmek és műsorok a könyvtáraidban.',
+			'homeLayout.spotlightContinue' => 'Folytassa a nézést',
+			'homeLayout.spotlightContinueDescription' => 'Elkezdett címek és folytatható epizódok.',
+			'homeLayout.spotlightFavorites' => 'A kedvenceid közül',
+			'homeLayout.spotlightInspired' => 'A megtekintésed ihlette',
+			'homeLayout.spotlightNextUp' => 'Következő',
 			'homeLayout.title' => 'Az otthon személyre szabása',
 			'homeLayout.description' => 'Válassza ki a profil sorrendjét és láthatóságát. Válasszon egy sort az áthelyezéséhez vagy elrejtéséhez.',
 			'homeLayout.rows' => 'Kezdőlap sorok',
+			'homeLayout.progressLayout' => 'Folytassa a megtekintést és a Következő oldalt',
+			'homeLayout.progressCombined' => 'Egy sorban kombinálva',
+			'homeLayout.progressSeparate' => 'Külön sorok',
+			'homeLayout.progressDescription' => 'Külön Következő fel, ha a szerver támogatja. A többi szerver kombinálva marad.',
 			'homeLayout.visible' => 'Látható',
 			'homeLayout.hidden' => 'Rejtett',
 			'homeLayout.showRow' => 'Sor megjelenítése',
@@ -5961,6 +6160,8 @@ extension on TranslationsHu {
 			'activityStats.trendTitle' => 'Nézési idő',
 			'activityStats.trendToday' => 'Ma',
 			'activityStats.gapDetail' => ({required Object stat, required Object range}) => '${stat} a ${range}-n',
+			'activityStats.patternsTitle' => 'A mintáid',
+			'activityStats.mostlyKind' => ({required Object kind}) => 'Többnyire ${kind}',
 			'activityStats.weekdayTitle' => 'Hétköznapra',
 			'activityStats.hoursTitle' => 'Napszak szerint',
 			'activityStats.amLabel' => 'AM',
@@ -5973,6 +6174,8 @@ extension on TranslationsHu {
 			'activityStats.kindOther' => 'Egyéb',
 			'activityStats.topTitlesTitle' => 'A legtöbben nézték',
 			'activityStats.sessionsTitle' => 'Legutóbbi ülések',
+			'activityStats.recentViewingTitle' => 'Legutóbbi megtekintés',
+			'activityStats.recentViewingHint' => 'Teljes megtekintési idő a kiválasztott időszakban. A dátumok a legutóbbi megtekintést mutatják.',
 			'activityStats.showMore' => 'Mutass többet',
 			'activityStats.sessionNoTitle' => 'Azonosítatlan lejátszás',
 			'activityStats.emptyTitle' => 'Itt még semmi',
@@ -6187,6 +6390,8 @@ extension on TranslationsHu {
 			'accessibility.hue' => 'Árnyalat',
 			'accessibility.saturation' => 'Telítettség',
 			'accessibility.brightness' => 'Fényerő',
+			_ => null,
+		} ?? switch (path) {
 			'accessibility.hexColor' => 'Hex színkód',
 			'accessibility.expandText' => 'Szöveg kibontása',
 			'accessibility.collapseText' => 'Szöveg összecsukása',
@@ -6233,8 +6438,6 @@ extension on TranslationsHu {
 			'videoControls.seekBackwardButton' => ({required Object seconds}) => 'Tekerés hátra ${seconds} másodperccel',
 			'videoControls.seekForwardButton' => ({required Object seconds}) => 'Tekerés előre ${seconds} másodperccel',
 			'videoControls.previousButton' => 'Előző epizód',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.nextButton' => 'Következő epizód',
 			'videoControls.previousChapterButton' => 'Előző fejezet',
 			'videoControls.nextChapterButton' => 'Következő fejezet',
@@ -6336,6 +6539,7 @@ extension on TranslationsHu {
 			'messages.metadataRefreshStarted' => ({required Object title}) => 'Metaadatok frissítése elindítva a következőhöz: "${title}"',
 			'messages.metadataRefreshFailed' => ({required Object error}) => 'Nem sikerült a metaadatok frissítése: ${error}',
 			'messages.logoutConfirm' => 'Biztosan ki szeretnél jelentkezni?',
+			'messages.logoutDeviceConfirm' => 'Kijelentkezik a Luroka alkalmazásból ezen az eszközön? Minden profil, beleértve a Kids-profilokat, a szerverfiókokat és a letöltött médiát is eltávolítja erről az eszközről. Később újra bejelentkezhet.',
 			'messages.noSeasonsFound' => 'Nem találhatók évadok',
 			'messages.seasonsLoadFailed' => 'Nem sikerült az évadok betöltése',
 			'messages.noEpisodesFound' => 'Nem találhatók epizódok az első évadban',
@@ -6421,6 +6625,9 @@ extension on TranslationsHu {
 			'mpvConfig.removeLine' => 'Sor eltávolítása',
 			'mpvConfig.embeddedVoHint' => 'A vo, gpu-context és gpu-api beállítások Linuxon figyelmen kívül maradnak: a beágyazott videó mindig a vo=libmpv-n keresztül jelenik meg a videósíkon, a gpu-next (amelyre az ArtCNN-hez hasonló compute shadereknek szükségük van) pedig nem futhat beágyazva.',
 			'dialog.confirmAction' => 'Művelet megerősítése',
+			'profiles.manageProfiles' => 'Profilok kezelése',
+			'profiles.quickAccess' => 'Gyors hozzáférés',
+			'profiles.signOutDevice' => 'Jelentkezzen ki erről az eszközről',
 			'profiles.addLurokaProfile' => 'Luroka profil hozzáadása',
 			'profiles.switchingProfile' => 'Profilváltás…',
 			'profiles.deleteThisProfileTitle' => 'Törlöd ezt a profilt?',
@@ -6512,7 +6719,7 @@ extension on TranslationsHu {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => 'Hang-, felirat- és könyvtárbeállítások mentve a(z) ${account} fiókra',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => 'Hang-, felirat- és könyvtárbeállítások mentve ${count} fiókra',
 			'accountPreferences.pickAccount' => 'Minden fiók a saját beállításait tárolja. Válaszd ki a szerkesztendőt.',
-			'accountPreferences.storedOnAccount' => 'Ezek a beállítások magán a fiókon tárolódnak, így minden bejelentkezett alkalmazás használja őket — beleértve a Lurokat a többi eszközödön.',
+			'accountPreferences.storedOnAccount' => 'Ezeket a beállításokat a rendszer a szerverfiókban menti, és megosztja minden, a fiókot használó Luroka profillal és alkalmazással, beleértve a többi eszközt is.',
 			'accountPreferences.noAccounts' => 'Nincs beállítható fiók',
 			'accountPreferences.noAccountsHint' => 'Jelentkezz be a Plexbe, vagy csatlakoztass egy Jellyfin- vagy Emby-szervert, és az azon a fiókon tárolt beállítások itt jelennek meg.',
 			'accountPreferences.unavailable' => 'Ez a fiók nem érhető el',
@@ -6697,6 +6904,8 @@ extension on TranslationsHu {
 			'libraries.sortLabels.dateShared' => 'Megosztás dátuma',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'A legutóbbi epizód sugárzási dátuma',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Utolsó epizód hozzáadásának dátuma',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Letöltés dátuma',
 			'libraries.sortLabels.size' => 'Méret',
 			'libraries.sortLabels.library' => 'Könyvtár',
@@ -6747,8 +6956,6 @@ extension on TranslationsHu {
 			'about.packageLine' => ({required Object package}) => 'Csomag: ${package}',
 			'about.localeLine' => ({required Object locale}) => 'Nyelv: ${locale}',
 			'about.copyDetails' => 'Részletek másolása',
-			_ => null,
-		} ?? switch (path) {
 			'about.detailsCopied' => 'Az alkalmazás részletei másolva',
 			'about.detailsCopyFailed' => 'Nem sikerült átmásolni az alkalmazás részleteit',
 			'about.checkForUpdatesDescription' => 'Keressen egy újabb kiadást a GitHubban',
@@ -7211,6 +7418,8 @@ extension on TranslationsHu {
 			'watchTogether.offsetPlusSecond' => '+1 s',
 			'watchTogether.participants' => 'Résztvevők',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('hu'))(n, one: '${n} résztvevő', other: '${n} résztvevők', ), 
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'HÁZIGAZDA',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (Ön)',
 			'watchTogether.playerIdle' => 'Tétlen',
@@ -7261,8 +7470,6 @@ extension on TranslationsHu {
 			'watchTogether.notices.finished' => 'kész',
 			'watchTogether.notices.hostChangedTo' => ({required Object name}) => '${name} lett a házigazda',
 			'watchTogether.notices.youAreNowHost' => 'Mostantól te vagy a házigazda',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.joined' => ({required Object name}) => '${name} csatlakozott',
 			'watchTogether.notices.left' => ({required Object name}) => '${name} kilépett',
 			'watchTogether.notices.controlRefused' => 'Csak a gazdagép irányíthatja a lejátszást',
@@ -7725,6 +7932,8 @@ extension on TranslationsHu {
 			'seerr.statusPartiallyAvailable' => 'Részben elérhető',
 			'seerr.statusRequested' => 'Igényelve',
 			'seerr.statusProcessing' => 'Feldolgozás alatt',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Tiltólistán',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Nem sikerült elérni ezt: ${url}: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'Nem található Seerr-példány ezen a címen: ${url} (HTTP ${status})',
@@ -7775,8 +7984,6 @@ extension on TranslationsHu {
 			'services.deviceCode.title' => ({required Object service}) => 'Luroka aktiválása a következőn: ${service}',
 			'services.deviceCode.instructions' => 'Olvasd be a QR-kódot, vagy nyisd meg az alábbi címet, és írd be ezt a kódot:',
 			'services.deviceCode.openToActivate' => ({required Object service}) => 'Nyisd meg a(z) ${service} oldalt az aktiváláshoz',
-			_ => null,
-		} ?? switch (path) {
 			'services.deviceCode.copyCode' => 'Aktiválási kód másolása',
 			'services.deviceCode.waitingForAuthorization' => 'Várakozás az engedélyezésre…',
 			'services.deviceCode.codeCopied' => 'Kód másolva',
@@ -7797,12 +8004,69 @@ extension on TranslationsHu {
 			'services.libraryFilter.modeHintWhitelist' => 'Csak az alább bejelölt könyvtárak szinkronizálása.',
 			'services.libraryFilter.libraries' => 'Könyvtárak',
 			'services.libraryFilter.noLibraries' => 'Nincsenek elérhető könyvtárak',
+			'offlineRecovery.title' => 'A szerverei offline állapotban vannak',
+			'offlineRecovery.description' => 'A letöltések továbbra is elérhetők. Próbáljon meg újra csatlakozni, amikor a szerver visszatér, vagy adjon hozzá egy másik szervert.',
+			'offlineRecovery.appleTvDescription' => 'A Luroka nem tudta elérni a médiaszervereket. Próbáljon meg újra csatlakozni, amikor elérhetők, vagy adjon hozzá egy másik szervert a megtekintés folytatásához.',
+			'offlineRecovery.kidsDescription' => 'Nem tudtuk elérni a médiaszerverét. Próbáljon újra csatlakozni, vagy kérjen segítséget egy szülőtől.',
+			'offlineRecovery.retrying' => 'Csatlakozás…',
+			'offlineRecovery.addServer' => 'Szerver hozzáadása',
+			'releaseUpdates.manualInstructions' => 'Töltse le a kiadási archívumot a GitHub webhelyről, csomagolja ki a APK fájlt, és telepítse a Android eszközére.',
+			'releaseUpdates.tvInstructions' => 'Nyissa meg ezt a címet telefonján vagy számítógépén, vagy olvassa be a QR-kódot a kiadás letöltéséhez.',
+			'releaseUpdates.pressBackAgain' => 'Nyomja meg ismét a Vissza gombot a lejátszásból való kilépéshez',
+			'profileIntegrations.title' => 'Legyen a Luroka a magáé',
+			'profileIntegrations.description' => 'Csatlakoztassa kedvenc szolgáltatásait, hogy nyomon kövesse, mit néz, és kérjen új filmeket és műsorokat. Minden Luroka profilnak saját csatlakozásai vannak.',
+			'profileIntegrations.step' => 'Választható integrációk',
+			'profileIntegrations.examples' => 'Trakt · Simkl · AniList · MyAnimeList · Seerr',
+			'profileIntegrations.connect' => 'Fedezze fel az integrációkat',
+			'profileIntegrations.later' => 'Állítsa be később',
+			'profileIntegrations.manage' => 'Integrációk kezelése',
+			'profileIntegrations.forProfile' => ({required Object name}) => '${name} csatlakozások',
+			'profileSetupGuide.title' => 'Tedd sajátoddá profilodat',
+			'profileSetupGuide.description' => 'Válassza ki, hogy a Luroka hogyan nézzen ki és érezzen ezt a profilt ezen az eszközön. Később mindent módosíthat a Beállításokban.',
+			'profileSetupGuide.appearanceStep' => '1 / 2 · Megjelenés',
+			'profileSetupGuide.homeStep' => '2/2 · A kezdőképernyő',
+			'profileSetupGuide.preview' => 'Előnézet',
+			'profileSetupGuide.previewTitle' => 'Az Ön Otthona',
+			'profileSetupGuide.previewPoster' => 'Plakát',
+			'profileSetupGuide.posterArtwork' => 'Csak műalkotás',
+			'profileSetupGuide.posterWithDetails' => 'A plakát részleteinek megjelenítése',
+			'profileSetupGuide.musicDescription' => 'Játssz le egy filmet vagy műsort, miközben a részletes oldal meg van nyitva, ha elérhető.',
+			'profileSetupGuide.moreThemes' => 'További témák',
+			'profileSetupGuide.fewerThemes' => 'Kevesebb téma',
+			'profileSetupGuide.spotlightHeading' => 'Mi jelenjen meg a Spotlightban?',
+			'profileSetupGuide.progressHeading' => 'Folytassa a megtekintést és a Következő oldalt',
+			'profileSetupGuide.skip' => 'Használja az alapértelmezett beállításokat, és kezdje el nézni',
+			'profileSetupGuide.finish' => 'Kezdje el nézni',
+			'profileSetupGuide.back' => 'Vissza',
+			'profileSetupGuide.kContinue' => 'Folytatás',
+			'profileSetupGuide.chooseLater' => 'Válasszon később könyvtárakat',
+			'profileSetupGuide.libraryScope' => 'Ez megváltoztatja, hogy mi jelenik meg a Lurokában ezen a profilon; a szerver engedélyeit nem módosítja.',
+			'profileSetupGuide.createdTitle' => 'Profil létrehozva',
+			'profileSetupGuide.createdDescription' => 'Elkészült az új profilod. Tulajdonosa az első kinyitáskor személyre szabhatja.',
+			'profileSetupGuide.switchProfile' => 'Váltás erre a profilra',
+			'profileSetupGuide.stayHere' => 'Maradjon az aktuális profilnál',
+			'animeFavorites.filter' => 'Anime',
+			'animeFavorites.manage' => 'Anime kezelése',
+			'animeFavorites.description' => 'Az automatikus felismerés animekönyvtár-neveket és elérhető animecímkéket vagy azonosítókat használ. Válasszon könyvtárakat, és javítsa ki az egyéni kedvenceket. A választásokat a rendszer ezen az eszközön menti profiljához.',
+			'animeFavorites.libraries' => 'Anime könyvtárak',
+			'animeFavorites.libraryHint' => 'Az Anime nevű könyvtárakat a rendszer automatikusan felismeri. Válasszon ki egy könyvtárat a besorolás módosításához.',
+			'animeFavorites.titles' => 'Kedvenc címek',
+			'animeFavorites.titleHint' => 'Válasszon ki egy címet, hogy animeként jelölje meg, vagy javítsa ki az automatikus egyezést.',
+			'animeFavorites.automatic' => 'Automatikus',
+			'animeFavorites.include' => 'Anime',
+			'animeFavorites.exclude' => 'Nem anime',
+			'animeFavorites.automaticIncluded' => 'Automatikus · Anime',
+			'animeFavorites.automaticExcluded' => 'Automatikus · Nem anime',
+			'animeFavorites.noLibraries' => 'Nincsenek csatlakoztatott könyvtárak.',
+			'animeFavorites.noTitles' => 'Nincsenek kedvenc filmek vagy műsorok.',
+			'animeFavorites.empty' => 'Nem található kedvenc anime. Nézze meg animekönyvtárait, vagy jelöljön meg egy címet animeként.',
+			'animeFavorites.saveFailed' => 'Nem sikerült menteni az anime beállításait. Kérjük, próbálja újra.',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => '${product} szerver hozzáadása',
 			'addServer.serverUrls' => 'Szerver URL-címei',
 			'addServer.serverUrlsHelper' => 'Több URL is megadható, vesszővel elválasztva.',
 			'addServer.findServer' => 'Szerver keresése',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => 'Helyi ${product} szerverek keresése...',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Helyi ${product} szerverek',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Mentett és közeli ${product} szerverek',
 			'addServer.username' => 'Felhasználónév',
 			'addServer.password' => 'Jelszó',
 			'addServer.signIn' => 'Bejelentkezés',

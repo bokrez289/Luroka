@@ -137,6 +137,11 @@ class TranslationsUz extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$trakt$uz trakt = _Translations$trakt$uz._(_root);
 	@override late final _Translations$seerr$uz seerr = _Translations$seerr$uz._(_root);
 	@override late final _Translations$services$uz services = _Translations$services$uz._(_root);
+	@override late final _Translations$offlineRecovery$uz offlineRecovery = _Translations$offlineRecovery$uz._(_root);
+	@override late final _Translations$releaseUpdates$uz releaseUpdates = _Translations$releaseUpdates$uz._(_root);
+	@override late final _Translations$profileIntegrations$uz profileIntegrations = _Translations$profileIntegrations$uz._(_root);
+	@override late final _Translations$profileSetupGuide$uz profileSetupGuide = _Translations$profileSetupGuide$uz._(_root);
+	@override late final _Translations$animeFavorites$uz animeFavorites = _Translations$animeFavorites$uz._(_root);
 	@override late final _Translations$addServer$uz addServer = _Translations$addServer$uz._(_root);
 }
 
@@ -320,6 +325,9 @@ class _Translations$libraryPolish$uz extends Translations$libraryPolish$en {
 	final TranslationsUz _root; // ignore: unused_field
 
 	// Translations
+	@override String get compactTvNavigation => 'Yilni kutubxona navigatsiyasi';
+	@override String get compactTvNavigationDescription => 'Kutubxona bo\'limlarini ko\'rsating va opsiyalarni slayd menyusida ko\'rib chiqing, plakatlar uchun ko\'proq joy qoldiring.';
+	@override String get openLibraryMenu => 'Kutubxona menyusini oching';
 	@override String get posterDetails => 'Plakat tafsilotlari';
 	@override String get showPosterDetails => 'Poster tafsilotlarini ko\'rsatish · ism, yil va IMDb';
 	@override String get hidePosterDetails => 'Poster tafsilotlarini yashirish';
@@ -633,6 +641,8 @@ class _Translations$settingsRedesign$uz extends Translations$settingsRedesign$en
 	// Translations
 	@override String get themeEffects => 'Mavzu va effektlar';
 	@override String get libraryLayout => 'Kutubxona tartibi';
+	@override String get posterInformation => 'Plakat ma\'lumotlari';
+	@override String get libraryBehavior => 'Kutubxona harakati';
 	@override String get appearanceHint => 'Luroka ko‘rinishini, tartibini va harakatini moslashtiring.';
 	@override String get livePreview => 'Jonli ko‘rish';
 	@override String get previewHint => 'Kutubxonangiz joriy sozlamalar bilan qanday ko‘rinishini ko‘ring.';
@@ -770,6 +780,19 @@ class _Translations$kids$uz extends Translations$kids$en {
 	final TranslationsUz _root; // ignore: unused_field
 
 	// Translations
+	@override String get timeLimits => 'Ekran vaqtini cheklash';
+	@override String get dailyWatchLimit => 'Kundalik tomosha vaqti';
+	@override String get dailyWatchLimitHint => 'Ushbu qurilmada har kuni video ijro etishni cheklaydi.';
+	@override String get noTimeLimit => 'Cheklov yo\'q';
+	@override String minutesLimit({required Object minutes}) => '${minutes} daqiqa';
+	@override String get bedtime => 'Uyqu vaqti';
+	@override String get bedtimeHint => 'Ushbu soatlarda ushbu profildan foydalanish uchun ota-ona PIN kerak.';
+	@override String get bedtimeStart => 'Uyqu vaqti boshlanadi';
+	@override String get bedtimeEnd => 'Uyqu vaqti tugaydi';
+	@override String get timeLimitReached => 'Bugun tomosha vaqti tugadi';
+	@override String get bedtimeReached => 'Uxlash vaqti keldi';
+	@override String get timeLimitParentHint => 'Ushbu sessiyani davom ettirish uchun ota-onadan PIN raqamini kiritishini so‘rang.';
+	@override String get parentUnlock => 'Ota-ona qulfini ochish';
 	@override String get backupProfile => 'Bolalar profilini zaxiralang';
 	@override String get backupExplain => 'Ushbu profilning saqlangan nomi, xarakteri, cheklovlari, tashqi koʻrinishi va mahalliy koʻrish istisnolarini zaxiralang. Ota-ona PIN-kodlari, serverga kirishlar, yuklab olishlar va serverni ijro etish jarayoni kiritilmagan.';
 	@override String get saveBackupFile => 'Zaxira faylini saqlang';
@@ -1313,6 +1336,7 @@ class _Translations$settings$uz extends Translations$settings$en {
 	@override String get downloadLocationPickerUnavailable => 'Ushbu qurilmada jildni tanlash imkoniyati yoʻq';
 	@override String get downloadOnWifiOnly => 'Faqat Wi-Fi orqali yuklash';
 	@override String get downloadOnWifiOnlyDescription => 'Mobil tarmoqdan foydalanilganda yuklashni toʻxtatib turish';
+	@override String get downloadWifiScope => 'Ushbu qurilmadagi barcha profillar va yuklab olishlar uchun amal qiladi.';
 	@override String get autoRemoveWatchedDownloads => 'Koʻrilgan yuklamalarni avtomatik oʻchirish';
 	@override String get autoRemoveWatchedDownloadsDescription => 'Koʻrib boʻlingan yuklamalarni avtomatik oʻchirish';
 	@override String get cellularDownloadBlocked => 'Mobil tarmoqda yuklash taqiqlangan. Wi-Fi-dan foydalaning yoki sozlamani oʻzgartiring.';
@@ -1651,8 +1675,8 @@ class _Translations$dashboard$uz extends Translations$dashboard$en {
 	@override String episodeLabel({required Object season, required Object episode}) => 'S${season} · E${episode}';
 	@override String get anotherPick => 'Boshqa tanlov';
 	@override String get exploreSeries => 'Seriyani o\'rganing';
-	@override String get showFeatured => 'Fokuslangan sarlavha tafsilotlari';
-	@override String get showFeaturedDescription => 'Ajratib ko‘rsatilgan kartaning posteri, qisqacha mazmuni va epizod ma’lumotlarini ko‘rsatish';
+	@override String get showFeatured => 'Bosh sahifadagi tavsiyalar';
+	@override String get showFeaturedDescription => 'Asosiy sahifaning tepasida taniqli filmlar va seriallarni ko‘rsating.';
 }
 
 // Path: lurokaCatalog
@@ -1753,9 +1777,32 @@ class _Translations$homeLayout$uz extends Translations$homeLayout$en {
 	final TranslationsUz _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageStudios => 'Studiyalarni tanlang va buyurtma bering';
+	@override String get manageStudiosDescription => 'Ushbu profil uchun qaysi studiyalar paydo bo\'lishini tanlang va ularning tartibini tartibga soling.';
+	@override String get studioUnavailable => 'Faqat siz tanlagan kutubxonalaringizdagi studiyalar Bosh sahifada koʻrinadi.';
+	@override String get showAllStudios => 'Barcha studiyalarni ko\'rsatish';
+	@override String get hideAllStudios => 'Barcha studiyalarni yashirish';
+	@override String get reorderStudio => 'Studiya tartibini o\'zgartirish';
+	@override String get episodeThumbnails => 'Ko‘rishni davom ettirish bo‘limidagi epizod rasmlari';
+	@override String get episodeThumbnailsDescription => '“Ko‘rishni davom ettirish” va “Keyingisini davom ettirish” bo‘limlarida seriyalar yoki mavsum afishalari o‘rniga epizod rasmlarini ko‘rsating.';
+	@override String get spotlightSource => 'Tavsiya etilgan kontent manbasi';
+	@override String get spotlightSourceDescription => 'For You bu qurilmada ushbu profilning koʻrish faolligi, sevimlilar va kutubxona nomlari bilan birga foydalanadi.';
+	@override String get spotlightForYou => 'Siz uchun';
+	@override String get spotlightForYouDescription => 'Siz tomosha qilayotgan narsalar, sevimlilar, yangi qoʻshimchalar va tendentsiyalar, bu qurilmada ushbu profilni koʻrish harakatidan foydalanish.';
+	@override String get spotlightTrending => 'Trend';
+	@override String get spotlightTrendingDescription => 'Kutubxonangizdagi mashhur filmlar va shoular.';
+	@override String get spotlightContinue => 'Tomosha qilishda davom eting';
+	@override String get spotlightContinueDescription => 'Siz boshlagan sarlavhalar va davom ettirishingiz mumkin boʻlgan epizodlar.';
+	@override String get spotlightFavorites => 'Sevimlilaringizdan';
+	@override String get spotlightInspired => 'Sizning tomoshangizdan ilhomlangan';
+	@override String get spotlightNextUp => 'Keyingi';
 	@override String get title => 'Bosh sahifani sozlash';
 	@override String get description => 'Ushbu profil uchun qatorlar tartibi va koʻrinishini tanlang. Ko‘chirish yoki yashirish uchun qatorni tanlang.';
 	@override String get rows => 'Uy qatorlari';
+	@override String get progressLayout => 'Tomosha qilishda davom eting va davom eting';
+	@override String get progressCombined => 'Bir qatorda birlashtirilgan';
+	@override String get progressSeparate => 'Alohida qatorlar';
+	@override String get progressDescription => 'Server tomonidan qo\'llab-quvvatlansa, "Next Up" ni ajrating. Boshqa serverlar birlashtiriladi.';
 	@override String get visible => 'Ko\'rinadigan';
 	@override String get hidden => 'Yashirin';
 	@override String get showRow => 'Qatorni ko\'rsatish';
@@ -1818,6 +1865,8 @@ class _Translations$activityStats$uz extends Translations$activityStats$en {
 	@override String get trendTitle => 'Tomosha vaqti';
 	@override String get trendToday => 'Bugun';
 	@override String gapDetail({required Object stat, required Object range}) => '${stat} ${range} da';
+	@override String get patternsTitle => 'Sizning naqshlaringiz';
+	@override String mostlyKind({required Object kind}) => 'Ko\'pincha ${kind}';
 	@override String get weekdayTitle => 'Ish kuni bo\'yicha';
 	@override String get hoursTitle => 'Kunning vaqti bo\'yicha';
 	@override String get amLabel => 'AM';
@@ -1830,6 +1879,8 @@ class _Translations$activityStats$uz extends Translations$activityStats$en {
 	@override String get kindOther => 'Boshqa';
 	@override String get topTitlesTitle => 'Eng ko\'p tomosha qilingan';
 	@override String get sessionsTitle => 'Oxirgi sessiyalar';
+	@override String get recentViewingTitle => 'Yaqinda ko\'rish';
+	@override String get recentViewingHint => 'Tanlangan davrda tomosha qilingan umumiy vaqt. Sanalar oxirgi ko\'rishni ko\'rsatadi.';
 	@override String get showMore => 'Ko\'proq ko\'rsatish';
 	@override String get sessionNoTitle => 'Noma\'lum ijro';
 	@override String get emptyTitle => 'Bu yerda hali hech narsa';
@@ -2262,6 +2313,7 @@ class _Translations$messages$uz extends Translations$messages$en {
 	@override String metadataRefreshStarted({required Object title}) => '"${title}" uchun metamaʼlumotlarni yangilash boshlandi';
 	@override String metadataRefreshFailed({required Object error}) => 'Metamaʼlumotlarni yangilab boʻlmadi: ${error}';
 	@override String get logoutConfirm => 'Haqiqatan ham chiqmoqchimisiz?';
+	@override String get logoutDeviceConfirm => 'Bu qurilmadagi Luroka tizimidan chiqasizmi? Barcha profillar, jumladan, Bolalar profillari, server hisoblari va yuklab olingan media bu qurilmadan oʻchirib tashlanadi. Keyinroq qayta kirishingiz mumkin.';
 	@override String get noSeasonsFound => 'Mavsumlar topilmadi';
 	@override String get seasonsLoadFailed => 'Mavsumlarni yuklab boʻlmadi';
 	@override String get noEpisodesFound => 'Birinchi mavsumda qismlar topilmadi';
@@ -2392,6 +2444,9 @@ class _Translations$profiles$uz extends Translations$profiles$en {
 	final TranslationsUz _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageProfiles => 'Profillarni boshqarish';
+	@override String get quickAccess => 'Tez kirish';
+	@override String get signOutDevice => 'Ushbu qurilmadan chiqing';
 	@override String get addLurokaProfile => 'Luroka profilini qo\'shing';
 	@override String get switchingProfile => 'Profil almashtirilmoqda…';
 	@override String get deleteThisProfileTitle => 'Ushbu profil oʻchirilsinmi?';
@@ -2510,7 +2565,7 @@ class _Translations$accountPreferences$uz extends Translations$accountPreference
 	@override String hubSubtitleSingle({required Object account}) => '${account} hisobida saqlangan audio, subtitr va kutubxona parametrlari';
 	@override String hubSubtitleMultiple({required Object count}) => '${count} ta hisobda saqlangan audio, subtitr va kutubxona parametrlari';
 	@override String get pickAccount => 'Har bir hisob oʻz sozlamalarini saqlaydi. Tahrirlash uchun birini tanlang.';
-	@override String get storedOnAccount => 'Bu parametrlar hisobning oʻzida saqlanadi — unga kirilgan har bir ilova ulardan foydalanadi, jumladan boshqa qurilmalaringizdagi Luroka ham.';
+	@override String get storedOnAccount => 'Ushbu parametrlar server hisobiga saqlanadi va har bir Luroka profili va ushbu hisob qaydnomasidan foydalanadigan ilova, jumladan, boshqa qurilmalarda ham ulashiladi.';
 	@override String get noAccounts => 'Sozlanadigan hisoblar yoʻq';
 	@override String get noAccountsHint => 'Plex-ga kiring yoki Jellyfin yoki Emby serverini ulang — shunda oʻsha hisobda saqlangan sozlamalar shu yerda koʻrinadi.';
 	@override String get unavailable => 'Bu hisobga ulanib boʻlmadi';
@@ -2707,7 +2762,7 @@ class _Translations$about$uz extends Translations$about$en {
 	@override String get attribution => 'Ma\'lumotlar va atributlar';
 	@override String get attributionDescription => 'Metadata, reytinglar va savdo belgilari';
 	@override String get attributionBody => 'Ushbu mahsulot TMDB API dan foydalanadi, lekin TMDB tomonidan tasdiqlanmagan yoki sertifikatlanmagan. Mashhurlik roʻyxati, metamaʼlumotlar va IMDb reytinglari Cinemeta tomonidan taqdim etilgan. Ballar manba belgilarini saqlab qoladi.';
-	@override String get trademarkNotices => 'Plex, Jellyfin, Emby, Trakt, Simkl, MyAnimeList, AniList, ZXQKEEP0, ZX7KEEP0 va tegishli savdo belgilari, egalari. Luroka ular bilan aloqador emas yoki ular tomonidan tasdiqlanmagan.';
+	@override String get trademarkNotices => 'Plex, Jellyfin, Emby, Trakt, Simkl, MyAnimeList, AniList, TMDB va tegishli belgilar o‘z egalarining savdo belgilaridir. Luroka ular bilan bog‘liq emas va ular tomonidan tasdiqlanmagan.';
 	@override String get privacyPolicy => 'Maxfiylik siyosati';
 	@override String get privacyPolicyDescription => 'Ma\'lumotlaringiz qanday qayta ishlanadi';
 	@override String get gplLicense => 'GNU GPL-3.0 litsenziyasi';
@@ -3700,6 +3755,108 @@ class _Translations$services$uz extends Translations$services$en {
 	@override late final _Translations$services$libraryFilter$uz libraryFilter = _Translations$services$libraryFilter$uz._(_root);
 }
 
+// Path: offlineRecovery
+class _Translations$offlineRecovery$uz extends Translations$offlineRecovery$en {
+	_Translations$offlineRecovery$uz._(TranslationsUz root) : this._root = root, super.internal(root);
+
+	final TranslationsUz _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Sizning serverlaringiz oflayn';
+	@override String get description => 'Yuklab olishlaringiz hali ham mavjud. Serveringiz qaytib kelganida qayta ulanishga harakat qiling yoki boshqa server qo\'shing.';
+	@override String get appleTvDescription => 'Luroka media serverlaringizga ulana olmadi. Ular mavjud boʻlganda qayta ulanishga harakat qiling yoki tomoshani davom ettirish uchun boshqa server qoʻshing.';
+	@override String get kidsDescription => 'Media serveringizga ulana olmadik. Qayta ulanishga harakat qiling yoki ota-onadan yordam so\'rang.';
+	@override String get retrying => 'Ulanmoqda…';
+	@override String get addServer => 'Server qo\'shing';
+}
+
+// Path: releaseUpdates
+class _Translations$releaseUpdates$uz extends Translations$releaseUpdates$en {
+	_Translations$releaseUpdates$uz._(TranslationsUz root) : this._root = root, super.internal(root);
+
+	final TranslationsUz _root; // ignore: unused_field
+
+	// Translations
+	@override String get manualInstructions => 'GitHub dan relizlar arxivini yuklab oling, APK ni chiqarib oling va uni Android qurilmangizga o\'rnating.';
+	@override String get tvInstructions => 'Ushbu manzilni telefoningiz yoki kompyuteringizda oching yoki nashrni yuklab olish uchun QR kodini skanerlang.';
+	@override String get pressBackAgain => 'Ijrodan chiqish uchun Orqaga yana bosing';
+}
+
+// Path: profileIntegrations
+class _Translations$profileIntegrations$uz extends Translations$profileIntegrations$en {
+	_Translations$profileIntegrations$uz._(TranslationsUz root) : this._root = root, super.internal(root);
+
+	final TranslationsUz _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Lurokani sizniki qiling';
+	@override String get description => 'Nima tomosha qilayotganingizni kuzatish va yangi filmlar va shoularni soʻrash uchun sevimli xizmatlaringizni ulang. Har bir Luroka profilining o\'z ulanishlari mavjud.';
+	@override String get step => 'Ixtiyoriy integratsiya';
+	@override String get examples => 'Trakt · Simkl · AniList · MyAnimeList · Seerr';
+	@override String get connect => 'Integratsiyalarni o\'rganing';
+	@override String get later => 'Keyinroq sozlang';
+	@override String get manage => 'Integratsiyalarni boshqarish';
+	@override String forProfile({required Object name}) => '${name} uchun ulanishlar';
+}
+
+// Path: profileSetupGuide
+class _Translations$profileSetupGuide$uz extends Translations$profileSetupGuide$en {
+	_Translations$profileSetupGuide$uz._(TranslationsUz root) : this._root = root, super.internal(root);
+
+	final TranslationsUz _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Profilingizni o\'zingizniki qiling';
+	@override String get description => 'Luroka ushbu qurilmadagi ushbu profil qanday ko‘rinishini va his qilishini tanlang. Hammasini keyinroq Sozlamalar orqali o‘zgartirishingiz mumkin.';
+	@override String get appearanceStep => '1 / 2 · Ko‘rinish';
+	@override String get homeStep => '2 / 2 · Asosiy ekraningiz';
+	@override String get preview => 'Ko‘rib chiqish';
+	@override String get previewTitle => 'Sizning uyingiz';
+	@override String get previewPoster => 'Plakat';
+	@override String get posterArtwork => 'Faqat san\'at asari';
+	@override String get posterWithDetails => 'Plakat tafsilotlarini ko\'rsatish';
+	@override String get musicDescription => 'Film yoki ko‘rsatuv mavzusini tafsilotlar sahifasi ochiq bo‘lganda, mavjud bo‘lganda ijro eting.';
+	@override String get moreThemes => 'Ko\'proq mavzular';
+	@override String get fewerThemes => 'Kamroq mavzular';
+	@override String get spotlightHeading => 'Spotlightda nima ko\'rinishi kerak?';
+	@override String get progressHeading => 'Tomosha qilishda davom eting va davom eting';
+	@override String get skip => 'Standartlardan foydalaning va tomosha qilishni boshlang';
+	@override String get finish => 'Ko\'rishni boshlang';
+	@override String get back => 'Orqaga';
+	@override String get kContinue => 'Davom eting';
+	@override String get chooseLater => 'Keyinroq kutubxonalarni tanlang';
+	@override String get libraryScope => 'Bu ushbu profil uchun Luroka da ko\'rinadigan narsalarni o\'zgartiradi; u server ruxsatlarini o\'zgartirmaydi.';
+	@override String get createdTitle => 'Profil yaratildi';
+	@override String get createdDescription => 'Yangi profilingiz tayyor. Uning egasi uni birinchi marta ochganida shaxsiylashtirishi mumkin.';
+	@override String get switchProfile => 'Ushbu profilga o\'tish';
+	@override String get stayHere => 'Joriy profilda qoling';
+}
+
+// Path: animeFavorites
+class _Translations$animeFavorites$uz extends Translations$animeFavorites$en {
+	_Translations$animeFavorites$uz._(TranslationsUz root) : this._root = root, super.internal(root);
+
+	final TranslationsUz _root; // ignore: unused_field
+
+	// Translations
+	@override String get filter => 'Anime';
+	@override String get manage => 'Animeni boshqarish';
+	@override String get description => 'Avtomatik aniqlash anime kutubxonasi nomlari va mavjud anime teglari yoki identifikatorlaridan foydalanadi. Kutubxonalarni tanlang va individual sevimlilarni to\'g\'rilang. Tanlovlar profilingiz uchun ushbu qurilmada saqlanadi.';
+	@override String get libraries => 'Anime kutubxonalar';
+	@override String get libraryHint => 'Anime nomli kutubxonalar avtomatik ravishda tan olinadi. Uning tasnifini o\'zgartirish uchun kutubxonani tanlang.';
+	@override String get titles => 'Sevimli sarlavhalar';
+	@override String get titleHint => 'Uni anime sifatida belgilash yoki avtomatik moslikni tuzatish uchun sarlavhani tanlang.';
+	@override String get automatic => 'Avtomatik';
+	@override String get include => 'Anime';
+	@override String get exclude => 'Anime emas';
+	@override String get automaticIncluded => 'Avtomatik · Anime';
+	@override String get automaticExcluded => 'Avtomatik · Anime emas';
+	@override String get noLibraries => 'Ulangan kutubxonalar mavjud emas.';
+	@override String get noTitles => 'Sevimli filmlar yoki seriallar mavjud emas.';
+	@override String get empty => 'Sevimli anime topilmadi. Anime kutubxonalaringizni tekshiring yoki nomni anime sifatida belgilang.';
+	@override String get saveFailed => 'Anime sozlamalaringizni saqlab bo‘lmadi. Iltimos, qayta urinib koʻring.';
+}
+
 // Path: addServer
 class _Translations$addServer$uz extends Translations$addServer$en {
 	_Translations$addServer$uz._(TranslationsUz root) : this._root = root, super.internal(root);
@@ -3712,7 +3869,7 @@ class _Translations$addServer$uz extends Translations$addServer$en {
 	@override String get serverUrlsHelper => 'Vergul bilan ajratilgan bir nechta URL manziliga ruxsat beriladi.';
 	@override String get findServer => 'Serverni topish';
 	@override String searchingLocalMediaBrowserServers({required Object product}) => 'Mahalliy ${product} serverlari qidirilmoqda...';
-	@override String localMediaBrowserServers({required Object product}) => 'Mahalliy ${product} serverlari';
+	@override String localMediaBrowserServers({required Object product}) => 'Saqlangan va yaqin ${product} serverlari';
 	@override String get username => 'Foydalanuvchi nomi';
 	@override String get password => 'Parol';
 	@override String get signIn => 'Kirish';
@@ -4788,6 +4945,9 @@ extension on TranslationsUz {
 			'posterDetails.catalogEpisodeInfoDescription' => 'Kashf qilish plakatlarida epizodlar soni va oʻrtacha davomiyligini koʻrsating.',
 			'posterDetails.title' => 'Plakat tafsilotlari',
 			'posterDetails.description' => 'Studiya, qidiruv, kashfiyot va kutubxonalardagi posterlar ostida nom, yil va IMDb reytingini ko‘rsating. IMDb reytingi bo‘lmasa, u yashirin qoladi. Faqat rasmli posterlar uchun bu sozlamani o‘chiring.',
+			'libraryPolish.compactTvNavigation' => 'Yilni kutubxona navigatsiyasi',
+			'libraryPolish.compactTvNavigationDescription' => 'Kutubxona bo\'limlarini ko\'rsating va opsiyalarni slayd menyusida ko\'rib chiqing, plakatlar uchun ko\'proq joy qoldiring.',
+			'libraryPolish.openLibraryMenu' => 'Kutubxona menyusini oching',
 			'libraryPolish.posterDetails' => 'Plakat tafsilotlari',
 			'libraryPolish.showPosterDetails' => 'Poster tafsilotlarini ko\'rsatish · ism, yil va IMDb',
 			'libraryPolish.hidePosterDetails' => 'Poster tafsilotlarini yashirish',
@@ -5002,6 +5162,8 @@ extension on TranslationsUz {
 			'tvSettingsV2.simpleAudio' => 'Tillar va subtitr ko\'rinishi',
 			'settingsRedesign.themeEffects' => 'Mavzu va effektlar',
 			'settingsRedesign.libraryLayout' => 'Kutubxona tartibi',
+			'settingsRedesign.posterInformation' => 'Plakat ma\'lumotlari',
+			'settingsRedesign.libraryBehavior' => 'Kutubxona harakati',
 			'settingsRedesign.appearanceHint' => 'Luroka ko‘rinishini, tartibini va harakatini moslashtiring.',
 			'settingsRedesign.livePreview' => 'Jonli ko‘rish',
 			'settingsRedesign.previewHint' => 'Kutubxonangiz joriy sozlamalar bilan qanday ko‘rinishini ko‘ring.',
@@ -5103,6 +5265,19 @@ extension on TranslationsUz {
 			'detailComposition.mediaInformation' => 'OAV ma\'lumotlari',
 			'detailComposition.fullFileInformation' => 'To\'liq fayl ma\'lumotlari',
 			'detailComposition.castAndCrew' => 'Aktyorlar va ekipaj',
+			'kids.timeLimits' => 'Ekran vaqtini cheklash',
+			'kids.dailyWatchLimit' => 'Kundalik tomosha vaqti',
+			'kids.dailyWatchLimitHint' => 'Ushbu qurilmada har kuni video ijro etishni cheklaydi.',
+			'kids.noTimeLimit' => 'Cheklov yo\'q',
+			'kids.minutesLimit' => ({required Object minutes}) => '${minutes} daqiqa',
+			'kids.bedtime' => 'Uyqu vaqti',
+			'kids.bedtimeHint' => 'Ushbu soatlarda ushbu profildan foydalanish uchun ota-ona PIN kerak.',
+			'kids.bedtimeStart' => 'Uyqu vaqti boshlanadi',
+			'kids.bedtimeEnd' => 'Uyqu vaqti tugaydi',
+			'kids.timeLimitReached' => 'Bugun tomosha vaqti tugadi',
+			'kids.bedtimeReached' => 'Uxlash vaqti keldi',
+			'kids.timeLimitParentHint' => 'Ushbu sessiyani davom ettirish uchun ota-onadan PIN raqamini kiritishini so‘rang.',
+			'kids.parentUnlock' => 'Ota-ona qulfini ochish',
 			'kids.backupProfile' => 'Bolalar profilini zaxiralang',
 			'kids.backupExplain' => 'Ushbu profilning saqlangan nomi, xarakteri, cheklovlari, tashqi koʻrinishi va mahalliy koʻrish istisnolarini zaxiralang. Ota-ona PIN-kodlari, serverga kirishlar, yuklab olishlar va serverni ijro etish jarayoni kiritilmagan.',
 			'kids.saveBackupFile' => 'Zaxira faylini saqlang',
@@ -5187,6 +5362,8 @@ extension on TranslationsUz {
 			'kids.blocked' => 'Bu nom ushbu bolalar profilida mavjud emas.',
 			'kids.switchProfile' => 'Profilni almashtirish',
 			'kids.manageFromAdult' => 'Sozlamalarni boshqarish uchun kattalar profiliga oʻting.',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => 'Bolalar profilini qo\'shishdan oldin serverni kattalar profilingizga ulang.',
 			'kids.created' => 'Bolalar profili yaratildi',
 			'kids.updated' => 'Bolalar profili yangilandi',
@@ -5205,8 +5382,6 @@ extension on TranslationsUz {
 			'lurokaDiscovery.imdbTv100' => 'IMDb Eng yaxshi 100 ta shou · 2026-yil sentabr lavhasi',
 			'lurokaDiscovery.emmyComedy' => 'Emmi · Komediya seriyasi g\'oliblari · 1971–2026',
 			'lurokaDiscovery.emmys' => 'Emmi · Drama seriali gʻoliblari · 1966–2026',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.bafta' => 'BAFTA · Eng yaxshi film g\'oliblari',
 			'lurokaDiscovery.cannes' => 'Kann · Palma d\'Or g\'oliblari',
 			'lurokaDiscovery.awardsNote' => 'Mukofot kollektsiyalariga Oskarning eng yaxshi filmi tarixi, Emmi drama/komediya g\'oliblari va kengaytirilgan BAFTA/Kann tanlovlari kiradi. Takroriy yutuq unvonlari bir marta paydo bo\'ladi. A\'zolik mukofot toifalari tarixi va Vikido\'stlik faktlaridan foydalanadi. IMDb Top 100 ta film/shou roʻyxati mmdju/imdb-top250-api dan 2026-yil sentabr oyidagi diagramma suratlarini saqlaydi. Faqat ko\'rinadigan, onlayn kutubxonalaringizdagi mosliklar paydo bo\'ladi; to\'plam hajmi kutubxona mavjudligiga bog\'liq.',
@@ -5599,6 +5774,7 @@ extension on TranslationsUz {
 			'settings.downloadLocationPickerUnavailable' => 'Ushbu qurilmada jildni tanlash imkoniyati yoʻq',
 			'settings.downloadOnWifiOnly' => 'Faqat Wi-Fi orqali yuklash',
 			'settings.downloadOnWifiOnlyDescription' => 'Mobil tarmoqdan foydalanilganda yuklashni toʻxtatib turish',
+			'settings.downloadWifiScope' => 'Ushbu qurilmadagi barcha profillar va yuklab olishlar uchun amal qiladi.',
 			'settings.autoRemoveWatchedDownloads' => 'Koʻrilgan yuklamalarni avtomatik oʻchirish',
 			'settings.autoRemoveWatchedDownloadsDescription' => 'Koʻrib boʻlingan yuklamalarni avtomatik oʻchirish',
 			'settings.cellularDownloadBlocked' => 'Mobil tarmoqda yuklash taqiqlangan. Wi-Fi-dan foydalaning yoki sozlamani oʻzgartiring.',
@@ -5700,6 +5876,8 @@ extension on TranslationsUz {
 			'settings.languageAndRegion' => 'Til va mintaqa',
 			'settings.startup' => 'Ishga tushirish',
 			'settings.display' => 'Displey',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Kutubxona va kartochkalar',
 			'settings.homeScreen' => 'Bosh ekran',
 			'settings.navigation' => 'Navigatsiya',
@@ -5719,8 +5897,6 @@ extension on TranslationsUz {
 			'settings.gestureVolumeSwipeDescription' => 'Ovozni sozlash uchun oʻng chekkada yuqoriga yoki pastga suring',
 			'settings.gesturePinchToZoom' => 'Chimchilab masshtablash',
 			'settings.gesturePinchToZoomDescription' => 'Videoni yaqinlashtirish yoki uzoqlashtirish uchun chimchilang',
-			_ => null,
-		} ?? switch (path) {
 			'settings.rememberBrightnessLevel' => 'Yorqinlik darajasini eslab qolish',
 			'settings.rememberBrightnessLevelDescription' => 'Ijroni oxirgi surish bilan oʻrnatilgan yorqinlikda boshlash',
 			'settings.controls' => 'Boshqaruv elementlari',
@@ -5860,8 +6036,8 @@ extension on TranslationsUz {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => 'Boshqa tanlov',
 			'dashboard.exploreSeries' => 'Seriyani o\'rganing',
-			'dashboard.showFeatured' => 'Fokuslangan sarlavha tafsilotlari',
-			'dashboard.showFeaturedDescription' => 'Ajratib ko‘rsatilgan kartaning posteri, qisqacha mazmuni va epizod ma’lumotlarini ko‘rsatish',
+			'dashboard.showFeatured' => 'Bosh sahifadagi tavsiyalar',
+			'dashboard.showFeaturedDescription' => 'Asosiy sahifaning tepasida taniqli filmlar va seriallarni ko‘rsating.',
 			'lurokaCatalog.aboutPerson' => 'E\'tibor markazida',
 			'lurokaCatalog.biographyUnavailable' => 'Bu serverda biografiya mavjud emas.',
 			'lurokaCatalog.filmography' => 'Kutubxonangizdagi film va seriallar',
@@ -5917,9 +6093,32 @@ extension on TranslationsUz {
 			'customPerformance.frameBudget' => 'Kadrlar uchun byudjet',
 			'customPerformance.processMemory' => 'Namuna oxirida ilova jarayoni xotirasi',
 			'customPerformance.noFrames' => 'Tasvirlangan kadrlar olinmadi. Boshqa namunani ishga tushiring va ilovani ko\'rib chiqing.',
+			'homeLayout.manageStudios' => 'Studiyalarni tanlang va buyurtma bering',
+			'homeLayout.manageStudiosDescription' => 'Ushbu profil uchun qaysi studiyalar paydo bo\'lishini tanlang va ularning tartibini tartibga soling.',
+			'homeLayout.studioUnavailable' => 'Faqat siz tanlagan kutubxonalaringizdagi studiyalar Bosh sahifada koʻrinadi.',
+			'homeLayout.showAllStudios' => 'Barcha studiyalarni ko\'rsatish',
+			'homeLayout.hideAllStudios' => 'Barcha studiyalarni yashirish',
+			'homeLayout.reorderStudio' => 'Studiya tartibini o\'zgartirish',
+			'homeLayout.episodeThumbnails' => 'Ko‘rishni davom ettirish bo‘limidagi epizod rasmlari',
+			'homeLayout.episodeThumbnailsDescription' => '“Ko‘rishni davom ettirish” va “Keyingisini davom ettirish” bo‘limlarida seriyalar yoki mavsum afishalari o‘rniga epizod rasmlarini ko‘rsating.',
+			'homeLayout.spotlightSource' => 'Tavsiya etilgan kontent manbasi',
+			'homeLayout.spotlightSourceDescription' => 'For You bu qurilmada ushbu profilning koʻrish faolligi, sevimlilar va kutubxona nomlari bilan birga foydalanadi.',
+			'homeLayout.spotlightForYou' => 'Siz uchun',
+			'homeLayout.spotlightForYouDescription' => 'Siz tomosha qilayotgan narsalar, sevimlilar, yangi qoʻshimchalar va tendentsiyalar, bu qurilmada ushbu profilni koʻrish harakatidan foydalanish.',
+			'homeLayout.spotlightTrending' => 'Trend',
+			'homeLayout.spotlightTrendingDescription' => 'Kutubxonangizdagi mashhur filmlar va shoular.',
+			'homeLayout.spotlightContinue' => 'Tomosha qilishda davom eting',
+			'homeLayout.spotlightContinueDescription' => 'Siz boshlagan sarlavhalar va davom ettirishingiz mumkin boʻlgan epizodlar.',
+			'homeLayout.spotlightFavorites' => 'Sevimlilaringizdan',
+			'homeLayout.spotlightInspired' => 'Sizning tomoshangizdan ilhomlangan',
+			'homeLayout.spotlightNextUp' => 'Keyingi',
 			'homeLayout.title' => 'Bosh sahifani sozlash',
 			'homeLayout.description' => 'Ushbu profil uchun qatorlar tartibi va koʻrinishini tanlang. Ko‘chirish yoki yashirish uchun qatorni tanlang.',
 			'homeLayout.rows' => 'Uy qatorlari',
+			'homeLayout.progressLayout' => 'Tomosha qilishda davom eting va davom eting',
+			'homeLayout.progressCombined' => 'Bir qatorda birlashtirilgan',
+			'homeLayout.progressSeparate' => 'Alohida qatorlar',
+			'homeLayout.progressDescription' => 'Server tomonidan qo\'llab-quvvatlansa, "Next Up" ni ajrating. Boshqa serverlar birlashtiriladi.',
 			'homeLayout.visible' => 'Ko\'rinadigan',
 			'homeLayout.hidden' => 'Yashirin',
 			'homeLayout.showRow' => 'Qatorni ko\'rsatish',
@@ -5961,6 +6160,8 @@ extension on TranslationsUz {
 			'activityStats.trendTitle' => 'Tomosha vaqti',
 			'activityStats.trendToday' => 'Bugun',
 			'activityStats.gapDetail' => ({required Object stat, required Object range}) => '${stat} ${range} da',
+			'activityStats.patternsTitle' => 'Sizning naqshlaringiz',
+			'activityStats.mostlyKind' => ({required Object kind}) => 'Ko\'pincha ${kind}',
 			'activityStats.weekdayTitle' => 'Ish kuni bo\'yicha',
 			'activityStats.hoursTitle' => 'Kunning vaqti bo\'yicha',
 			'activityStats.amLabel' => 'AM',
@@ -5973,6 +6174,8 @@ extension on TranslationsUz {
 			'activityStats.kindOther' => 'Boshqa',
 			'activityStats.topTitlesTitle' => 'Eng ko\'p tomosha qilingan',
 			'activityStats.sessionsTitle' => 'Oxirgi sessiyalar',
+			'activityStats.recentViewingTitle' => 'Yaqinda ko\'rish',
+			'activityStats.recentViewingHint' => 'Tanlangan davrda tomosha qilingan umumiy vaqt. Sanalar oxirgi ko\'rishni ko\'rsatadi.',
 			'activityStats.showMore' => 'Ko\'proq ko\'rsatish',
 			'activityStats.sessionNoTitle' => 'Noma\'lum ijro',
 			'activityStats.emptyTitle' => 'Bu yerda hali hech narsa',
@@ -6187,6 +6390,8 @@ extension on TranslationsUz {
 			'accessibility.hue' => 'Rang jilosi',
 			'accessibility.saturation' => 'Toʻyinganlik',
 			'accessibility.brightness' => 'Yorqinlik',
+			_ => null,
+		} ?? switch (path) {
 			'accessibility.hexColor' => 'Hex rangi',
 			'accessibility.expandText' => 'Matnni yoyish',
 			'accessibility.collapseText' => 'Matnni yigʻish',
@@ -6233,8 +6438,6 @@ extension on TranslationsUz {
 			'videoControls.seekBackwardButton' => ({required Object seconds}) => '${seconds} soniya orqaga oʻtkazish',
 			'videoControls.seekForwardButton' => ({required Object seconds}) => '${seconds} soniya oldinga oʻtkazish',
 			'videoControls.previousButton' => 'Oldingi qism',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.nextButton' => 'Keyingi qism',
 			'videoControls.previousChapterButton' => 'Oldingi boʻlimcha',
 			'videoControls.nextChapterButton' => 'Keyingi boʻlimcha',
@@ -6336,6 +6539,7 @@ extension on TranslationsUz {
 			'messages.metadataRefreshStarted' => ({required Object title}) => '"${title}" uchun metamaʼlumotlarni yangilash boshlandi',
 			'messages.metadataRefreshFailed' => ({required Object error}) => 'Metamaʼlumotlarni yangilab boʻlmadi: ${error}',
 			'messages.logoutConfirm' => 'Haqiqatan ham chiqmoqchimisiz?',
+			'messages.logoutDeviceConfirm' => 'Bu qurilmadagi Luroka tizimidan chiqasizmi? Barcha profillar, jumladan, Bolalar profillari, server hisoblari va yuklab olingan media bu qurilmadan oʻchirib tashlanadi. Keyinroq qayta kirishingiz mumkin.',
 			'messages.noSeasonsFound' => 'Mavsumlar topilmadi',
 			'messages.seasonsLoadFailed' => 'Mavsumlarni yuklab boʻlmadi',
 			'messages.noEpisodesFound' => 'Birinchi mavsumda qismlar topilmadi',
@@ -6421,6 +6625,9 @@ extension on TranslationsUz {
 			'mpvConfig.removeLine' => 'Qatorni oʻchirish',
 			'mpvConfig.embeddedVoHint' => 'Linux-da vo, gpu-context va gpu-api e\'tiborga olinmaydi: ichki video har doim video tekisligida vo=libmpv orqali ko\'rsatiladi va gpu-next (ArtCNN kabi compute shaderlar uchun zarur) ichki rejimda ishlay olmaydi.',
 			'dialog.confirmAction' => 'Harakatni tasdiqlash',
+			'profiles.manageProfiles' => 'Profillarni boshqarish',
+			'profiles.quickAccess' => 'Tez kirish',
+			'profiles.signOutDevice' => 'Ushbu qurilmadan chiqing',
 			'profiles.addLurokaProfile' => 'Luroka profilini qo\'shing',
 			'profiles.switchingProfile' => 'Profil almashtirilmoqda…',
 			'profiles.deleteThisProfileTitle' => 'Ushbu profil oʻchirilsinmi?',
@@ -6512,7 +6719,7 @@ extension on TranslationsUz {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => '${account} hisobida saqlangan audio, subtitr va kutubxona parametrlari',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => '${count} ta hisobda saqlangan audio, subtitr va kutubxona parametrlari',
 			'accountPreferences.pickAccount' => 'Har bir hisob oʻz sozlamalarini saqlaydi. Tahrirlash uchun birini tanlang.',
-			'accountPreferences.storedOnAccount' => 'Bu parametrlar hisobning oʻzida saqlanadi — unga kirilgan har bir ilova ulardan foydalanadi, jumladan boshqa qurilmalaringizdagi Luroka ham.',
+			'accountPreferences.storedOnAccount' => 'Ushbu parametrlar server hisobiga saqlanadi va har bir Luroka profili va ushbu hisob qaydnomasidan foydalanadigan ilova, jumladan, boshqa qurilmalarda ham ulashiladi.',
 			'accountPreferences.noAccounts' => 'Sozlanadigan hisoblar yoʻq',
 			'accountPreferences.noAccountsHint' => 'Plex-ga kiring yoki Jellyfin yoki Emby serverini ulang — shunda oʻsha hisobda saqlangan sozlamalar shu yerda koʻrinadi.',
 			'accountPreferences.unavailable' => 'Bu hisobga ulanib boʻlmadi',
@@ -6697,6 +6904,8 @@ extension on TranslationsUz {
 			'libraries.sortLabels.dateShared' => 'Ulashilgan sanasi',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Soʻnggi qism chiqqan sana',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Soʻnggi qoʻshilgan qism sanasi',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Yuklab olingan sanasi',
 			'libraries.sortLabels.size' => 'Hajmi',
 			'libraries.sortLabels.library' => 'Kutubxona',
@@ -6747,8 +6956,6 @@ extension on TranslationsUz {
 			'about.packageLine' => ({required Object package}) => 'Paket: ${package}',
 			'about.localeLine' => ({required Object locale}) => 'Til: ${locale}',
 			'about.copyDetails' => 'Tafsilotlarni nusxalash',
-			_ => null,
-		} ?? switch (path) {
 			'about.detailsCopied' => 'Ilova tafsilotlari nusxalandi',
 			'about.detailsCopyFailed' => 'Ilova tafsilotlarini nusxalab bo‘lmadi',
 			'about.checkForUpdatesDescription' => 'Yangi versiya uchun GitHub-ni tekshiring',
@@ -6765,7 +6972,7 @@ extension on TranslationsUz {
 			'about.attribution' => 'Ma\'lumotlar va atributlar',
 			'about.attributionDescription' => 'Metadata, reytinglar va savdo belgilari',
 			'about.attributionBody' => 'Ushbu mahsulot TMDB API dan foydalanadi, lekin TMDB tomonidan tasdiqlanmagan yoki sertifikatlanmagan. Mashhurlik roʻyxati, metamaʼlumotlar va IMDb reytinglari Cinemeta tomonidan taqdim etilgan. Ballar manba belgilarini saqlab qoladi.',
-			'about.trademarkNotices' => 'Plex, Jellyfin, Emby, Trakt, Simkl, MyAnimeList, AniList, ZXQKEEP0, ZX7KEEP0 va tegishli savdo belgilari, egalari. Luroka ular bilan aloqador emas yoki ular tomonidan tasdiqlanmagan.',
+			'about.trademarkNotices' => 'Plex, Jellyfin, Emby, Trakt, Simkl, MyAnimeList, AniList, TMDB va tegishli belgilar o‘z egalarining savdo belgilaridir. Luroka ular bilan bog‘liq emas va ular tomonidan tasdiqlanmagan.',
 			'about.privacyPolicy' => 'Maxfiylik siyosati',
 			'about.privacyPolicyDescription' => 'Ma\'lumotlaringiz qanday qayta ishlanadi',
 			'about.gplLicense' => 'GNU GPL-3.0 litsenziyasi',
@@ -7211,6 +7418,8 @@ extension on TranslationsUz {
 			'watchTogether.offsetPlusSecond' => '+1 s',
 			'watchTogether.participants' => 'Ishtirokchilar',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('uz'))(n, one: '${n} ishtirokchisi', other: '${n} ishtirokchilari', ), 
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'TASHKILOTCHI',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (siz)',
 			'watchTogether.playerIdle' => 'Bo\'sh',
@@ -7261,8 +7470,6 @@ extension on TranslationsUz {
 			'watchTogether.notices.finished' => 'Tugallandi',
 			'watchTogether.notices.hostChangedTo' => ({required Object name}) => '${name} endi tashkilotchi',
 			'watchTogether.notices.youAreNowHost' => 'Endi tashkilotchi sizsiz',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.joined' => ({required Object name}) => '${name} qoʻshildi',
 			'watchTogether.notices.left' => ({required Object name}) => '${name} chiqdi',
 			'watchTogether.notices.controlRefused' => 'Faqat uy egasi ijroni boshqarishi mumkin',
@@ -7725,6 +7932,8 @@ extension on TranslationsUz {
 			'seerr.statusPartiallyAvailable' => 'Qisman mavjud',
 			'seerr.statusRequested' => 'Soʻraldi',
 			'seerr.statusProcessing' => 'Ishlanmoqda',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Bloklangan roʻyxatda',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => '${url} manziliga ulanib boʻlmadi: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => '${url} manzilida Seerr nusxasi yoʻq (HTTP ${status})',
@@ -7775,8 +7984,6 @@ extension on TranslationsUz {
 			'services.deviceCode.title' => ({required Object service}) => 'Luroka-ni ${service} xizmatida faollashtiring',
 			'services.deviceCode.instructions' => 'QR-kodni skanerlang yoki quyidagi manzilga oʻtib, bu kodni kiriting:',
 			'services.deviceCode.openToActivate' => ({required Object service}) => 'Faollashtirish uchun ${service} xizmatini oching',
-			_ => null,
-		} ?? switch (path) {
 			'services.deviceCode.copyCode' => 'Faollashtirish kodini nusxalash',
 			'services.deviceCode.waitingForAuthorization' => 'Avtorizatsiya kutilmoqda…',
 			'services.deviceCode.codeCopied' => 'Kod nusxalandi',
@@ -7797,12 +8004,69 @@ extension on TranslationsUz {
 			'services.libraryFilter.modeHintWhitelist' => 'Faqat quyida tanlangan kutubxonalarni sinxronlash.',
 			'services.libraryFilter.libraries' => 'Kutubxonalar',
 			'services.libraryFilter.noLibraries' => 'Kutubxonalar yoʻq',
+			'offlineRecovery.title' => 'Sizning serverlaringiz oflayn',
+			'offlineRecovery.description' => 'Yuklab olishlaringiz hali ham mavjud. Serveringiz qaytib kelganida qayta ulanishga harakat qiling yoki boshqa server qo\'shing.',
+			'offlineRecovery.appleTvDescription' => 'Luroka media serverlaringizga ulana olmadi. Ular mavjud boʻlganda qayta ulanishga harakat qiling yoki tomoshani davom ettirish uchun boshqa server qoʻshing.',
+			'offlineRecovery.kidsDescription' => 'Media serveringizga ulana olmadik. Qayta ulanishga harakat qiling yoki ota-onadan yordam so\'rang.',
+			'offlineRecovery.retrying' => 'Ulanmoqda…',
+			'offlineRecovery.addServer' => 'Server qo\'shing',
+			'releaseUpdates.manualInstructions' => 'GitHub dan relizlar arxivini yuklab oling, APK ni chiqarib oling va uni Android qurilmangizga o\'rnating.',
+			'releaseUpdates.tvInstructions' => 'Ushbu manzilni telefoningiz yoki kompyuteringizda oching yoki nashrni yuklab olish uchun QR kodini skanerlang.',
+			'releaseUpdates.pressBackAgain' => 'Ijrodan chiqish uchun Orqaga yana bosing',
+			'profileIntegrations.title' => 'Lurokani sizniki qiling',
+			'profileIntegrations.description' => 'Nima tomosha qilayotganingizni kuzatish va yangi filmlar va shoularni soʻrash uchun sevimli xizmatlaringizni ulang. Har bir Luroka profilining o\'z ulanishlari mavjud.',
+			'profileIntegrations.step' => 'Ixtiyoriy integratsiya',
+			'profileIntegrations.examples' => 'Trakt · Simkl · AniList · MyAnimeList · Seerr',
+			'profileIntegrations.connect' => 'Integratsiyalarni o\'rganing',
+			'profileIntegrations.later' => 'Keyinroq sozlang',
+			'profileIntegrations.manage' => 'Integratsiyalarni boshqarish',
+			'profileIntegrations.forProfile' => ({required Object name}) => '${name} uchun ulanishlar',
+			'profileSetupGuide.title' => 'Profilingizni o\'zingizniki qiling',
+			'profileSetupGuide.description' => 'Luroka ushbu qurilmadagi ushbu profil qanday ko‘rinishini va his qilishini tanlang. Hammasini keyinroq Sozlamalar orqali o‘zgartirishingiz mumkin.',
+			'profileSetupGuide.appearanceStep' => '1 / 2 · Ko‘rinish',
+			'profileSetupGuide.homeStep' => '2 / 2 · Asosiy ekraningiz',
+			'profileSetupGuide.preview' => 'Ko‘rib chiqish',
+			'profileSetupGuide.previewTitle' => 'Sizning uyingiz',
+			'profileSetupGuide.previewPoster' => 'Plakat',
+			'profileSetupGuide.posterArtwork' => 'Faqat san\'at asari',
+			'profileSetupGuide.posterWithDetails' => 'Plakat tafsilotlarini ko\'rsatish',
+			'profileSetupGuide.musicDescription' => 'Film yoki ko‘rsatuv mavzusini tafsilotlar sahifasi ochiq bo‘lganda, mavjud bo‘lganda ijro eting.',
+			'profileSetupGuide.moreThemes' => 'Ko\'proq mavzular',
+			'profileSetupGuide.fewerThemes' => 'Kamroq mavzular',
+			'profileSetupGuide.spotlightHeading' => 'Spotlightda nima ko\'rinishi kerak?',
+			'profileSetupGuide.progressHeading' => 'Tomosha qilishda davom eting va davom eting',
+			'profileSetupGuide.skip' => 'Standartlardan foydalaning va tomosha qilishni boshlang',
+			'profileSetupGuide.finish' => 'Ko\'rishni boshlang',
+			'profileSetupGuide.back' => 'Orqaga',
+			'profileSetupGuide.kContinue' => 'Davom eting',
+			'profileSetupGuide.chooseLater' => 'Keyinroq kutubxonalarni tanlang',
+			'profileSetupGuide.libraryScope' => 'Bu ushbu profil uchun Luroka da ko\'rinadigan narsalarni o\'zgartiradi; u server ruxsatlarini o\'zgartirmaydi.',
+			'profileSetupGuide.createdTitle' => 'Profil yaratildi',
+			'profileSetupGuide.createdDescription' => 'Yangi profilingiz tayyor. Uning egasi uni birinchi marta ochganida shaxsiylashtirishi mumkin.',
+			'profileSetupGuide.switchProfile' => 'Ushbu profilga o\'tish',
+			'profileSetupGuide.stayHere' => 'Joriy profilda qoling',
+			'animeFavorites.filter' => 'Anime',
+			'animeFavorites.manage' => 'Animeni boshqarish',
+			'animeFavorites.description' => 'Avtomatik aniqlash anime kutubxonasi nomlari va mavjud anime teglari yoki identifikatorlaridan foydalanadi. Kutubxonalarni tanlang va individual sevimlilarni to\'g\'rilang. Tanlovlar profilingiz uchun ushbu qurilmada saqlanadi.',
+			'animeFavorites.libraries' => 'Anime kutubxonalar',
+			'animeFavorites.libraryHint' => 'Anime nomli kutubxonalar avtomatik ravishda tan olinadi. Uning tasnifini o\'zgartirish uchun kutubxonani tanlang.',
+			'animeFavorites.titles' => 'Sevimli sarlavhalar',
+			'animeFavorites.titleHint' => 'Uni anime sifatida belgilash yoki avtomatik moslikni tuzatish uchun sarlavhani tanlang.',
+			'animeFavorites.automatic' => 'Avtomatik',
+			'animeFavorites.include' => 'Anime',
+			'animeFavorites.exclude' => 'Anime emas',
+			'animeFavorites.automaticIncluded' => 'Avtomatik · Anime',
+			'animeFavorites.automaticExcluded' => 'Avtomatik · Anime emas',
+			'animeFavorites.noLibraries' => 'Ulangan kutubxonalar mavjud emas.',
+			'animeFavorites.noTitles' => 'Sevimli filmlar yoki seriallar mavjud emas.',
+			'animeFavorites.empty' => 'Sevimli anime topilmadi. Anime kutubxonalaringizni tekshiring yoki nomni anime sifatida belgilang.',
+			'animeFavorites.saveFailed' => 'Anime sozlamalaringizni saqlab bo‘lmadi. Iltimos, qayta urinib koʻring.',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => '${product} serverini qoʻshish',
 			'addServer.serverUrls' => 'Server URL-lari',
 			'addServer.serverUrlsHelper' => 'Vergul bilan ajratilgan bir nechta URL manziliga ruxsat beriladi.',
 			'addServer.findServer' => 'Serverni topish',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => 'Mahalliy ${product} serverlari qidirilmoqda...',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Mahalliy ${product} serverlari',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Saqlangan va yaqin ${product} serverlari',
 			'addServer.username' => 'Foydalanuvchi nomi',
 			'addServer.password' => 'Parol',
 			'addServer.signIn' => 'Kirish',

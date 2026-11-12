@@ -32,6 +32,13 @@ MediaItem collection(String server, {String id = 'collection'}) => MediaItem(
 );
 
 void main() {
+  test('studio preferences hide and order brands while preserving newly added brands', () {
+    final layout = HomeLayout(studioOrder: ['bbc', 'netflix'], hiddenStudios: ['netflix']);
+    expect(layout.arrangeStudios(['netflix', 'itv', 'bbc'], (key) => key), ['bbc', 'itv']);
+    final restored = HomeLayout.fromJson(layout.toJson());
+    expect(restored.hiddenStudios, {'netflix'});
+    expect(restored.studioOrder, ['bbc', 'netflix']);
+  });
   setUp(resetSharedPreferencesForTest);
 
   test('default order is stable; custom order hides exact server/library rows and appends new ones', () {
@@ -161,5 +168,53 @@ void main() {
     await provider.setHidden('row', true);
     await storage.clearUserScopedPreferencesForProfile('p');
     expect(storage.getHomeLayout('p').hidden, isEmpty);
+  });
+
+  test('combined is the default and split preference is persisted per profile', () async {
+    final storage = await StorageService.getInstance();
+    final first = HomeLayoutProvider(storage: storage, profileId: 'p1');
+    final second = HomeLayoutProvider(storage: storage, profileId: 'p2');
+    addTearDown(first.dispose);
+    addTearDown(second.dispose);
+    expect(first.layout.splitContinueWatching, isFalse);
+    await first.setSplitContinueWatching(true);
+    expect(storage.getHomeLayout('p1').splitContinueWatching, isTrue);
+    expect(second.layout.splitContinueWatching, isFalse);
+    await first.setHidden(homeNextUpKey, true);
+    await first.setSplitContinueWatching(false);
+    await first.setSplitContinueWatching(true);
+    expect(first.layout.hidden, contains(homeNextUpKey));
+  });
+
+  test('Spotlight keeps legacy defaults and saves new choices per profile', () async {
+    final storage = await StorageService.getInstance();
+    final legacy = HomeLayout.fromJson({
+      'version': 1,
+      'hidden': ['old'],
+    });
+    expect(legacy.spotlightSource, HomeSpotlightSource.trending);
+    expect(HomeLayout.fromJson({'spotlightSource': 'unknown'}).spotlightSource, HomeSpotlightSource.trending);
+    final first = HomeLayoutProvider(storage: storage, profileId: 'old');
+    addTearDown(first.dispose);
+    await storage.initializeNewProfileHome('new');
+    final second = HomeLayoutProvider(storage: storage, profileId: 'new');
+    addTearDown(second.dispose);
+    expect(first.layout.spotlightSource, HomeSpotlightSource.trending);
+    expect(second.layout.spotlightSource, HomeSpotlightSource.forYou);
+    await second.setSpotlightSource(HomeSpotlightSource.continueWatching);
+    await storage.initializeNewProfileHome('new');
+    expect(storage.getHomeLayout('new').spotlightSource, HomeSpotlightSource.continueWatching);
+    expect(first.layout.spotlightSource, HomeSpotlightSource.trending);
+  });
+
+  test('failed profile setup removes only its untouched Spotlight default', () async {
+    final storage = await StorageService.getInstance();
+    expect(await storage.initializeNewProfileHome('failed'), isTrue);
+    await storage.removeNewProfileHomeIfUnchanged('failed');
+    expect(storage.getHomeLayout('failed').spotlightSource, HomeSpotlightSource.trending);
+    expect(await storage.initializeNewProfileHome('edited'), isTrue);
+    await storage.saveHomeLayout('edited', HomeLayout(spotlightSource: HomeSpotlightSource.continueWatching));
+    await storage.removeNewProfileHomeIfUnchanged('edited');
+    expect(storage.getHomeLayout('edited').spotlightSource, HomeSpotlightSource.continueWatching);
   });
 }

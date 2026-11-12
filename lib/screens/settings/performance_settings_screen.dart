@@ -10,6 +10,7 @@ import '../../widgets/focusable_list_tile.dart';
 import '../../widgets/settings_builder.dart';
 import '../../widgets/settings_page.dart';
 import '../../widgets/settings_section.dart';
+import '../../widgets/setting_tile.dart';
 
 class PerformanceSettingsScreen extends StatelessWidget {
   const PerformanceSettingsScreen({super.key});
@@ -27,6 +28,12 @@ class PerformanceSettingsScreen extends StatelessWidget {
         return SettingsPage(
           title: Text(t.customPerformance.title),
           children: [
+            SettingSwitchTile(
+              pref: SettingsService.fireStickMode,
+              icon: Symbols.speed_rounded,
+              title: t.customPerformance.fireStickMode,
+              subtitle: t.customPerformance.description,
+            ),
             SettingsGroup(
               children: [
                 ListTile(

@@ -80,6 +80,23 @@ void main() {
     expect(appearance.integrationsPendingFor('two'), isFalse);
   });
 
+  test('guide and library prompts survive restart, avatar edits, and are cleared on logout', () async {
+    await appearance.markPersonalizationPending('one');
+    await appearance.markSourceSelectionPending('one');
+    await appearance.markPersonalizationPending('two');
+    await appearance.reset('one');
+    appearance.resetForTesting();
+    await appearance.initialize();
+    expect(appearance.personalizationPendingFor('one'), isTrue);
+    expect(appearance.sourceSelectionPendingFor('one'), isTrue);
+    await appearance.completeSourceSelection('one');
+    await appearance.completePersonalization('one');
+    expect(appearance.personalizationPendingFor('two'), isTrue);
+    await appearance.clearForLogout();
+    expect(appearance.personalizationPendingFor('two'), isFalse);
+    expect(appearance.sourceSelectionPendingFor('one'), isFalse);
+  });
+
   test('photo resizing bounds decode dimensions and preserves aspect ratio', () async {
     final recorder = ui.PictureRecorder();
     final canvas = ui.Canvas(recorder);

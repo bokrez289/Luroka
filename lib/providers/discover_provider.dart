@@ -7,6 +7,7 @@ import '../media/ids.dart';
 import '../media/media_hub.dart';
 import '../media/library_change_event.dart';
 import '../media/media_item.dart';
+import '../media/home_progress.dart';
 import '../media/media_server_client.dart';
 import '../mixins/disposable_change_notifier_mixin.dart';
 import '../mixins/event_aware.dart';
@@ -229,6 +230,8 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   List<MediaItem> _onDeck = [];
   List<MediaHub> _hubs = [];
   bool _hasMoreContinueWatching = false;
+  bool _hasMoreNextUp = false;
+  bool _splitHomeProgress = false;
   DiscoverLoadState _onDeckState = DiscoverLoadState.initial;
   DiscoverLoadState _hubsState = DiscoverLoadState.initial;
   String? _errorMessage;
@@ -237,6 +240,25 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   int _commitRevision = 0;
   DiscoverRefreshOutcome _lastOutcome = DiscoverRefreshOutcome.cancelled;
   Future<void>? _continueWatchingRefreshFuture;
+  DateTime? _lastContinueWatchingRefresh;
+  Object? _continueWatchingFreshScope;
+
+  Object _continueWatchingScope() => (
+    KidsProfileService.instance.activeId,
+    Object.hashAllUnordered(_multiServer.onlineServerIds.map((id) =>
+        (id, _multiServer.getClientForServer(ServerId(id))))),
+    Object.hashAllUnordered(_hiddenLibraries.hiddenLibraryKeys),
+    _hiddenLibraries.selectedSourceLibraries == null
+        ? null
+        : Object.hashAllUnordered(_hiddenLibraries.selectedSourceLibraries!),
+    _continueWatchingProbeLimit,
+    _splitHomeProgress,
+  );
+
+  void _markContinueWatchingFresh() {
+    _lastContinueWatchingRefresh = DateTime.now();
+    _continueWatchingFreshScope = _continueWatchingScope();
+  }
   bool _continueWatchingRefreshQueued = false;
 
   Set<String> _lastSeenHiddenKeys = {};
@@ -298,6 +320,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   }
 
   void _onKidsPolicyChanged() {
+    _lastContinueWatchingRefresh = null;
     if (KidsProfileService.instance.activeId != profileId) return;
     safeNotifyListeners();
     unawaited(_syncSystemShelf(onDeck));
@@ -305,6 +328,21 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   }
 
   bool get hasMoreContinueWatching => _hasMoreContinueWatching;
+  bool get hasMoreNextUp => _hasMoreNextUp;
+
+  /// Changing presentation never blocks Home: show the current rows first,
+  /// then refresh with independent per-row limits in the background.
+  void setSplitHomeProgress(bool split) {
+    if (_splitHomeProgress == split) return;
+    final hadMore = _hasMoreContinueWatching || _hasMoreNextUp;
+    _splitHomeProgress = split;
+    _applyOnDeck(_onDeck);
+    if (hadMore) {
+      _hasMoreContinueWatching = true;
+      if (split) _hasMoreNextUp = true;
+    }
+    if (_onDeckState != DiscoverLoadState.initial) unawaited(refreshContinueWatching());
+  }
 
   /// Raw load failure (unlocalized); the screen wraps it for display.
   String? get errorMessage => _errorMessage;
@@ -405,6 +443,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   }
 
   Future<void> _loadOnce() async {
+    _lastContinueWatchingRefresh = null;
     final loadTimer = Stopwatch()..start();
     var loggedFirstHub = false;
     var outcome = DiscoverRefreshOutcome.cancelled;
@@ -424,6 +463,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     final previousOnDeck = _onDeck;
     final previousHubs = _hubs;
     final previousHasMoreContinueWatching = _hasMoreContinueWatching;
+    final previousHasMoreNextUp = _hasMoreNextUp;
     final previousLoadedOnDeckServerIds = _loadedOnDeckServerIds;
     final previousLoadedHubServerIds = _loadedHubServerIds;
     final previousOnDeckState = _onDeckState;
@@ -489,10 +529,12 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
       // and must survive this pass's observations.
       observation = _beginObservation();
       final partialRevision = _contentRevision;
+      final freshnessScope = _continueWatchingScope();
       final partialOwner = KidsProfileService.instance.activeId;
       final completedOnDeckLibraries = <String>{};
       final onDeckFuture = aggregation.getOnDeckFromAllServers(
         limit: _continueWatchingProbeLimit,
+        splitRows: _splitHomeProgress,
         hiddenLibraryKeys: _hiddenLibraries.hiddenLibraryKeys,
         selectedSourceLibraryKeys: _hiddenLibraries.selectedSourceLibraries,
         onPartialLibrary: (result) {
@@ -593,6 +635,11 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
             return;
           }
           _applyOnDeck(_excludingHiddenLibraries(items));
+          if (fetchedOnDeck.succeededServerIds.isNotEmpty &&
+              fetchedOnDeck.failedServerIds.isEmpty && fetchedOnDeck.cancelledServerIds.isEmpty &&
+              freshnessScope == _continueWatchingScope()) {
+            _markContinueWatchingFresh();
+          }
           ++expectedCommitRevision;
           replacedOnDeck = true;
           _onDeckState = DiscoverLoadState.loaded;
@@ -687,6 +734,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
         _replaceOnDeck(
           _withoutHiddenLibraries(previousOnDeck, _hiddenLibraries.hiddenLibraryKeys),
           hasMore: previousHasMoreContinueWatching,
+          hasMoreNextUp: previousHasMoreNextUp,
         );
         _replaceHubs(_hubsWithoutHiddenLibraries(previousHubs, _hiddenLibraries.hiddenLibraryKeys));
         _loadedOnDeckServerIds = Set<String>.of(previousLoadedOnDeckServerIds);
@@ -761,6 +809,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
           ? Future<OnDeckAggregationResult?>.value()
           : aggregation.getOnDeckFromAllServers(
               limit: _continueWatchingProbeLimit,
+              splitRows: _splitHomeProgress,
               hiddenLibraryKeys: _hiddenLibraries.hiddenLibraryKeys,
               selectedSourceLibraryKeys: _hiddenLibraries.selectedSourceLibraries,
               serverIds: onDeckIds,
@@ -802,10 +851,12 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
 
       if (freshOnDeck != null) {
         final hadMore = _hasMoreContinueWatching;
+        final hadMoreNext = _hasMoreNextUp;
         final mergedOnDeck = await aggregation.mergeContinueWatching(
           _onDeck,
           freshOnDeck.items,
           limit: _continueWatchingProbeLimit,
+          splitRows: _splitHomeProgress,
         );
         if (isDisposed ||
             isProfileBinding() ||
@@ -817,6 +868,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
         // The stored list is already trimmed, so the merge can't see old items
         // past the cap — a previously-true "more" affordance stays true.
         if (hadMore) _hasMoreContinueWatching = true;
+        if (hadMoreNext) _hasMoreNextUp = true;
         _loadedOnDeckServerIds = {..._loadedOnDeckServerIds, ...freshOnDeck.succeededServerIds}
           ..removeAll(freshOnDeck.failedServerIds)
           ..removeAll(freshOnDeck.cancelledServerIds);
@@ -945,6 +997,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   /// Background refresh of Continue Watching only. Mutations require a trailing
   /// pass; passive lifecycle refreshes can share work already in progress.
   Future<void> refreshContinueWatching({bool coalesce = false}) {
+    if (!coalesce) _lastContinueWatchingRefresh = null;
     final active = _continueWatchingRefreshFuture;
     if (active != null) {
       if (!coalesce) _continueWatchingRefreshQueued = true;
@@ -952,6 +1005,11 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     }
     if (coalesce && _loadCoordinator.isFullActive) {
       return _loadCoordinator.inFlight ?? Future<void>.value();
+    }
+    if (coalesce && !isProfileBinding() && _continueWatchingFreshScope == _continueWatchingScope() &&
+        _lastContinueWatchingRefresh != null &&
+        DateTime.now().difference(_lastContinueWatchingRefresh!) < const Duration(seconds: 30)) {
+      return Future<void>.value();
     }
     late final Future<void> refresh;
     refresh = _runContinueWatchingRefreshes().whenComplete(() {
@@ -985,12 +1043,14 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
       if (isProfileBinding() || !_multiServer.hasConnectedServers) return;
       final revision = _contentRevision;
       final hiddenKeys = Set<String>.of(_hiddenLibraries.hiddenLibraryKeys);
+      final freshnessScope = _continueWatchingScope();
       final observation = _beginObservation();
       final completedLibraries = <String>{};
       final owner = KidsProfileService.instance.activeId;
       var acceptingPartial = true;
       final fetched = await _multiServer.aggregationService.getOnDeckFromAllServers(
         limit: _continueWatchingProbeLimit,
+        splitRows: _splitHomeProgress,
         hiddenLibraryKeys: hiddenKeys,
         selectedSourceLibraryKeys: _hiddenLibraries.selectedSourceLibraries,
         onPartialLibrary: (result) {
@@ -1036,6 +1096,10 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
         return;
       }
       _applyOnDeck(_excludingHiddenLibraries(items));
+      if (fetched.failedServerIds.isEmpty && fetched.cancelledServerIds.isEmpty &&
+          freshnessScope == _continueWatchingScope()) {
+        _markContinueWatchingFresh();
+      }
       _recordObservations(observation, fetched.observedItems, fetched.succeededServerIds);
       safeNotifyListeners();
       unawaited(_syncSystemShelf(_onDeck));
@@ -1058,8 +1122,10 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
       for (final item in result.items) item.globalKey: item,
     }.values.toList()..sort((a, b) => b.recencySortKey.compareTo(a.recencySortKey));
     final hadMore = _hasMoreContinueWatching;
+    final hadMoreNext = _hasMoreNextUp;
     _applyOnDeck(rows);
     if (hadMore) _hasMoreContinueWatching = true;
+    if (hadMoreNext) _hasMoreNextUp = true;
     return true;
   }
 
@@ -1076,7 +1142,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
       final library = item.libraryGlobalKey;
       return library == null || !completedLibraries.contains(library);
     }).toList();
-    return aggregation.mergeContinueWatching(fetched.items, retained, limit: limit);
+    return aggregation.mergeContinueWatching(fetched.items, retained, limit: limit, splitRows: _splitHomeProgress);
   }
 
   /// The full unlimited Continue Watching list for the hub's load-more path.
@@ -1119,7 +1185,12 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   void _updateItemInLists(String sourceGlobalKey, MediaItem updatedItem) {
     final onDeckIndex = _onDeck.indexWhere((item) => item.globalKey == sourceGlobalKey);
     if (onDeckIndex != -1) {
-      _replaceOnDeck(List.of(_onDeck)..[onDeckIndex] = updatedItem, hasMore: _hasMoreContinueWatching);
+      final previous = _onDeck[onDeckIndex];
+      final rawRole = previous.raw?[homeProgressRoleKey];
+      final preserved = rawRole == null
+          ? updatedItem
+          : updatedItem.copyWith(raw: {...?updatedItem.raw, homeProgressRoleKey: rawRole});
+      _replaceOnDeck(List.of(_onDeck)..[onDeckIndex] = preserved, hasMore: _hasMoreContinueWatching);
     }
 
     List<MediaHub>? updatedHubs;
@@ -1136,13 +1207,19 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   }
 
   void _applyOnDeck(List<MediaItem> fetched) {
-    final hasMore = fetched.length > _previewLimit;
-    _replaceOnDeck(hasMore ? fetched.take(_previewLimit).toList() : fetched, hasMore: hasMore);
+    final resumeCount = _splitHomeProgress ? fetched.where((item) => !isHomeNextUp(item)).length : fetched.length;
+    final nextCount = _splitHomeProgress ? fetched.where(isHomeNextUp).length : 0;
+    _replaceOnDeck(
+      limitHomeProgressRows(fetched, _previewLimit, split: _splitHomeProgress),
+      hasMore: resumeCount > _previewLimit,
+      hasMoreNextUp: nextCount > _previewLimit,
+    );
   }
 
-  void _replaceOnDeck(List<MediaItem> onDeck, {required bool hasMore}) {
+  void _replaceOnDeck(List<MediaItem> onDeck, {required bool hasMore, bool? hasMoreNextUp}) {
     _onDeck = onDeck;
     _hasMoreContinueWatching = hasMore;
+    if (hasMoreNextUp != null) _hasMoreNextUp = hasMoreNextUp;
     ++_commitRevision;
   }
 
@@ -1160,6 +1237,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   Set<String>? get _watchedGlobalKeys => hierarchicalEventGlobalKeys(_onDeck);
 
   void _onWatchStateChanged(WatchStateEvent event) {
+    _lastContinueWatchingRefresh = null;
     if (event.changeType == WatchStateChangeType.progressUpdate && event.isNowWatched != true) {
       final viewOffset = event.viewOffset;
       final index = _onDeck.indexWhere((item) => item.globalKey == event.globalKey);
@@ -1215,6 +1293,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     // On-deck and hubs are server-backed: a download-only deletion leaves the
     // server item in place, so it must not evict anything here.
     if (event.isDownloadOnly) return;
+    _lastContinueWatchingRefresh = null;
 
     // Scoped to the emitting server: backend-native ids (Plex rating keys are
     // small sequential integers) routinely collide across servers, and push

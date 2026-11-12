@@ -47,6 +47,7 @@ import 'package:luroka/widgets/dialog_action_button.dart';
 import 'package:luroka/widgets/focusable_list_tile.dart';
 import 'package:luroka/widgets/loading_indicator_box.dart';
 import 'package:luroka/widgets/setting_tile.dart';
+import 'package:luroka/widgets/tv_settings_hub.dart';
 import 'package:provider/provider.dart';
 
 import '../../test_helpers/io_fakes.dart';
@@ -87,6 +88,20 @@ void main() {
     if (temporaryDirectory.existsSync()) {
       await temporaryDirectory.delete(recursive: true);
     }
+  });
+
+  testWidgets('mobile exposes cloud backup in the main settings navigation', (tester) async {
+    final harness = await _pumpSettingsScreen(tester, platform: TargetPlatform.android, size: const Size(390, 844));
+    addTearDown(() => harness.dispose(tester));
+    final backup = find.byKey(const ValueKey('mobile-settings-category-backup'));
+    await tester.scrollUntilVisible(backup, 250, scrollable: find.byType(Scrollable).first);
+    await tester.tap(backup);
+    await _pumpUi(tester);
+    expect(find.text('Encrypted cloud backup'), findsOneWidget);
+    expect(find.text('Restore cloud backup'), findsOneWidget);
+    expect(find.text('Delete cloud backup'), findsOneWidget);
+    expect(find.byKey(const ValueKey('mobile-mini-home-preview')), findsNothing);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('system back closes Manage Libraries without popping pushed settings', (tester) async {
@@ -131,12 +146,15 @@ void main() {
   for (final size in [const Size(320, 640), const Size(390, 844), const Size(844, 390)]) {
     testWidgets('mobile settings stays usable in Simple and Advanced at $size', (tester) async {
       final harness = await _pumpSettingsScreen(
-        tester, platform: TargetPlatform.android, size: size, textScale: size.width == 320 ? 1.5 : 1,
+        tester,
+        platform: TargetPlatform.android,
+        size: size,
+        textScale: size.width == 320 ? 1.5 : 1,
       );
       addTearDown(() => harness.dispose(tester));
       expect(find.byKey(const ValueKey('mobile-settings-mode-simple')), findsOneWidget);
       expect(find.byKey(const ValueKey('mobile-settings-mode-advanced')), findsOneWidget);
-      expect(find.byKey(const ValueKey('mobile-settings-category-appearance')), findsOneWidget);
+      expect(find.byKey(const ValueKey('mobile-settings-category-playback')), findsOneWidget);
       final before = SettingsService.instance.read(SettingsService.autoPlayNextEpisode);
       await tester.tap(find.byKey(const ValueKey('mobile-settings-mode-advanced')));
       await _pumpUi(tester);
@@ -149,6 +167,7 @@ void main() {
       await tester.tap(playback);
       await _pumpUi(tester);
       expect(find.text(t.tvSettingsV2.morePlayback), findsOneWidget);
+      expect(find.byKey(const ValueKey('mobile-mini-home-preview')), findsNothing);
       expect(tester.takeException(), isNull);
     });
   }
@@ -193,14 +212,16 @@ void main() {
     await _pumpUi(tester);
     final preview = find.byKey(const ValueKey('library-settings-preview'));
     expect(preview, findsOneWidget);
-    int columns() => (tester.widget<GridView>(find.descendant(of: preview, matching: find.byType(GridView))).gridDelegate
-        as SliverGridDelegateWithFixedCrossAxisCount).crossAxisCount;
+    int columns() =>
+        (tester.widget<GridView>(find.descendant(of: preview, matching: find.byType(GridView))).gridDelegate
+                as SliverGridDelegateWithFixedCrossAxisCount)
+            .crossAxisCount;
     await SettingsService.instance.write(SettingsService.libraryDensity, 1);
     await _pumpUi(tester);
-    expect(columns(), 5);
+    expect(columns(), 4);
     await SettingsService.instance.write(SettingsService.libraryDensity, 5);
     await _pumpUi(tester);
-    expect(columns(), 3);
+    expect(columns(), 2);
     await tester.drag(find.byKey(const PageStorageKey('workspace-library')), const Offset(0, -350));
     await _pumpUi(tester);
     expect(tester.getRect(preview).bottom, lessThan(844));
@@ -209,13 +230,21 @@ void main() {
 
   testWidgets('mobile appearance preview fits a small phone with enlarged text', (tester) async {
     final harness = await _pumpSettingsScreen(
-      tester, platform: TargetPlatform.android, size: const Size(320, 640), textScale: 1.5,
+      tester,
+      platform: TargetPlatform.android,
+      size: const Size(320, 640),
+      textScale: 1.5,
     );
     addTearDown(() => harness.dispose(tester));
-    await tester.tap(find.byKey(const ValueKey('mobile-settings-category-appearance')));
+    final appearance = find.byKey(const ValueKey('mobile-settings-category-appearance'));
+    await tester.scrollUntilVisible(appearance, 250, scrollable: find.byType(Scrollable).first);
+    await _pumpUi(tester);
+    await tester.tap(appearance);
     await _pumpUi(tester);
     expect(find.byKey(const ValueKey('mobile-mini-home-preview')), findsOneWidget);
     expect(find.byKey(const PageStorageKey('workspace-appearance')), findsOneWidget);
+    expect(find.byKey(const ValueKey('expand-settings-preview')).hitTestable(), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('mobile settings search reveals and remembers Advanced for advanced results', (tester) async {
@@ -233,12 +262,65 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('TV category order and search reach compact library navigation before the page is visited', (
+    tester,
+  ) async {
+    await initializeDateFormatting('en');
+    TvDetectionService.debugSetAppleTVOverride(true);
+    final harness = await _pumpSettingsScreen(tester, size: const Size(1280, 720));
+    addTearDown(() => harness.dispose(tester));
+    expect(tester.widget<TvSettingsHub>(find.byType(TvSettingsHub)).categories.take(5).map((c) => c.id), [
+      'playback',
+      'audio',
+      'home',
+      'library',
+      'appearance',
+    ]);
+    await tester.tap(find.byTooltip(t.lurokaWorkspace.searchSettings));
+    await _pumpUi(tester);
+    await tester.enterText(find.byType(TextField), 'emby style');
+    await _pumpUi(tester);
+    await tester.tap(find.text(t.libraryPolish.compactTvNavigation).last);
+    await _pumpUi(tester);
+    expect(find.text(t.libraryPolish.compactTvNavigation), findsOneWidget);
+    final focused = FocusManager.instance.primaryFocus?.context;
+    expect(focused?.findAncestorWidgetOfExactType<FocusableSwitchListTile>()?.title, isA<Text>());
+    expect(SettingsService.instance.read(SettingsService.tvSettingsAdvancedMode), isFalse);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('search labels advanced library results and reveals them without changing their value', (tester) async {
+    await initializeDateFormatting('en');
+    TvDetectionService.debugSetAppleTVOverride(true);
+    final harness = await _pumpSettingsScreen(tester, size: const Size(1280, 720));
+    addTearDown(() => harness.dispose(tester));
+    final before = SettingsService.instance.read(SettingsService.viewMode);
+    await tester.tap(find.byTooltip(t.lurokaWorkspace.searchSettings));
+    await _pumpUi(tester);
+    await tester.enterText(find.byType(TextField), 'grid list layout');
+    await _pumpUi(tester);
+    final result = find.ancestor(of: find.text(t.settings.viewMode), matching: find.byType(FocusableListTile));
+    expect(find.descendant(of: result, matching: find.text(t.settings.advanced)), findsOneWidget);
+    await tester.tap(find.text(t.settings.viewMode));
+    await _pumpUi(tester);
+    expect(SettingsService.instance.read(SettingsService.tvSettingsAdvancedMode), isTrue);
+    expect(find.text(t.settings.viewMode), findsOneWidget);
+    expect(SettingsService.instance.read(SettingsService.viewMode), before);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'TV Simple and Advanced keep the same categories and reveal extra controls without changing preferences',
     (tester) async {
       await initializeDateFormatting('en');
       TvDetectionService.debugSetAppleTVOverride(true);
-      PackageInfo.setMockInitialValues(appName: 'Luroka', packageName: 'com.bokrez.luroka', version: '2.24.0', buildNumber: '1', buildSignature: '');
+      PackageInfo.setMockInitialValues(
+        appName: 'Luroka',
+        packageName: 'com.bokrez.luroka',
+        version: '2.24.0',
+        buildNumber: '1',
+        buildSignature: '',
+      );
       final harness = await _pumpSettingsScreen(tester, size: const Size(1280, 720));
       addTearDown(() => harness.dispose(tester));
       expect(find.text(t.tvSettingsV2.simple), findsOneWidget);
@@ -255,8 +337,9 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
       final second = await _pumpSettingsScreen(tester, size: const Size(1280, 720));
       addTearDown(() => second.dispose(tester));
-      expect(find.text(t.tvSettingsV2.performance), findsOneWidget);
       expect(find.text(t.tvSettingsV2.homeNavigation), findsOneWidget);
+      await tester.tap(find.text(t.settings.appearance));
+      await _pumpUi(tester);
       expect(find.text(t.tvSettingsV2.performance), findsOneWidget);
       expect(SettingsService.instance.read(SettingsService.fireStickMode), before);
       await tester.tap(find.text(t.tvSettingsV2.libraryCards));
@@ -282,23 +365,31 @@ void main() {
     testWidgets('TV live theme preview and direct About are visible at $size', (tester) async {
       await initializeDateFormatting('en');
       TvDetectionService.debugSetAppleTVOverride(true);
-      PackageInfo.setMockInitialValues(appName: 'Luroka', packageName: 'com.bokrez.luroka', version: '2.24.0', buildNumber: '1', buildSignature: '');
+      PackageInfo.setMockInitialValues(
+        appName: 'Luroka',
+        packageName: 'com.bokrez.luroka',
+        version: '2.24.0',
+        buildNumber: '1',
+        buildSignature: '',
+      );
       final harness = await _pumpSettingsScreen(tester, size: size);
       addTearDown(() => harness.dispose(tester));
-      final preview = find.byKey(const ValueKey('tv-contextual-preview'));
-      expect(preview, findsOneWidget, reason: 'The preview must not disappear on a compact TV');
-      expect(find.text(t.tvSettingsV2.themePreview), findsOneWidget);
-      final old = SettingsService.instance.read(SettingsService.themeMode);
-      final themeRow = find.widgetWithText(SettingNavigationTile, t.settings.theme);
-      expect(themeRow, findsOneWidget);
-      await tester.tap(themeRow);
+      final appearance = find.text(t.settings.appearance);
+      await tester.scrollUntilVisible(appearance, 180, scrollable: find.byType(Scrollable).first);
       await _pumpUi(tester);
-      final nextTheme = app_settings.ThemeMode.featuredDark.firstWhere((mode) => mode != old);
-      await tester.tap(find.byKey(ValueKey(nextTheme)));
+      await tester.tap(appearance);
+      await _pumpUi(tester);
+      final compact = size.width < 1050;
+      final preview = find.byKey(ValueKey(compact ? 'tv-mini-home-preview' : 'tv-contextual-preview'));
+      expect(preview, findsOneWidget, reason: 'The preview must not disappear on a compact TV');
+      expect(find.text(compact ? t.tvSettingsV2.previewLive : t.tvSettingsV2.themePreview), findsOneWidget);
+      final old = SettingsService.instance.read(SettingsService.themeMode);
+      await SettingsService.instance.write(
+        SettingsService.themeMode,
+        old == app_settings.ThemeMode.light ? app_settings.ThemeMode.dark : app_settings.ThemeMode.light,
+      );
       await _pumpUi(tester);
       expect(SettingsService.instance.read(SettingsService.themeMode), isNot(old));
-      await tester.pageBack();
-      await _pumpUi(tester);
       expect(preview, findsOneWidget, reason: 'Selecting a theme leaves the live preview on screen');
       final about = find.text(t.tvSettingsV2.aboutSupport);
       await tester.scrollUntilVisible(about, 200, scrollable: find.byType(Scrollable).first);
@@ -311,7 +402,13 @@ void main() {
       expect(find.text(t.about.communitySection), findsNothing);
       expect(find.text(t.about.customSource), findsNothing);
       expect(find.text(t.about.openSourceLicenses), findsOneWidget);
-      expect(tester.getRect(find.byKey(const ValueKey('luroka-version'))).top, lessThan(size.height / 2));
+      final versionBounds = tester.getRect(find.byKey(const ValueKey('luroka-version')));
+      expect(versionBounds.top, greaterThanOrEqualTo(0));
+      expect(
+        versionBounds.bottom,
+        lessThanOrEqualTo(size.height),
+        reason: 'The version should be visible without scrolling, not tied to the screen midpoint',
+      );
       expect(tester.takeException(), isNull);
     });
   }
@@ -472,7 +569,7 @@ void main() {
   });
 
   testWidgets('background downloads tile renders and opens the injected blocked status', (tester) async {
-    const channel = MethodChannel('com.luroka/device.settings-background-test');
+    const channel = MethodChannel('com.plezy/device.settings-background-test');
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call) async {
       return switch (call.method) {
         'getBackgroundWorkSignals' => {
@@ -977,7 +1074,6 @@ Future<_SettingsHarness> _pumpSettingsScreen(
           ChangeNotifierProvider<ActiveProfileProvider>.value(value: activeProfile),
           ChangeNotifierProvider<LibrariesProvider>.value(value: libraries),
           ChangeNotifierProvider<HiddenLibrariesProvider>.value(value: hiddenLibraries),
-          ChangeNotifierProvider<SupporterService>.value(value: supporter),
           ChangeNotifierProvider<ThemeProvider>.value(value: theme),
           ChangeNotifierProvider<TrackersProvider>.value(value: trackers),
           ChangeNotifierProvider<SeerrAccountProvider>.value(value: seerr),

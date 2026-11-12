@@ -16,8 +16,10 @@ void main() {
     test('parses raw, dashed and lower-case codes', () {
       for (final link in [
         'luroka://watch?code=K7MQ2X',
-        'luroka://watch?code=k7m-q2x',
-        'luroka://watch?code=K7M-Q2X',
+        'lumora://watch?code=K7MQ2X',
+        'luroka://watch?code=K7MQ2X',
+        'plezy://watch?code=k7m-q2x',
+        'plezy://watch?code=K7M-Q2X',
       ]) {
         final parsed = WatchTogetherDeepLink.tryParse(link);
         expect(parsed, isNotNull, reason: link);
@@ -27,14 +29,13 @@ void main() {
     });
 
     test('rejects wrong hosts, missing codes and malformed codes', () {
-      expect(WatchTogetherDeepLink.tryParse('plezy://watch?code=K7MQ2X'), isNull);
-      expect(WatchTogetherDeepLink.tryParse('luroka://live?channel=4.1'), isNull);
-      expect(WatchTogetherDeepLink.tryParse('luroka://watch'), isNull);
-      expect(WatchTogetherDeepLink.tryParse('luroka://watch?code='), isNull);
-      expect(WatchTogetherDeepLink.tryParse('luroka://watch?code=K7MQ2'), isNull);
-      expect(WatchTogetherDeepLink.tryParse('luroka://watch?code=K7MQ2X9'), isNull);
+      expect(WatchTogetherDeepLink.tryParse('plezy://live?channel=4.1'), isNull);
+      expect(WatchTogetherDeepLink.tryParse('plezy://watch'), isNull);
+      expect(WatchTogetherDeepLink.tryParse('plezy://watch?code='), isNull);
+      expect(WatchTogetherDeepLink.tryParse('plezy://watch?code=K7MQ2'), isNull);
+      expect(WatchTogetherDeepLink.tryParse('plezy://watch?code=K7MQ2X9'), isNull);
       // 0, 1, I, L and O never appear in room codes.
-      expect(WatchTogetherDeepLink.tryParse('luroka://watch?code=K7MQ10'), isNull);
+      expect(WatchTogetherDeepLink.tryParse('plezy://watch?code=K7MQ10'), isNull);
       expect(WatchTogetherDeepLink.tryParse('not a link'), isNull);
     });
   });

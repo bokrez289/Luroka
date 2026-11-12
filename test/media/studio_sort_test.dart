@@ -5,6 +5,28 @@ import 'package:luroka/media/media_kind.dart';
 import 'package:luroka/media/studio_sort.dart';
 
 void main() {
+  test('newest release uses the release date within a year rather than title order', () {
+    final earlier = MediaItem.plex(
+      id: 'a',
+      kind: MediaKind.movie,
+      title: 'A',
+      year: 2026,
+      originallyAvailableAt: '2026-01-01',
+    );
+    final later = MediaItem.plex(
+      id: 'z',
+      kind: MediaKind.movie,
+      title: 'Z',
+      year: 2026,
+      originallyAvailableAt: '2026-10-01',
+    );
+    final rows = [earlier, later]..sort(StudioSort.newest.compare);
+    expect(rows.map((item) => item.id), ['z', 'a']);
+    for (final backend in MediaBackend.values) {
+      expect(StudioSort.newest.forBackend(backend).field, 'originallyAvailableAt');
+    }
+  });
+
   test('episode recency uses actual episode dates rather than series import dates', () {
     final oldShowWithNewEpisode = MediaItem.plex(
       id: 'old',

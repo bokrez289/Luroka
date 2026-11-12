@@ -137,6 +137,11 @@ class TranslationsNb extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$trakt$nb trakt = _Translations$trakt$nb._(_root);
 	@override late final _Translations$seerr$nb seerr = _Translations$seerr$nb._(_root);
 	@override late final _Translations$services$nb services = _Translations$services$nb._(_root);
+	@override late final _Translations$offlineRecovery$nb offlineRecovery = _Translations$offlineRecovery$nb._(_root);
+	@override late final _Translations$releaseUpdates$nb releaseUpdates = _Translations$releaseUpdates$nb._(_root);
+	@override late final _Translations$profileIntegrations$nb profileIntegrations = _Translations$profileIntegrations$nb._(_root);
+	@override late final _Translations$profileSetupGuide$nb profileSetupGuide = _Translations$profileSetupGuide$nb._(_root);
+	@override late final _Translations$animeFavorites$nb animeFavorites = _Translations$animeFavorites$nb._(_root);
 	@override late final _Translations$addServer$nb addServer = _Translations$addServer$nb._(_root);
 }
 
@@ -320,6 +325,9 @@ class _Translations$libraryPolish$nb extends Translations$libraryPolish$en {
 	final TranslationsNb _root; // ignore: unused_field
 
 	// Translations
+	@override String get compactTvNavigation => 'Kompakt biblioteknavigasjon';
+	@override String get compactTvNavigationDescription => 'Vis bibliotekseksjoner og bla gjennom alternativer i en uttrekkbar meny, slik at det blir mer plass til plakater.';
+	@override String get openLibraryMenu => 'Åpne bibliotekmenyen';
 	@override String get posterDetails => 'Plakatdetaljer';
 	@override String get showPosterDetails => 'Vis plakatdetaljer · navn, år og IMDb';
 	@override String get hidePosterDetails => 'Skjul plakatdetaljer';
@@ -633,6 +641,8 @@ class _Translations$settingsRedesign$nb extends Translations$settingsRedesign$en
 	// Translations
 	@override String get themeEffects => 'Tema og effekter';
 	@override String get libraryLayout => 'Bibliotekets layout';
+	@override String get posterInformation => 'Plakatinformasjon';
+	@override String get libraryBehavior => 'Bibliotekatferd';
 	@override String get appearanceHint => 'Tilpass utseendet, oppsettet og oppførselen til Luroka.';
 	@override String get livePreview => 'Live forhåndsvisning';
 	@override String get previewHint => 'Se hvordan biblioteket ditt vil se ut med gjeldende innstillinger.';
@@ -770,6 +780,19 @@ class _Translations$kids$nb extends Translations$kids$en {
 	final TranslationsNb _root; // ignore: unused_field
 
 	// Translations
+	@override String get timeLimits => 'Skjermtidsbegrensninger';
+	@override String get dailyWatchLimit => 'Daglig seertid';
+	@override String get dailyWatchLimitHint => 'Begrenser videoavspilling på denne enheten hver dag.';
+	@override String get noTimeLimit => 'Ingen grense';
+	@override String minutesLimit({required Object minutes}) => '${minutes} minutter';
+	@override String get bedtime => 'Sengetid';
+	@override String get bedtimeHint => 'En foreldres PIN-kode kreves for å bruke denne profilen i dette tidsrommet.';
+	@override String get bedtimeStart => 'Sengetiden starter';
+	@override String get bedtimeEnd => 'Sengetiden slutter';
+	@override String get timeLimitReached => 'Visningstiden er over for i dag';
+	@override String get bedtimeReached => 'Det er sengetid';
+	@override String get timeLimitParentHint => 'Be en forelder om å skrive inn PIN for å fortsette denne økten.';
+	@override String get parentUnlock => 'Lås opp foreldre';
 	@override String get backupProfile => 'Sikkerhetskopier barneprofilen';
 	@override String get backupExplain => 'Sikkerhetskopier denne profilens lagrede navn, karakter, begrensninger, utseende og lokale visningsekskluderinger. Foreldre-PIN-er, serverpålogginger, nedlastinger og serveravspillingsfremgang er ikke inkludert.';
 	@override String get saveBackupFile => 'Lagre sikkerhetskopifilen';
@@ -1313,6 +1336,7 @@ class _Translations$settings$nb extends Translations$settings$en {
 	@override String get downloadLocationPickerUnavailable => 'Mappevalg er ikke tilgjengelig på denne enheten';
 	@override String get downloadOnWifiOnly => 'Last bare ned via Wi-Fi';
 	@override String get downloadOnWifiOnlyDescription => 'Forhindre nedlasting via mobildata';
+	@override String get downloadWifiScope => 'Gjelder alle profiler og nedlastinger på denne enheten.';
 	@override String get autoRemoveWatchedDownloads => 'Fjern avspilte nedlastinger automatisk';
 	@override String get autoRemoveWatchedDownloadsDescription => 'Slett avspilte nedlastinger automatisk';
 	@override String get cellularDownloadBlocked => 'Nedlastinger er blokkert på mobilnett. Bruk Wi-Fi eller endre innstillingen.';
@@ -1651,8 +1675,8 @@ class _Translations$dashboard$nb extends Translations$dashboard$en {
 	@override String episodeLabel({required Object season, required Object episode}) => 'S${season} · E${episode}';
 	@override String get anotherPick => 'Et annet valg';
 	@override String get exploreSeries => 'Utforsk serier';
-	@override String get showFeatured => 'Fokuserte titteldetaljer';
-	@override String get showFeaturedDescription => 'Vis kunstverk, synopsis og episodeinformasjon for det uthevede kortet';
+	@override String get showFeatured => 'Fremhevet på Hjem';
+	@override String get showFeaturedDescription => 'Vis fremhevede filmer og serier øverst på Hjem.';
 }
 
 // Path: lurokaCatalog
@@ -1753,9 +1777,32 @@ class _Translations$homeLayout$nb extends Translations$homeLayout$en {
 	final TranslationsNb _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageStudios => 'Velg og bestill studioer';
+	@override String get manageStudiosDescription => 'Velg hvilke studioer som skal vises for denne profilen, og ordne rekkefølgen deres.';
+	@override String get studioUnavailable => 'Bare studioer som finnes i de valgte bibliotekene dine vises på Home.';
+	@override String get showAllStudios => 'Vis alle studioene';
+	@override String get hideAllStudios => 'Skjul alle studioene';
+	@override String get reorderStudio => 'Endre studiorekkefølge';
+	@override String get episodeThumbnails => 'Episodebilder i Fortsett å se';
+	@override String get episodeThumbnailsDescription => 'Vis episodebilder i stedet for serie- eller sesongplakater i Fortsett å se og Neste opp.';
+	@override String get spotlightSource => 'Kilde for fremhevet innhold';
+	@override String get spotlightSourceDescription => 'For You bruker denne profilens visningsaktivitet på denne enheten, sammen med favoritter og bibliotektitler.';
+	@override String get spotlightForYou => 'For deg';
+	@override String get spotlightForYouDescription => 'En blanding av det du ser på, favoritter, nye tillegg og trender, ved å bruke denne profilens seeraktivitet på denne enheten.';
+	@override String get spotlightTrending => 'På vei opp';
+	@override String get spotlightTrendingDescription => 'Populære filmer og serier i bibliotekene dine.';
+	@override String get spotlightContinue => 'Fortsett å se';
+	@override String get spotlightContinueDescription => 'Titler du har startet og episoder du kan fortsette.';
+	@override String get spotlightFavorites => 'Fra dine favoritter';
+	@override String get spotlightInspired => 'Inspirert av visningen din';
+	@override String get spotlightNextUp => 'Neste opp';
 	@override String get title => 'Tilpass hjemmet';
 	@override String get description => 'Velg rekkefølge og synlighet for denne profilen. Velg en rad for å flytte eller skjule den.';
 	@override String get rows => 'Hjem-rader';
+	@override String get progressLayout => 'Fortsett å se og neste opp';
+	@override String get progressCombined => 'Kombinert i en rad';
+	@override String get progressSeparate => 'Separate rader';
+	@override String get progressDescription => 'Separat Next Up når det støttes av serveren. Andre servere forblir kombinert.';
 	@override String get visible => 'Synlig';
 	@override String get hidden => 'Skjult';
 	@override String get showRow => 'Vis rad';
@@ -1818,6 +1865,8 @@ class _Translations$activityStats$nb extends Translations$activityStats$en {
 	@override String get trendTitle => 'Se tid';
 	@override String get trendToday => 'I dag';
 	@override String gapDetail({required Object stat, required Object range}) => '${stat} på ${range}';
+	@override String get patternsTitle => 'Mønstrene dine';
+	@override String mostlyKind({required Object kind}) => 'For det meste ${kind}';
 	@override String get weekdayTitle => 'Etter ukedag';
 	@override String get hoursTitle => 'Etter tid på døgnet';
 	@override String get amLabel => 'AM';
@@ -1830,6 +1879,8 @@ class _Translations$activityStats$nb extends Translations$activityStats$en {
 	@override String get kindOther => 'Annet';
 	@override String get topTitlesTitle => 'Mest sett';
 	@override String get sessionsTitle => 'Nylige økter';
+	@override String get recentViewingTitle => 'Nylig visning';
+	@override String get recentViewingHint => 'Total tid sett i den valgte perioden. Datoer viser siste visning.';
 	@override String get showMore => 'Vis mer';
 	@override String get sessionNoTitle => 'Uidentifisert avspilling';
 	@override String get emptyTitle => 'Ingenting her ennå';
@@ -2262,6 +2313,7 @@ class _Translations$messages$nb extends Translations$messages$en {
 	@override String metadataRefreshStarted({required Object title}) => 'Metadataoppdatering startet for "${title}"';
 	@override String metadataRefreshFailed({required Object error}) => 'Kunne ikke oppdatere metadata: ${error}';
 	@override String get logoutConfirm => 'Er du sikker på at du vil logge ut?';
+	@override String get logoutDeviceConfirm => 'Logge ut av Luroka på denne enheten? Alle profiler, inkludert barneprofiler, serverkontoer og nedlastede medier vil bli fjernet fra denne enheten. Du kan logge på igjen senere.';
 	@override String get noSeasonsFound => 'Ingen sesonger funnet';
 	@override String get seasonsLoadFailed => 'Kunne ikke laste sesonger';
 	@override String get noEpisodesFound => 'Ingen episoder funnet i første sesong';
@@ -2392,6 +2444,9 @@ class _Translations$profiles$nb extends Translations$profiles$en {
 	final TranslationsNb _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageProfiles => 'Administrer profiler';
+	@override String get quickAccess => 'Rask tilgang';
+	@override String get signOutDevice => 'Logg av denne enheten';
 	@override String get addLurokaProfile => 'Legg til Luroka-profil';
 	@override String get switchingProfile => 'Bytter profil…';
 	@override String get deleteThisProfileTitle => 'Slett denne profilen?';
@@ -2510,7 +2565,7 @@ class _Translations$accountPreferences$nb extends Translations$accountPreference
 	@override String hubSubtitleSingle({required Object account}) => 'Lyd-, undertekst- og bibliotekalternativer lagret på ${account}';
 	@override String hubSubtitleMultiple({required Object count}) => 'Lyd-, undertekst- og bibliotekalternativer lagret på ${count} kontoer';
 	@override String get pickAccount => 'Hver konto lagrer sine egne innstillinger. Velg hvilken du vil redigere.';
-	@override String get storedOnAccount => 'Disse alternativene lagres på selve kontoen, så alle apper som er logget på den, bruker dem — inkludert Luroka på de andre enhetene dine.';
+	@override String get storedOnAccount => 'Disse alternativene lagres på serverkontoen og deles av hver Luroka-profil og app som bruker den kontoen, inkludert på andre enheter.';
 	@override String get noAccounts => 'Ingen kontoer å konfigurere';
 	@override String get noAccountsHint => 'Logg inn på Plex, eller koble til en Jellyfin- eller Emby-server, så vises innstillingene som er lagret på den kontoen, her.';
 	@override String get unavailable => 'Kan ikke nå denne kontoen';
@@ -3167,7 +3222,7 @@ class _Translations$watchTogether$nb extends Translations$watchTogether$en {
 	@override String get matchMatched => 'Har videoen';
 	@override String get matchMismatched => 'Ulik lengde';
 	@override String get matchUnavailable => 'Har ikke videoen';
-	@override String participantOffset({required Object offset}) => 'Offset ${offset}';
+	@override String participantOffset({required Object offset}) => 'Tidsforskyvning ${offset}';
 	@override String get makeHost => 'Gjør til vert';
 	@override String get makeHostQuestion => 'Overfør vert?';
 	@override String makeHostConfirm({required Object name}) => '${name} vil kontrollere avspillingen og styre økten for alle.';
@@ -3700,6 +3755,108 @@ class _Translations$services$nb extends Translations$services$en {
 	@override late final _Translations$services$libraryFilter$nb libraryFilter = _Translations$services$libraryFilter$nb._(_root);
 }
 
+// Path: offlineRecovery
+class _Translations$offlineRecovery$nb extends Translations$offlineRecovery$en {
+	_Translations$offlineRecovery$nb._(TranslationsNb root) : this._root = root, super.internal(root);
+
+	final TranslationsNb _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Serverne dine er frakoblet';
+	@override String get description => 'Nedlastingene dine er fortsatt tilgjengelige. Prøv å koble til på nytt når serveren er tilbake, eller legg til en annen server.';
+	@override String get appleTvDescription => 'Luroka kunne ikke nå medieserverne dine. Prøv å koble til på nytt når de er tilgjengelige, eller legg til en annen server for å fortsette å se.';
+	@override String get kidsDescription => 'Vi kunne ikke nå medieserveren din. Prøv å koble til igjen, eller be en forelder om hjelp.';
+	@override String get retrying => 'Kobler til …';
+	@override String get addServer => 'Legg til en server';
+}
+
+// Path: releaseUpdates
+class _Translations$releaseUpdates$nb extends Translations$releaseUpdates$en {
+	_Translations$releaseUpdates$nb._(TranslationsNb root) : this._root = root, super.internal(root);
+
+	final TranslationsNb _root; // ignore: unused_field
+
+	// Translations
+	@override String get manualInstructions => 'Last ned utgivelsesarkivet fra GitHub, pakk ut APK og installer det på Android-enheten.';
+	@override String get tvInstructions => 'Åpne denne adressen på telefonen eller datamaskinen din, eller skann QR-koden for å laste ned utgivelsen.';
+	@override String get pressBackAgain => 'Trykk på Tilbake igjen for å avslutte avspillingen';
+}
+
+// Path: profileIntegrations
+class _Translations$profileIntegrations$nb extends Translations$profileIntegrations$en {
+	_Translations$profileIntegrations$nb._(TranslationsNb root) : this._root = root, super.internal(root);
+
+	final TranslationsNb _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Gjør Luroka til din';
+	@override String get description => 'Koble til favoritttjenestene dine for å spore hva du ser og be om nye filmer og serier. Hver Luroka-profil har sine egne tilkoblinger.';
+	@override String get step => 'Valgfrie integrasjoner';
+	@override String get examples => 'Trakt · Simkl · AniList · MyAnimeList · Seerr';
+	@override String get connect => 'Utforsk integrasjoner';
+	@override String get later => 'Sett opp senere';
+	@override String get manage => 'Administrer integrasjoner';
+	@override String forProfile({required Object name}) => 'Tilkoblinger for ${name}';
+}
+
+// Path: profileSetupGuide
+class _Translations$profileSetupGuide$nb extends Translations$profileSetupGuide$en {
+	_Translations$profileSetupGuide$nb._(TranslationsNb root) : this._root = root, super.internal(root);
+
+	final TranslationsNb _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Gjør profilen din til din';
+	@override String get description => 'Velg hvordan Luroka ser ut og føles for denne profilen på denne enheten. Du kan endre alt senere i Innstillinger.';
+	@override String get appearanceStep => '1 av 2 · Utseende';
+	@override String get homeStep => '2 av 2 · Startskjermen';
+	@override String get preview => 'Forhåndsvisning';
+	@override String get previewTitle => 'Ditt hjem';
+	@override String get previewPoster => 'Plakat';
+	@override String get posterArtwork => 'Kun kunstverk';
+	@override String get posterWithDetails => 'Vis plakatdetaljer';
+	@override String get musicDescription => 'Spill av en film eller series tema mens detaljsiden er åpen, når tilgjengelig.';
+	@override String get moreThemes => 'Flere temaer';
+	@override String get fewerThemes => 'Færre temaer';
+	@override String get spotlightHeading => 'Hva skal vises i Spotlight?';
+	@override String get progressHeading => 'Fortsett å se og neste opp';
+	@override String get skip => 'Bruk standardinnstillinger og begynn å se';
+	@override String get finish => 'Begynn å se';
+	@override String get back => 'Tilbake';
+	@override String get kContinue => 'Fortsett';
+	@override String get chooseLater => 'Velg bibliotek senere';
+	@override String get libraryScope => 'Dette endrer det som vises i Luroka for denne profilen; det endrer ikke servertillatelser.';
+	@override String get createdTitle => 'Profil opprettet';
+	@override String get createdDescription => 'Din nye profil er klar. Eieren kan tilpasse den første gang de åpner den.';
+	@override String get switchProfile => 'Bytt til denne profilen';
+	@override String get stayHere => 'Hold deg på gjeldende profil';
+}
+
+// Path: animeFavorites
+class _Translations$animeFavorites$nb extends Translations$animeFavorites$en {
+	_Translations$animeFavorites$nb._(TranslationsNb root) : this._root = root, super.internal(root);
+
+	final TranslationsNb _root; // ignore: unused_field
+
+	// Translations
+	@override String get filter => 'Anime';
+	@override String get manage => 'Administrer anime';
+	@override String get description => 'Automatisk gjenkjenning bruker anime-biblioteknavn og tilgjengelige anime-tagger eller ID-er. Velg biblioteker og rett individuelle favoritter. Valg lagres på denne enheten for profilen din.';
+	@override String get libraries => 'Anime biblioteker';
+	@override String get libraryHint => 'Biblioteker kalt Anime gjenkjennes automatisk. Velg et bibliotek for å endre klassifiseringen.';
+	@override String get titles => 'Favoritttitler';
+	@override String get titleHint => 'Velg en tittel for å merke den som anime eller korriger en automatisk match.';
+	@override String get automatic => 'Automatisk';
+	@override String get include => 'Anime';
+	@override String get exclude => 'Ikke anime';
+	@override String get automaticIncluded => 'Automatisk · Anime';
+	@override String get automaticExcluded => 'Automatisk · Ikke anime';
+	@override String get noLibraries => 'Ingen tilkoblede biblioteker tilgjengelig.';
+	@override String get noTitles => 'Ingen favorittfilmer eller -serier tilgjengelig.';
+	@override String get empty => 'Ingen anime-favoritter funnet. Sjekk anime-bibliotekene dine eller merk en tittel som anime.';
+	@override String get saveFailed => 'Kunne ikke lagre anime-innstillingene dine. Vennligst prøv igjen.';
+}
+
 // Path: addServer
 class _Translations$addServer$nb extends Translations$addServer$en {
 	_Translations$addServer$nb._(TranslationsNb root) : this._root = root, super.internal(root);
@@ -3712,7 +3869,7 @@ class _Translations$addServer$nb extends Translations$addServer$en {
 	@override String get serverUrlsHelper => 'Flere URL-er er tillatt, atskilt med komma.';
 	@override String get findServer => 'Finn server';
 	@override String searchingLocalMediaBrowserServers({required Object product}) => 'Leter etter lokale ${product}-servere...';
-	@override String localMediaBrowserServers({required Object product}) => 'Lokale ${product}-servere';
+	@override String localMediaBrowserServers({required Object product}) => 'Lagrede og nærliggende ${product}-servere';
 	@override String get username => 'Brukernavn';
 	@override String get password => 'Passord';
 	@override String get signIn => 'Logg inn';
@@ -4788,6 +4945,9 @@ extension on TranslationsNb {
 			'posterDetails.catalogEpisodeInfoDescription' => 'Vis antall episoder og gjennomsnittlig varighet på Oppdag-plakater.',
 			'posterDetails.title' => 'Plakatdetaljer',
 			'posterDetails.description' => 'Vis tittelen, året og IMDb-vurderingen under plakater på tvers av Studio, Search, Oppdag og Libraries. Manglende IMDb-rangeringer forblir skjult. Slå av for plakater kun for kunstverk.',
+			'libraryPolish.compactTvNavigation' => 'Kompakt biblioteknavigasjon',
+			'libraryPolish.compactTvNavigationDescription' => 'Vis bibliotekseksjoner og bla gjennom alternativer i en uttrekkbar meny, slik at det blir mer plass til plakater.',
+			'libraryPolish.openLibraryMenu' => 'Åpne bibliotekmenyen',
 			'libraryPolish.posterDetails' => 'Plakatdetaljer',
 			'libraryPolish.showPosterDetails' => 'Vis plakatdetaljer · navn, år og IMDb',
 			'libraryPolish.hidePosterDetails' => 'Skjul plakatdetaljer',
@@ -5002,6 +5162,8 @@ extension on TranslationsNb {
 			'tvSettingsV2.simpleAudio' => 'Språk og undertekst utseende',
 			'settingsRedesign.themeEffects' => 'Tema og effekter',
 			'settingsRedesign.libraryLayout' => 'Bibliotekets layout',
+			'settingsRedesign.posterInformation' => 'Plakatinformasjon',
+			'settingsRedesign.libraryBehavior' => 'Bibliotekatferd',
 			'settingsRedesign.appearanceHint' => 'Tilpass utseendet, oppsettet og oppførselen til Luroka.',
 			'settingsRedesign.livePreview' => 'Live forhåndsvisning',
 			'settingsRedesign.previewHint' => 'Se hvordan biblioteket ditt vil se ut med gjeldende innstillinger.',
@@ -5103,6 +5265,19 @@ extension on TranslationsNb {
 			'detailComposition.mediaInformation' => 'Medieinformasjon',
 			'detailComposition.fullFileInformation' => 'Full filinformasjon',
 			'detailComposition.castAndCrew' => 'Medvirkende',
+			'kids.timeLimits' => 'Skjermtidsbegrensninger',
+			'kids.dailyWatchLimit' => 'Daglig seertid',
+			'kids.dailyWatchLimitHint' => 'Begrenser videoavspilling på denne enheten hver dag.',
+			'kids.noTimeLimit' => 'Ingen grense',
+			'kids.minutesLimit' => ({required Object minutes}) => '${minutes} minutter',
+			'kids.bedtime' => 'Sengetid',
+			'kids.bedtimeHint' => 'En foreldres PIN-kode kreves for å bruke denne profilen i dette tidsrommet.',
+			'kids.bedtimeStart' => 'Sengetiden starter',
+			'kids.bedtimeEnd' => 'Sengetiden slutter',
+			'kids.timeLimitReached' => 'Visningstiden er over for i dag',
+			'kids.bedtimeReached' => 'Det er sengetid',
+			'kids.timeLimitParentHint' => 'Be en forelder om å skrive inn PIN for å fortsette denne økten.',
+			'kids.parentUnlock' => 'Lås opp foreldre',
 			'kids.backupProfile' => 'Sikkerhetskopier barneprofilen',
 			'kids.backupExplain' => 'Sikkerhetskopier denne profilens lagrede navn, karakter, begrensninger, utseende og lokale visningsekskluderinger. Foreldre-PIN-er, serverpålogginger, nedlastinger og serveravspillingsfremgang er ikke inkludert.',
 			'kids.saveBackupFile' => 'Lagre sikkerhetskopifilen',
@@ -5187,6 +5362,8 @@ extension on TranslationsNb {
 			'kids.blocked' => 'Denne tittelen er ikke tilgjengelig i denne barneprofilen.',
 			'kids.switchProfile' => 'Bytt profil',
 			'kids.manageFromAdult' => 'Bytt til en voksenprofil for å administrere innstillinger.',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => 'Koble en server til voksenprofilen din før du legger til en barneprofil.',
 			'kids.created' => 'Barneprofil opprettet',
 			'kids.updated' => 'Barneprofilen er oppdatert',
@@ -5205,8 +5382,6 @@ extension on TranslationsNb {
 			'lurokaDiscovery.imdbTv100' => 'IMDb Topp 100-show · Sep 2026 øyeblikksbilde',
 			'lurokaDiscovery.emmyComedy' => 'Emmys · Vinnere av komedieserier · 1971–2026',
 			'lurokaDiscovery.emmys' => 'Emmys · Dramaserievinnere · 1966–2026',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.bafta' => 'BAFTA · Vinnere av beste film',
 			'lurokaDiscovery.cannes' => 'Cannes · Gullpalme-vinnere',
 			'lurokaDiscovery.awardsNote' => 'Prissamlingene inkluderer Oscar Best Picture-historie, Emmy-drama/komedievinnere og utvidede BAFTA/Cannes-utvalg. Gjentatte vinnertitler vises én gang. Medlemskap bruker historier i priskategorier og Wikidata-fakta. IMDb Topp 100 film-/serielister beholder øyeblikksbilder fra september 2026 fra mmdju/imdb-top250-api. Bare treff i dine synlige nettbiblioteker vises; samlingens størrelse avhenger av bibliotekets tilgjengelighet.',
@@ -5599,6 +5774,7 @@ extension on TranslationsNb {
 			'settings.downloadLocationPickerUnavailable' => 'Mappevalg er ikke tilgjengelig på denne enheten',
 			'settings.downloadOnWifiOnly' => 'Last bare ned via Wi-Fi',
 			'settings.downloadOnWifiOnlyDescription' => 'Forhindre nedlasting via mobildata',
+			'settings.downloadWifiScope' => 'Gjelder alle profiler og nedlastinger på denne enheten.',
 			'settings.autoRemoveWatchedDownloads' => 'Fjern avspilte nedlastinger automatisk',
 			'settings.autoRemoveWatchedDownloadsDescription' => 'Slett avspilte nedlastinger automatisk',
 			'settings.cellularDownloadBlocked' => 'Nedlastinger er blokkert på mobilnett. Bruk Wi-Fi eller endre innstillingen.',
@@ -5700,6 +5876,8 @@ extension on TranslationsNb {
 			'settings.languageAndRegion' => 'Språk og region',
 			'settings.startup' => 'Oppstart',
 			'settings.display' => 'Skjerm',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Bibliotek og kort',
 			'settings.homeScreen' => 'Hjemmeskjerm',
 			'settings.navigation' => 'Navigering',
@@ -5719,8 +5897,6 @@ extension on TranslationsNb {
 			'settings.gestureVolumeSwipeDescription' => 'Sveip opp eller ned på høyre kant for å justere volumet',
 			'settings.gesturePinchToZoom' => 'Klyp for å zoome',
 			'settings.gesturePinchToZoomDescription' => 'Klyp på videoen for å zoome inn eller ut',
-			_ => null,
-		} ?? switch (path) {
 			'settings.rememberBrightnessLevel' => 'Husk lysstyrkenivå',
 			'settings.rememberBrightnessLevelDescription' => 'Start avspilling med lysstyrken som ble satt med det siste sveipet',
 			'settings.controls' => 'Kontroller',
@@ -5860,8 +6036,8 @@ extension on TranslationsNb {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => 'Et annet valg',
 			'dashboard.exploreSeries' => 'Utforsk serier',
-			'dashboard.showFeatured' => 'Fokuserte titteldetaljer',
-			'dashboard.showFeaturedDescription' => 'Vis kunstverk, synopsis og episodeinformasjon for det uthevede kortet',
+			'dashboard.showFeatured' => 'Fremhevet på Hjem',
+			'dashboard.showFeaturedDescription' => 'Vis fremhevede filmer og serier øverst på Hjem.',
 			'lurokaCatalog.aboutPerson' => 'I SPYLELYSET',
 			'lurokaCatalog.biographyUnavailable' => 'En biografi er ikke tilgjengelig fra denne serveren.',
 			'lurokaCatalog.filmography' => 'Filmer og serier i bibliotekene dine',
@@ -5917,9 +6093,32 @@ extension on TranslationsNb {
 			'customPerformance.frameBudget' => 'Budsjett per ramme',
 			'customPerformance.processMemory' => 'App prosessminne ved prøveenden',
 			'customPerformance.noFrames' => 'Ingen gjengitte rammer ble fanget. Start en annen prøve og bla gjennom appen.',
+			'homeLayout.manageStudios' => 'Velg og bestill studioer',
+			'homeLayout.manageStudiosDescription' => 'Velg hvilke studioer som skal vises for denne profilen, og ordne rekkefølgen deres.',
+			'homeLayout.studioUnavailable' => 'Bare studioer som finnes i de valgte bibliotekene dine vises på Home.',
+			'homeLayout.showAllStudios' => 'Vis alle studioene',
+			'homeLayout.hideAllStudios' => 'Skjul alle studioene',
+			'homeLayout.reorderStudio' => 'Endre studiorekkefølge',
+			'homeLayout.episodeThumbnails' => 'Episodebilder i Fortsett å se',
+			'homeLayout.episodeThumbnailsDescription' => 'Vis episodebilder i stedet for serie- eller sesongplakater i Fortsett å se og Neste opp.',
+			'homeLayout.spotlightSource' => 'Kilde for fremhevet innhold',
+			'homeLayout.spotlightSourceDescription' => 'For You bruker denne profilens visningsaktivitet på denne enheten, sammen med favoritter og bibliotektitler.',
+			'homeLayout.spotlightForYou' => 'For deg',
+			'homeLayout.spotlightForYouDescription' => 'En blanding av det du ser på, favoritter, nye tillegg og trender, ved å bruke denne profilens seeraktivitet på denne enheten.',
+			'homeLayout.spotlightTrending' => 'På vei opp',
+			'homeLayout.spotlightTrendingDescription' => 'Populære filmer og serier i bibliotekene dine.',
+			'homeLayout.spotlightContinue' => 'Fortsett å se',
+			'homeLayout.spotlightContinueDescription' => 'Titler du har startet og episoder du kan fortsette.',
+			'homeLayout.spotlightFavorites' => 'Fra dine favoritter',
+			'homeLayout.spotlightInspired' => 'Inspirert av visningen din',
+			'homeLayout.spotlightNextUp' => 'Neste opp',
 			'homeLayout.title' => 'Tilpass hjemmet',
 			'homeLayout.description' => 'Velg rekkefølge og synlighet for denne profilen. Velg en rad for å flytte eller skjule den.',
 			'homeLayout.rows' => 'Hjem-rader',
+			'homeLayout.progressLayout' => 'Fortsett å se og neste opp',
+			'homeLayout.progressCombined' => 'Kombinert i en rad',
+			'homeLayout.progressSeparate' => 'Separate rader',
+			'homeLayout.progressDescription' => 'Separat Next Up når det støttes av serveren. Andre servere forblir kombinert.',
 			'homeLayout.visible' => 'Synlig',
 			'homeLayout.hidden' => 'Skjult',
 			'homeLayout.showRow' => 'Vis rad',
@@ -5961,6 +6160,8 @@ extension on TranslationsNb {
 			'activityStats.trendTitle' => 'Se tid',
 			'activityStats.trendToday' => 'I dag',
 			'activityStats.gapDetail' => ({required Object stat, required Object range}) => '${stat} på ${range}',
+			'activityStats.patternsTitle' => 'Mønstrene dine',
+			'activityStats.mostlyKind' => ({required Object kind}) => 'For det meste ${kind}',
 			'activityStats.weekdayTitle' => 'Etter ukedag',
 			'activityStats.hoursTitle' => 'Etter tid på døgnet',
 			'activityStats.amLabel' => 'AM',
@@ -5973,6 +6174,8 @@ extension on TranslationsNb {
 			'activityStats.kindOther' => 'Annet',
 			'activityStats.topTitlesTitle' => 'Mest sett',
 			'activityStats.sessionsTitle' => 'Nylige økter',
+			'activityStats.recentViewingTitle' => 'Nylig visning',
+			'activityStats.recentViewingHint' => 'Total tid sett i den valgte perioden. Datoer viser siste visning.',
 			'activityStats.showMore' => 'Vis mer',
 			'activityStats.sessionNoTitle' => 'Uidentifisert avspilling',
 			'activityStats.emptyTitle' => 'Ingenting her ennå',
@@ -6187,6 +6390,8 @@ extension on TranslationsNb {
 			'accessibility.hue' => 'Fargetone',
 			'accessibility.saturation' => 'Metning',
 			'accessibility.brightness' => 'Lysstyrke',
+			_ => null,
+		} ?? switch (path) {
 			'accessibility.hexColor' => 'Heksadesimal farge',
 			'accessibility.expandText' => 'Utvid tekst',
 			'accessibility.collapseText' => 'Fold sammen tekst',
@@ -6233,8 +6438,6 @@ extension on TranslationsNb {
 			'videoControls.seekBackwardButton' => ({required Object seconds}) => 'Spol tilbake ${seconds} sekunder',
 			'videoControls.seekForwardButton' => ({required Object seconds}) => 'Spol fremover ${seconds} sekunder',
 			'videoControls.previousButton' => 'Forrige episode',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.nextButton' => 'Neste episode',
 			'videoControls.previousChapterButton' => 'Forrige kapittel',
 			'videoControls.nextChapterButton' => 'Neste kapittel',
@@ -6336,6 +6539,7 @@ extension on TranslationsNb {
 			'messages.metadataRefreshStarted' => ({required Object title}) => 'Metadataoppdatering startet for "${title}"',
 			'messages.metadataRefreshFailed' => ({required Object error}) => 'Kunne ikke oppdatere metadata: ${error}',
 			'messages.logoutConfirm' => 'Er du sikker på at du vil logge ut?',
+			'messages.logoutDeviceConfirm' => 'Logge ut av Luroka på denne enheten? Alle profiler, inkludert barneprofiler, serverkontoer og nedlastede medier vil bli fjernet fra denne enheten. Du kan logge på igjen senere.',
 			'messages.noSeasonsFound' => 'Ingen sesonger funnet',
 			'messages.seasonsLoadFailed' => 'Kunne ikke laste sesonger',
 			'messages.noEpisodesFound' => 'Ingen episoder funnet i første sesong',
@@ -6421,6 +6625,9 @@ extension on TranslationsNb {
 			'mpvConfig.removeLine' => 'Fjern linje',
 			'mpvConfig.embeddedVoHint' => 'vo, gpu-context og gpu-api ignoreres på Linux: innebygd video renderes alltid via vo=libmpv på videoplanet, og gpu-next (som compute-shadere som ArtCNN trenger) kan ikke kjøre innebygd.',
 			'dialog.confirmAction' => 'Bekreft handling',
+			'profiles.manageProfiles' => 'Administrer profiler',
+			'profiles.quickAccess' => 'Rask tilgang',
+			'profiles.signOutDevice' => 'Logg av denne enheten',
 			'profiles.addLurokaProfile' => 'Legg til Luroka-profil',
 			'profiles.switchingProfile' => 'Bytter profil…',
 			'profiles.deleteThisProfileTitle' => 'Slett denne profilen?',
@@ -6512,7 +6719,7 @@ extension on TranslationsNb {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => 'Lyd-, undertekst- og bibliotekalternativer lagret på ${account}',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => 'Lyd-, undertekst- og bibliotekalternativer lagret på ${count} kontoer',
 			'accountPreferences.pickAccount' => 'Hver konto lagrer sine egne innstillinger. Velg hvilken du vil redigere.',
-			'accountPreferences.storedOnAccount' => 'Disse alternativene lagres på selve kontoen, så alle apper som er logget på den, bruker dem — inkludert Luroka på de andre enhetene dine.',
+			'accountPreferences.storedOnAccount' => 'Disse alternativene lagres på serverkontoen og deles av hver Luroka-profil og app som bruker den kontoen, inkludert på andre enheter.',
 			'accountPreferences.noAccounts' => 'Ingen kontoer å konfigurere',
 			'accountPreferences.noAccountsHint' => 'Logg inn på Plex, eller koble til en Jellyfin- eller Emby-server, så vises innstillingene som er lagret på den kontoen, her.',
 			'accountPreferences.unavailable' => 'Kan ikke nå denne kontoen',
@@ -6697,6 +6904,8 @@ extension on TranslationsNb {
 			'libraries.sortLabels.dateShared' => 'Delingsdato',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Siste episodes sendedato',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Dato for sist lagt til episode',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Dato lastet ned',
 			'libraries.sortLabels.size' => 'Størrelse',
 			'libraries.sortLabels.library' => 'Bibliotek',
@@ -6747,8 +6956,6 @@ extension on TranslationsNb {
 			'about.packageLine' => ({required Object package}) => 'Pakke: ${package}',
 			'about.localeLine' => ({required Object locale}) => 'Språk: ${locale}',
 			'about.copyDetails' => 'Kopier detaljer',
-			_ => null,
-		} ?? switch (path) {
 			'about.detailsCopied' => 'Appdetaljene er kopiert',
 			'about.detailsCopyFailed' => 'Kunne ikke kopiere appdetaljer',
 			'about.checkForUpdatesDescription' => 'Sjekk GitHub for en nyere utgivelse',
@@ -7211,6 +7418,8 @@ extension on TranslationsNb {
 			'watchTogether.offsetPlusSecond' => '+1 s',
 			'watchTogether.participants' => 'Deltakere',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('nb'))(n, one: '${n} deltaker', other: '${n} deltakere', ), 
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'VERT',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (du)',
 			'watchTogether.playerIdle' => 'Inaktiv',
@@ -7221,7 +7430,7 @@ extension on TranslationsNb {
 			'watchTogether.matchMatched' => 'Har videoen',
 			'watchTogether.matchMismatched' => 'Ulik lengde',
 			'watchTogether.matchUnavailable' => 'Har ikke videoen',
-			'watchTogether.participantOffset' => ({required Object offset}) => 'Offset ${offset}',
+			'watchTogether.participantOffset' => ({required Object offset}) => 'Tidsforskyvning ${offset}',
 			'watchTogether.makeHost' => 'Gjør til vert',
 			'watchTogether.makeHostQuestion' => 'Overfør vert?',
 			'watchTogether.makeHostConfirm' => ({required Object name}) => '${name} vil kontrollere avspillingen og styre økten for alle.',
@@ -7261,8 +7470,6 @@ extension on TranslationsNb {
 			'watchTogether.notices.finished' => 'Ferdig',
 			'watchTogether.notices.hostChangedTo' => ({required Object name}) => '${name} er nå verten',
 			'watchTogether.notices.youAreNowHost' => 'Du er nå verten',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.joined' => ({required Object name}) => '${name} ble med',
 			'watchTogether.notices.left' => ({required Object name}) => '${name} forlot',
 			'watchTogether.notices.controlRefused' => 'Bare verten kan kontrollere avspillingen',
@@ -7725,6 +7932,8 @@ extension on TranslationsNb {
 			'seerr.statusPartiallyAvailable' => 'Delvis tilgjengelig',
 			'seerr.statusRequested' => 'Forespurt',
 			'seerr.statusProcessing' => 'Behandler',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'På blokkeringslisten',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Kunne ikke nå ${url}: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'Ingen Seerr-instans på ${url} (HTTP ${status})',
@@ -7775,8 +7984,6 @@ extension on TranslationsNb {
 			'services.deviceCode.title' => ({required Object service}) => 'Aktiver Luroka på ${service}',
 			'services.deviceCode.instructions' => 'Skann QR-koden, eller gå til adressen nedenfor og skriv inn denne koden:',
 			'services.deviceCode.openToActivate' => ({required Object service}) => 'Åpne ${service} for å aktivere',
-			_ => null,
-		} ?? switch (path) {
 			'services.deviceCode.copyCode' => 'Kopier aktiveringskode',
 			'services.deviceCode.waitingForAuthorization' => 'Venter på godkjenning…',
 			'services.deviceCode.codeCopied' => 'Kode kopiert',
@@ -7797,12 +8004,69 @@ extension on TranslationsNb {
 			'services.libraryFilter.modeHintWhitelist' => 'Synkroniser kun bibliotekene du markerer nedenfor.',
 			'services.libraryFilter.libraries' => 'Biblioteker',
 			'services.libraryFilter.noLibraries' => 'Ingen biblioteker tilgjengelige',
+			'offlineRecovery.title' => 'Serverne dine er frakoblet',
+			'offlineRecovery.description' => 'Nedlastingene dine er fortsatt tilgjengelige. Prøv å koble til på nytt når serveren er tilbake, eller legg til en annen server.',
+			'offlineRecovery.appleTvDescription' => 'Luroka kunne ikke nå medieserverne dine. Prøv å koble til på nytt når de er tilgjengelige, eller legg til en annen server for å fortsette å se.',
+			'offlineRecovery.kidsDescription' => 'Vi kunne ikke nå medieserveren din. Prøv å koble til igjen, eller be en forelder om hjelp.',
+			'offlineRecovery.retrying' => 'Kobler til …',
+			'offlineRecovery.addServer' => 'Legg til en server',
+			'releaseUpdates.manualInstructions' => 'Last ned utgivelsesarkivet fra GitHub, pakk ut APK og installer det på Android-enheten.',
+			'releaseUpdates.tvInstructions' => 'Åpne denne adressen på telefonen eller datamaskinen din, eller skann QR-koden for å laste ned utgivelsen.',
+			'releaseUpdates.pressBackAgain' => 'Trykk på Tilbake igjen for å avslutte avspillingen',
+			'profileIntegrations.title' => 'Gjør Luroka til din',
+			'profileIntegrations.description' => 'Koble til favoritttjenestene dine for å spore hva du ser og be om nye filmer og serier. Hver Luroka-profil har sine egne tilkoblinger.',
+			'profileIntegrations.step' => 'Valgfrie integrasjoner',
+			'profileIntegrations.examples' => 'Trakt · Simkl · AniList · MyAnimeList · Seerr',
+			'profileIntegrations.connect' => 'Utforsk integrasjoner',
+			'profileIntegrations.later' => 'Sett opp senere',
+			'profileIntegrations.manage' => 'Administrer integrasjoner',
+			'profileIntegrations.forProfile' => ({required Object name}) => 'Tilkoblinger for ${name}',
+			'profileSetupGuide.title' => 'Gjør profilen din til din',
+			'profileSetupGuide.description' => 'Velg hvordan Luroka ser ut og føles for denne profilen på denne enheten. Du kan endre alt senere i Innstillinger.',
+			'profileSetupGuide.appearanceStep' => '1 av 2 · Utseende',
+			'profileSetupGuide.homeStep' => '2 av 2 · Startskjermen',
+			'profileSetupGuide.preview' => 'Forhåndsvisning',
+			'profileSetupGuide.previewTitle' => 'Ditt hjem',
+			'profileSetupGuide.previewPoster' => 'Plakat',
+			'profileSetupGuide.posterArtwork' => 'Kun kunstverk',
+			'profileSetupGuide.posterWithDetails' => 'Vis plakatdetaljer',
+			'profileSetupGuide.musicDescription' => 'Spill av en film eller series tema mens detaljsiden er åpen, når tilgjengelig.',
+			'profileSetupGuide.moreThemes' => 'Flere temaer',
+			'profileSetupGuide.fewerThemes' => 'Færre temaer',
+			'profileSetupGuide.spotlightHeading' => 'Hva skal vises i Spotlight?',
+			'profileSetupGuide.progressHeading' => 'Fortsett å se og neste opp',
+			'profileSetupGuide.skip' => 'Bruk standardinnstillinger og begynn å se',
+			'profileSetupGuide.finish' => 'Begynn å se',
+			'profileSetupGuide.back' => 'Tilbake',
+			'profileSetupGuide.kContinue' => 'Fortsett',
+			'profileSetupGuide.chooseLater' => 'Velg bibliotek senere',
+			'profileSetupGuide.libraryScope' => 'Dette endrer det som vises i Luroka for denne profilen; det endrer ikke servertillatelser.',
+			'profileSetupGuide.createdTitle' => 'Profil opprettet',
+			'profileSetupGuide.createdDescription' => 'Din nye profil er klar. Eieren kan tilpasse den første gang de åpner den.',
+			'profileSetupGuide.switchProfile' => 'Bytt til denne profilen',
+			'profileSetupGuide.stayHere' => 'Hold deg på gjeldende profil',
+			'animeFavorites.filter' => 'Anime',
+			'animeFavorites.manage' => 'Administrer anime',
+			'animeFavorites.description' => 'Automatisk gjenkjenning bruker anime-biblioteknavn og tilgjengelige anime-tagger eller ID-er. Velg biblioteker og rett individuelle favoritter. Valg lagres på denne enheten for profilen din.',
+			'animeFavorites.libraries' => 'Anime biblioteker',
+			'animeFavorites.libraryHint' => 'Biblioteker kalt Anime gjenkjennes automatisk. Velg et bibliotek for å endre klassifiseringen.',
+			'animeFavorites.titles' => 'Favoritttitler',
+			'animeFavorites.titleHint' => 'Velg en tittel for å merke den som anime eller korriger en automatisk match.',
+			'animeFavorites.automatic' => 'Automatisk',
+			'animeFavorites.include' => 'Anime',
+			'animeFavorites.exclude' => 'Ikke anime',
+			'animeFavorites.automaticIncluded' => 'Automatisk · Anime',
+			'animeFavorites.automaticExcluded' => 'Automatisk · Ikke anime',
+			'animeFavorites.noLibraries' => 'Ingen tilkoblede biblioteker tilgjengelig.',
+			'animeFavorites.noTitles' => 'Ingen favorittfilmer eller -serier tilgjengelig.',
+			'animeFavorites.empty' => 'Ingen anime-favoritter funnet. Sjekk anime-bibliotekene dine eller merk en tittel som anime.',
+			'animeFavorites.saveFailed' => 'Kunne ikke lagre anime-innstillingene dine. Vennligst prøv igjen.',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => 'Legg til ${product}-server',
 			'addServer.serverUrls' => 'Server-URL-er',
 			'addServer.serverUrlsHelper' => 'Flere URL-er er tillatt, atskilt med komma.',
 			'addServer.findServer' => 'Finn server',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => 'Leter etter lokale ${product}-servere...',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Lokale ${product}-servere',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Lagrede og nærliggende ${product}-servere',
 			'addServer.username' => 'Brukernavn',
 			'addServer.password' => 'Passord',
 			'addServer.signIn' => 'Logg inn',

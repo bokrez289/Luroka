@@ -4,9 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/focus/input_mode_tracker.dart';
 import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/media/media_item.dart';
+import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_kind.dart';
+import 'package:luroka/media/media_library.dart';
 import 'package:luroka/media/media_rating.dart';
 import 'package:luroka/media/studio_sort.dart';
+import 'package:luroka/screens/anime_favorites_settings_screen.dart';
 import 'package:luroka/services/settings_service.dart';
 import 'package:luroka/services/storage_service.dart';
 import 'package:luroka/theme/mono_theme.dart';
@@ -47,6 +50,7 @@ void main() {
     double textScale = 1,
     ValueNotifier<List<MediaItem>>? data,
     VoidCallback? onNavigation,
+    List<MediaLibrary> libraries = const [],
   }) async {
     TvDetectionService.debugSetAppleTVOverride(size.width >= 700);
     tester.view.physicalSize = size;
@@ -70,6 +74,7 @@ void main() {
               builder: (context, value, _) => FavoritesCatalogView(
                 key: key,
                 items: value,
+                libraries: libraries,
                 loading: false,
                 errorMessage: null,
                 resolveClient: (_) => null,
@@ -196,6 +201,113 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  for (final size in [const Size(360, 780), const Size(960, 540)]) {
+    testWidgets('anime filter and corrections work at $size without changing the other filters', (tester) async {
+      final storage = await StorageService.getInstance();
+      await storage.setActiveProfileId('local-anime-test');
+      const libraries = [
+        MediaLibrary(id: 'a', title: 'Anime Movies', serverId: 'srv', backend: MediaBackend.jellyfin),
+        MediaLibrary(id: 'm', title: 'Mixed', serverId: 'srv', backend: MediaBackend.jellyfin),
+      ];
+      final data = ValueNotifier<List<MediaItem>>([
+        MediaItem.jellyfin(id: 'a', kind: MediaKind.movie, title: 'Anime film', serverId: 'srv', libraryId: 'a'),
+        MediaItem.jellyfin(id: 'b', kind: MediaKind.show, title: 'Mixed show', serverId: 'srv', libraryId: 'm'),
+        MediaItem.jellyfin(id: 'c', kind: MediaKind.show, title: 'Tagged anime', serverId: 'srv', labels: ['Anime']),
+      ]);
+      addTearDown(data.dispose);
+      await mount(tester, size: size, data: data, libraries: libraries);
+      await tester.tap(find.text(t.animeFavorites.filter));
+      await tester.pumpAndSettle();
+      expect(cards(tester).map((item) => item.title), containsAll(['Anime film', 'Tagged anime']));
+      expect(cards(tester).map((item) => item.title), isNot(contains('Mixed show')));
+
+      await tester.tap(find.byKey(const ValueKey('favorites_anime_settings')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(ValueKey('anime-library-${libraries.last.globalKey}')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(t.animeFavorites.include).last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(t.common.save));
+      await tester.pumpAndSettle();
+      expect(cards(tester).map((item) => item.title), contains('Mixed show'));
+      expect(storage.getAnimeFavoritesRules('local-anime-test').libraries[libraries.last.globalKey], isTrue);
+
+      await tester.tap(find.byKey(const ValueKey('favorites_anime_settings')));
+      await tester.pumpAndSettle();
+      final mixedTitle = find.byKey(const ValueKey('anime-title-srv:b'));
+      await tester.scrollUntilVisible(
+        mixedTitle,
+        200,
+        scrollable: find
+            .descendant(of: find.byType(AnimeFavoritesSettingsScreen), matching: find.byType(Scrollable))
+            .first,
+      );
+      await tester.tap(mixedTitle);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(t.animeFavorites.exclude).last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(t.common.save));
+      await tester.pumpAndSettle();
+      expect(cards(tester).map((item) => item.title), isNot(contains('Mixed show')));
+      expect(storage.getAnimeFavoritesRules('local-anime-test').titles['srv:b'], isFalse);
+      await tester.tap(find.text(t.studios.all));
+      await tester.pumpAndSettle();
+      expect(cards(tester).map((item) => item.title), contains('Mixed show'));
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('TV remote reaches and selects the anime filter', (tester) async {
+    final key = await mount(tester);
+    key.currentState!.focusContent();
+    await tester.pumpAndSettle();
+    for (var i = 0; i < 3; i++) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    }
+    await tester.pumpAndSettle();
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'favorites_filter_3');
+    await tester.sendKeyEvent(LogicalKeyboardKey.select);
+    await tester.pumpAndSettle();
+    expect(find.text(t.animeFavorites.empty), findsOneWidget);
+    expect(find.text(t.animeFavorites.manage), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'favorites_anime_empty_settings');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('TV remote reaches anime management, changes a library and saves', (tester) async {
+    final storage = await StorageService.getInstance();
+    await storage.setActiveProfileId('tv-anime');
+    const library = MediaLibrary(id: 'mixed', title: 'Mixed', serverId: 'srv', backend: MediaBackend.jellyfin);
+    final data = ValueNotifier<List<MediaItem>>([]);
+    addTearDown(data.dispose);
+    final key = await mount(tester, data: data, libraries: [library]);
+    key.currentState!.focusContent();
+    await tester.pumpAndSettle();
+    for (var i = 0; i < 6; i++) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+    }
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'favorites_anime_settings');
+    await tester.sendKeyEvent(LogicalKeyboardKey.select);
+    await tester.pumpAndSettle();
+    expect(find.byType(AnimeFavoritesSettingsScreen), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.select);
+    await tester.pumpAndSettle();
+    expect(find.text(t.animeFavorites.automatic), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.sendKeyEvent(LogicalKeyboardKey.select);
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.select);
+    await tester.pumpAndSettle();
+    expect(find.byType(AnimeFavoritesSettingsScreen), findsNothing);
+    expect(storage.getAnimeFavoritesRules('tv-anime').libraries[library.globalKey], isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('refresh retains focused title and removing it focuses a reachable neighbor', (tester) async {
     final data = ValueNotifier<List<MediaItem>>(items);
     addTearDown(data.dispose);
@@ -231,10 +343,10 @@ void main() {
 
   testWidgets('phone Favorites keeps every filter visible above its separate sort row', (tester) async {
     await mount(tester, size: const Size(360, 780));
-    for (var index = 0; index < 3; index++) {
+    for (var index = 0; index < 4; index++) {
       expect(find.byKey(ValueKey('favorites_filter_$index')).hitTestable(), findsOneWidget);
     }
-    final filter = tester.getRect(find.byKey(const ValueKey('favorites_filter_0')));
+    final filter = tester.getRect(find.byKey(const ValueKey('favorites_filter_3')));
     final sort = tester.getRect(find.text(t.studios.sortTitleAscending));
     expect(sort.top, greaterThanOrEqualTo(filter.bottom));
     await tester.tap(find.text(t.studios.shows));

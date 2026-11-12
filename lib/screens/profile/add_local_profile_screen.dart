@@ -7,6 +7,7 @@ import '../../focus/focusable_button.dart';
 import '../../i18n/strings.g.dart';
 import '../../mixins/controller_disposer_mixin.dart';
 import '../../profiles/profile.dart';
+import '../../profiles/profile_activation.dart';
 import '../../profiles/profile_registry.dart';
 import '../../utils/error_dialog.dart';
 import '../../widgets/app_icon.dart';
@@ -17,6 +18,7 @@ import 'pin_status_row.dart';
 import 'profile_name_field.dart';
 import '../../services/kids_profile_service.dart';
 import '../../services/profile_appearance_service.dart';
+import '../../services/storage_service.dart';
 import 'kids_settings_screen.dart';
 import '../../profiles/profile_connection_registry.dart';
 import 'profile_picture_screen.dart';
@@ -28,7 +30,9 @@ import 'profile_picture_screen.dart';
 /// an existing profile. Profiles with zero connections are stored but
 /// blocked from activation.
 class AddLocalProfileScreen extends StatefulWidget {
-  const AddLocalProfileScreen({super.key});
+  const AddLocalProfileScreen({super.key, this.offerSwitchAfterCreate = false});
+
+  final bool offerSwitchAfterCreate;
 
   @override
   State<AddLocalProfileScreen> createState() => _AddLocalProfileScreenState();
@@ -40,9 +44,11 @@ class _AddLocalProfileScreenState extends State<AddLocalProfileScreen> with Cont
   final _setPinFocus = FocusNode(debugLabel: 'AddLocalProfile:SetPin');
   final _continueFocus = FocusNode(debugLabel: 'AddLocalProfile:Continue');
   final _cancelFocus = FocusNode(debugLabel: 'AddLocalProfile:Cancel');
+  final _switchFocus = FocusNode(debugLabel: 'AddLocalProfile:SwitchCreated');
   String? _pinHash;
   bool _saving = false;
   Profile? _createdProfile;
+  bool _ready = false;
 
   @override
   void dispose() {
@@ -50,6 +56,7 @@ class _AddLocalProfileScreenState extends State<AddLocalProfileScreen> with Cont
     _setPinFocus.dispose();
     _continueFocus.dispose();
     _cancelFocus.dispose();
+    _switchFocus.dispose();
     super.dispose();
   }
 
@@ -79,9 +86,12 @@ class _AddLocalProfileScreenState extends State<AddLocalProfileScreen> with Cont
         sortOrder: _createdProfile?.sortOrder ?? DateTime.now().millisecondsSinceEpoch,
         createdAt: _createdProfile?.createdAt ?? DateTime.now(),
       );
-      await registry.upsert(profile);
       final isNew = _createdProfile == null;
+      await registry.upsert(profile);
       _createdProfile = profile;
+      await (await StorageService.getInstance()).initializeNewProfileHome(profile.id);
+      await ProfileAppearanceService.instance.markPersonalizationPending(profile.id);
+      await ProfileAppearanceService.instance.markSourceSelectionPending(profile.id);
 
       if (!mounted) return;
       if (isNew) {
@@ -100,14 +110,36 @@ class _AddLocalProfileScreenState extends State<AddLocalProfileScreen> with Cont
         await showErrorDialog(context, t.household.connectionRequired);
         return;
       }
-      await ProfileAppearanceService.instance.markIntegrationsPending(profile.id);
       if (!mounted) return;
-      navigator.pop(true);
+      if (widget.offerSwitchAfterCreate) {
+        setState(() => _ready = true);
+      } else {
+        navigator.pop(true);
+      }
     } catch (_) {
       if (mounted) await showErrorDialog(context, t.household.saveFailed);
     } finally {
       // A failed upsert (or returning from the connection picker without
       // popping) must re-enable the button instead of wedging it.
+      if (mounted) {
+        setState(() => _saving = false);
+        if (_ready) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted && _ready && !_saving) _switchFocus.requestFocus();
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> _switchToCreated() async {
+    final profile = _createdProfile;
+    if (_saving || profile == null) return;
+    setState(() => _saving = true);
+    try {
+      final switched = await switchProfileFromUi(context, profile);
+      if (mounted && switched) Navigator.of(context).pop(true);
+    } finally {
       if (mounted) setState(() => _saving = false);
     }
   }
@@ -116,6 +148,41 @@ class _AddLocalProfileScreenState extends State<AddLocalProfileScreen> with Cont
   Widget build(BuildContext context) {
     if (KidsProfileService.instance.isActiveKids) return const KidsSettingsScreen();
     final theme = Theme.of(context);
+    if (_ready) {
+      return FocusedScrollScaffold(
+        title: Text(t.profileSetupGuide.createdTitle),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.all(24),
+            sliver: SliverList.list(
+              children: [
+                Text(t.profileSetupGuide.createdDescription, style: theme.textTheme.bodyLarge),
+                const SizedBox(height: 24),
+                FocusableButton(
+                  autofocus: true,
+                  focusNode: _switchFocus,
+                  onPressed: _saving ? null : _switchToCreated,
+                  child: FilledButton(
+                    key: const ValueKey('profile-created-switch'),
+                    onPressed: _saving ? null : _switchToCreated,
+                    child: Text(t.profileSetupGuide.switchProfile),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FocusableButton(
+                  onPressed: _saving ? null : () => Navigator.of(context).pop(true),
+                  child: OutlinedButton(
+                    key: const ValueKey('profile-created-stay'),
+                    onPressed: _saving ? null : () => Navigator.of(context).pop(true),
+                    child: Text(t.profileSetupGuide.stayHere),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
     return FocusedScrollScaffold(
       title: Text(t.profiles.newProfile),
       slivers: [

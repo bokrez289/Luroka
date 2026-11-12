@@ -36,7 +36,7 @@ class TranslationsZhHant extends TranslationsZh with BaseTranslations<AppLocale,
 
 	late final TranslationsZhHant _root = this; // ignore: unused_field
 
-	@override 
+	@override
 	TranslationsZhHant $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsZhHant(meta: meta ?? this.$meta);
 
 	// Translations
@@ -138,6 +138,11 @@ class TranslationsZhHant extends TranslationsZh with BaseTranslations<AppLocale,
 	@override late final _Translations$trakt$zh_Hant trakt = _Translations$trakt$zh_Hant._(_root);
 	@override late final _Translations$seerr$zh_Hant seerr = _Translations$seerr$zh_Hant._(_root);
 	@override late final _Translations$services$zh_Hant services = _Translations$services$zh_Hant._(_root);
+	@override late final _Translations$offlineRecovery$zh_Hant offlineRecovery = _Translations$offlineRecovery$zh_Hant._(_root);
+	@override late final _Translations$releaseUpdates$zh_Hant releaseUpdates = _Translations$releaseUpdates$zh_Hant._(_root);
+	@override late final _Translations$profileIntegrations$zh_Hant profileIntegrations = _Translations$profileIntegrations$zh_Hant._(_root);
+	@override late final _Translations$profileSetupGuide$zh_Hant profileSetupGuide = _Translations$profileSetupGuide$zh_Hant._(_root);
+	@override late final _Translations$animeFavorites$zh_Hant animeFavorites = _Translations$animeFavorites$zh_Hant._(_root);
 	@override late final _Translations$addServer$zh_Hant addServer = _Translations$addServer$zh_Hant._(_root);
 }
 
@@ -255,9 +260,11 @@ class _Translations$family$zh_Hant extends Translations$family$zh {
 	@override String get manageHint => '管理此設備上的人員、兒童的安全和觀看活動。';
 	@override String get people => '人們';
 	@override String peopleCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n}​人',
 		other: '${n}人',
 	);
 	@override String kidsCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n}​子',
 		other: '${n} 兒童',
 	);
 	@override String get you => '你';
@@ -319,6 +326,9 @@ class _Translations$libraryPolish$zh_Hant extends Translations$libraryPolish$zh 
 	final TranslationsZhHant _root; // ignore: unused_field
 
 	// Translations
+	@override String get compactTvNavigation => '緊湊的圖書館導航';
+	@override String get compactTvNavigationDescription => '在滑出式選單中顯示庫部分和瀏覽選項，為海報留出更多空間。';
+	@override String get openLibraryMenu => '開啟庫選單';
 	@override String get posterDetails => '海報詳情';
 	@override String get showPosterDetails => '顯示海報詳細資料·姓名、年份和 IMDb';
 	@override String get hidePosterDetails => '隱藏海報詳細信息';
@@ -632,6 +642,8 @@ class _Translations$settingsRedesign$zh_Hant extends Translations$settingsRedesi
 	// Translations
 	@override String get themeEffects => '主題和效果';
 	@override String get libraryLayout => '圖書館佈局';
+	@override String get posterInformation => '海報訊息';
+	@override String get libraryBehavior => '圖書館行為';
 	@override String get appearanceHint => '自訂 Luroka 的外觀、佈局和行為。';
 	@override String get livePreview => '即時預覽';
 	@override String get previewHint => '查看您的圖書館在目前設定下的外觀。';
@@ -769,6 +781,19 @@ class _Translations$kids$zh_Hant extends Translations$kids$zh {
 	final TranslationsZhHant _root; // ignore: unused_field
 
 	// Translations
+	@override String get timeLimits => '螢幕時間限制';
+	@override String get dailyWatchLimit => '每日觀看時長';
+	@override String get dailyWatchLimitHint => '每天限制該裝置上的影片播放。';
+	@override String get noTimeLimit => '無限制';
+	@override String minutesLimit({required Object minutes}) => '${minutes} 分鐘';
+	@override String get bedtime => '就寢時間';
+	@override String get bedtimeHint => '需要家長 PIN 才能在這些時間內使用此設定檔。';
+	@override String get bedtimeStart => '就寢時間開始';
+	@override String get bedtimeEnd => '就寢時間結束';
+	@override String get timeLimitReached => '今天的觀看時間已結束';
+	@override String get bedtimeReached => '睡覺時間到了';
+	@override String get timeLimitParentHint => '請家長輸入 PIN，讓此使用者繼續觀看。';
+	@override String get parentUnlock => '家長解鎖';
 	@override String get backupProfile => '備份孩子的個人資料';
 	@override String get backupExplain => '備份此設定檔的已儲存名稱、字元、限制、外觀和本機檢視排除。不包括家長 PIN、伺服器登入、下載和伺服器播放進度。';
 	@override String get saveBackupFile => '儲存備份文件';
@@ -1312,6 +1337,7 @@ class _Translations$settings$zh_Hant extends Translations$settings$zh {
 	@override String get downloadLocationPickerUnavailable => '此裝置無法選擇資料夾';
 	@override String get downloadOnWifiOnly => '僅在 Wi-Fi 連線時下載';
 	@override String get downloadOnWifiOnlyDescription => '使用行動網路時不會下載';
+	@override String get downloadWifiScope => '適用於此裝置上的所有使用者設定檔與下載。';
 	@override String get autoRemoveWatchedDownloads => '自動移除已觀看的下載內容';
 	@override String get autoRemoveWatchedDownloadsDescription => '自動刪除已觀看的下載影片';
 	@override String get cellularDownloadBlocked => '使用行動網路時無法下載。請改用 Wi-Fi 或變更設定。';
@@ -1650,8 +1676,8 @@ class _Translations$dashboard$zh_Hant extends Translations$dashboard$zh {
 	@override String episodeLabel({required Object season, required Object episode}) => 'S${season} · E${episode}';
 	@override String get anotherPick => '另一個選擇';
 	@override String get exploreSeries => '探索系列';
-	@override String get showFeatured => '重點標題細節';
-	@override String get showFeaturedDescription => '顯示突出顯示的卡片的藝術作品、摘要和劇集訊息';
+	@override String get showFeatured => '主頁聚焦';
+	@override String get showFeaturedDescription => '在主頁頂部顯示精選電影和節目。';
 }
 
 // Path: lurokaCatalog
@@ -1752,9 +1778,32 @@ class _Translations$homeLayout$zh_Hant extends Translations$homeLayout$zh {
 	final TranslationsZhHant _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageStudios => '選擇並訂購工作室';
+	@override String get manageStudiosDescription => '選擇此設定檔中顯示的工作室，並安排它們的順序。';
+	@override String get studioUnavailable => '只有在您選擇的庫中找到的工作室才會出現在主頁上。';
+	@override String get showAllStudios => '顯示所有工作室';
+	@override String get hideAllStudios => '隱藏所有工作室';
+	@override String get reorderStudio => '更改工作室順序';
+	@override String get episodeThumbnails => '繼續觀看中的劇集影像';
+	@override String get episodeThumbnailsDescription => '在“繼續觀看”和“下一步”中顯示劇集圖像而不是系列或季海報。';
+	@override String get spotlightSource => '精選內容來源';
+	@override String get spotlightSourceDescription => '「為您推薦」使用該個人資料在此裝置上的檢視活動，以及收藏夾和圖書館標題。';
+	@override String get spotlightForYou => '為你';
+	@override String get spotlightForYouDescription => '使用此個人資料在此裝置上的觀看活動，混合您正在觀看的內容、收藏夾、新增內容和趨勢。';
+	@override String get spotlightTrending => '流行趨勢';
+	@override String get spotlightTrendingDescription => '您圖書館中的熱門電影和節目。';
+	@override String get spotlightContinue => '繼續觀看';
+	@override String get spotlightContinueDescription => '您已開始的標題和可以繼續的劇集。';
+	@override String get spotlightFavorites => '從你的最愛';
+	@override String get spotlightInspired => '受到您的觀看啟發';
+	@override String get spotlightNextUp => '接下來';
 	@override String get title => '個人化主頁';
 	@override String get description => '選擇此設定檔的行順序和可見性。選擇一行以移動或隱藏它。';
 	@override String get rows => '主行';
+	@override String get progressLayout => '繼續觀看並下一步';
+	@override String get progressCombined => '組合成一排';
+	@override String get progressSeparate => '單獨的行';
+	@override String get progressDescription => '當伺服器支援時，單獨的下一個。其他伺服器保持合併。';
 	@override String get visible => '可見的';
 	@override String get hidden => '隱';
 	@override String get showRow => '顯示行';
@@ -1808,6 +1857,7 @@ class _Translations$activityStats$zh_Hant extends Translations$activityStats$zh 
 	@override String get consistency => '一致性';
 	@override String get currentStreak => '目前連勝';
 	@override String dayCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 天',
 		other: '${n} 天',
 	);
 	@override String get longestStreak => '最長連續紀錄';
@@ -1816,6 +1866,8 @@ class _Translations$activityStats$zh_Hant extends Translations$activityStats$zh 
 	@override String get trendTitle => '觀看時間';
 	@override String get trendToday => '今天';
 	@override String gapDetail({required Object stat, required Object range}) => '${stat} 上 ${range}';
+	@override String get patternsTitle => '你的模式';
+	@override String mostlyKind({required Object kind}) => '大部分是${kind}';
 	@override String get weekdayTitle => '按工作日';
 	@override String get hoursTitle => '按一天中的時間';
 	@override String get amLabel => '是';
@@ -1828,6 +1880,8 @@ class _Translations$activityStats$zh_Hant extends Translations$activityStats$zh 
 	@override String get kindOther => '其他';
 	@override String get topTitlesTitle => '最受關注';
 	@override String get sessionsTitle => '最近的會議';
+	@override String get recentViewingTitle => '最近觀看';
+	@override String get recentViewingHint => '所選時間內的總觀看時間。日期顯示最新觀看次數。';
 	@override String get showMore => '顯示更多';
 	@override String get sessionNoTitle => '不明播放';
 	@override String get emptyTitle => '這裡還什麼都沒有';
@@ -2023,12 +2077,15 @@ class _Translations$mediaMenu$zh_Hant extends Translations$mediaMenu$zh {
 	@override String confirmDeleteTarget({required Object title}) => '確定要從您的伺服器永久刪除「${title}」嗎？';
 	@override String get deleteMultipleWarning => '這將會刪除所有單集及其檔案。';
 	@override String deleteEpisodeCountWarning({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '這將刪除其中的所有 ${n} 劇集及其檔案。',
 		other: '這會刪除其中全部 ${n} 集及其檔案。',
 	);
 	@override String deleteMultiPartWarning({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '該專案儲存為 ${n} 文件，該文件將被刪除。',
 		other: '此項目分散儲存於 ${n} 個檔案中，且全部都會被刪除。',
 	);
 	@override String deleteSharedFileHeading({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 其他劇集儲存在同一檔案中，也將被刪除：',
 		other: '另有 ${n} 集儲存在同一檔案中，也會一併被刪除：',
 	);
 	@override String get deleteScopeUnverifiedProbeFailed => 'Luroka 無法確認此操作會刪除哪些檔案，因此刪除範圍可能超出上方所列的項目。請取消後重試，或仍要刪除。';
@@ -2223,6 +2280,7 @@ class _Translations$messages$zh_Hant extends Translations$messages$zh {
 	@override String get markedAsUnwatchedOffline => '已標記為未觀看（將在連線時同步）';
 	@override String autoRemovedWatchedDownload({required Object title}) => '已自動移除：${title}';
 	@override String autoRemovedWatchedDownloads({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '自動刪除${n}觀看下載',
 		other: '已自動移除 ${n} 個已觀看的下載內容',
 	);
 	@override String get removedFromContinueWatching => '已從「繼續觀看」中移除';
@@ -2256,6 +2314,7 @@ class _Translations$messages$zh_Hant extends Translations$messages$zh {
 	@override String metadataRefreshStarted({required Object title}) => '已開始重新整理「${title}」的中繼資料';
 	@override String metadataRefreshFailed({required Object error}) => '無法重新整理中繼資料：${error}';
 	@override String get logoutConfirm => '您確定要登出嗎？';
+	@override String get logoutDeviceConfirm => '在此設備上註銷 Luroka 嗎？所有設定文件，包括兒童設定檔、伺服器帳戶和下載的媒體都將從該裝置中刪除。您可以稍後再次登入。';
 	@override String get noSeasonsFound => '找不到季數';
 	@override String get seasonsLoadFailed => '無法載入季數';
 	@override String get noEpisodesFound => '在第一季中找不到單集';
@@ -2386,6 +2445,9 @@ class _Translations$profiles$zh_Hant extends Translations$profiles$zh {
 	final TranslationsZhHant _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageProfiles => '管理個人資料';
+	@override String get quickAccess => '快速存取';
+	@override String get signOutDevice => '退出該設備';
 	@override String get addLurokaProfile => '新增 Luroka 設定文件';
 	@override String get switchingProfile => '正在切換使用者設定檔…';
 	@override String get deleteThisProfileTitle => '刪除此使用者設定檔？';
@@ -2504,7 +2566,7 @@ class _Translations$accountPreferences$zh_Hant extends Translations$accountPrefe
 	@override String hubSubtitleSingle({required Object account}) => '已在 ${account} 上儲存音訊、字幕與媒體庫選項';
 	@override String hubSubtitleMultiple({required Object count}) => '已在 ${count} 個帳戶上儲存音訊、字幕與媒體庫選項';
 	@override String get pickAccount => '每個帳戶都會儲存各自的偏好設定。請選擇要編輯的帳戶。';
-	@override String get storedOnAccount => '這些選項會儲存在帳戶本身，因此登入該帳戶的所有應用程式都會使用它們，包括您其他裝置上的 Luroka。';
+	@override String get storedOnAccount => '這些設定儲存在伺服器帳戶中，使用該帳戶的所有 Luroka 使用者設定檔和應用程式都會共用，包括其他裝置上的應用程式。';
 	@override String get noAccounts => '沒有可設定的帳戶';
 	@override String get noAccountsHint => '登入 Plex，或連線至 Jellyfin 或 Emby 伺服器，儲存在該帳戶上的偏好設定便會顯示在此處。';
 	@override String get unavailable => '無法連線至此帳戶';
@@ -2568,6 +2630,7 @@ class _Translations$discover$zh_Hant extends Translations$discover$zh {
 	@override String minutesLeft({required Object minutes}) => '剩餘 ${minutes} 分鐘';
 	@override String get moreLikeThis => '更多類似內容';
 	@override String titleCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 標題',
 		other: '${n} 部作品',
 	);
 	@override late final _Translations$discover$person$zh_Hant person = _Translations$discover$person$zh_Hant._(_root);
@@ -2829,6 +2892,7 @@ class _Translations$explore$zh_Hant extends Translations$explore$zh {
 	@override late final _Translations$explore$rows$zh_Hant rows = _Translations$explore$rows$zh_Hant._(_root);
 	@override late final _Translations$explore$status$zh_Hant status = _Translations$explore$status$zh_Hant._(_root);
 	@override String episodeCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 劇集',
 		other: '${n} 集',
 	);
 	@override String get cast => '演員陣容';
@@ -2843,6 +2907,7 @@ class _Translations$explore$zh_Hant extends Translations$explore$zh {
 	@override String get inTheseLibraries => '在這些媒體庫中';
 	@override String get checkingLibrary => '正在檢查您的媒體庫…';
 	@override String libraryCheckFailed({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '無法檢查 ${n} 伺服器',
 		other: '無法檢查 ${n} 台伺服器',
 	);
 	@override String get emptyTitle => '這裡還沒有任何內容';
@@ -2862,6 +2927,7 @@ class _Translations$explore$zh_Hant extends Translations$explore$zh {
 	@override String broadcastWithZone({required Object day, required Object time, required Object timezone}) => '${day} ${time} ${timezone} 播出';
 	@override late final _Translations$explore$detail$zh_Hant detail = _Translations$explore$detail$zh_Hant._(_root);
 	@override String totalResults({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 結果',
 		other: '${n} 筆結果',
 	);
 }
@@ -3038,6 +3104,7 @@ class _Translations$music$zh_Hant extends Translations$music$zh {
 	@override String get addToQueue => '新增至佇列';
 	@override String discNumber({required Object n}) => 'CD ${n}';
 	@override String trackCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n}軌道',
 		other: '${n} 首',
 	);
 	@override String get nowPlaying => '正在播放';
@@ -3143,6 +3210,7 @@ class _Translations$watchTogether$zh_Hant extends Translations$watchTogether$zh 
 	@override String get offsetPlusSecond => '+1秒';
 	@override String get participants => '參與者';
 	@override String participantCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 參與者',
 		other: '${n} 參與者',
 	);
 	@override String get hostBadge => '主持人';
@@ -3688,6 +3756,108 @@ class _Translations$services$zh_Hant extends Translations$services$zh {
 	@override late final _Translations$services$libraryFilter$zh_Hant libraryFilter = _Translations$services$libraryFilter$zh_Hant._(_root);
 }
 
+// Path: offlineRecovery
+class _Translations$offlineRecovery$zh_Hant extends Translations$offlineRecovery$zh {
+	_Translations$offlineRecovery$zh_Hant._(TranslationsZhHant root) : this._root = root, super.internal(root);
+
+	final TranslationsZhHant _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '您的伺服器離線';
+	@override String get description => '您的下載仍然可用。當您的伺服器恢復時嘗試重新連接，或新增另一台伺服器。';
+	@override String get appleTvDescription => 'Luroka 無法存取您的媒體伺服器。嘗試在可用時重新連接，或新增另一台伺服器以繼續觀看。';
+	@override String get kidsDescription => '我們無法存取您的媒體伺服器。嘗試重新連接，或向家長尋求協助。';
+	@override String get retrying => '正在連線…';
+	@override String get addServer => '新增伺服器';
+}
+
+// Path: releaseUpdates
+class _Translations$releaseUpdates$zh_Hant extends Translations$releaseUpdates$zh {
+	_Translations$releaseUpdates$zh_Hant._(TranslationsZhHant root) : this._root = root, super.internal(root);
+
+	final TranslationsZhHant _root; // ignore: unused_field
+
+	// Translations
+	@override String get manualInstructions => '從 GitHub 下載發布存檔，解壓縮 APK，並將其安裝在您的 Android 裝置上。';
+	@override String get tvInstructions => '在手機或電腦上開啟此位址，或掃描二維碼下載版本。';
+	@override String get pressBackAgain => '再次按返回退出播放';
+}
+
+// Path: profileIntegrations
+class _Translations$profileIntegrations$zh_Hant extends Translations$profileIntegrations$zh {
+	_Translations$profileIntegrations$zh_Hant._(TranslationsZhHant root) : this._root = root, super.internal(root);
+
+	final TranslationsZhHant _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '打造專屬 Luroka';
+	@override String get description => '連接您喜愛的服務，記錄觀看內容並請求新電影和影集。每個 Luroka 使用者設定檔都有自己的連線。';
+	@override String get step => '可選集成';
+	@override String get examples => 'Trakt · Simkl · AniList · MyAnimeList · Seerr';
+	@override String get connect => '探索集成';
+	@override String get later => '稍後設定';
+	@override String get manage => '管理集成';
+	@override String forProfile({required Object name}) => '${name} 的連接';
+}
+
+// Path: profileSetupGuide
+class _Translations$profileSetupGuide$zh_Hant extends Translations$profileSetupGuide$zh {
+	_Translations$profileSetupGuide$zh_Hant._(TranslationsZhHant root) : this._root = root, super.internal(root);
+
+	final TranslationsZhHant _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '打造專屬使用者設定檔';
+	@override String get description => '為此裝置上的使用者設定檔選擇 Luroka 的外觀和使用方式。您可以稍後在設定中變更。';
+	@override String get appearanceStep => '1 / 2 · 外觀';
+	@override String get homeStep => '2 / 2 · 您的首頁';
+	@override String get preview => '預覽';
+	@override String get previewTitle => '您的首頁';
+	@override String get previewPoster => '海報';
+	@override String get posterArtwork => '僅顯示海報';
+	@override String get posterWithDetails => '顯示海報詳細信息';
+	@override String get musicDescription => '開啟電影或影集詳細資訊頁面時播放主題音樂（如有）。';
+	@override String get moreThemes => '更多主題';
+	@override String get fewerThemes => '收合主題';
+	@override String get spotlightHeading => '精選區域要顯示什麼內容？';
+	@override String get progressHeading => '繼續觀看與接下來觀看';
+	@override String get skip => '使用預設設定並開始觀看';
+	@override String get finish => '開始觀看';
+	@override String get back => '返回';
+	@override String get kContinue => '繼續';
+	@override String get chooseLater => '稍後選擇媒體庫';
+	@override String get libraryScope => '這只會變更此使用者設定檔在 Luroka 中顯示的內容，不會變更伺服器權限。';
+	@override String get createdTitle => '使用者設定檔已建立';
+	@override String get createdDescription => '新的使用者設定檔已準備就緒，使用者可在首次開啟時進行個人化設定。';
+	@override String get switchProfile => '切換至此使用者設定檔';
+	@override String get stayHere => '留在目前的使用者設定檔';
+}
+
+// Path: animeFavorites
+class _Translations$animeFavorites$zh_Hant extends Translations$animeFavorites$zh {
+	_Translations$animeFavorites$zh_Hant._(TranslationsZhHant root) : this._root = root, super.internal(root);
+
+	final TranslationsZhHant _root; // ignore: unused_field
+
+	// Translations
+	@override String get filter => '動漫';
+	@override String get manage => '管理動漫';
+	@override String get description => '自動偵測使用動漫庫名稱和可用的動漫標籤或 ID。選擇圖書館並糾正個人最愛。您的個人資料的選擇將保存在此裝置上。';
+	@override String get libraries => '動漫庫';
+	@override String get libraryHint => '名為 Anime 的庫會自動辨識。選擇一個庫以更改其分類。';
+	@override String get titles => '最喜歡的標題';
+	@override String get titleHint => '選擇一個標題將其標記為動漫或更正自動匹配。';
+	@override String get automatic => '自動';
+	@override String get include => '動漫';
+	@override String get exclude => '不是動漫';
+	@override String get automaticIncluded => '自動·動漫';
+	@override String get automaticExcluded => '自動 · 非動漫';
+	@override String get noLibraries => '沒有可用的連線庫。';
+	@override String get noTitles => '沒有最喜歡的電影或節目。';
+	@override String get empty => '沒有找到最喜歡的動漫。檢查您的動漫庫或將標題標記為動漫。';
+	@override String get saveFailed => '無法儲存您的動漫設定。請再試一次。';
+}
+
 // Path: addServer
 class _Translations$addServer$zh_Hant extends Translations$addServer$zh {
 	_Translations$addServer$zh_Hant._(TranslationsZhHant root) : this._root = root, super.internal(root);
@@ -3700,7 +3870,7 @@ class _Translations$addServer$zh_Hant extends Translations$addServer$zh {
 	@override String get serverUrlsHelper => '可輸入多個連線網址，以逗號區隔。';
 	@override String get findServer => '尋找伺服器';
 	@override String searchingLocalMediaBrowserServers({required Object product}) => '正在尋找本機的 ${product} 伺服器…';
-	@override String localMediaBrowserServers({required Object product}) => '本機的 ${product} 伺服器';
+	@override String localMediaBrowserServers({required Object product}) => '已儲存和附近的 ${product} 伺服器';
 	@override String get username => '使用者名稱';
 	@override String get password => '密碼';
 	@override String get signIn => '登入';
@@ -4212,6 +4382,7 @@ class _Translations$explore$stats$zh_Hant extends Translations$explore$stats$zh 
 	@override String favorited({required Object n}) => '${n} 人收藏';
 	@override String dropRate({required Object percent}) => '${percent} 的人棄番';
 	@override String comments({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n} 評論',
 		other: '${n} 則留言',
 	);
 	@override String votes({required Object n}) => '${n} 票';
@@ -4333,6 +4504,7 @@ class _Translations$explore$detail$zh_Hant extends Translations$explore$detail$z
 	@override String get ratings => '評分';
 	@override String get schedule => '播出時間';
 	@override String recommendedByUsers({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		one: '${n}用戶推薦',
 		other: '${n} 位使用者推薦',
 	);
 	@override String recommendedBy({required Object who}) => '由 ${who} 推薦';
@@ -4731,8 +4903,8 @@ extension on TranslationsZhHant {
 			'family.yourPeople' => '你的人',
 			'family.manageHint' => '管理此設備上的人員、兒童的安全和觀看活動。',
 			'family.people' => '人們',
-			'family.peopleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n}人', ), 
-			'family.kidsCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 兒童', ), 
+			'family.peopleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}​人', other: '${n}人', ),
+			'family.kidsCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}​子', other: '${n} 兒童', ),
 			'family.you' => '你',
 			'family.adult' => '成人',
 			'family.child' => '孩子',
@@ -4774,6 +4946,9 @@ extension on TranslationsZhHant {
 			'posterDetails.catalogEpisodeInfoDescription' => '在「發現」海報上顯示劇集數和平均時長。',
 			'posterDetails.title' => '海報詳情',
 			'posterDetails.description' => '在 Studio、搜尋、發現和圖書館的海報下方顯示標題、年份和 IMDb 評級。缺少的 IMDb 評級保持隱藏狀態。對於純藝術作品海報請關閉。',
+			'libraryPolish.compactTvNavigation' => '緊湊的圖書館導航',
+			'libraryPolish.compactTvNavigationDescription' => '在滑出式選單中顯示庫部分和瀏覽選項，為海報留出更多空間。',
+			'libraryPolish.openLibraryMenu' => '開啟庫選單',
 			'libraryPolish.posterDetails' => '海報詳情',
 			'libraryPolish.showPosterDetails' => '顯示海報詳細資料·姓名、年份和 IMDb',
 			'libraryPolish.hidePosterDetails' => '隱藏海報詳細信息',
@@ -4988,6 +5163,8 @@ extension on TranslationsZhHant {
 			'tvSettingsV2.simpleAudio' => '語言和字幕外觀',
 			'settingsRedesign.themeEffects' => '主題和效果',
 			'settingsRedesign.libraryLayout' => '圖書館佈局',
+			'settingsRedesign.posterInformation' => '海報訊息',
+			'settingsRedesign.libraryBehavior' => '圖書館行為',
 			'settingsRedesign.appearanceHint' => '自訂 Luroka 的外觀、佈局和行為。',
 			'settingsRedesign.livePreview' => '即時預覽',
 			'settingsRedesign.previewHint' => '查看您的圖書館在目前設定下的外觀。',
@@ -5089,6 +5266,19 @@ extension on TranslationsZhHant {
 			'detailComposition.mediaInformation' => '媒體資訊',
 			'detailComposition.fullFileInformation' => '完整的文件訊息',
 			'detailComposition.castAndCrew' => '演職人員',
+			'kids.timeLimits' => '螢幕時間限制',
+			'kids.dailyWatchLimit' => '每日觀看時長',
+			'kids.dailyWatchLimitHint' => '每天限制該裝置上的影片播放。',
+			'kids.noTimeLimit' => '無限制',
+			'kids.minutesLimit' => ({required Object minutes}) => '${minutes} 分鐘',
+			'kids.bedtime' => '就寢時間',
+			'kids.bedtimeHint' => '需要家長 PIN 才能在這些時間內使用此設定檔。',
+			'kids.bedtimeStart' => '就寢時間開始',
+			'kids.bedtimeEnd' => '就寢時間結束',
+			'kids.timeLimitReached' => '今天的觀看時間已結束',
+			'kids.bedtimeReached' => '睡覺時間到了',
+			'kids.timeLimitParentHint' => '請家長輸入 PIN，讓此使用者繼續觀看。',
+			'kids.parentUnlock' => '家長解鎖',
 			'kids.backupProfile' => '備份孩子的個人資料',
 			'kids.backupExplain' => '備份此設定檔的已儲存名稱、字元、限制、外觀和本機檢視排除。不包括家長 PIN、伺服器登入、下載和伺服器播放進度。',
 			'kids.saveBackupFile' => '儲存備份文件',
@@ -5173,6 +5363,8 @@ extension on TranslationsZhHant {
 			'kids.blocked' => '此標題在此兒童個人資料中不可用。',
 			'kids.switchProfile' => '切換設定檔',
 			'kids.manageFromAdult' => '切換到成人設定檔以管理設定。',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => '在新增兒童個人資料之前，將伺服器連接到您的成人個人資料。',
 			'kids.created' => '兒童檔案已創建',
 			'kids.updated' => '孩子的個人資料已更新',
@@ -5191,8 +5383,6 @@ extension on TranslationsZhHant {
 			'lurokaDiscovery.imdbTv100' => 'IMDb 前 100 場演出 · 2026 年 9 月快照',
 			'lurokaDiscovery.emmyComedy' => '艾美獎 · 喜劇影集得獎者 · 1971–2026',
 			'lurokaDiscovery.emmys' => '艾美獎 · 劇情類影集得獎者 · 1966–2026',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.bafta' => '英國電影電視藝術學院·最佳影片得獎者',
 			'lurokaDiscovery.cannes' => '坎城金棕櫚獎得主',
 			'lurokaDiscovery.awardsNote' => '獲獎作品包括奧斯卡最佳影片歷史獎、艾美獎戲劇/喜劇獲獎作品以及英國電影和電視藝術學院 (BAFTA)/坎城影展精選影片。重複獲獎的頭銜出現一次。會員資格使用獎項類別歷史和維基數據事實。 IMDb 前 100 部電影/節目清單保留了來自 mmdju/imdb-top250-api 的 2026 年 9 月圖表快照。僅顯示您可見的線上庫中的匹配項；館藏規模取決於圖書館的可用性。',
@@ -5585,6 +5775,7 @@ extension on TranslationsZhHant {
 			'settings.downloadLocationPickerUnavailable' => '此裝置無法選擇資料夾',
 			'settings.downloadOnWifiOnly' => '僅在 Wi-Fi 連線時下載',
 			'settings.downloadOnWifiOnlyDescription' => '使用行動網路時不會下載',
+			'settings.downloadWifiScope' => '適用於此裝置上的所有使用者設定檔與下載。',
 			'settings.autoRemoveWatchedDownloads' => '自動移除已觀看的下載內容',
 			'settings.autoRemoveWatchedDownloadsDescription' => '自動刪除已觀看的下載影片',
 			'settings.cellularDownloadBlocked' => '使用行動網路時無法下載。請改用 Wi-Fi 或變更設定。',
@@ -5686,6 +5877,8 @@ extension on TranslationsZhHant {
 			'settings.languageAndRegion' => '語言與地區',
 			'settings.startup' => '啟動',
 			'settings.display' => '顯示器',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => '媒體庫與卡片',
 			'settings.homeScreen' => '主畫面',
 			'settings.navigation' => '導覽',
@@ -5705,8 +5898,6 @@ extension on TranslationsZhHant {
 			'settings.gestureVolumeSwipeDescription' => '在螢幕右側邊緣上下滑動以調整音量',
 			'settings.gesturePinchToZoom' => '雙指縮放',
 			'settings.gesturePinchToZoomDescription' => '在影片上雙指捏合以放大或縮小',
-			_ => null,
-		} ?? switch (path) {
 			'settings.rememberBrightnessLevel' => '記住亮度',
 			'settings.rememberBrightnessLevelDescription' => '以上次滑動設定的亮度開始播放',
 			'settings.controls' => '控制',
@@ -5846,8 +6037,8 @@ extension on TranslationsZhHant {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => '另一個選擇',
 			'dashboard.exploreSeries' => '探索系列',
-			'dashboard.showFeatured' => '重點標題細節',
-			'dashboard.showFeaturedDescription' => '顯示突出顯示的卡片的藝術作品、摘要和劇集訊息',
+			'dashboard.showFeatured' => '主頁聚焦',
+			'dashboard.showFeaturedDescription' => '在主頁頂部顯示精選電影和節目。',
 			'lurokaCatalog.aboutPerson' => '在聚光燈下',
 			'lurokaCatalog.biographyUnavailable' => '該伺服器無法提供傳記。',
 			'lurokaCatalog.filmography' => '您圖書館中的電影和節目',
@@ -5903,9 +6094,32 @@ extension on TranslationsZhHant {
 			'customPerformance.frameBudget' => '每幀預算',
 			'customPerformance.processMemory' => '範例結束時的應用程式進程內存',
 			'customPerformance.noFrames' => '未捕捉任何渲染幀。啟動另一個範例並瀏覽該應用程式。',
+			'homeLayout.manageStudios' => '選擇並訂購工作室',
+			'homeLayout.manageStudiosDescription' => '選擇此設定檔中顯示的工作室，並安排它們的順序。',
+			'homeLayout.studioUnavailable' => '只有在您選擇的庫中找到的工作室才會出現在主頁上。',
+			'homeLayout.showAllStudios' => '顯示所有工作室',
+			'homeLayout.hideAllStudios' => '隱藏所有工作室',
+			'homeLayout.reorderStudio' => '更改工作室順序',
+			'homeLayout.episodeThumbnails' => '繼續觀看中的劇集影像',
+			'homeLayout.episodeThumbnailsDescription' => '在“繼續觀看”和“下一步”中顯示劇集圖像而不是系列或季海報。',
+			'homeLayout.spotlightSource' => '精選內容來源',
+			'homeLayout.spotlightSourceDescription' => '「為您推薦」使用該個人資料在此裝置上的檢視活動，以及收藏夾和圖書館標題。',
+			'homeLayout.spotlightForYou' => '為你',
+			'homeLayout.spotlightForYouDescription' => '使用此個人資料在此裝置上的觀看活動，混合您正在觀看的內容、收藏夾、新增內容和趨勢。',
+			'homeLayout.spotlightTrending' => '流行趨勢',
+			'homeLayout.spotlightTrendingDescription' => '您圖書館中的熱門電影和節目。',
+			'homeLayout.spotlightContinue' => '繼續觀看',
+			'homeLayout.spotlightContinueDescription' => '您已開始的標題和可以繼續的劇集。',
+			'homeLayout.spotlightFavorites' => '從你的最愛',
+			'homeLayout.spotlightInspired' => '受到您的觀看啟發',
+			'homeLayout.spotlightNextUp' => '接下來',
 			'homeLayout.title' => '個人化主頁',
 			'homeLayout.description' => '選擇此設定檔的行順序和可見性。選擇一行以移動或隱藏它。',
 			'homeLayout.rows' => '主行',
+			'homeLayout.progressLayout' => '繼續觀看並下一步',
+			'homeLayout.progressCombined' => '組合成一排',
+			'homeLayout.progressSeparate' => '單獨的行',
+			'homeLayout.progressDescription' => '當伺服器支援時，單獨的下一個。其他伺服器保持合併。',
 			'homeLayout.visible' => '可見的',
 			'homeLayout.hidden' => '隱',
 			'homeLayout.showRow' => '顯示行',
@@ -5940,13 +6154,15 @@ extension on TranslationsZhHant {
 			'activityStats.heroDailyAverage' => '日平均',
 			'activityStats.consistency' => '一致性',
 			'activityStats.currentStreak' => '目前連勝',
-			'activityStats.dayCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 天', ), 
+			'activityStats.dayCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 天', other: '${n} 天', ),
 			'activityStats.longestStreak' => '最長連續紀錄',
 			'activityStats.bestDay' => '最好的一天',
 			'activityStats.bestWeek' => '最好的一周',
 			'activityStats.trendTitle' => '觀看時間',
 			'activityStats.trendToday' => '今天',
 			'activityStats.gapDetail' => ({required Object stat, required Object range}) => '${stat} 上 ${range}',
+			'activityStats.patternsTitle' => '你的模式',
+			'activityStats.mostlyKind' => ({required Object kind}) => '大部分是${kind}',
 			'activityStats.weekdayTitle' => '按工作日',
 			'activityStats.hoursTitle' => '按一天中的時間',
 			'activityStats.amLabel' => '是',
@@ -5959,6 +6175,8 @@ extension on TranslationsZhHant {
 			'activityStats.kindOther' => '其他',
 			'activityStats.topTitlesTitle' => '最受關注',
 			'activityStats.sessionsTitle' => '最近的會議',
+			'activityStats.recentViewingTitle' => '最近觀看',
+			'activityStats.recentViewingHint' => '所選時間內的總觀看時間。日期顯示最新觀看次數。',
 			'activityStats.showMore' => '顯示更多',
 			'activityStats.sessionNoTitle' => '不明播放',
 			'activityStats.emptyTitle' => '這裡還什麼都沒有',
@@ -6141,9 +6359,9 @@ extension on TranslationsZhHant {
 			'mediaMenu.deleteAnyway' => '仍要刪除',
 			'mediaMenu.confirmDeleteTarget' => ({required Object title}) => '確定要從您的伺服器永久刪除「${title}」嗎？',
 			'mediaMenu.deleteMultipleWarning' => '這將會刪除所有單集及其檔案。',
-			'mediaMenu.deleteEpisodeCountWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '這會刪除其中全部 ${n} 集及其檔案。', ), 
-			'mediaMenu.deleteMultiPartWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '此項目分散儲存於 ${n} 個檔案中，且全部都會被刪除。', ), 
-			'mediaMenu.deleteSharedFileHeading' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '另有 ${n} 集儲存在同一檔案中，也會一併被刪除：', ), 
+			'mediaMenu.deleteEpisodeCountWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '這將刪除其中的所有 ${n} 劇集及其檔案。', other: '這會刪除其中全部 ${n} 集及其檔案。', ),
+			'mediaMenu.deleteMultiPartWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '該專案儲存為 ${n} 文件，該文件將被刪除。', other: '此項目分散儲存於 ${n} 個檔案中，且全部都會被刪除。', ),
+			'mediaMenu.deleteSharedFileHeading' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 其他劇集儲存在同一檔案中，也將被刪除：', other: '另有 ${n} 集儲存在同一檔案中，也會一併被刪除：', ),
 			'mediaMenu.deleteScopeUnverifiedProbeFailed' => 'Luroka 無法確認此操作會刪除哪些檔案，因此刪除範圍可能超出上方所列的項目。請取消後重試，或仍要刪除。',
 			'mediaMenu.deleteScopeUnverifiedNoFileInfo' => '您的伺服器未提供此項目的檔案資訊，因此 Luroka 無法確認此操作會刪除哪些檔案。刪除範圍可能超出上方所列的項目。',
 			'mediaMenu.mediaDeletedSuccessfully' => '媒體已成功刪除',
@@ -6173,6 +6391,8 @@ extension on TranslationsZhHant {
 			'accessibility.hue' => '色相',
 			'accessibility.saturation' => '飽和度',
 			'accessibility.brightness' => '亮度',
+			_ => null,
+		} ?? switch (path) {
 			'accessibility.hexColor' => 'Hex 顏色值',
 			'accessibility.expandText' => '展開文字',
 			'accessibility.collapseText' => '收合文字',
@@ -6219,8 +6439,6 @@ extension on TranslationsZhHant {
 			'videoControls.seekBackwardButton' => ({required Object seconds}) => '後退 ${seconds} 秒',
 			'videoControls.seekForwardButton' => ({required Object seconds}) => '前進 ${seconds} 秒',
 			'videoControls.previousButton' => '上一集',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.nextButton' => '下一集',
 			'videoControls.previousChapterButton' => '上一個章節',
 			'videoControls.nextChapterButton' => '下一個章節',
@@ -6290,7 +6508,7 @@ extension on TranslationsZhHant {
 			'messages.markedAsWatchedOffline' => '已標記為已觀看（將在連線時同步）',
 			'messages.markedAsUnwatchedOffline' => '已標記為未觀看（將在連線時同步）',
 			'messages.autoRemovedWatchedDownload' => ({required Object title}) => '已自動移除：${title}',
-			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '已自動移除 ${n} 個已觀看的下載內容', ), 
+			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '自動刪除${n}觀看下載', other: '已自動移除 ${n} 個已觀看的下載內容', ),
 			'messages.removedFromContinueWatching' => '已從「繼續觀看」中移除',
 			'messages.errorLoading' => ({required Object error}) => '錯誤：${error}',
 			'messages.searchPartialResults' => '部分媒體伺服器無法搜尋。目前顯示可取得的結果。',
@@ -6322,6 +6540,7 @@ extension on TranslationsZhHant {
 			'messages.metadataRefreshStarted' => ({required Object title}) => '已開始重新整理「${title}」的中繼資料',
 			'messages.metadataRefreshFailed' => ({required Object error}) => '無法重新整理中繼資料：${error}',
 			'messages.logoutConfirm' => '您確定要登出嗎？',
+			'messages.logoutDeviceConfirm' => '在此設備上註銷 Luroka 嗎？所有設定文件，包括兒童設定檔、伺服器帳戶和下載的媒體都將從該裝置中刪除。您可以稍後再次登入。',
 			'messages.noSeasonsFound' => '找不到季數',
 			'messages.seasonsLoadFailed' => '無法載入季數',
 			'messages.noEpisodesFound' => '在第一季中找不到單集',
@@ -6407,6 +6626,9 @@ extension on TranslationsZhHant {
 			'mpvConfig.removeLine' => '移除行',
 			'mpvConfig.embeddedVoHint' => '在 Linux 上會忽略 vo、gpu-context 和 gpu-api：嵌入式影片一律透過影片平面上的 vo=libmpv 轉譯，而 gpu-next（ArtCNN 等計算著色器需要它）無法以嵌入式方式執行。',
 			'dialog.confirmAction' => '確認操作',
+			'profiles.manageProfiles' => '管理個人資料',
+			'profiles.quickAccess' => '快速存取',
+			'profiles.signOutDevice' => '退出該設備',
 			'profiles.addLurokaProfile' => '新增 Luroka 設定文件',
 			'profiles.switchingProfile' => '正在切換使用者設定檔…',
 			'profiles.deleteThisProfileTitle' => '刪除此使用者設定檔？',
@@ -6498,7 +6720,7 @@ extension on TranslationsZhHant {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => '已在 ${account} 上儲存音訊、字幕與媒體庫選項',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => '已在 ${count} 個帳戶上儲存音訊、字幕與媒體庫選項',
 			'accountPreferences.pickAccount' => '每個帳戶都會儲存各自的偏好設定。請選擇要編輯的帳戶。',
-			'accountPreferences.storedOnAccount' => '這些選項會儲存在帳戶本身，因此登入該帳戶的所有應用程式都會使用它們，包括您其他裝置上的 Luroka。',
+			'accountPreferences.storedOnAccount' => '這些設定儲存在伺服器帳戶中，使用該帳戶的所有 Luroka 使用者設定檔和應用程式都會共用，包括其他裝置上的應用程式。',
 			'accountPreferences.noAccounts' => '沒有可設定的帳戶',
 			'accountPreferences.noAccountsHint' => '登入 Plex，或連線至 Jellyfin 或 Emby 伺服器，儲存在該帳戶上的偏好設定便會顯示在此處。',
 			'accountPreferences.unavailable' => '無法連線至此帳戶',
@@ -6575,7 +6797,7 @@ extension on TranslationsZhHant {
 			'discover.tvShow' => '影集',
 			'discover.minutesLeft' => ({required Object minutes}) => '剩餘 ${minutes} 分鐘',
 			'discover.moreLikeThis' => '更多類似內容',
-			'discover.titleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 部作品', ), 
+			'discover.titleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 標題', other: '${n} 部作品', ),
 			'discover.person.born' => '出生',
 			'discover.person.died' => '死了',
 			'discover.person.birthplace' => '出生地',
@@ -6683,6 +6905,8 @@ extension on TranslationsZhHant {
 			'libraries.sortLabels.dateShared' => '分享日期',
 			'libraries.sortLabels.latestEpisodeAirDate' => '最新一集播出日期',
 			'libraries.sortLabels.lastEpisodeDateAdded' => '最新一集新增日期',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => '下載日期',
 			'libraries.sortLabels.size' => '大小',
 			'libraries.sortLabels.library' => '媒體庫',
@@ -6733,8 +6957,6 @@ extension on TranslationsZhHant {
 			'about.packageLine' => ({required Object package}) => '封裝：${package}',
 			'about.localeLine' => ({required Object locale}) => '語言：${locale}',
 			'about.copyDetails' => '複製詳細信息',
-			_ => null,
-		} ?? switch (path) {
 			'about.detailsCopied' => '已複製應用程式詳細信息',
 			'about.detailsCopyFailed' => '無法複製應用程式詳細信息',
 			'about.checkForUpdatesDescription' => '檢查 GitHub 是否有更新版本',
@@ -6832,7 +7054,7 @@ extension on TranslationsZhHant {
 			'explore.status.ended' => '已完結',
 			'explore.status.canceled' => '已取消',
 			'explore.status.upcoming' => '即將上線',
-			'explore.episodeCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 集', ), 
+			'explore.episodeCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 劇集', other: '${n} 集', ),
 			'explore.cast' => '演員陣容',
 			'explore.characters' => '角色',
 			'explore.addToWatchlist' => '新增至待看清單',
@@ -6844,7 +7066,7 @@ extension on TranslationsZhHant {
 			'explore.notInLibrary' => '不在您的媒體庫中',
 			'explore.inTheseLibraries' => '在這些媒體庫中',
 			'explore.checkingLibrary' => '正在檢查您的媒體庫…',
-			'explore.libraryCheckFailed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '無法檢查 ${n} 台伺服器', ), 
+			'explore.libraryCheckFailed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '無法檢查 ${n} 伺服器', other: '無法檢查 ${n} 台伺服器', ),
 			'explore.emptyTitle' => '這裡還沒有任何內容',
 			'explore.emptyMessage' => ({required Object source}) => '當 ${source} 有內容時，相關資訊將顯示在此處。',
 			'explore.searchHint' => ({required Object source}) => '搜尋 ${source}',
@@ -6881,7 +7103,7 @@ extension on TranslationsZhHant {
 			'explore.stats.planning' => ({required Object n}) => '${n} 人打算觀看',
 			'explore.stats.favorited' => ({required Object n}) => '${n} 人收藏',
 			'explore.stats.dropRate' => ({required Object percent}) => '${percent} 的人棄番',
-			'explore.stats.comments' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 則留言', ), 
+			'explore.stats.comments' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 評論', other: '${n} 則留言', ),
 			'explore.stats.votes' => ({required Object n}) => '${n} 票',
 			'explore.stats.watching' => ({required Object n}) => '${n} 人正在觀看',
 			'explore.stats.completed' => ({required Object n}) => '${n} 人已看完',
@@ -6948,14 +7170,14 @@ extension on TranslationsZhHant {
 			'explore.detail.crew' => '幕後團隊',
 			'explore.detail.ratings' => '評分',
 			'explore.detail.schedule' => '播出時間',
-			'explore.detail.recommendedByUsers' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 位使用者推薦', ), 
+			'explore.detail.recommendedByUsers' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}用戶推薦', other: '${n} 位使用者推薦', ),
 			'explore.detail.recommendedBy' => ({required Object who}) => '由 ${who} 推薦',
 			'explore.detail.favoritedBy' => ({required Object who}) => '由 ${who} 收藏',
 			'explore.detail.unairedEpisodes' => ({required Object n}) => '尚有 ${n} 集未播出',
 			'explore.detail.recommendedByPercent' => ({required Object percent}) => '${percent} 的觀眾推薦',
 			'explore.detail.relatedTitles' => '相關作品',
 			'explore.detail.background' => '背景介紹',
-			'explore.totalResults' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 筆結果', ), 
+			'explore.totalResults' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 結果', other: '${n} 筆結果', ),
 			'liveTv.title' => '直播電視',
 			'liveTv.guide' => '節目表指南',
 			'liveTv.noChannels' => '沒有可用的頻道',
@@ -7100,7 +7322,7 @@ extension on TranslationsZhHant {
 			'music.playNext' => '下一首播放',
 			'music.addToQueue' => '新增至佇列',
 			'music.discNumber' => ({required Object n}) => 'CD ${n}',
-			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 首', ), 
+			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}軌道', other: '${n} 首', ),
 			'music.nowPlaying' => '正在播放',
 			'music.playingFrom' => ({required Object title}) => '來自 ${title}',
 			'music.queue' => '播放佇列',
@@ -7196,7 +7418,9 @@ extension on TranslationsZhHant {
 			'watchTogether.offsetPlusTenth' => '+100 毫秒',
 			'watchTogether.offsetPlusSecond' => '+1秒',
 			'watchTogether.participants' => '參與者',
-			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 參與者', ), 
+			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 參與者', other: '${n} 參與者', ),
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.hostBadge' => '主持人',
 			'watchTogether.nameYou' => ({required Object name}) => '${name}（你）',
 			'watchTogether.playerIdle' => '閒置的',
@@ -7247,8 +7471,6 @@ extension on TranslationsZhHant {
 			'watchTogether.notices.finished' => '完成的',
 			'watchTogether.notices.hostChangedTo' => ({required Object name}) => '${name} 現在是主持人',
 			'watchTogether.notices.youAreNowHost' => '您現在是主持人',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.joined' => ({required Object name}) => '${name} 已加入',
 			'watchTogether.notices.left' => ({required Object name}) => '${name} 已離開',
 			'watchTogether.notices.controlRefused' => '只有主機可以控製播放',
@@ -7711,6 +7933,8 @@ extension on TranslationsZhHant {
 			'seerr.statusPartiallyAvailable' => '部分可用',
 			'seerr.statusRequested' => '已請求',
 			'seerr.statusProcessing' => '處理中',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusBlocklisted' => '已加入封鎖清單',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => '無法連線至 ${url}：${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => '在 ${url} 找不到 Seerr 執行個體（HTTP ${status}）',
@@ -7761,8 +7985,6 @@ extension on TranslationsZhHant {
 			'services.deviceCode.title' => ({required Object service}) => '在 ${service} 啟用 Luroka',
 			'services.deviceCode.instructions' => '掃描 QR 碼，或前往下方網址並輸入此代碼：',
 			'services.deviceCode.openToActivate' => ({required Object service}) => '開啟 ${service} 進行啟用',
-			_ => null,
-		} ?? switch (path) {
 			'services.deviceCode.copyCode' => '複製啟用代碼',
 			'services.deviceCode.waitingForAuthorization' => '等待授權中…',
 			'services.deviceCode.codeCopied' => '代碼已複製',
@@ -7783,12 +8005,69 @@ extension on TranslationsZhHant {
 			'services.libraryFilter.modeHintWhitelist' => '僅同步下方已勾選的媒體庫。',
 			'services.libraryFilter.libraries' => '媒體庫',
 			'services.libraryFilter.noLibraries' => '沒有可用的媒體庫',
+			'offlineRecovery.title' => '您的伺服器離線',
+			'offlineRecovery.description' => '您的下載仍然可用。當您的伺服器恢復時嘗試重新連接，或新增另一台伺服器。',
+			'offlineRecovery.appleTvDescription' => 'Luroka 無法存取您的媒體伺服器。嘗試在可用時重新連接，或新增另一台伺服器以繼續觀看。',
+			'offlineRecovery.kidsDescription' => '我們無法存取您的媒體伺服器。嘗試重新連接，或向家長尋求協助。',
+			'offlineRecovery.retrying' => '正在連線…',
+			'offlineRecovery.addServer' => '新增伺服器',
+			'releaseUpdates.manualInstructions' => '從 GitHub 下載發布存檔，解壓縮 APK，並將其安裝在您的 Android 裝置上。',
+			'releaseUpdates.tvInstructions' => '在手機或電腦上開啟此位址，或掃描二維碼下載版本。',
+			'releaseUpdates.pressBackAgain' => '再次按返回退出播放',
+			'profileIntegrations.title' => '打造專屬 Luroka',
+			'profileIntegrations.description' => '連接您喜愛的服務，記錄觀看內容並請求新電影和影集。每個 Luroka 使用者設定檔都有自己的連線。',
+			'profileIntegrations.step' => '可選集成',
+			'profileIntegrations.examples' => 'Trakt · Simkl · AniList · MyAnimeList · Seerr',
+			'profileIntegrations.connect' => '探索集成',
+			'profileIntegrations.later' => '稍後設定',
+			'profileIntegrations.manage' => '管理集成',
+			'profileIntegrations.forProfile' => ({required Object name}) => '${name} 的連接',
+			'profileSetupGuide.title' => '打造專屬使用者設定檔',
+			'profileSetupGuide.description' => '為此裝置上的使用者設定檔選擇 Luroka 的外觀和使用方式。您可以稍後在設定中變更。',
+			'profileSetupGuide.appearanceStep' => '1 / 2 · 外觀',
+			'profileSetupGuide.homeStep' => '2 / 2 · 您的首頁',
+			'profileSetupGuide.preview' => '預覽',
+			'profileSetupGuide.previewTitle' => '您的首頁',
+			'profileSetupGuide.previewPoster' => '海報',
+			'profileSetupGuide.posterArtwork' => '僅顯示海報',
+			'profileSetupGuide.posterWithDetails' => '顯示海報詳細信息',
+			'profileSetupGuide.musicDescription' => '開啟電影或影集詳細資訊頁面時播放主題音樂（如有）。',
+			'profileSetupGuide.moreThemes' => '更多主題',
+			'profileSetupGuide.fewerThemes' => '收合主題',
+			'profileSetupGuide.spotlightHeading' => '精選區域要顯示什麼內容？',
+			'profileSetupGuide.progressHeading' => '繼續觀看與接下來觀看',
+			'profileSetupGuide.skip' => '使用預設設定並開始觀看',
+			'profileSetupGuide.finish' => '開始觀看',
+			'profileSetupGuide.back' => '返回',
+			'profileSetupGuide.kContinue' => '繼續',
+			'profileSetupGuide.chooseLater' => '稍後選擇媒體庫',
+			'profileSetupGuide.libraryScope' => '這只會變更此使用者設定檔在 Luroka 中顯示的內容，不會變更伺服器權限。',
+			'profileSetupGuide.createdTitle' => '使用者設定檔已建立',
+			'profileSetupGuide.createdDescription' => '新的使用者設定檔已準備就緒，使用者可在首次開啟時進行個人化設定。',
+			'profileSetupGuide.switchProfile' => '切換至此使用者設定檔',
+			'profileSetupGuide.stayHere' => '留在目前的使用者設定檔',
+			'animeFavorites.filter' => '動漫',
+			'animeFavorites.manage' => '管理動漫',
+			'animeFavorites.description' => '自動偵測使用動漫庫名稱和可用的動漫標籤或 ID。選擇圖書館並糾正個人最愛。您的個人資料的選擇將保存在此裝置上。',
+			'animeFavorites.libraries' => '動漫庫',
+			'animeFavorites.libraryHint' => '名為 Anime 的庫會自動辨識。選擇一個庫以更改其分類。',
+			'animeFavorites.titles' => '最喜歡的標題',
+			'animeFavorites.titleHint' => '選擇一個標題將其標記為動漫或更正自動匹配。',
+			'animeFavorites.automatic' => '自動',
+			'animeFavorites.include' => '動漫',
+			'animeFavorites.exclude' => '不是動漫',
+			'animeFavorites.automaticIncluded' => '自動·動漫',
+			'animeFavorites.automaticExcluded' => '自動 · 非動漫',
+			'animeFavorites.noLibraries' => '沒有可用的連線庫。',
+			'animeFavorites.noTitles' => '沒有最喜歡的電影或節目。',
+			'animeFavorites.empty' => '沒有找到最喜歡的動漫。檢查您的動漫庫或將標題標記為動漫。',
+			'animeFavorites.saveFailed' => '無法儲存您的動漫設定。請再試一次。',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => '新增 ${product} 伺服器',
 			'addServer.serverUrls' => '伺服器 URL',
 			'addServer.serverUrlsHelper' => '可輸入多個連線網址，以逗號區隔。',
 			'addServer.findServer' => '尋找伺服器',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => '正在尋找本機的 ${product} 伺服器…',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => '本機的 ${product} 伺服器',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => '已儲存和附近的 ${product} 伺服器',
 			'addServer.username' => '使用者名稱',
 			'addServer.password' => '密碼',
 			'addServer.signIn' => '登入',

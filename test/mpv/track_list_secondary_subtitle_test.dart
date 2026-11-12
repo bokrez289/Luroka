@@ -22,8 +22,8 @@ void main() {
 
   Future<void> withPlayer(Future<void> Function(PlayerAndroid player) body) async {
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/exo_player',
-      eventChannelName: 'com.luroka/exo_player/events',
+      methodChannelName: 'com.plezy/exo_player',
+      eventChannelName: 'com.plezy/exo_player/events',
       testBody: () async {
         final player = PlayerAndroid();
         try {

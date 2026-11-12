@@ -15,7 +15,7 @@ class GridSizeCalculator {
 
     if (PlatformDetector.isTV()) {
       final size = MediaQuery.sizeOf(context);
-      return math.min(size.width / _lerp(8, 4, f), size.height * 0.52 / 1.5);
+      return math.min(size.width / _lerp(8, 4, f), size.height * _lerp(0.40, 0.70, f) / 1.5);
     }
     if (ScreenBreakpoints.isDesktopOrLarger(screenWidth)) return _lerp(140, 280, f);
     if (ScreenBreakpoints.isTablet(screenWidth)) return _lerp(120, 230, f);

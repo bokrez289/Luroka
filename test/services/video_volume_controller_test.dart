@@ -319,14 +319,14 @@ void main() {
   for (final adapter in <({String name, String methodChannel, String eventChannel, Player Function() create})>[
     (
       name: 'PlayerNative',
-      methodChannel: 'com.luroka/mpv_player',
-      eventChannel: 'com.luroka/mpv_player/events',
+      methodChannel: 'com.plezy/mpv_player',
+      eventChannel: 'com.plezy/mpv_player/events',
       create: PlayerNative.new,
     ),
     (
       name: 'PlayerAndroid',
-      methodChannel: 'com.luroka/exo_player',
-      eventChannel: 'com.luroka/exo_player/events',
+      methodChannel: 'com.plezy/exo_player',
+      eventChannel: 'com.plezy/exo_player/events',
       create: PlayerAndroid.new,
     ),
   ]) {

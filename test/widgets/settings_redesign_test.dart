@@ -126,7 +126,7 @@ void main() {
       await SettingsService.instance.write(SettingsService.libraryDensity, 5);
       await tester.pumpAndSettle();
       final after = tester.widget<GridView>(grid).gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
-      expect(after.crossAxisCount, 3);
+      expect(after.crossAxisCount, lessThan(before.crossAxisCount));
       expect(after.crossAxisCount, isNot(before.crossAxisCount));
       final previewContext = tester.element(find.byType(LibrarySettingsPreview));
       expect(Theme.of(previewContext).colorScheme.primary, palette.accent);

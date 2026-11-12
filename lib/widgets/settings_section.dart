@@ -4,7 +4,6 @@ import '../utils/platform_detector.dart';
 import 'app_icon.dart';
 import 'expressive_button_group.dart';
 import 'settings_surface.dart';
-import 'settings_workspace_scope.dart';
 
 /// Standard settings-option title style, for group children that are not a
 /// [ListTile] (segmented controls, sliders) and so don't inherit its
@@ -14,13 +13,8 @@ import 'settings_workspace_scope.dart';
 /// `dense: true` and the `Focusable*ListTile`s default to it — and Flutter
 /// draws a dense [ListTile] title at 13. Match that so a settings page reads
 /// as one family instead of one size per row type.
-TextStyle? settingsOptionTitleStyle(BuildContext context) => Theme.of(context).textTheme.bodyLarge?.copyWith(
-  fontSize:
-      PlatformDetector.isTV() &&
-          !(SettingsWorkspaceScope.maybeOf(context) != null && MediaQuery.sizeOf(context).width < 1200)
-      ? 16
-      : 14,
-);
+TextStyle? settingsOptionTitleStyle(BuildContext context) =>
+    Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: PlatformDetector.isTV() ? 16 : 14);
 
 class SettingsSectionHeader extends StatelessWidget {
   final String title;

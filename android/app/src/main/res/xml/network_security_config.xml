@@ -9,7 +9,7 @@
          Only the platform HTTP stack (background_downloader, ExoPlayer's Cronet
          data source) reads this file. The app's own requests run on dart:io,
          which applies the same split through lib/utils/certificate_trust.dart
-         by loading the user store over com.luroka/user_certificates. -->
+         by loading the user store over com.plezy/user_certificates. -->
     <base-config cleartextTrafficPermitted="true">
         <trust-anchors>
             <certificates src="system" />

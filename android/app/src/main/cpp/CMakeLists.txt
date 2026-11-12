@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22.1)
-project(luroka_native)
+project(plezy_native)
 
 option(DOVI_ENABLE_LIBDOVI "Link real libdovi" ON)
 set(DOVI_LIBDOVI_PREBUILT_ROOT "" CACHE PATH "Path to prebuilt libdovi")

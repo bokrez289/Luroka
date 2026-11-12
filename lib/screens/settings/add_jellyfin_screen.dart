@@ -39,6 +39,7 @@ import '../profile/profile_switch_screen.dart';
 import 'async_form_state_mixin.dart';
 import 'connection_persistence.dart';
 import 'quick_connect_flow_mixin.dart';
+import 'tv_server_pairing_dialog.dart';
 
 @visibleForTesting
 Future<String> resolveJellyfinClientVersion({Future<PackageInfo> Function()? packageInfoLoader}) async {
@@ -133,6 +134,7 @@ class _AddJellyfinScreenState extends State<AddJellyfinScreen>
   late final _usernameController = createTextEditingController();
   late final _passwordController = createTextEditingController();
   final _urlFocus = FocusNode(debugLabel: 'AddJellyfin:Url');
+  final _pairFocus = FocusNode(debugLabel: 'AddJellyfin:PairPhone');
   final _httpsFocus = FocusNode(debugLabel: 'AddJellyfin:Https');
   final _httpFocus = FocusNode(debugLabel: 'AddJellyfin:Http');
   final _findServerFocus = FocusNode(debugLabel: 'AddJellyfin:FindServer');
@@ -169,6 +171,7 @@ class _AddJellyfinScreenState extends State<AddJellyfinScreen>
     // setState after the widget is gone.
     endQuickConnectFlow();
     _urlFocus.dispose();
+    _pairFocus.dispose();
     _httpsFocus.dispose();
     _httpFocus.dispose();
     _findServerFocus.dispose();
@@ -339,6 +342,22 @@ class _AddJellyfinScreenState extends State<AddJellyfinScreen>
         appLogger.e('Add ${widget.dialect.productName} failed', error: e);
         return t.addServer.signInFailed(error: e.toString());
       },
+    );
+  }
+
+  Future<void> _pairWithPhone() async {
+    final active = context.read<ActiveProfileProvider>();
+    final owner = active.activeId;
+    final generation = active.identityMutationGeneration;
+    final connection = await showTvServerPairing(context, widget.dialect);
+    if (!mounted || connection == null) return;
+    if (active.activeId != owner || active.identityMutationGeneration != generation) {
+      setErrorText('Profile changed. Start pairing again.');
+      return;
+    }
+    await runAsync<void>(
+      () => _persistAndExit(connection),
+      errorMapper: (_) => 'Could not save the paired connection.',
     );
   }
 
@@ -567,6 +586,20 @@ class _AddJellyfinScreenState extends State<AddJellyfinScreen>
   List<Widget> _buildBodyChildren(ThemeData theme) {
     return [
       if (_serverInfo == null) ...[
+        if (serverPairingEnabled && PlatformDetector.isTV()) ...[
+          FocusableButton(
+            focusNode: _pairFocus,
+            autofocus: true,
+            onNavigateDown: () => _httpsFocus.requestFocus(),
+            onPressed: busy ? null : _pairWithPhone,
+            child: OutlinedButton.icon(
+              onPressed: busy ? null : _pairWithPhone,
+              icon: const Icon(Icons.qr_code_rounded),
+              label: const Text('Set up with phone'),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
         Wrap(
           spacing: 10,
           runSpacing: 8,
@@ -600,7 +633,7 @@ class _AddJellyfinScreenState extends State<AddJellyfinScreen>
         // wrap-to-4-lines field to the Flutter overlay, but it is logically
         // single-line URL input the system keyboard handles.
         tvTextInputPresentation: TvTextInputPresentation.platform,
-        autofocus: true,
+        autofocus: !(serverPairingEnabled && PlatformDetector.isTV()),
         tvTextInputAutoOpenBehavior: deferredUrlFieldAutoOpen,
         keyboardType: TextInputType.url,
         minLines: 1,

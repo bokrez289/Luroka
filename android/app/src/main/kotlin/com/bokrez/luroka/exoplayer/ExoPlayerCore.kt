@@ -135,7 +135,7 @@ class ExoPlayerCore(private val activity: Activity) :
     private const val ASS_LATENCY_AUTOCAL = true
 
     /** SharedPreferences store for the per-device subtitle/video latency calibration. */
-    private const val ASS_CAL_PREFS = "luroka_ass_calibration"
+    private const val ASS_CAL_PREFS = "plezy_ass_calibration"
     private const val ASS_CAL_KEY_FRAMES = "video_latency_frames"
     private const val TS_TIMESTAMP_SEARCH_PACKETS = 1800
     private val DV_CODEC_PROFILE_REGEX = Regex("""(?:^|,)\s*dvh[1e]\.(\d{2})""")

@@ -1317,6 +1317,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
   Future<void> debugWirePlayerStreamsForTesting() =>
       _wirePlayerStreams(currentPlayer: player!, settingsService: SettingsService.instance, useExoPlayer: false);
 
+  @visibleForTesting
+  ScreenTimeSessionKey? get debugScreenTimeSessionKeyForTesting => _screenTimeSessionKeySource();
+
   /// The service layer without standing up the whole player initialization —
   /// the entry point for asserting what a screen publishes to the OS media
   /// session.

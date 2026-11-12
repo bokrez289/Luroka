@@ -780,10 +780,7 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from < 27) {
           appLogger.i('Adding ScreenTimeSessions table (v27 migration)');
-          await _ignoreAlreadyExists(
-            'ScreenTimeSessions table',
-            () => m.createTable(screenTimeSessions),
-          );
+          await _ignoreAlreadyExists('ScreenTimeSessions table', () => m.createTable(screenTimeSessions));
           await _ignoreAlreadyExists(
             'Index idx_screen_time_sessions_profile_date',
             () => m.create(idxScreenTimeSessionsProfileDate),
@@ -1232,12 +1229,14 @@ class AppDatabase extends _$AppDatabase {
 
   /// Per-profile watch-time totals for one local day, for the family hub's
   /// "Today" chips. Profiles without recorded time are absent from the map.
-  Future<Map<String, int>> getScreenTimePerProfileForDate({required String localDate}) async {
+  Future<Map<String, int>> getScreenTimePerProfileForDate({required String localDate, Set<String>? profileIds}) async {
+    if (profileIds != null && profileIds.isEmpty) return const {};
     final sum = screenTimeDaily.durationMs.sum();
     final query = selectOnly(screenTimeDaily)
       ..addColumns([screenTimeDaily.profileId, sum])
       ..where(screenTimeDaily.localDate.equals(localDate))
       ..groupBy([screenTimeDaily.profileId]);
+    if (profileIds != null) query.where(screenTimeDaily.profileId.isIn(profileIds));
     final result = <String, int>{};
     for (final row in await query.get()) {
       final totalMs = row.read(sum) ?? 0;
@@ -1258,12 +1257,11 @@ class AppDatabase extends _$AppDatabase {
   /// Appends closed playback-interval rows. Callers write only finalized
   /// segments; the ledger is append-only until explicitly cleared.
   Future<void> addScreenTimeSessions(List<ScreenTimeSessionsCompanion> rows) async {
-    final persisted = rows
-        .where((row) {
-          final profileId = row.profileId.value;
-          final durationMs = row.durationMs.value;
-          return profileId.isNotEmpty && durationMs > 0;
-        });
+    final persisted = rows.where((row) {
+      final profileId = row.profileId.value;
+      final durationMs = row.durationMs.value;
+      return profileId.isNotEmpty && durationMs > 0;
+    });
     if (persisted.isEmpty) return;
     await transaction(() async {
       await batch((b) => b.insertAll(screenTimeSessions, persisted.toList()));
@@ -1282,19 +1280,101 @@ class AppDatabase extends _$AppDatabase {
     final query = select(screenTimeSessions)
       ..orderBy([(t) => OrderingTerm.desc(t.startUtcMs)])
       ..limit(limit, offset: offset);
-    query.where(
-      (t) {
-        var condition = t.profileId.equals(profileId);
-        if (startLocalDate != null) {
-          condition = condition & t.localDate.isBiggerOrEqualValue(startLocalDate);
-        }
-        if (endLocalDate != null) {
-          condition = condition & t.localDate.isSmallerOrEqualValue(endLocalDate);
-        }
-        return condition;
-      },
-    );
+    query.where((t) {
+      var condition = t.profileId.equals(profileId);
+      if (startLocalDate != null) {
+        condition = condition & t.localDate.isBiggerOrEqualValue(startLocalDate);
+      }
+      if (endLocalDate != null) {
+        condition = condition & t.localDate.isSmallerOrEqualValue(endLocalDate);
+      }
+      return condition;
+    });
     return query.get();
+  }
+
+  /// One recent card per identifiable movie, episode or track, with its actual
+  /// watched duration summed inside the selected date window. The newest row
+  /// supplies the displayed date, artwork and navigation identity. Unknown
+  /// items remain separate so unrelated streams cannot be merged by accident.
+  /// The original intervals remain untouched for time-of-day analytics.
+  /// Distinct playable items with recorded time; episodes count separately.
+  Future<int> countScreenTimeViewedTitles({
+    required String profileId,
+    required String startLocalDate,
+    required String endLocalDate,
+  }) async {
+    final row = await customSelect(
+      """
+      SELECT COUNT(*) AS total FROM (
+        SELECT media_kind, server_key, item_key FROM screen_time_sessions
+        WHERE profile_id = ? AND local_date >= ? AND local_date <= ?
+          AND duration_ms > 0 AND item_key IS NOT NULL AND item_key != ''
+        GROUP BY media_kind, server_key, item_key
+      )
+      """,
+      variables: [
+        Variable.withString(profileId),
+        Variable.withString(startLocalDate),
+        Variable.withString(endLocalDate),
+      ],
+      readsFrom: {screenTimeSessions},
+    ).getSingle();
+    return row.read<int>('total');
+  }
+
+  Future<List<ScreenTimeSessionRow>> getScreenTimeViewingTotals({
+    required String profileId,
+    required String startLocalDate,
+    required String endLocalDate,
+    int limit = 50,
+    int offset = 0,
+    String search = '',
+    int? mediaKind,
+  }) async {
+    final rows = await customSelect(
+      '''
+      WITH eligible AS (
+        SELECT *, CASE
+          WHEN media_kind IN (0, 1, 3)
+            AND server_key IS NOT NULL AND server_key != ''
+            AND item_key IS NOT NULL AND item_key != '' THEN 0
+          ELSE id
+        END AS separate_row
+        FROM screen_time_sessions
+        WHERE profile_id = ? AND local_date >= ? AND local_date <= ?
+          AND (? = '' OR instr(lower(coalesce(item_title, '') || ' ' || coalesce(show_title, '')), lower(?)) > 0)
+          AND (? IS NULL OR media_kind = ?)
+      ), ranked AS (
+        SELECT *,
+          SUM(duration_ms) OVER (
+            PARTITION BY media_kind, server_key, item_key, separate_row
+          ) AS viewing_total_ms,
+          ROW_NUMBER() OVER (
+            PARTITION BY media_kind, server_key, item_key, separate_row
+            ORDER BY start_utc_ms DESC, id DESC
+          ) AS viewing_rank
+        FROM eligible
+      )
+      SELECT * FROM ranked WHERE viewing_rank = 1
+      ORDER BY start_utc_ms DESC, id DESC LIMIT ? OFFSET ?
+      ''',
+      variables: [
+        Variable.withString(profileId),
+        Variable.withString(startLocalDate),
+        Variable.withString(endLocalDate),
+        Variable.withString(search),
+        Variable.withString(search),
+        Variable<int>(mediaKind),
+        Variable<int>(mediaKind),
+        Variable.withInt(limit),
+        Variable.withInt(offset),
+      ],
+      readsFrom: {screenTimeSessions},
+    ).get();
+    return [
+      for (final row in rows) screenTimeSessions.map(row.data).copyWith(durationMs: row.read<int>('viewing_total_ms')),
+    ];
   }
 
   Future<void> deleteScreenTimeSessionsForProfile(String profileId) async {

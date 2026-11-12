@@ -3082,6 +3082,15 @@ void main() {
         ownedDownloadKeys: {itemA.globalKey, itemB.globalKey},
       );
 
+      expect(
+        await provider.deleteWatchedDownloadCandidate(
+          itemB.globalKey,
+          logContext: 'stale-profile',
+          expectedProfileId: 'profile-b',
+        ),
+        isNull,
+      );
+      expect(await db.getDownloadedMedia(itemB.globalKey), isNotNull);
       expect(await provider.autoDeleteWatchedDownloads(activeGlobalKey: itemA.globalKey), ['B watched']);
       expect(provider.downloads.keys, [itemA.globalKey]);
       expect(await db.getDownloadedMedia(itemA.globalKey), isNotNull);

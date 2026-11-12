@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:luroka/exceptions/media_server_exceptions.dart';
 import 'package:luroka/media/library_query.dart';
+import 'package:luroka/media/home_progress.dart';
 import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_item.dart';
 import 'package:luroka/media/media_kind.dart';
@@ -71,6 +72,70 @@ Map<String, Object?> _chapterItem({List<Map<String, Object?>>? chapters}) => {
 
 void main() {
   group('MediaBrowser user-scoped routes', () {
+    for (final emby in [false, true]) {
+      test('${emby ? 'Emby' : 'Jellyfin'} preserves resume and Next Up when split rows are requested', () async {
+        final next = {
+          'Id': 'next',
+          'Name': 'Next episode',
+          'Type': 'Episode',
+          'SeriesId': 'series-next',
+          'UserData': {'PlaybackPositionTicks': 0, 'Played': false},
+        };
+        final resume = [
+          for (var i = 0; i < 2; i++)
+            {
+              'Id': 'resume-$i',
+              'Name': 'Movie $i',
+              'Type': 'Movie',
+              'UserData': {
+                'PlaybackPositionTicks': 300000000,
+                'LastPlayedDate': DateTime.now().toUtc().toIso8601String(),
+              },
+            },
+        ];
+        final client = (emby ? testEmbyClient : testJellyfinClient)(
+          handler: (request) async {
+            if (request.url.path.endsWith('/Views')) {
+              return jsonResponse({
+                'Items': [
+                  {'Id': 'shows', 'Name': 'Shows', 'CollectionType': 'tvshows'},
+                ],
+              });
+            }
+            if (request.url.path.endsWith('/Items/Resume') || request.url.path == '/UserItems/Resume') {
+              return jsonResponse({
+                'Items': [...resume, if (emby) next],
+              });
+            }
+            if (request.url.path == '/Shows/NextUp') {
+              return jsonResponse({
+                'Items': [next],
+              });
+            }
+            if (request.url.queryParameters['Filters'] == 'IsPlayed') {
+              return jsonResponse({
+                'Items': [
+                  {
+                    'Id': 'previous',
+                    'SeriesId': 'series-next',
+                    'Type': 'Episode',
+                    'UserData': {'LastPlayedDate': DateTime.now().toUtc().toIso8601String()},
+                  },
+                ],
+              });
+            }
+            return jsonResponse({'Items': <Object?>[]});
+          },
+        );
+        addTearDown(client.close);
+        final split = await client.fetchContinueWatchingByLibrary(count: 1, splitRows: true);
+        expect(split.where(isHomeNextUp).map((item) => item.id), ['next']);
+        expect(split.where((item) => !isHomeNextUp(item)), hasLength(1));
+        final combined = await client.fetchContinueWatchingByLibrary(count: 1);
+        expect(combined, hasLength(1));
+      });
+    }
+
     test('selected Emby libraries retain Continue Watching source identity', () async {
       final requests = _RequestCapture((request) {
         if (request.url.path == '/Users/user-1/Views') {
@@ -562,7 +627,7 @@ void main() {
       expect(rows.totalCount, 2);
     });
 
-    test('a failed recency scan empties the shelf instead of sinking the fetch', () async {
+    test('a failed recency scan preserves server-provided Next Up', () async {
       // The scan is what vouches that a series is recent enough for the cutoff;
       // without it an abandoned series could resurface, so unvouched rows are
       // dropped rather than published undated.
@@ -587,7 +652,7 @@ void main() {
 
       final rows = await client.fetchMoreHubItemsPage('home.nextup', start: 0, size: 10);
 
-      expect(rows.items, isEmpty);
+      expect(rows.items.map((item) => item.id), ['next-series-a']);
     });
 
     test('an Emby window with no zero-position rows issues no recency scan', () async {
@@ -813,7 +878,10 @@ void main() {
       final hubs = await client.fetchGlobalHubs(limit: 5);
 
       // A failing best-effort scan must degrade, not trigger failover.
-      expect(hubs.where((hub) => hub.id.endsWith('nextup')), isEmpty);
+      expect(
+        hubs.where((hub) => hub.id.endsWith('nextup')).expand((hub) => hub.items).map((item) => item.id),
+        contains('next-series-a'),
+      );
       expect(exhausted, 0, reason: 'the recency scan escalated to endpoint exhaustion');
       expect(
         requests.requests.every((request) => request.url.host == 'emby.example.com'),
@@ -993,7 +1061,11 @@ void main() {
       final shelf = await client.fetchContinueWatching(count: 10);
       sw.stop();
 
-      expect(shelf.map((item) => item.id), ['movie-1'], reason: 'the resume half was sunk by the stalled scan');
+      expect(
+        shelf.map((item) => item.id),
+        containsAll(['movie-1', 'next-series-a']),
+        reason: 'a failed enrichment scan must preserve both server-provided halves',
+      );
       expect(
         sw.elapsed,
         lessThan(const Duration(seconds: 8)),

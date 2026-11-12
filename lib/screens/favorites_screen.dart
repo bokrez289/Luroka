@@ -20,6 +20,7 @@ import '../media/media_server_client.dart';
 import '../mixins/refreshable.dart';
 import '../mixins/tab_visibility_aware.dart';
 import '../providers/libraries_provider.dart';
+import '../providers/home_favorites_snapshot.dart';
 import '../providers/hidden_libraries_provider.dart';
 import '../providers/multi_server_provider.dart';
 import '../providers/catalog_sources_provider.dart';
@@ -192,6 +193,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   }
 
   Future<void> _load({bool showSpinner = true}) async {
+    context.read<HomeFavoritesSnapshot?>()?.cancelBackground();
     final generation = ++_loadGeneration;
     _abortController?.abort();
     final abort = AbortController();
@@ -264,6 +266,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
       _copies = MovieCopyGroups(ordered);
       _items = _copies.items;
     });
+    context.read<HomeFavoritesSnapshot?>()?.replace(ordered);
     appLogger.d('Favorites timing: published ${_items.length} titles in ${loadTimer.elapsedMilliseconds}ms');
     _updateCopySearch();
   }
@@ -433,6 +436,10 @@ class _FavoritesScreenState extends State<FavoritesScreen>
         key: _catalogKey,
         items: _items,
         copyCount: (item) => _copies.copiesFor(item).length,
+        copiesFor: _copies.copiesFor,
+        libraries: (_librariesProvider?.libraries ?? const <MediaLibrary>[])
+            .where((library) => !(_sources?.hiddenLibraryKeys.contains(library.globalKey) ?? false))
+            .toList(),
         loading: _isLoading,
         errorMessage: _errorMessage,
         resolveClient: (item) => item.serverId == null

@@ -18,7 +18,7 @@ void main() {
   });
   tearDown(DevicePerformance.debugReset);
 
-  testWidgets('performance details page reports the active tier without duplicating the appearance preset', (
+  testWidgets('performance page exposes low-power control and reports the active tier', (
     tester,
   ) async {
     final cache = PaintingBinding.instance.imageCache;
@@ -34,7 +34,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.byType(Switch), findsNothing);
+    expect(find.byType(Switch), findsOneWidget);
     expect(SettingsService.instance.read(SettingsService.fireStickMode), isFalse);
     expect(DevicePerformance.isReduced, isFalse);
     expect(SettingsService.instance.read(SettingsService.visualEffects), VisualEffectsSetting.auto);

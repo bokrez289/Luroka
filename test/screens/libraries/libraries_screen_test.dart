@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:luroka/exceptions/media_server_exceptions.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/focus/input_mode_tracker.dart';
+import 'package:luroka/focus/focusable_wrapper.dart';
 import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/media/ids.dart';
 import 'package:luroka/media/library_filter_result.dart';
@@ -33,6 +34,7 @@ import 'package:luroka/screens/libraries/tabs/library_recommended_tab.dart';
 import 'package:luroka/widgets/library_overview_preview.dart';
 import 'package:luroka/widgets/media_card.dart';
 import 'package:luroka/widgets/focusable_tab_chip.dart';
+import 'package:luroka/widgets/focusable_media_card.dart';
 import 'package:luroka/screens/libraries/tabs/base_library_tab.dart';
 import 'package:luroka/services/multi_server_manager.dart';
 import 'package:luroka/services/library_events/library_event_service.dart';
@@ -101,6 +103,150 @@ void main() {
   });
 
   tearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+
+  testWidgets('compact TV library menu preserves grid focus and provides library sections and options', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    final client = _PagedClient('server-c');
+    final harness = await _Harness.create(
+      _GatedPreferences({
+        'selected_library_key': _musicLibrary.globalKey,
+        'library_tab_${_musicLibrary.globalKey}': LibraryTabType.browse.name,
+      }),
+      clients: [client],
+      libraryOrder: const [_musicLibrary],
+    );
+    addTearDown(harness.dispose);
+    expect(SettingsService.instance.read(SettingsService.compactTvLibraryNavigation), isFalse);
+    await SettingsService.instance.write(SettingsService.compactTvLibraryNavigation, true);
+    await harness.pump(tester);
+
+    expect(find.byKey(const ValueKey('compact-library-header')), findsOneWidget);
+    expect(find.byType(FocusableTabChip), findsNothing);
+    final card = tester.widget<FocusableMediaCard>(find.byType(FocusableMediaCard).first);
+    card.focusNode!.requestFocus();
+    await tester.pump();
+    final focus = FocusManager.instance.primaryFocus;
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('compact-library-tab:browse')), findsOneWidget);
+    expect(find.byKey(const ValueKey('compact-library-group')), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(
+      FocusManager.instance.primaryFocus?.context?.findAncestorWidgetOfExactType<FocusableWrapper>()?.key,
+      const ValueKey('compact-library-tab:collections'),
+    );
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('compact-library-tab:browse')), findsNothing);
+    expect(FocusManager.instance.primaryFocus, same(focus));
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('compact-library-group')));
+    await tester.pumpAndSettle();
+    expect(find.text(t.libraries.groupings.title), findsWidgets);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('switching the TV layout live keeps the default layout and updates grid navigation', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    final harness = await _Harness.create(
+      _GatedPreferences({
+        'selected_library_key': _musicLibrary.globalKey,
+        'library_tab_${_musicLibrary.globalKey}': LibraryTabType.browse.name,
+      }),
+      clients: [_PagedClient('server-c')],
+      libraryOrder: const [_musicLibrary],
+    );
+    addTearDown(harness.dispose);
+    await harness.pump(tester);
+    expect(find.byType(FocusableTabChip), findsWidgets);
+    expect(find.byKey(const ValueKey('compact-library-header')), findsNothing);
+
+    await SettingsService.instance.write(SettingsService.compactTvLibraryNavigation, true);
+    await tester.pumpAndSettle();
+    final card = tester.widget<FocusableMediaCard>(find.byType(FocusableMediaCard).first);
+    card.focusNode!.requestFocus();
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('compact-library-tab:browse')), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    await SettingsService.instance.write(SettingsService.compactTvLibraryNavigation, false);
+    await tester.pumpAndSettle();
+    expect(find.byType(FocusableTabChip), findsWidgets);
+    expect(find.byKey(const ValueKey('compact-library-header')), findsNothing);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('closing the compact menu restores a scrolled grid card without resetting its position', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    final harness = await _Harness.create(
+      _GatedPreferences({
+        'selected_library_key': _musicLibrary.globalKey,
+        'library_tab_${_musicLibrary.globalKey}': LibraryTabType.browse.name,
+      }),
+      clients: [_ManyPagedClient()],
+      libraryOrder: const [_musicLibrary],
+    );
+    addTearDown(harness.dispose);
+    await SettingsService.instance.write(SettingsService.compactTvLibraryNavigation, true);
+    await harness.pump(tester);
+    final scrollable = find.descendant(of: find.byType(LibraryBrowseTab), matching: find.byType(Scrollable)).first;
+    await tester.drag(scrollable, const Offset(0, -800));
+    await tester.pumpAndSettle();
+    final cards = find.byType(FocusableMediaCard).evaluate().where((element) {
+      final box = element.renderObject as RenderBox;
+      final rect = box.localToGlobal(Offset.zero) & box.size;
+      return rect.left < 60 && rect.top >= 100 && rect.bottom <= 720;
+    }).toList();
+    expect(cards, isNotEmpty);
+    final card = cards.first.widget as FocusableMediaCard;
+    card.focusNode!.requestFocus();
+    await tester.pumpAndSettle();
+    final focus = FocusManager.instance.primaryFocus;
+    final position = tester.state<ScrollableState>(scrollable).position;
+    final offset = position.pixels;
+    expect(offset, greaterThan(0));
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('compact-library-tab:browse')), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+    expect(FocusManager.instance.primaryFocus, same(focus));
+    expect(position.pixels, closeTo(offset, 0.1));
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('compact TV library menu switches tabs and persists the selection', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    final harness = await _Harness.create(
+      _GatedPreferences({'selected_library_key': _libraryA.globalKey}),
+      clients: [_HubClient()],
+      libraryOrder: const [_libraryA],
+    );
+    addTearDown(harness.dispose);
+    await SettingsService.instance.write(SettingsService.compactTvLibraryNavigation, true);
+    await harness.pump(tester);
+    tester.widget<FocusableWrapper>(find.byKey(const ValueKey('compact-library-header'))).focusNode!.requestFocus();
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(harness.controller(tester).index, LibraryTabType.browse.index);
+    expect((await StorageService.getInstance()).getLibraryTab(_libraryA.globalKey), LibraryTabType.browse.name);
+    expect(find.textContaining(' · ${t.lurokaCatalog.browse}'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
 
   testWidgets('kids TV Movies can switch among permitted movie libraries', (tester) async {
     final kids = KidsProfileService.instance;
@@ -871,6 +1017,32 @@ class _PagedClient implements MediaServerClient {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _ManyPagedClient extends _PagedClient {
+  _ManyPagedClient() : super('server-c');
+
+  @override
+  Future<LibraryPage<MediaItem>> fetchLibraryPagedContent(
+    String libraryId, {
+    required LibraryQuery query,
+    MediaKind? libraryKind,
+    AbortController? abort,
+  }) async => LibraryPage<MediaItem>(
+    items: [
+      for (var i = query.offset; i < (query.offset + query.limit).clamp(0, 80); i++)
+        testMediaItem(
+          id: 'artist-$i',
+          backend: MediaBackend.jellyfin,
+          kind: MediaKind.artist,
+          title: 'Artist $i',
+          serverId: serverId.value,
+          serverName: serverName,
+        ),
+    ],
+    totalCount: 80,
+    offset: query.offset,
+  );
 }
 
 HubSectionState _rowState(WidgetTester tester, String id) =>

@@ -32,6 +32,12 @@ import 'server_capabilities.dart';
 /// Default number of items requested for horizontal hub previews.
 const int defaultHubPreviewLimit = 16;
 
+/// Lightweight, cancellable metadata for a focused Home card. This must not
+/// populate the full playback-detail cache with an incomplete DTO.
+abstract interface class PreviewMetadataClient {
+  Future<MediaItem?> fetchPreviewItem(String id, {required AbortController abort});
+}
+
 /// Default number of people [MediaServerClient.searchPeople] returns.
 const int defaultPeopleSearchLimit = 20;
 

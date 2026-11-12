@@ -6,12 +6,23 @@ import '../media/media_item.dart';
 import '../media/media_kind.dart';
 import '../mixins/disposable_change_notifier_mixin.dart';
 import '../services/storage_service.dart';
+import '../utils/app_logger.dart';
 
 /// Lives in the keyed profile session. Writes always use the captured owner,
 /// even if another profile becomes active while persistence is in flight.
 class HomeLayoutProvider extends ChangeNotifier with DisposableChangeNotifierMixin {
   HomeLayoutProvider({required StorageService storage, required this.profileId}) : _storage = storage {
-    if (profileId != null) _layout = storage.getHomeLayout(profileId!);
+    if (profileId != null) {
+      _layout = storage.getHomeLayout(profileId!);
+      _writes = storage
+          .migrateLegacyHomeSpotlight(profileId!)
+          .then<void>(
+            (_) {},
+            onError: (Object error, StackTrace stack) {
+              appLogger.w('Could not migrate the Home Spotlight preference', error: error, stackTrace: stack);
+            },
+          );
+    }
   }
 
   final StorageService _storage;
@@ -26,8 +37,7 @@ class HomeLayoutProvider extends ChangeNotifier with DisposableChangeNotifierMix
     final result = _writes.then((_) async {
       final owner = profileId;
       if (isDisposed || owner == null) return;
-      final next = update(_layout);
-      await _storage.saveHomeLayout(owner, next);
+      final next = await _storage.updateHomeLayout(owner, update);
       if (isDisposed) return;
       _layout = next;
       safeNotifyListeners();
@@ -44,6 +54,21 @@ class HomeLayoutProvider extends ChangeNotifier with DisposableChangeNotifierMix
     hidden ? shown.remove(key) : shown.add(key);
     return current.copyWith(hidden: keys, shown: shown);
   });
+
+  Future<void> setSplitContinueWatching(bool split) =>
+      _mutate((current) => current.copyWith(splitContinueWatching: split));
+
+  Future<void> setSpotlightSource(HomeSpotlightSource source) =>
+      _mutate((current) => current.copyWith(spotlightSource: source));
+
+  Future<void> setGuideChoices({HomeSpotlightSource? spotlight, bool? splitProgress, Iterable<String>? studioOrder,
+    Iterable<String>? hiddenStudios}) => _mutate(
+    (current) => current.copyWith(spotlightSource: spotlight, splitContinueWatching: splitProgress,
+      studioOrder: studioOrder, hiddenStudios: hiddenStudios),
+  );
+
+  Future<void> setStudios({required Iterable<String> order, required Iterable<String> hidden}) =>
+      _mutate((current) => current.copyWith(studioOrder: order, hiddenStudios: hidden));
 
   Future<void> moveRow(List<MediaHub> availableRows, String key, int offset) => _mutate((current) {
     final keys = current.arrange(availableRows, includeHidden: true).map(homeRowKey).toSet().toList();

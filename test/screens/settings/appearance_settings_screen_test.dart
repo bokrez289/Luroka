@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/providers/theme_provider.dart';
+import 'package:luroka/providers/home_layout_provider.dart';
 import 'package:luroka/screens/settings/appearance_settings_screen.dart';
 import 'package:luroka/screens/settings/performance_settings_screen.dart';
 import 'package:luroka/screens/settings/theme_settings_screen.dart';
 import 'package:luroka/services/settings_service.dart' hide ThemeMode;
+import 'package:luroka/services/storage_service.dart';
 import 'package:luroka/services/device_performance.dart';
 import 'package:luroka/widgets/focusable_list_tile.dart';
 import 'package:luroka/services/settings_service.dart' as settings show ThemeMode;
@@ -27,6 +29,66 @@ void main() {
     LocaleSettings.setLocaleSync(AppLocale.en);
   });
   tearDown(DevicePerformance.debugReset);
+
+  testWidgets('TV library settings expose the optional compact navigation switch', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+    tester.view.physicalSize = const Size(1280, 1800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final supporter = SupporterService.forTesting(availability: SupporterAvailability.hidden);
+    addTearDown(supporter.dispose);
+    final theme = ThemeProvider(supporter: supporter);
+    addTearDown(theme.dispose);
+    await tester.pumpWidget(
+      ChangeNotifierProvider<ThemeProvider>.value(
+        value: theme,
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.dark),
+          home: const AppearanceSettingsScreen(section: AppearanceSettingsSection.library),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final tile = find.ancestor(
+      of: find.text(t.libraryPolish.compactTvNavigation),
+      matching: find.byType(FocusableSwitchListTile),
+    );
+    expect(tester.widget<FocusableSwitchListTile>(tile).value, isFalse);
+    expect(find.text(t.settingsRedesign.libraryLayout), findsOneWidget);
+    expect(find.text(t.settingsRedesign.posterInformation), findsOneWidget);
+    expect(find.text(t.settingsRedesign.libraryBehavior), findsOneWidget);
+    await tester.tap(find.descendant(of: tile, matching: find.byType(Switch)));
+    await tester.pumpAndSettle();
+    expect(SettingsService.instance.read(SettingsService.compactTvLibraryNavigation), isTrue);
+  });
+
+  testWidgets('Customize Home appears before individual Home controls', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+    tester.view.physicalSize = const Size(1280, 1800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final storage = await tester.runAsync(StorageService.getInstance);
+    final layout = HomeLayoutProvider(storage: storage!, profileId: 'test-profile');
+    addTearDown(layout.dispose);
+    await tester.pumpWidget(
+      ChangeNotifierProvider<HomeLayoutProvider>.value(
+        value: layout,
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.dark),
+          home: const AppearanceSettingsScreen(section: AppearanceSettingsSection.home),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text(t.homeLayout.title), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text(t.homeLayout.title)).dy,
+      lessThan(tester.getTopLeft(find.text(t.downloadsRedesign.shelfSize)).dy),
+    );
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('appearance screen renders every reorganized group', (tester) async {
     tester.view.devicePixelRatio = 1;

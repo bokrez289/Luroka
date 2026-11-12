@@ -1,3 +1,4 @@
+import '../widgets/quit_luroka_dialog.dart';
 import 'dart:async';
 import '../services/kids_profile_service.dart';
 import '../media/ids.dart';
@@ -28,7 +29,6 @@ import '../widgets/app_icon.dart';
 import '../widgets/app_menu.dart';
 import '../utils/platform_detector.dart';
 import '../utils/error_dialog.dart';
-import '../utils/dialogs.dart';
 import '../utils/update_dialog.dart';
 import '../utils/video_player_navigation.dart';
 import '../mixins/mounted_set_state_mixin.dart';
@@ -46,6 +46,7 @@ import '../profiles/profile_selection_policy.dart';
 import '../providers/catalog_sources_provider.dart';
 import '../providers/account_preferences_controller.dart';
 import '../providers/download_provider.dart';
+import '../providers/home_layout_provider.dart';
 import '../providers/multi_server_provider.dart';
 import '../providers/hidden_libraries_provider.dart';
 import '../providers/libraries_provider.dart';
@@ -68,6 +69,7 @@ import '../widgets/navigation_label_fit.dart';
 import '../widgets/mobile_navigation_rail.dart';
 import '../widgets/side_navigation_rail.dart';
 import '../widgets/tv_navigation_dock.dart';
+import '../widgets/profile_menu.dart';
 import '../widgets/tv_library_dropdown.dart';
 import '../widgets/system_clock.dart';
 import '../focus/focusable_wrapper.dart';
@@ -89,11 +91,13 @@ import '../widgets/mobile_shell_scaffold.dart';
 import '../widgets/account_recovery_menu.dart';
 import '../widgets/luroka_mobile_navigation.dart';
 import 'settings/settings_screen.dart';
+import 'settings/home_layout_screen.dart';
 import 'settings/screen_time_screen.dart';
 import 'settings/source_libraries_screen.dart';
 import 'settings/add_connection_screen.dart';
 import 'offline_tv_recovery_screen.dart';
 import 'profile/profile_switch_screen.dart';
+import 'profile/family_settings_screen.dart';
 import 'video_player_screen.dart';
 import 'profile/profile_teardown.dart';
 import '../services/system_shelf_service.dart';
@@ -1718,13 +1722,7 @@ class _MainScreenState extends State<MainScreen>
     if (_exitPromptVisible) return;
     _exitPromptVisible = true;
     try {
-      final confirmed = await showConfirmDialog(
-        context,
-        title: t.startup.quitLuroka,
-        message: t.common.exitAppBody,
-        confirmText: t.common.exitApp,
-        cancelText: t.common.stay,
-      );
+      final confirmed = await showQuitLurokaDialog(context);
       if (!confirmed || !mounted) return;
       // AppExitService.requestExit is a required exit on desktop, which skips
       // the root exit observer's teardown; quit the way the close button does.
@@ -2538,33 +2536,26 @@ class _MainScreenState extends State<MainScreen>
             }
             final choice = await showAdaptiveAppMenu<String>(
               context,
-              title: active?.displayName ?? t.profiles.sectionTitle,
               position: Offset(MediaQuery.sizeOf(context).width - 100, 64),
               focusFirstItem: true,
-              entries: [
-                AppMenuItem(value: 'profile', icon: Symbols.account_circle_rounded, label: t.screens.switchProfile),
-                if (active != null && !KidsProfileService.instance.isActiveKids)
-                  AppMenuItem(value: 'activity', icon: Symbols.insights_rounded, label: t.family.activity),
-                if (active != null && !KidsProfileService.instance.isActiveKids)
-                  AppMenuItem(value: 'sources', icon: Symbols.video_library_rounded, label: t.sourceLibraries.title),
-                if (!PlatformDetector.isAppleTV())
-                  AppMenuItem(value: 'downloads', icon: Symbols.download_rounded, label: t.navigation.downloads),
-                AppMenuItem(value: 'settings', icon: Symbols.settings_rounded, label: t.common.settings),
-                if (!_isOffline)
-                  AppMenuItem(value: 'together', icon: Symbols.group_rounded, label: t.watchTogether.title),
-                if (homeOptions)
-                  AppMenuItem(value: 'home', icon: Symbols.tune_rounded, label: t.lurokaWorkspace.homeOptions),
-                const AppMenuDivider(),
-                AppMenuItem(value: 'logout', icon: Symbols.logout_rounded, label: t.common.logout),
-              ],
+              entries: buildProfileMenuEntries(
+                provider: profile,
+                isKids: false,
+                showDownloads: !PlatformDetector.isAppleTV(),
+                showWatchTogether: !_isOffline,
+                showCustomizeHome: homeOptions && context.read<HomeLayoutProvider?>()?.profileId != null,
+                showHomeOptions: homeOptions,
+              ),
             );
             if (!context.mounted) return;
             switch (choice) {
-              case 'profile':
+              case 'switch_profile':
                 Navigator.of(
                   context,
                   rootNavigator: true,
                 ).push(MaterialPageRoute<void>(builder: (_) => const ProfileSwitchScreen()));
+              case 'manage_profiles':
+                await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const FamilySettingsScreen()));
               case 'downloads':
                 _selectTab(NavigationTabId.downloads);
                 _focusContent(restorePreviousFocus: false);
@@ -2579,7 +2570,9 @@ class _MainScreenState extends State<MainScreen>
               case 'settings':
                 _selectTab(NavigationTabId.settings);
                 _focusContent(restorePreviousFocus: false);
-              case 'home':
+              case 'customize_home':
+                await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const HomeLayoutScreen()));
+              case 'home_options':
                 _onScreen<HomeOptionsTab>(NavigationTabId.discover, (screen) => screen.openHomeOptions());
               case 'together':
                 await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WatchTogetherScreen()));

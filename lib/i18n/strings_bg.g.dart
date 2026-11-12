@@ -137,6 +137,11 @@ class TranslationsBg extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$trakt$bg trakt = _Translations$trakt$bg._(_root);
 	@override late final _Translations$seerr$bg seerr = _Translations$seerr$bg._(_root);
 	@override late final _Translations$services$bg services = _Translations$services$bg._(_root);
+	@override late final _Translations$offlineRecovery$bg offlineRecovery = _Translations$offlineRecovery$bg._(_root);
+	@override late final _Translations$releaseUpdates$bg releaseUpdates = _Translations$releaseUpdates$bg._(_root);
+	@override late final _Translations$profileIntegrations$bg profileIntegrations = _Translations$profileIntegrations$bg._(_root);
+	@override late final _Translations$profileSetupGuide$bg profileSetupGuide = _Translations$profileSetupGuide$bg._(_root);
+	@override late final _Translations$animeFavorites$bg animeFavorites = _Translations$animeFavorites$bg._(_root);
 	@override late final _Translations$addServer$bg addServer = _Translations$addServer$bg._(_root);
 }
 
@@ -320,6 +325,9 @@ class _Translations$libraryPolish$bg extends Translations$libraryPolish$en {
 	final TranslationsBg _root; // ignore: unused_field
 
 	// Translations
+	@override String get compactTvNavigation => 'Компактна библиотечна навигация';
+	@override String get compactTvNavigationDescription => 'Показвайте секциите на библиотеката и опциите за разглеждане в плъзгащо се меню, оставяйки повече място за плакати.';
+	@override String get openLibraryMenu => 'Отворете менюто на библиотеката';
 	@override String get posterDetails => 'Подробности за плаката';
 	@override String get showPosterDetails => 'Показване на подробности за плаката · име, година и IMDb';
 	@override String get hidePosterDetails => 'Скриване на подробности за плаката';
@@ -633,6 +641,8 @@ class _Translations$settingsRedesign$bg extends Translations$settingsRedesign$en
 	// Translations
 	@override String get themeEffects => 'Тема и ефекти';
 	@override String get libraryLayout => 'Оформление на библиотеката';
+	@override String get posterInformation => 'Информация за плаката';
+	@override String get libraryBehavior => 'Поведение на библиотеката';
 	@override String get appearanceHint => 'Персонализирайте външния вид, оформлението и поведението на Luroka.';
 	@override String get livePreview => 'Преглед на живо';
 	@override String get previewHint => 'Вижте как ще изглежда вашата библиотека с текущите настройки.';
@@ -770,6 +780,19 @@ class _Translations$kids$bg extends Translations$kids$en {
 	final TranslationsBg _root; // ignore: unused_field
 
 	// Translations
+	@override String get timeLimits => 'Ограничения на времето на екрана';
+	@override String get dailyWatchLimit => 'Ежедневно време за гледане';
+	@override String get dailyWatchLimitHint => 'Ограничава възпроизвеждането на видео на това устройство всеки ден.';
+	@override String get noTimeLimit => 'Без ограничение';
+	@override String minutesLimit({required Object minutes}) => '${minutes} минути';
+	@override String get bedtime => 'Време за лягане';
+	@override String get bedtimeHint => 'За използване на този профил през тези часове е необходим родителски PIN код.';
+	@override String get bedtimeStart => 'Времето за лягане започва';
+	@override String get bedtimeEnd => 'Времето за лягане свършва';
+	@override String get timeLimitReached => 'Времето за гледане изтече за днес';
+	@override String get bedtimeReached => 'Време е за лягане';
+	@override String get timeLimitParentHint => 'Помолете родител да въведе своя PIN, за да продължи за тази сесия.';
+	@override String get parentUnlock => 'Родителско отключване';
 	@override String get backupProfile => 'Архивирайте профила на децата';
 	@override String get backupExplain => 'Архивирайте запазеното име, характер, ограничения, външен вид и локални изключения за гледане на този профил. ПИН кодовете на родителите, влизанията в сървъра, изтеглянията и прогресът на възпроизвеждане на сървъра не са включени.';
 	@override String get saveBackupFile => 'Запазете архивния файл';
@@ -1313,6 +1336,7 @@ class _Translations$settings$bg extends Translations$settings$en {
 	@override String get downloadLocationPickerUnavailable => 'Изборът на папка не е наличен на това устройство';
 	@override String get downloadOnWifiOnly => 'Изтегляне само през Wi-Fi';
 	@override String get downloadOnWifiOnlyDescription => 'Предотвратявай изтегляния през мобилни данни';
+	@override String get downloadWifiScope => 'Отнася се за всички профили и изтегляния на това устройство.';
 	@override String get autoRemoveWatchedDownloads => 'Автоматично премахвай изгледаните изтегляния';
 	@override String get autoRemoveWatchedDownloadsDescription => 'Изтривай изгледаните изтегляния автоматично';
 	@override String get cellularDownloadBlocked => 'Изтеглянията през мобилни данни са блокирани. Използвайте Wi-Fi или променете настройката.';
@@ -1651,8 +1675,8 @@ class _Translations$dashboard$bg extends Translations$dashboard$en {
 	@override String episodeLabel({required Object season, required Object episode}) => 'S${season} · E${episode}';
 	@override String get anotherPick => 'Друг избор';
 	@override String get exploreSeries => 'Разгледайте сериите';
-	@override String get showFeatured => 'Фокусирани подробности за заглавието';
-	@override String get showFeaturedDescription => 'Показване на обложка, резюме и информация за епизода за маркираната карта';
+	@override String get showFeatured => 'Акценти на началната страница';
+	@override String get showFeaturedDescription => 'Показване на избрани филми и предавания в горната част на началната страница.';
 }
 
 // Path: lurokaCatalog
@@ -1753,9 +1777,32 @@ class _Translations$homeLayout$bg extends Translations$homeLayout$en {
 	final TranslationsBg _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageStudios => 'Изберете и поръчайте студия';
+	@override String get manageStudiosDescription => 'Изберете кои студиа да се показват в този профил и подредете техния ред.';
+	@override String get studioUnavailable => 'Само студия, намерени в избраните от вас библиотеки, се показват на началната страница.';
+	@override String get showAllStudios => 'Покажи всички студия';
+	@override String get hideAllStudios => 'Скриване на всички студия';
+	@override String get reorderStudio => 'Променете реда на студиото';
+	@override String get episodeThumbnails => 'Изображения от епизоди в Продължете да гледате';
+	@override String get episodeThumbnailsDescription => 'Показвайте изображения на епизоди вместо плакати на сериали или сезони в Продължаване на гледането и Следващо.';
+	@override String get spotlightSource => 'Източник на подбрано съдържание';
+	@override String get spotlightSourceDescription => 'За вас използва активността на гледане на този профил на това устройство, заедно с любими и заглавия на библиотека.';
+	@override String get spotlightForYou => 'За теб';
+	@override String get spotlightForYouDescription => 'Комбинация от това, което гледате, любими, нови допълнения и тенденции, използвайки активността на гледане на този профил на това устройство.';
+	@override String get spotlightTrending => 'Тенденция';
+	@override String get spotlightTrendingDescription => 'Популярни филми и предавания във вашите библиотеки.';
+	@override String get spotlightContinue => 'Продължете да гледате';
+	@override String get spotlightContinueDescription => 'Заглавия, които сте започнали, и епизоди, които можете да продължите.';
+	@override String get spotlightFavorites => 'От вашите любими';
+	@override String get spotlightInspired => 'Вдъхновен от вашето гледане';
+	@override String get spotlightNextUp => 'Следва';
 	@override String get title => 'Персонализиране на дома';
 	@override String get description => 'Изберете реда на редовете и видимостта за този профил. Изберете ред, за да го преместите или скриете.';
 	@override String get rows => 'Домашни редове';
+	@override String get progressLayout => 'Продължете да гледате и напред';
+	@override String get progressCombined => 'Комбинирани в един ред';
+	@override String get progressSeparate => 'Отделни редове';
+	@override String get progressDescription => 'Отделете Next Up, когато се поддържа от сървъра. Други сървъри остават комбинирани.';
 	@override String get visible => 'Видими';
 	@override String get hidden => 'Скрити';
 	@override String get showRow => 'Покажи ред';
@@ -1818,6 +1865,8 @@ class _Translations$activityStats$bg extends Translations$activityStats$en {
 	@override String get trendTitle => 'Време за гледане';
 	@override String get trendToday => 'Днес';
 	@override String gapDetail({required Object stat, required Object range}) => '${stat} на ${range}';
+	@override String get patternsTitle => 'Вашите модели';
+	@override String mostlyKind({required Object kind}) => 'Предимно ${kind}';
 	@override String get weekdayTitle => 'По делничен ден';
 	@override String get hoursTitle => 'По време на деня';
 	@override String get amLabel => 'сутринта';
@@ -1830,6 +1879,8 @@ class _Translations$activityStats$bg extends Translations$activityStats$en {
 	@override String get kindOther => 'други';
 	@override String get topTitlesTitle => 'Най-гледан';
 	@override String get sessionsTitle => 'Последни сесии';
+	@override String get recentViewingTitle => 'Скорошно гледане';
+	@override String get recentViewingHint => 'Общо гледано време в избрания период. Датите показват последното гледане.';
 	@override String get showMore => 'Покажи повече';
 	@override String get sessionNoTitle => 'Неидентифицирано възпроизвеждане';
 	@override String get emptyTitle => 'Тук още няма нищо';
@@ -2262,6 +2313,7 @@ class _Translations$messages$bg extends Translations$messages$en {
 	@override String metadataRefreshStarted({required Object title}) => 'Опресняването на метаданни е стартирано за "${title}"';
 	@override String metadataRefreshFailed({required Object error}) => 'Неуспешно опресняване на метаданни: ${error}';
 	@override String get logoutConfirm => 'Сигурни ли сте, че искате да излезете?';
+	@override String get logoutDeviceConfirm => 'Излезте от Luroka на това устройство? Всички профили, включително профили за деца, сървърни акаунти и изтеглени медии ще бъдат премахнати от това устройство. Можете да влезете отново по-късно.';
 	@override String get noSeasonsFound => 'Не са намерени сезони';
 	@override String get seasonsLoadFailed => 'Неуспешно зареждане на сезони';
 	@override String get noEpisodesFound => 'Не са намерени епизоди в първия сезон';
@@ -2392,6 +2444,9 @@ class _Translations$profiles$bg extends Translations$profiles$en {
 	final TranslationsBg _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageProfiles => 'Управление на профили';
+	@override String get quickAccess => 'Бърз достъп';
+	@override String get signOutDevice => 'Излезте от това устройство';
 	@override String get addLurokaProfile => 'Добавете Luroka профил';
 	@override String get switchingProfile => 'Смяна на профил…';
 	@override String get deleteThisProfileTitle => 'Да се изтрие ли този профил?';
@@ -2510,7 +2565,7 @@ class _Translations$accountPreferences$bg extends Translations$accountPreference
 	@override String hubSubtitleSingle({required Object account}) => 'Опции за аудио, субтитри и библиотека, запазени на ${account}';
 	@override String hubSubtitleMultiple({required Object count}) => 'Опции за аудио, субтитри и библиотека, запазени на ${count} акаунта';
 	@override String get pickAccount => 'Всеки акаунт съхранява собствени предпочитания. Изберете кой да редактирате.';
-	@override String get storedOnAccount => 'Тези опции се запазват на самия акаунт, така че всяко приложение, вписано в него, ги използва — включително Luroka на другите ви устройства.';
+	@override String get storedOnAccount => 'Тези опции се записват в сървърния акаунт и се споделят от всеки Luroka профил и приложение, използващи този акаунт, включително на други устройства.';
 	@override String get noAccounts => 'Няма акаунти за настройка';
 	@override String get noAccountsHint => 'Влезте в Plex или свържете Jellyfin или Emby сървър и предпочитанията, запазени на този акаунт, ще се появят тук.';
 	@override String get unavailable => 'Акаунтът не може да бъде достигнат';
@@ -3700,6 +3755,108 @@ class _Translations$services$bg extends Translations$services$en {
 	@override late final _Translations$services$libraryFilter$bg libraryFilter = _Translations$services$libraryFilter$bg._(_root);
 }
 
+// Path: offlineRecovery
+class _Translations$offlineRecovery$bg extends Translations$offlineRecovery$en {
+	_Translations$offlineRecovery$bg._(TranslationsBg root) : this._root = root, super.internal(root);
+
+	final TranslationsBg _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Вашите сървъри са офлайн';
+	@override String get description => 'Вашите изтеглени файлове все още са налични. Опитайте да се свържете отново, когато сървърът ви се върне, или добавете друг сървър.';
+	@override String get appleTvDescription => 'Luroka не можа да се свърже с медийните ви сървъри. Опитайте да се свържете отново, когато са налични, или добавете друг сървър, за да продължите да гледате.';
+	@override String get kidsDescription => 'Не успяхме да се свържем с вашия медиен сървър. Опитайте да се свържете отново или помолете родител за помощ.';
+	@override String get retrying => 'Свързване...';
+	@override String get addServer => 'Добавяне на сървър';
+}
+
+// Path: releaseUpdates
+class _Translations$releaseUpdates$bg extends Translations$releaseUpdates$en {
+	_Translations$releaseUpdates$bg._(TranslationsBg root) : this._root = root, super.internal(root);
+
+	final TranslationsBg _root; // ignore: unused_field
+
+	// Translations
+	@override String get manualInstructions => 'Изтеглете архива на изданието от GitHub, разархивирайте APK и го инсталирайте на вашето Android устройство.';
+	@override String get tvInstructions => 'Отворете този адрес на телефона или компютъра си или сканирайте QR кода, за да изтеглите изданието.';
+	@override String get pressBackAgain => 'Натиснете Назад отново, за да излезете от възпроизвеждането';
+}
+
+// Path: profileIntegrations
+class _Translations$profileIntegrations$bg extends Translations$profileIntegrations$en {
+	_Translations$profileIntegrations$bg._(TranslationsBg root) : this._root = root, super.internal(root);
+
+	final TranslationsBg _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Направете Luroka ваш';
+	@override String get description => 'Свържете любимите си услуги, за да следите какво гледате и да поискате нови филми и предавания. Всеки Luroka профил има свои собствени връзки.';
+	@override String get step => 'Интеграции по избор';
+	@override String get examples => 'Trakt · Simkl · AniList · MyAnimeList · Seerr';
+	@override String get connect => 'Разгледайте интеграциите';
+	@override String get later => 'Настройте по-късно';
+	@override String get manage => 'Управление на интеграции';
+	@override String forProfile({required Object name}) => 'Връзки за ${name}';
+}
+
+// Path: profileSetupGuide
+class _Translations$profileSetupGuide$bg extends Translations$profileSetupGuide$en {
+	_Translations$profileSetupGuide$bg._(TranslationsBg root) : this._root = root, super.internal(root);
+
+	final TranslationsBg _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Направете вашия профил ваш';
+	@override String get description => 'Изберете как Luroka изглежда и се чувства за този профил на това устройство. Можете да промените всичко по-късно в Настройки.';
+	@override String get appearanceStep => '1 от 2 · Външен вид';
+	@override String get homeStep => '2 от 2 · Вашият начален екран';
+	@override String get preview => 'Преглед';
+	@override String get previewTitle => 'Вашият дом';
+	@override String get previewPoster => 'Плакат';
+	@override String get posterArtwork => 'Само произведения на изкуството';
+	@override String get posterWithDetails => 'Показване на подробности за плаката';
+	@override String get musicDescription => 'Пуснете филм или тема на предаване, докато страницата с подробности е отворена, когато е налична.';
+	@override String get moreThemes => 'Още теми';
+	@override String get fewerThemes => 'По-малко теми';
+	@override String get spotlightHeading => 'Какво трябва да се появи в Spotlight?';
+	@override String get progressHeading => 'Продължете да гледате и напред';
+	@override String get skip => 'Използвайте настройките по подразбиране и започнете да гледате';
+	@override String get finish => 'Започнете да гледате';
+	@override String get back => 'Назад';
+	@override String get kContinue => 'Продължи';
+	@override String get chooseLater => 'Изберете библиотеки по-късно';
+	@override String get libraryScope => 'Това променя това, което се появява в Luroka за този профил; не променя разрешенията на сървъра.';
+	@override String get createdTitle => 'Профилът е създаден';
+	@override String get createdDescription => 'Вашият нов профил е готов. Притежателят му може да го персонализира при първото отваряне.';
+	@override String get switchProfile => 'Преминете към този профил';
+	@override String get stayHere => 'Останете в текущия профил';
+}
+
+// Path: animeFavorites
+class _Translations$animeFavorites$bg extends Translations$animeFavorites$en {
+	_Translations$animeFavorites$bg._(TranslationsBg root) : this._root = root, super.internal(root);
+
+	final TranslationsBg _root; // ignore: unused_field
+
+	// Translations
+	@override String get filter => 'Аниме';
+	@override String get manage => 'Управление на аниме';
+	@override String get description => 'Автоматичното откриване използва имена на аниме библиотеки и налични аниме тагове или идентификатори. Изберете библиотеки и коригирайте отделни любими. Изборите се запазват на това устройство за вашия профил.';
+	@override String get libraries => 'Аниме библиотеки';
+	@override String get libraryHint => 'Библиотеките с име Anime се разпознават автоматично. Изберете библиотека, за да промените нейната класификация.';
+	@override String get titles => 'Любими заглавия';
+	@override String get titleHint => 'Изберете заглавие, за да го маркирате като аниме, или коригирайте автоматично съвпадение.';
+	@override String get automatic => 'Автоматичен';
+	@override String get include => 'Аниме';
+	@override String get exclude => 'Не аниме';
+	@override String get automaticIncluded => 'Автоматично · Аниме';
+	@override String get automaticExcluded => 'Автоматично · Не е аниме';
+	@override String get noLibraries => 'Няма налични свързани библиотеки.';
+	@override String get noTitles => 'Няма налични любими филми или предавания.';
+	@override String get empty => 'Няма намерени любими аниме. Проверете вашите аниме библиотеки или маркирайте заглавие като аниме.';
+	@override String get saveFailed => 'Настройките ви за аниме не можаха да бъдат запазени. Моля, опитайте отново.';
+}
+
 // Path: addServer
 class _Translations$addServer$bg extends Translations$addServer$en {
 	_Translations$addServer$bg._(TranslationsBg root) : this._root = root, super.internal(root);
@@ -3712,7 +3869,7 @@ class _Translations$addServer$bg extends Translations$addServer$en {
 	@override String get serverUrlsHelper => 'Позволени са няколко URL адреса, разделени със запетаи.';
 	@override String get findServer => 'Намери сървър';
 	@override String searchingLocalMediaBrowserServers({required Object product}) => 'Търсене на локални ${product} сървъри...';
-	@override String localMediaBrowserServers({required Object product}) => 'Локални ${product} сървъри';
+	@override String localMediaBrowserServers({required Object product}) => 'Запазени и близки ${product} сървъри';
 	@override String get username => 'Потребителско име';
 	@override String get password => 'Парола';
 	@override String get signIn => 'Вход';
@@ -4788,6 +4945,9 @@ extension on TranslationsBg {
 			'posterDetails.catalogEpisodeInfoDescription' => 'Показвайте броя на епизодите и средната продължителност на плакатите на Открий.',
 			'posterDetails.title' => 'Подробности за плаката',
 			'posterDetails.description' => 'Показвайте заглавието, годината и рейтинга IMDb под плакати в Studio, Search, Открий и Libraries. Липсващите IMDb оценки остават скрити. Изключете за плакати само с произведения на изкуството.',
+			'libraryPolish.compactTvNavigation' => 'Компактна библиотечна навигация',
+			'libraryPolish.compactTvNavigationDescription' => 'Показвайте секциите на библиотеката и опциите за разглеждане в плъзгащо се меню, оставяйки повече място за плакати.',
+			'libraryPolish.openLibraryMenu' => 'Отворете менюто на библиотеката',
 			'libraryPolish.posterDetails' => 'Подробности за плаката',
 			'libraryPolish.showPosterDetails' => 'Показване на подробности за плаката · име, година и IMDb',
 			'libraryPolish.hidePosterDetails' => 'Скриване на подробности за плаката',
@@ -5002,6 +5162,8 @@ extension on TranslationsBg {
 			'tvSettingsV2.simpleAudio' => 'Езици и външен вид на субтитрите',
 			'settingsRedesign.themeEffects' => 'Тема и ефекти',
 			'settingsRedesign.libraryLayout' => 'Оформление на библиотеката',
+			'settingsRedesign.posterInformation' => 'Информация за плаката',
+			'settingsRedesign.libraryBehavior' => 'Поведение на библиотеката',
 			'settingsRedesign.appearanceHint' => 'Персонализирайте външния вид, оформлението и поведението на Luroka.',
 			'settingsRedesign.livePreview' => 'Преглед на живо',
 			'settingsRedesign.previewHint' => 'Вижте как ще изглежда вашата библиотека с текущите настройки.',
@@ -5103,6 +5265,19 @@ extension on TranslationsBg {
 			'detailComposition.mediaInformation' => 'Информация за медиите',
 			'detailComposition.fullFileInformation' => 'Пълна информация за файла',
 			'detailComposition.castAndCrew' => 'Актьори и екип',
+			'kids.timeLimits' => 'Ограничения на времето на екрана',
+			'kids.dailyWatchLimit' => 'Ежедневно време за гледане',
+			'kids.dailyWatchLimitHint' => 'Ограничава възпроизвеждането на видео на това устройство всеки ден.',
+			'kids.noTimeLimit' => 'Без ограничение',
+			'kids.minutesLimit' => ({required Object minutes}) => '${minutes} минути',
+			'kids.bedtime' => 'Време за лягане',
+			'kids.bedtimeHint' => 'За използване на този профил през тези часове е необходим родителски PIN код.',
+			'kids.bedtimeStart' => 'Времето за лягане започва',
+			'kids.bedtimeEnd' => 'Времето за лягане свършва',
+			'kids.timeLimitReached' => 'Времето за гледане изтече за днес',
+			'kids.bedtimeReached' => 'Време е за лягане',
+			'kids.timeLimitParentHint' => 'Помолете родител да въведе своя PIN, за да продължи за тази сесия.',
+			'kids.parentUnlock' => 'Родителско отключване',
 			'kids.backupProfile' => 'Архивирайте профила на децата',
 			'kids.backupExplain' => 'Архивирайте запазеното име, характер, ограничения, външен вид и локални изключения за гледане на този профил. ПИН кодовете на родителите, влизанията в сървъра, изтеглянията и прогресът на възпроизвеждане на сървъра не са включени.',
 			'kids.saveBackupFile' => 'Запазете архивния файл',
@@ -5187,6 +5362,8 @@ extension on TranslationsBg {
 			'kids.blocked' => 'Това заглавие не е налично в този детски профил.',
 			'kids.switchProfile' => 'Превключване на профил',
 			'kids.manageFromAdult' => 'Превключете към профил за възрастни, за да управлявате настройките.',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => 'Свържете сървър към вашия профил за възрастни, преди да добавите профил за деца.',
 			'kids.created' => 'Създаден детски профил',
 			'kids.updated' => 'Детският профил е актуализиран',
@@ -5205,8 +5382,6 @@ extension on TranslationsBg {
 			'lurokaDiscovery.imdbTv100' => 'IMDb Топ 100 предавания · Моментна снимка от септември 2026 г.',
 			'lurokaDiscovery.emmyComedy' => 'Еми · Победители в комедиен сериал · 1971–2026',
 			'lurokaDiscovery.emmys' => 'Еми · Победители в драматичен сериал · 1966–2026',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.bafta' => 'BAFTA · Победители за най-добър филм',
 			'lurokaDiscovery.cannes' => 'Кан · Носители на Златна палма',
 			'lurokaDiscovery.awardsNote' => 'Колекциите от награди включват история на Оскар за най-добър филм, победители в драма/комедия на Еми и разширени селекции на BAFTA/Кан. Повтарящите се печеливши заглавия се появяват веднъж. Членството използва истории на награди и факти от Wikidata. IMDb Списъците с топ 100 филми/шоу запазват моментни снимки на класацията от септември 2026 г. от mmdju/imdb-top250-api. Появяват се само съвпадения във вашите видими онлайн библиотеки; размерът на колекцията зависи от наличността на библиотеката.',
@@ -5599,6 +5774,7 @@ extension on TranslationsBg {
 			'settings.downloadLocationPickerUnavailable' => 'Изборът на папка не е наличен на това устройство',
 			'settings.downloadOnWifiOnly' => 'Изтегляне само през Wi-Fi',
 			'settings.downloadOnWifiOnlyDescription' => 'Предотвратявай изтегляния през мобилни данни',
+			'settings.downloadWifiScope' => 'Отнася се за всички профили и изтегляния на това устройство.',
 			'settings.autoRemoveWatchedDownloads' => 'Автоматично премахвай изгледаните изтегляния',
 			'settings.autoRemoveWatchedDownloadsDescription' => 'Изтривай изгледаните изтегляния автоматично',
 			'settings.cellularDownloadBlocked' => 'Изтеглянията през мобилни данни са блокирани. Използвайте Wi-Fi или променете настройката.',
@@ -5700,6 +5876,8 @@ extension on TranslationsBg {
 			'settings.languageAndRegion' => 'Език и регион',
 			'settings.startup' => 'Стартиране',
 			'settings.display' => 'Дисплей',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Библиотека и карти',
 			'settings.homeScreen' => 'Начален екран',
 			'settings.navigation' => 'Навигация',
@@ -5719,8 +5897,6 @@ extension on TranslationsBg {
 			'settings.gestureVolumeSwipeDescription' => 'Плъзни нагоре или надолу по десния ръб, за да регулираш силата на звука',
 			'settings.gesturePinchToZoom' => 'Стискане за мащабиране',
 			'settings.gesturePinchToZoomDescription' => 'Стисни видеото, за да увеличиш или намалиш мащаба',
-			_ => null,
-		} ?? switch (path) {
 			'settings.rememberBrightnessLevel' => 'Запомняй нивото на яркостта',
 			'settings.rememberBrightnessLevelDescription' => 'Започвай възпроизвеждането с яркостта, зададена от последното плъзгане',
 			'settings.controls' => 'Контроли',
@@ -5860,8 +6036,8 @@ extension on TranslationsBg {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => 'Друг избор',
 			'dashboard.exploreSeries' => 'Разгледайте сериите',
-			'dashboard.showFeatured' => 'Фокусирани подробности за заглавието',
-			'dashboard.showFeaturedDescription' => 'Показване на обложка, резюме и информация за епизода за маркираната карта',
+			'dashboard.showFeatured' => 'Акценти на началната страница',
+			'dashboard.showFeaturedDescription' => 'Показване на избрани филми и предавания в горната част на началната страница.',
 			'lurokaCatalog.aboutPerson' => 'В СВЕТЛИНАТА НА ПРОЖЕКТОРИТЕ',
 			'lurokaCatalog.biographyUnavailable' => 'Биографията не е достъпна от този сървър.',
 			'lurokaCatalog.filmography' => 'Филми и предавания във вашите библиотеки',
@@ -5917,9 +6093,32 @@ extension on TranslationsBg {
 			'customPerformance.frameBudget' => 'Бюджет на кадър',
 			'customPerformance.processMemory' => 'Паметта на процеса на приложението в края на пробата',
 			'customPerformance.noFrames' => 'Не бяха заснети изобразени кадри. Стартирайте друга проба и прегледайте приложението.',
+			'homeLayout.manageStudios' => 'Изберете и поръчайте студия',
+			'homeLayout.manageStudiosDescription' => 'Изберете кои студиа да се показват в този профил и подредете техния ред.',
+			'homeLayout.studioUnavailable' => 'Само студия, намерени в избраните от вас библиотеки, се показват на началната страница.',
+			'homeLayout.showAllStudios' => 'Покажи всички студия',
+			'homeLayout.hideAllStudios' => 'Скриване на всички студия',
+			'homeLayout.reorderStudio' => 'Променете реда на студиото',
+			'homeLayout.episodeThumbnails' => 'Изображения от епизоди в Продължете да гледате',
+			'homeLayout.episodeThumbnailsDescription' => 'Показвайте изображения на епизоди вместо плакати на сериали или сезони в Продължаване на гледането и Следващо.',
+			'homeLayout.spotlightSource' => 'Източник на подбрано съдържание',
+			'homeLayout.spotlightSourceDescription' => 'За вас използва активността на гледане на този профил на това устройство, заедно с любими и заглавия на библиотека.',
+			'homeLayout.spotlightForYou' => 'За теб',
+			'homeLayout.spotlightForYouDescription' => 'Комбинация от това, което гледате, любими, нови допълнения и тенденции, използвайки активността на гледане на този профил на това устройство.',
+			'homeLayout.spotlightTrending' => 'Тенденция',
+			'homeLayout.spotlightTrendingDescription' => 'Популярни филми и предавания във вашите библиотеки.',
+			'homeLayout.spotlightContinue' => 'Продължете да гледате',
+			'homeLayout.spotlightContinueDescription' => 'Заглавия, които сте започнали, и епизоди, които можете да продължите.',
+			'homeLayout.spotlightFavorites' => 'От вашите любими',
+			'homeLayout.spotlightInspired' => 'Вдъхновен от вашето гледане',
+			'homeLayout.spotlightNextUp' => 'Следва',
 			'homeLayout.title' => 'Персонализиране на дома',
 			'homeLayout.description' => 'Изберете реда на редовете и видимостта за този профил. Изберете ред, за да го преместите или скриете.',
 			'homeLayout.rows' => 'Домашни редове',
+			'homeLayout.progressLayout' => 'Продължете да гледате и напред',
+			'homeLayout.progressCombined' => 'Комбинирани в един ред',
+			'homeLayout.progressSeparate' => 'Отделни редове',
+			'homeLayout.progressDescription' => 'Отделете Next Up, когато се поддържа от сървъра. Други сървъри остават комбинирани.',
 			'homeLayout.visible' => 'Видими',
 			'homeLayout.hidden' => 'Скрити',
 			'homeLayout.showRow' => 'Покажи ред',
@@ -5961,6 +6160,8 @@ extension on TranslationsBg {
 			'activityStats.trendTitle' => 'Време за гледане',
 			'activityStats.trendToday' => 'Днес',
 			'activityStats.gapDetail' => ({required Object stat, required Object range}) => '${stat} на ${range}',
+			'activityStats.patternsTitle' => 'Вашите модели',
+			'activityStats.mostlyKind' => ({required Object kind}) => 'Предимно ${kind}',
 			'activityStats.weekdayTitle' => 'По делничен ден',
 			'activityStats.hoursTitle' => 'По време на деня',
 			'activityStats.amLabel' => 'сутринта',
@@ -5973,6 +6174,8 @@ extension on TranslationsBg {
 			'activityStats.kindOther' => 'други',
 			'activityStats.topTitlesTitle' => 'Най-гледан',
 			'activityStats.sessionsTitle' => 'Последни сесии',
+			'activityStats.recentViewingTitle' => 'Скорошно гледане',
+			'activityStats.recentViewingHint' => 'Общо гледано време в избрания период. Датите показват последното гледане.',
 			'activityStats.showMore' => 'Покажи повече',
 			'activityStats.sessionNoTitle' => 'Неидентифицирано възпроизвеждане',
 			'activityStats.emptyTitle' => 'Тук още няма нищо',
@@ -6187,6 +6390,8 @@ extension on TranslationsBg {
 			'accessibility.hue' => 'Нюанс',
 			'accessibility.saturation' => 'Наситеност',
 			'accessibility.brightness' => 'Яркост',
+			_ => null,
+		} ?? switch (path) {
 			'accessibility.hexColor' => 'Шестнадесетичен цвят',
 			'accessibility.expandText' => 'Разгъни текста',
 			'accessibility.collapseText' => 'Свий текста',
@@ -6233,8 +6438,6 @@ extension on TranslationsBg {
 			'videoControls.seekBackwardButton' => ({required Object seconds}) => 'Превърти назад ${seconds} секунди',
 			'videoControls.seekForwardButton' => ({required Object seconds}) => 'Превърти напред ${seconds} секунди',
 			'videoControls.previousButton' => 'Предишен епизод',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.nextButton' => 'Следващ епизод',
 			'videoControls.previousChapterButton' => 'Предишна глава',
 			'videoControls.nextChapterButton' => 'Следваща глава',
@@ -6336,6 +6539,7 @@ extension on TranslationsBg {
 			'messages.metadataRefreshStarted' => ({required Object title}) => 'Опресняването на метаданни е стартирано за "${title}"',
 			'messages.metadataRefreshFailed' => ({required Object error}) => 'Неуспешно опресняване на метаданни: ${error}',
 			'messages.logoutConfirm' => 'Сигурни ли сте, че искате да излезете?',
+			'messages.logoutDeviceConfirm' => 'Излезте от Luroka на това устройство? Всички профили, включително профили за деца, сървърни акаунти и изтеглени медии ще бъдат премахнати от това устройство. Можете да влезете отново по-късно.',
 			'messages.noSeasonsFound' => 'Не са намерени сезони',
 			'messages.seasonsLoadFailed' => 'Неуспешно зареждане на сезони',
 			'messages.noEpisodesFound' => 'Не са намерени епизоди в първия сезон',
@@ -6421,6 +6625,9 @@ extension on TranslationsBg {
 			'mpvConfig.removeLine' => 'Премахни ред',
 			'mpvConfig.embeddedVoHint' => 'vo, gpu-context и gpu-api се игнорират на Linux: вграденото видео винаги се рендерира през vo=libmpv върху видео равнината, а gpu-next (който е нужен за compute шейдъри като ArtCNN) не може да работи вградено.',
 			'dialog.confirmAction' => 'Потвърждение на действие',
+			'profiles.manageProfiles' => 'Управление на профили',
+			'profiles.quickAccess' => 'Бърз достъп',
+			'profiles.signOutDevice' => 'Излезте от това устройство',
 			'profiles.addLurokaProfile' => 'Добавете Luroka профил',
 			'profiles.switchingProfile' => 'Смяна на профил…',
 			'profiles.deleteThisProfileTitle' => 'Да се изтрие ли този профил?',
@@ -6512,7 +6719,7 @@ extension on TranslationsBg {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => 'Опции за аудио, субтитри и библиотека, запазени на ${account}',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => 'Опции за аудио, субтитри и библиотека, запазени на ${count} акаунта',
 			'accountPreferences.pickAccount' => 'Всеки акаунт съхранява собствени предпочитания. Изберете кой да редактирате.',
-			'accountPreferences.storedOnAccount' => 'Тези опции се запазват на самия акаунт, така че всяко приложение, вписано в него, ги използва — включително Luroka на другите ви устройства.',
+			'accountPreferences.storedOnAccount' => 'Тези опции се записват в сървърния акаунт и се споделят от всеки Luroka профил и приложение, използващи този акаунт, включително на други устройства.',
 			'accountPreferences.noAccounts' => 'Няма акаунти за настройка',
 			'accountPreferences.noAccountsHint' => 'Влезте в Plex или свържете Jellyfin или Emby сървър и предпочитанията, запазени на този акаунт, ще се появят тук.',
 			'accountPreferences.unavailable' => 'Акаунтът не може да бъде достигнат',
@@ -6697,6 +6904,8 @@ extension on TranslationsBg {
 			'libraries.sortLabels.dateShared' => 'Дата на споделяне',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Дата на излъчване на последния епизод',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Дата на добавяне на последния епизод',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Дата на изтегляне',
 			'libraries.sortLabels.size' => 'Размер',
 			'libraries.sortLabels.library' => 'Библиотека',
@@ -6747,8 +6956,6 @@ extension on TranslationsBg {
 			'about.packageLine' => ({required Object package}) => 'Опаковка: ${package}',
 			'about.localeLine' => ({required Object locale}) => 'Език: ${locale}',
 			'about.copyDetails' => 'Копиране на подробности',
-			_ => null,
-		} ?? switch (path) {
 			'about.detailsCopied' => 'Подробностите за приложението са копирани',
 			'about.detailsCopyFailed' => 'Подробностите за приложението не можаха да се копират',
 			'about.checkForUpdatesDescription' => 'Проверете GitHub за по-нова версия',
@@ -7211,6 +7418,8 @@ extension on TranslationsBg {
 			'watchTogether.offsetPlusSecond' => '+1 сек',
 			'watchTogether.participants' => 'Участници',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('bg'))(n, one: '${n} участник', other: '${n} участници', ), 
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'ОРГАНИЗАТОР',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (Вие)',
 			'watchTogether.playerIdle' => 'празен ход',
@@ -7261,8 +7470,6 @@ extension on TranslationsBg {
 			'watchTogether.notices.finished' => 'Готово',
 			'watchTogether.notices.hostChangedTo' => ({required Object name}) => '${name} вече е организатор',
 			'watchTogether.notices.youAreNowHost' => 'Вече сте организаторът',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.joined' => ({required Object name}) => '${name} се присъедини',
 			'watchTogether.notices.left' => ({required Object name}) => '${name} напусна',
 			'watchTogether.notices.controlRefused' => 'Само домакинът може да контролира възпроизвеждането',
@@ -7725,6 +7932,8 @@ extension on TranslationsBg {
 			'seerr.statusPartiallyAvailable' => 'Частично налично',
 			'seerr.statusRequested' => 'Заявено',
 			'seerr.statusProcessing' => 'Обработва се',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'В списъка с блокирани',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Неуспешна връзка с ${url}: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'На ${url} няма инстанция на Seerr (HTTP ${status})',
@@ -7775,8 +7984,6 @@ extension on TranslationsBg {
 			'services.deviceCode.title' => ({required Object service}) => 'Активиране на Luroka в ${service}',
 			'services.deviceCode.instructions' => 'Сканирайте QR кода или посетете адреса по-долу и въведете този код:',
 			'services.deviceCode.openToActivate' => ({required Object service}) => 'Отворете ${service}, за да активирате',
-			_ => null,
-		} ?? switch (path) {
 			'services.deviceCode.copyCode' => 'Копирай кода за активиране',
 			'services.deviceCode.waitingForAuthorization' => 'Изчакване на оторизация…',
 			'services.deviceCode.codeCopied' => 'Кодът е копиран',
@@ -7797,12 +8004,69 @@ extension on TranslationsBg {
 			'services.libraryFilter.modeHintWhitelist' => 'Синхронизирай само отметнатите по-долу библиотеки.',
 			'services.libraryFilter.libraries' => 'Библиотеки',
 			'services.libraryFilter.noLibraries' => 'Няма налични библиотеки',
+			'offlineRecovery.title' => 'Вашите сървъри са офлайн',
+			'offlineRecovery.description' => 'Вашите изтеглени файлове все още са налични. Опитайте да се свържете отново, когато сървърът ви се върне, или добавете друг сървър.',
+			'offlineRecovery.appleTvDescription' => 'Luroka не можа да се свърже с медийните ви сървъри. Опитайте да се свържете отново, когато са налични, или добавете друг сървър, за да продължите да гледате.',
+			'offlineRecovery.kidsDescription' => 'Не успяхме да се свържем с вашия медиен сървър. Опитайте да се свържете отново или помолете родител за помощ.',
+			'offlineRecovery.retrying' => 'Свързване...',
+			'offlineRecovery.addServer' => 'Добавяне на сървър',
+			'releaseUpdates.manualInstructions' => 'Изтеглете архива на изданието от GitHub, разархивирайте APK и го инсталирайте на вашето Android устройство.',
+			'releaseUpdates.tvInstructions' => 'Отворете този адрес на телефона или компютъра си или сканирайте QR кода, за да изтеглите изданието.',
+			'releaseUpdates.pressBackAgain' => 'Натиснете Назад отново, за да излезете от възпроизвеждането',
+			'profileIntegrations.title' => 'Направете Luroka ваш',
+			'profileIntegrations.description' => 'Свържете любимите си услуги, за да следите какво гледате и да поискате нови филми и предавания. Всеки Luroka профил има свои собствени връзки.',
+			'profileIntegrations.step' => 'Интеграции по избор',
+			'profileIntegrations.examples' => 'Trakt · Simkl · AniList · MyAnimeList · Seerr',
+			'profileIntegrations.connect' => 'Разгледайте интеграциите',
+			'profileIntegrations.later' => 'Настройте по-късно',
+			'profileIntegrations.manage' => 'Управление на интеграции',
+			'profileIntegrations.forProfile' => ({required Object name}) => 'Връзки за ${name}',
+			'profileSetupGuide.title' => 'Направете вашия профил ваш',
+			'profileSetupGuide.description' => 'Изберете как Luroka изглежда и се чувства за този профил на това устройство. Можете да промените всичко по-късно в Настройки.',
+			'profileSetupGuide.appearanceStep' => '1 от 2 · Външен вид',
+			'profileSetupGuide.homeStep' => '2 от 2 · Вашият начален екран',
+			'profileSetupGuide.preview' => 'Преглед',
+			'profileSetupGuide.previewTitle' => 'Вашият дом',
+			'profileSetupGuide.previewPoster' => 'Плакат',
+			'profileSetupGuide.posterArtwork' => 'Само произведения на изкуството',
+			'profileSetupGuide.posterWithDetails' => 'Показване на подробности за плаката',
+			'profileSetupGuide.musicDescription' => 'Пуснете филм или тема на предаване, докато страницата с подробности е отворена, когато е налична.',
+			'profileSetupGuide.moreThemes' => 'Още теми',
+			'profileSetupGuide.fewerThemes' => 'По-малко теми',
+			'profileSetupGuide.spotlightHeading' => 'Какво трябва да се появи в Spotlight?',
+			'profileSetupGuide.progressHeading' => 'Продължете да гледате и напред',
+			'profileSetupGuide.skip' => 'Използвайте настройките по подразбиране и започнете да гледате',
+			'profileSetupGuide.finish' => 'Започнете да гледате',
+			'profileSetupGuide.back' => 'Назад',
+			'profileSetupGuide.kContinue' => 'Продължи',
+			'profileSetupGuide.chooseLater' => 'Изберете библиотеки по-късно',
+			'profileSetupGuide.libraryScope' => 'Това променя това, което се появява в Luroka за този профил; не променя разрешенията на сървъра.',
+			'profileSetupGuide.createdTitle' => 'Профилът е създаден',
+			'profileSetupGuide.createdDescription' => 'Вашият нов профил е готов. Притежателят му може да го персонализира при първото отваряне.',
+			'profileSetupGuide.switchProfile' => 'Преминете към този профил',
+			'profileSetupGuide.stayHere' => 'Останете в текущия профил',
+			'animeFavorites.filter' => 'Аниме',
+			'animeFavorites.manage' => 'Управление на аниме',
+			'animeFavorites.description' => 'Автоматичното откриване използва имена на аниме библиотеки и налични аниме тагове или идентификатори. Изберете библиотеки и коригирайте отделни любими. Изборите се запазват на това устройство за вашия профил.',
+			'animeFavorites.libraries' => 'Аниме библиотеки',
+			'animeFavorites.libraryHint' => 'Библиотеките с име Anime се разпознават автоматично. Изберете библиотека, за да промените нейната класификация.',
+			'animeFavorites.titles' => 'Любими заглавия',
+			'animeFavorites.titleHint' => 'Изберете заглавие, за да го маркирате като аниме, или коригирайте автоматично съвпадение.',
+			'animeFavorites.automatic' => 'Автоматичен',
+			'animeFavorites.include' => 'Аниме',
+			'animeFavorites.exclude' => 'Не аниме',
+			'animeFavorites.automaticIncluded' => 'Автоматично · Аниме',
+			'animeFavorites.automaticExcluded' => 'Автоматично · Не е аниме',
+			'animeFavorites.noLibraries' => 'Няма налични свързани библиотеки.',
+			'animeFavorites.noTitles' => 'Няма налични любими филми или предавания.',
+			'animeFavorites.empty' => 'Няма намерени любими аниме. Проверете вашите аниме библиотеки или маркирайте заглавие като аниме.',
+			'animeFavorites.saveFailed' => 'Настройките ви за аниме не можаха да бъдат запазени. Моля, опитайте отново.',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => 'Добави ${product} сървър',
 			'addServer.serverUrls' => 'URL адреси на сървъра',
 			'addServer.serverUrlsHelper' => 'Позволени са няколко URL адреса, разделени със запетаи.',
 			'addServer.findServer' => 'Намери сървър',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => 'Търсене на локални ${product} сървъри...',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Локални ${product} сървъри',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => 'Запазени и близки ${product} сървъри',
 			'addServer.username' => 'Потребителско име',
 			'addServer.password' => 'Парола',
 			'addServer.signIn' => 'Вход',

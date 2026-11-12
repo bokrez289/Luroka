@@ -35,7 +35,7 @@ class TranslationsKo extends Translations with BaseTranslations<AppLocale, Trans
 
 	late final TranslationsKo _root = this; // ignore: unused_field
 
-	@override 
+	@override
 	TranslationsKo $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsKo(meta: meta ?? this.$meta);
 
 	// Translations
@@ -137,6 +137,11 @@ class TranslationsKo extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$trakt$ko trakt = _Translations$trakt$ko._(_root);
 	@override late final _Translations$seerr$ko seerr = _Translations$seerr$ko._(_root);
 	@override late final _Translations$services$ko services = _Translations$services$ko._(_root);
+	@override late final _Translations$offlineRecovery$ko offlineRecovery = _Translations$offlineRecovery$ko._(_root);
+	@override late final _Translations$releaseUpdates$ko releaseUpdates = _Translations$releaseUpdates$ko._(_root);
+	@override late final _Translations$profileIntegrations$ko profileIntegrations = _Translations$profileIntegrations$ko._(_root);
+	@override late final _Translations$profileSetupGuide$ko profileSetupGuide = _Translations$profileSetupGuide$ko._(_root);
+	@override late final _Translations$animeFavorites$ko animeFavorites = _Translations$animeFavorites$ko._(_root);
 	@override late final _Translations$addServer$ko addServer = _Translations$addServer$ko._(_root);
 }
 
@@ -254,9 +259,11 @@ class _Translations$family$ko extends Translations$family$en {
 	@override String get manageHint => '이 기기에서 사람과 어린이의 안전, 시청 활동을 관리하세요.';
 	@override String get people => '사람';
 	@override String peopleCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '${n} 사람',
 		other: '${n} 명',
 	);
 	@override String kidsCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '${n} 자식',
 		other: '${n} 키즈',
 	);
 	@override String get you => '당신';
@@ -318,6 +325,9 @@ class _Translations$libraryPolish$ko extends Translations$libraryPolish$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
+	@override String get compactTvNavigation => '컴팩트 라이브러리 탐색';
+	@override String get compactTvNavigationDescription => '슬라이드 아웃 메뉴에 라이브러리 섹션을 표시하고 옵션을 탐색하여 포스터를 위한 더 많은 공간을 확보합니다.';
+	@override String get openLibraryMenu => '라이브러리 메뉴 열기';
 	@override String get posterDetails => '포스터 세부정보';
 	@override String get showPosterDetails => '포스터 세부정보 표시 · 이름, 연도 및 IMDb';
 	@override String get hidePosterDetails => '포스터 세부정보 숨기기';
@@ -631,6 +641,8 @@ class _Translations$settingsRedesign$ko extends Translations$settingsRedesign$en
 	// Translations
 	@override String get themeEffects => '테마 및 효과';
 	@override String get libraryLayout => '라이브러리 레이아웃';
+	@override String get posterInformation => '포스터 정보';
+	@override String get libraryBehavior => '라이브러리 동작';
 	@override String get appearanceHint => 'Luroka의 모양, 레이아웃 및 동작을 사용자 정의하세요.';
 	@override String get livePreview => '실시간 미리보기';
 	@override String get previewHint => '현재 설정으로 라이브러리가 어떻게 보이는지 확인하세요.';
@@ -768,6 +780,19 @@ class _Translations$kids$ko extends Translations$kids$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
+	@override String get timeLimits => '화면 시간 제한';
+	@override String get dailyWatchLimit => '일일 시청 시간';
+	@override String get dailyWatchLimitHint => '매일 이 장치에서 비디오 재생을 제한합니다.';
+	@override String get noTimeLimit => '제한 없음';
+	@override String minutesLimit({required Object minutes}) => '${minutes}분';
+	@override String get bedtime => '취침 시간';
+	@override String get bedtimeHint => '이 시간에 프로필을 사용하려면 부모 PIN이 필요합니다.';
+	@override String get bedtimeStart => '취침 시간 시작';
+	@override String get bedtimeEnd => '취침 시간 종료';
+	@override String get timeLimitReached => '오늘의 시청 시간이 끝났습니다.';
+	@override String get bedtimeReached => '취침시간이다';
+	@override String get timeLimitParentHint => '계속 시청하려면 부모님께 PIN을 입력해 달라고 요청하세요.';
+	@override String get parentUnlock => '부모 잠금 해제';
 	@override String get backupProfile => '자녀 프로필 백업';
 	@override String get backupExplain => '이 프로필의 저장된 이름, 캐릭터, 제한 사항, 외모 및 로컬 보기 제외를 백업하세요. 상위 PIN, 서버 로그인, 다운로드 및 서버 재생 진행 상황은 포함되지 않습니다.';
 	@override String get saveBackupFile => '백업 파일 저장';
@@ -1311,6 +1336,7 @@ class _Translations$settings$ko extends Translations$settings$en {
 	@override String get downloadLocationPickerUnavailable => '이 기기에서는 폴더를 선택할 수 없습니다';
 	@override String get downloadOnWifiOnly => 'Wi-Fi 연결 시에만 다운로드';
 	@override String get downloadOnWifiOnlyDescription => '셀룰러 데이터 사용 중에는 다운로드하지 않습니다';
+	@override String get downloadWifiScope => '이 장치의 모든 프로필과 다운로드에 적용됩니다.';
 	@override String get autoRemoveWatchedDownloads => '시청한 다운로드 항목 자동 삭제';
 	@override String get autoRemoveWatchedDownloadsDescription => '시청한 다운로드 항목을 자동으로 삭제합니다';
 	@override String get cellularDownloadBlocked => '셀룰러에서는 다운로드가 차단됩니다. Wi-Fi를 사용하거나 설정을 변경하세요.';
@@ -1649,8 +1675,8 @@ class _Translations$dashboard$ko extends Translations$dashboard$en {
 	@override String episodeLabel({required Object season, required Object episode}) => 'S${season} · E${episode}';
 	@override String get anotherPick => '또 다른 선택';
 	@override String get exploreSeries => '시리즈 살펴보기';
-	@override String get showFeatured => '집중된 제목 세부정보';
-	@override String get showFeaturedDescription => '강조 표시된 카드의 삽화, 시놉시스, 에피소드 정보 표시';
+	@override String get showFeatured => '홈 스포트라이트';
+	@override String get showFeaturedDescription => '홈 상단에 추천 영화와 프로그램을 표시합니다.';
 }
 
 // Path: lurokaCatalog
@@ -1751,9 +1777,32 @@ class _Translations$homeLayout$ko extends Translations$homeLayout$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageStudios => '스튜디오 선택 및 주문';
+	@override String get manageStudiosDescription => '이 프로필에 표시할 스튜디오를 선택하고 순서를 조정하세요.';
+	@override String get studioUnavailable => '선택한 라이브러리에 있는 스튜디오만 홈에 표시됩니다.';
+	@override String get showAllStudios => '모든 스튜디오 보기';
+	@override String get hideAllStudios => '모든 스튜디오 숨기기';
+	@override String get reorderStudio => '스튜디오 순서 변경';
+	@override String get episodeThumbnails => '계속 시청의 에피소드 이미지';
+	@override String get episodeThumbnailsDescription => '계속 시청 및 다음편에서 시리즈나 시즌 포스터 대신 에피소드 이미지를 표시하세요.';
+	@override String get spotlightSource => '추천 콘텐츠 소스';
+	@override String get spotlightSourceDescription => 'For You는 즐겨찾기 및 라이브러리 제목과 함께 이 기기에서 이 프로필의 시청 활동을 사용합니다.';
+	@override String get spotlightForYou => '당신을 위해';
+	@override String get spotlightForYouDescription => '이 기기에서 이 프로필의 시청 활동을 사용하여 시청 중인 콘텐츠, 즐겨찾기, 새로운 추가 항목 및 트렌드가 혼합되어 있습니다.';
+	@override String get spotlightTrending => '인기 급상승';
+	@override String get spotlightTrendingDescription => '라이브러리에 있는 인기 영화와 프로그램.';
+	@override String get spotlightContinue => '계속 시청하기';
+	@override String get spotlightContinueDescription => '시작한 타이틀과 계속할 수 있는 에피소드.';
+	@override String get spotlightFavorites => '즐겨찾기에서';
+	@override String get spotlightInspired => '귀하의 시청에서 영감을 얻었습니다.';
+	@override String get spotlightNextUp => '다음은';
 	@override String get title => '홈 개인화';
 	@override String get description => '이 프로필의 행 순서와 공개 여부를 선택하세요. 이동하거나 숨기려면 행을 선택하세요.';
 	@override String get rows => '홈 행';
+	@override String get progressLayout => '계속해서 시청하고 다음 단계를 진행하세요';
+	@override String get progressCombined => '한 줄로 결합';
+	@override String get progressSeparate => '별도의 행';
+	@override String get progressDescription => '서버에서 지원하는 경우 Next Up을 분리하세요. 다른 서버는 결합된 상태로 유지됩니다.';
 	@override String get visible => '보이는';
 	@override String get hidden => '숨겨진';
 	@override String get showRow => '행 표시';
@@ -1807,6 +1856,7 @@ class _Translations$activityStats$ko extends Translations$activityStats$en {
 	@override String get consistency => '일관성';
 	@override String get currentStreak => '현재 연속';
 	@override String dayCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '${n}​일',
 		other: '${n}일',
 	);
 	@override String get longestStreak => '최장 연속 행진';
@@ -1815,6 +1865,8 @@ class _Translations$activityStats$ko extends Translations$activityStats$en {
 	@override String get trendTitle => '시청 시간';
 	@override String get trendToday => '오늘';
 	@override String gapDetail({required Object range, required Object stat}) => '${range}의 ${stat}';
+	@override String get patternsTitle => '당신의 패턴';
+	@override String mostlyKind({required Object kind}) => '주로 ${kind}';
 	@override String get weekdayTitle => '평일 기준';
 	@override String get hoursTitle => '시간대별';
 	@override String get amLabel => '오전';
@@ -1827,6 +1879,8 @@ class _Translations$activityStats$ko extends Translations$activityStats$en {
 	@override String get kindOther => '기타';
 	@override String get topTitlesTitle => '가장 많이 본';
 	@override String get sessionsTitle => '최근 세션';
+	@override String get recentViewingTitle => '최근 시청';
+	@override String get recentViewingHint => '선택한 기간 동안 시청한 총 시간입니다. 날짜는 최근 시청 횟수를 보여줍니다.';
 	@override String get showMore => '더 보기';
 	@override String get sessionNoTitle => '미확인 재생';
 	@override String get emptyTitle => '아직 아무것도 없습니다';
@@ -2022,12 +2076,15 @@ class _Translations$mediaMenu$ko extends Translations$mediaMenu$en {
 	@override String confirmDeleteTarget({required Object title}) => '서버에서 ${title}을(를) 영구 삭제할까요?';
 	@override String get deleteMultipleWarning => '모든 에피소드와 파일이 포함됩니다.';
 	@override String deleteEpisodeCountWarning({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '이렇게 하면 포함된 모든 ${n} 에피소드와 해당 파일이 삭제됩니다.',
 		other: '포함된 에피소드 ${n}개와 해당 파일이 모두 삭제됩니다.',
 	);
 	@override String deleteMultiPartWarning({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '이 항목은 ${n} 파일로 저장되며 삭제됩니다.',
 		other: '이 항목은 파일 ${n}개에 걸쳐 저장되어 있으며, 모든 파일이 삭제됩니다.',
 	);
 	@override String deleteSharedFileHeading({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '${n} 다른 에피소드도 동일한 파일에 저장되며 삭제됩니다.',
 		other: '같은 파일에 저장된 다른 에피소드 ${n}개도 함께 삭제됩니다:',
 	);
 	@override String get deleteScopeUnverifiedProbeFailed => 'Luroka가 어떤 파일이 삭제될지 확인하지 못해 위 항목보다 더 많은 파일이 삭제될 수 있습니다. 취소하고 다시 시도하거나 그래도 삭제하세요.';
@@ -2222,6 +2279,7 @@ class _Translations$messages$ko extends Translations$messages$en {
 	@override String get markedAsUnwatchedOffline => '미시청으로 표시됨 (연결 시 동기화됨)';
 	@override String autoRemovedWatchedDownload({required Object title}) => '자동 삭제됨: ${title}';
 	@override String autoRemovedWatchedDownloads({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '자동 제거된 ${n} 시청 다운로드',
 		other: '시청한 다운로드 ${n}개를 자동 삭제했습니다',
 	);
 	@override String get removedFromContinueWatching => '계속 시청 목록에서 제거됨';
@@ -2255,6 +2313,7 @@ class _Translations$messages$ko extends Translations$messages$en {
 	@override String metadataRefreshStarted({required Object title}) => '"${title}" 메타데이터 새로고침 시작됨';
 	@override String metadataRefreshFailed({required Object error}) => '메타데이터 새로고침 실패: ${error}';
 	@override String get logoutConfirm => '로그아웃하시겠습니까?';
+	@override String get logoutDeviceConfirm => '이 기기의 Luroka에서 로그아웃하시겠습니까? 키즈 프로필, 서버 계정, 다운로드한 미디어를 포함한 모든 프로필이 이 기기에서 삭제됩니다. 나중에 다시 로그인할 수 있습니다.';
 	@override String get noSeasonsFound => '시즌을 찾을 수 없음';
 	@override String get seasonsLoadFailed => '시즌을 불러오지 못했습니다';
 	@override String get noEpisodesFound => '시즌 1에서 에피소드를 찾을 수 없습니다';
@@ -2385,6 +2444,9 @@ class _Translations$profiles$ko extends Translations$profiles$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
+	@override String get manageProfiles => '프로필 관리';
+	@override String get quickAccess => '빠른 액세스';
+	@override String get signOutDevice => '이 기기에서 로그아웃';
 	@override String get addLurokaProfile => 'Luroka 프로필 추가';
 	@override String get switchingProfile => '프로필 전환 중…';
 	@override String get deleteThisProfileTitle => '이 프로필을 삭제하시겠습니까?';
@@ -2503,7 +2565,7 @@ class _Translations$accountPreferences$ko extends Translations$accountPreference
 	@override String hubSubtitleSingle({required Object account}) => '${account}에 저장된 오디오, 자막 및 라이브러리 옵션';
 	@override String hubSubtitleMultiple({required Object count}) => '${count}개 계정에 저장된 오디오, 자막 및 라이브러리 옵션';
 	@override String get pickAccount => '각 계정은 고유한 기본 설정을 저장합니다. 편집할 계정을 선택하세요.';
-	@override String get storedOnAccount => '이 옵션은 계정 자체에 저장되므로 해당 계정으로 로그인한 모든 앱에서 사용됩니다 — 다른 기기의 Luroka를 포함합니다.';
+	@override String get storedOnAccount => '이러한 옵션은 서버 계정에 저장되며 다른 장치를 포함하여 해당 계정을 사용하는 모든 Luroka 프로필 및 앱에서 공유됩니다.';
 	@override String get noAccounts => '구성할 계정이 없습니다';
 	@override String get noAccountsHint => 'Plex에 로그인하거나 Jellyfin 또는 Emby 서버에 연결하면 해당 계정에 저장된 기본 설정이 여기에 표시됩니다.';
 	@override String get unavailable => '이 계정에 연결할 수 없습니다';
@@ -2567,6 +2629,7 @@ class _Translations$discover$ko extends Translations$discover$en {
 	@override String minutesLeft({required Object minutes}) => '${minutes}분 남음';
 	@override String get moreLikeThis => '비슷한 콘텐츠';
 	@override String titleCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '${n} 제목',
 		other: '${n}개 타이틀',
 	);
 	@override late final _Translations$discover$person$ko person = _Translations$discover$person$ko._(_root);
@@ -2828,6 +2891,7 @@ class _Translations$explore$ko extends Translations$explore$en {
 	@override late final _Translations$explore$rows$ko rows = _Translations$explore$rows$ko._(_root);
 	@override late final _Translations$explore$status$ko status = _Translations$explore$status$ko._(_root);
 	@override String episodeCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '${n} 에피소드',
 		other: '${n}화',
 	);
 	@override String get cast => '출연진';
@@ -2842,6 +2906,7 @@ class _Translations$explore$ko extends Translations$explore$en {
 	@override String get inTheseLibraries => '이 라이브러리에 있음';
 	@override String get checkingLibrary => '라이브러리 확인 중...';
 	@override String libraryCheckFailed({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '${n} 서버를 확인할 수 없습니다.',
 		other: '서버 ${n}개를 확인할 수 없습니다',
 	);
 	@override String get emptyTitle => '아직 아무것도 없습니다';
@@ -2861,6 +2926,7 @@ class _Translations$explore$ko extends Translations$explore$en {
 	@override String broadcastWithZone({required Object day, required Object time, required Object timezone}) => '${day} ${time} ${timezone} 방영';
 	@override late final _Translations$explore$detail$ko detail = _Translations$explore$detail$ko._(_root);
 	@override String totalResults({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '${n} 결과',
 		other: '결과 ${n}개',
 	);
 }
@@ -3037,6 +3103,7 @@ class _Translations$music$ko extends Translations$music$en {
 	@override String get addToQueue => '대기열에 추가';
 	@override String discNumber({required Object n}) => '디스크 ${n}';
 	@override String trackCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '${n} 트랙',
 		other: '${n}곡',
 	);
 	@override String get nowPlaying => '재생 중';
@@ -3142,6 +3209,7 @@ class _Translations$watchTogether$ko extends Translations$watchTogether$en {
 	@override String get offsetPlusSecond => '+1초';
 	@override String get participants => '참가자';
 	@override String participantCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '${n} 참가자',
 		other: '${n} 참가자',
 	);
 	@override String get hostBadge => '호스트';
@@ -3687,6 +3755,108 @@ class _Translations$services$ko extends Translations$services$en {
 	@override late final _Translations$services$libraryFilter$ko libraryFilter = _Translations$services$libraryFilter$ko._(_root);
 }
 
+// Path: offlineRecovery
+class _Translations$offlineRecovery$ko extends Translations$offlineRecovery$en {
+	_Translations$offlineRecovery$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '서버가 오프라인 상태입니다';
+	@override String get description => '다운로드 항목은 계속 사용할 수 있습니다. 서버가 복구되면 다시 연결해 보거나 다른 서버를 추가하세요.';
+	@override String get appleTvDescription => 'Luroka가 미디어 서버에 연결할 수 없습니다. 사용 가능할 때 다시 연결해 보거나 계속 시청하려면 다른 서버를 추가하세요.';
+	@override String get kidsDescription => '미디어 서버에 연결할 수 없습니다. 다시 연결해 보거나 부모님께 도움을 요청하세요.';
+	@override String get retrying => '연결 중…';
+	@override String get addServer => '서버 추가';
+}
+
+// Path: releaseUpdates
+class _Translations$releaseUpdates$ko extends Translations$releaseUpdates$en {
+	_Translations$releaseUpdates$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get manualInstructions => 'GitHub에서 릴리스 아카이브를 다운로드하고 APK를 추출한 후 Android 장치에 설치합니다.';
+	@override String get tvInstructions => '휴대폰이나 컴퓨터에서 이 주소를 열거나 QR 코드를 스캔하여 릴리스를 다운로드하세요.';
+	@override String get pressBackAgain => '재생을 종료하려면 뒤로를 다시 누르세요.';
+}
+
+// Path: profileIntegrations
+class _Translations$profileIntegrations$ko extends Translations$profileIntegrations$en {
+	_Translations$profileIntegrations$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Luroka를 나만의 것으로 만드세요';
+	@override String get description => '즐겨찾는 서비스를 연결하여 시청 내용을 추적하고 새 영화와 프로그램을 요청하세요. 각 Luroka 프로필에는 자체 연결이 있습니다.';
+	@override String get step => '선택적 통합';
+	@override String get examples => 'Trakt · Simkl · AniList · MyAnimeList · Seerr';
+	@override String get connect => '통합 살펴보기';
+	@override String get later => '나중에 설정하세요';
+	@override String get manage => '통합 관리';
+	@override String forProfile({required Object name}) => '${name}에 대한 연결';
+}
+
+// Path: profileSetupGuide
+class _Translations$profileSetupGuide$ko extends Translations$profileSetupGuide$en {
+	_Translations$profileSetupGuide$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '프로필을 나만의 것으로 만드세요';
+	@override String get description => '이 장치에서 이 프로필에 대한 Luroka의 모양과 느낌을 선택하세요. 나중에 설정에서 모든 내용을 변경할 수 있습니다.';
+	@override String get appearanceStep => '1/2 · 화면 스타일';
+	@override String get homeStep => '2/2 · 홈 화면';
+	@override String get preview => '미리보기';
+	@override String get previewTitle => '당신의 집';
+	@override String get previewPoster => '포스터';
+	@override String get posterArtwork => '예술작품만';
+	@override String get posterWithDetails => '포스터 세부정보 표시';
+	@override String get musicDescription => '가능한 경우 세부정보 페이지가 열려 있는 동안 영화나 프로그램의 테마를 재생하세요.';
+	@override String get moreThemes => '더 많은 테마';
+	@override String get fewerThemes => '더 적은 테마';
+	@override String get spotlightHeading => 'Spotlight에는 무엇이 나타나야 합니까?';
+	@override String get progressHeading => '계속해서 시청하고 다음 단계를 진행하세요';
+	@override String get skip => '기본값을 사용하고 시청을 시작하세요';
+	@override String get finish => '시청 시작';
+	@override String get back => '뒤로';
+	@override String get kContinue => '계속';
+	@override String get chooseLater => '나중에 라이브러리 선택';
+	@override String get libraryScope => '이는 이 프로필의 Luroka에 나타나는 내용을 변경합니다. 서버 권한은 변경되지 않습니다.';
+	@override String get createdTitle => '프로필이 생성되었습니다.';
+	@override String get createdDescription => '새 프로필이 준비되었습니다. 소유자는 처음 열 때 이를 개인화할 수 있습니다.';
+	@override String get switchProfile => '이 프로필로 전환';
+	@override String get stayHere => '현재 프로필 유지';
+}
+
+// Path: animeFavorites
+class _Translations$animeFavorites$ko extends Translations$animeFavorites$en {
+	_Translations$animeFavorites$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get filter => '애니메이션';
+	@override String get manage => '애니메이션 관리';
+	@override String get description => '자동 감지에서는 애니메이션 라이브러리 이름과 사용 가능한 애니메이션 태그 또는 ID를 사용합니다. 라이브러리를 선택하고 개별 즐겨찾기를 수정하세요. 프로필에 대한 선택 사항이 이 기기에 저장됩니다.';
+	@override String get libraries => '애니메이션 도서관';
+	@override String get libraryHint => 'Anime이라는 라이브러리는 자동으로 인식됩니다. 분류를 변경할 라이브러리를 선택하세요.';
+	@override String get titles => '좋아하는 제목';
+	@override String get titleHint => '제목을 선택하여 애니메이션으로 표시하거나 자동 일치를 수정하세요.';
+	@override String get automatic => '자동';
+	@override String get include => '애니메이션';
+	@override String get exclude => '애니메이션 아님';
+	@override String get automaticIncluded => '자동 · 애니메이션';
+	@override String get automaticExcluded => '자동 · 애니메이션 아님';
+	@override String get noLibraries => '연결된 라이브러리를 사용할 수 없습니다.';
+	@override String get noTitles => '좋아하는 영화나 프로그램이 없습니다.';
+	@override String get empty => '즐겨찾는 애니메이션을 찾을 수 없습니다. 애니메이션 라이브러리를 확인하거나 제목을 애니메이션으로 표시하세요.';
+	@override String get saveFailed => '애니메이션 설정을 저장할 수 없습니다. 다시 시도해 주세요.';
+}
+
 // Path: addServer
 class _Translations$addServer$ko extends Translations$addServer$en {
 	_Translations$addServer$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -3699,7 +3869,7 @@ class _Translations$addServer$ko extends Translations$addServer$en {
 	@override String get serverUrlsHelper => '쉼표로 구분하여 여러 URL을 입력할 수 있습니다.';
 	@override String get findServer => '서버 찾기';
 	@override String searchingLocalMediaBrowserServers({required Object product}) => '로컬 ${product} 서버를 찾는 중...';
-	@override String localMediaBrowserServers({required Object product}) => '로컬 ${product} 서버';
+	@override String localMediaBrowserServers({required Object product}) => '저장되어 있고 근처에 있는 ${product} 서버';
 	@override String get username => '사용자 이름';
 	@override String get password => '비밀번호';
 	@override String get signIn => '로그인';
@@ -4211,6 +4381,7 @@ class _Translations$explore$stats$ko extends Translations$explore$stats$en {
 	@override String favorited({required Object n}) => '즐겨찾기 ${n}명';
 	@override String dropRate({required Object percent}) => '${percent} 하차';
 	@override String comments({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '${n} 댓글',
 		other: '댓글 ${n}개',
 	);
 	@override String votes({required Object n}) => '투표 ${n}개';
@@ -4332,6 +4503,7 @@ class _Translations$explore$detail$ko extends Translations$explore$detail$en {
 	@override String get ratings => '평점';
 	@override String get schedule => '방영 일정';
 	@override String recommendedByUsers({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
+		one: '${n} 사용자가 추천함',
 		other: '사용자 ${n}명이 추천',
 	);
 	@override String recommendedBy({required Object who}) => '${who} 추천';
@@ -4730,8 +4902,8 @@ extension on TranslationsKo {
 			'family.yourPeople' => '당신의 사람들',
 			'family.manageHint' => '이 기기에서 사람과 어린이의 안전, 시청 활동을 관리하세요.',
 			'family.people' => '사람',
-			'family.peopleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '${n} 명', ), 
-			'family.kidsCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '${n} 키즈', ), 
+			'family.peopleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '${n} 사람', other: '${n} 명', ),
+			'family.kidsCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '${n} 자식', other: '${n} 키즈', ),
 			'family.you' => '당신',
 			'family.adult' => '성인',
 			'family.child' => '어린이',
@@ -4773,6 +4945,9 @@ extension on TranslationsKo {
 			'posterDetails.catalogEpisodeInfoDescription' => '둘러보기 포스터에 에피소드 수와 평균 지속 시간을 표시합니다.',
 			'posterDetails.title' => '포스터 세부정보',
 			'posterDetails.description' => 'Studio, 검색, 둘러보기 및 라이브러리 전반의 포스터 아래에 제목, 연도 및 IMDb 등급을 표시합니다. 누락된 IMDb 등급은 숨겨져 있습니다. 예술작품 전용 포스터의 경우 끄세요.',
+			'libraryPolish.compactTvNavigation' => '컴팩트 라이브러리 탐색',
+			'libraryPolish.compactTvNavigationDescription' => '슬라이드 아웃 메뉴에 라이브러리 섹션을 표시하고 옵션을 탐색하여 포스터를 위한 더 많은 공간을 확보합니다.',
+			'libraryPolish.openLibraryMenu' => '라이브러리 메뉴 열기',
 			'libraryPolish.posterDetails' => '포스터 세부정보',
 			'libraryPolish.showPosterDetails' => '포스터 세부정보 표시 · 이름, 연도 및 IMDb',
 			'libraryPolish.hidePosterDetails' => '포스터 세부정보 숨기기',
@@ -4987,6 +5162,8 @@ extension on TranslationsKo {
 			'tvSettingsV2.simpleAudio' => '언어 및 자막 표시',
 			'settingsRedesign.themeEffects' => '테마 및 효과',
 			'settingsRedesign.libraryLayout' => '라이브러리 레이아웃',
+			'settingsRedesign.posterInformation' => '포스터 정보',
+			'settingsRedesign.libraryBehavior' => '라이브러리 동작',
 			'settingsRedesign.appearanceHint' => 'Luroka의 모양, 레이아웃 및 동작을 사용자 정의하세요.',
 			'settingsRedesign.livePreview' => '실시간 미리보기',
 			'settingsRedesign.previewHint' => '현재 설정으로 라이브러리가 어떻게 보이는지 확인하세요.',
@@ -5088,6 +5265,19 @@ extension on TranslationsKo {
 			'detailComposition.mediaInformation' => '미디어 정보',
 			'detailComposition.fullFileInformation' => '전체 파일 정보',
 			'detailComposition.castAndCrew' => '출연진 및 제작진',
+			'kids.timeLimits' => '화면 시간 제한',
+			'kids.dailyWatchLimit' => '일일 시청 시간',
+			'kids.dailyWatchLimitHint' => '매일 이 장치에서 비디오 재생을 제한합니다.',
+			'kids.noTimeLimit' => '제한 없음',
+			'kids.minutesLimit' => ({required Object minutes}) => '${minutes}분',
+			'kids.bedtime' => '취침 시간',
+			'kids.bedtimeHint' => '이 시간에 프로필을 사용하려면 부모 PIN이 필요합니다.',
+			'kids.bedtimeStart' => '취침 시간 시작',
+			'kids.bedtimeEnd' => '취침 시간 종료',
+			'kids.timeLimitReached' => '오늘의 시청 시간이 끝났습니다.',
+			'kids.bedtimeReached' => '취침시간이다',
+			'kids.timeLimitParentHint' => '계속 시청하려면 부모님께 PIN을 입력해 달라고 요청하세요.',
+			'kids.parentUnlock' => '부모 잠금 해제',
 			'kids.backupProfile' => '자녀 프로필 백업',
 			'kids.backupExplain' => '이 프로필의 저장된 이름, 캐릭터, 제한 사항, 외모 및 로컬 보기 제외를 백업하세요. 상위 PIN, 서버 로그인, 다운로드 및 서버 재생 진행 상황은 포함되지 않습니다.',
 			'kids.saveBackupFile' => '백업 파일 저장',
@@ -5172,6 +5362,8 @@ extension on TranslationsKo {
 			'kids.blocked' => '이 어린이 프로필에서는 이 제목을 사용할 수 없습니다.',
 			'kids.switchProfile' => '프로필 전환',
 			'kids.manageFromAdult' => '설정을 관리하려면 성인 프로필로 전환하세요.',
+			_ => null,
+		} ?? switch (path) {
 			'kids.noConnections' => '어린이 프로필을 추가하기 전에 서버를 성인 프로필에 연결하세요.',
 			'kids.created' => '어린이 프로필이 생성되었습니다.',
 			'kids.updated' => '어린이 프로필이 업데이트되었습니다.',
@@ -5190,8 +5382,6 @@ extension on TranslationsKo {
 			'lurokaDiscovery.imdbTv100' => 'IMDb 상위 100개 프로그램 · 2026년 9월 스냅샷',
 			'lurokaDiscovery.emmyComedy' => '에미상 · 코미디 시리즈 수상자 · 1971~2026년',
 			'lurokaDiscovery.emmys' => '에미상 · 드라마 시리즈 수상자 · 1966~2026년',
-			_ => null,
-		} ?? switch (path) {
 			'lurokaDiscovery.bafta' => 'BAFTA · 최우수 영화 수상자',
 			'lurokaDiscovery.cannes' => '칸 · 황금종려상 수상자',
 			'lurokaDiscovery.awardsNote' => '수상 컬렉션에는 오스카 최우수 작품상 역사, 에미 드라마/코미디 수상작, BAFTA/칸 선정 작품 확대 등이 포함됩니다. 반복 우승 타이틀이 한 번 나타납니다. 멤버십은 수상 카테고리 내역과 Wikidata 사실을 사용합니다. IMDb 상위 100개 영화/쇼 목록은 mmdju/imdb-top250-api의 2026년 9월 차트 스냅샷을 유지합니다. 눈에 보이는 온라인 라이브러리의 일치 항목만 나타납니다. 컬렉션 크기는 라이브러리 가용성에 따라 다릅니다.',
@@ -5584,6 +5774,7 @@ extension on TranslationsKo {
 			'settings.downloadLocationPickerUnavailable' => '이 기기에서는 폴더를 선택할 수 없습니다',
 			'settings.downloadOnWifiOnly' => 'Wi-Fi 연결 시에만 다운로드',
 			'settings.downloadOnWifiOnlyDescription' => '셀룰러 데이터 사용 중에는 다운로드하지 않습니다',
+			'settings.downloadWifiScope' => '이 장치의 모든 프로필과 다운로드에 적용됩니다.',
 			'settings.autoRemoveWatchedDownloads' => '시청한 다운로드 항목 자동 삭제',
 			'settings.autoRemoveWatchedDownloadsDescription' => '시청한 다운로드 항목을 자동으로 삭제합니다',
 			'settings.cellularDownloadBlocked' => '셀룰러에서는 다운로드가 차단됩니다. Wi-Fi를 사용하거나 설정을 변경하세요.',
@@ -5685,6 +5876,8 @@ extension on TranslationsKo {
 			'settings.languageAndRegion' => '언어 및 지역',
 			'settings.startup' => '시작',
 			'settings.display' => '디스플레이',
+			_ => null,
+		} ?? switch (path) {
 			'settings.libraryAndCards' => '라이브러리 및 카드',
 			'settings.homeScreen' => '홈 화면',
 			'settings.navigation' => '탐색',
@@ -5704,8 +5897,6 @@ extension on TranslationsKo {
 			'settings.gestureVolumeSwipeDescription' => '오른쪽 가장자리에서 위아래로 스와이프하여 볼륨을 조절합니다',
 			'settings.gesturePinchToZoom' => '핀치 줌',
 			'settings.gesturePinchToZoomDescription' => '비디오에서 핀치하여 확대하거나 축소합니다',
-			_ => null,
-		} ?? switch (path) {
 			'settings.rememberBrightnessLevel' => '밝기 수준 기억',
 			'settings.rememberBrightnessLevelDescription' => '마지막으로 스와이프하여 설정한 밝기로 재생을 시작합니다',
 			'settings.controls' => '컨트롤',
@@ -5845,8 +6036,8 @@ extension on TranslationsKo {
 			'dashboard.episodeLabel' => ({required Object season, required Object episode}) => 'S${season} · E${episode}',
 			'dashboard.anotherPick' => '또 다른 선택',
 			'dashboard.exploreSeries' => '시리즈 살펴보기',
-			'dashboard.showFeatured' => '집중된 제목 세부정보',
-			'dashboard.showFeaturedDescription' => '강조 표시된 카드의 삽화, 시놉시스, 에피소드 정보 표시',
+			'dashboard.showFeatured' => '홈 스포트라이트',
+			'dashboard.showFeaturedDescription' => '홈 상단에 추천 영화와 프로그램을 표시합니다.',
 			'lurokaCatalog.aboutPerson' => '스포트라이트에서',
 			'lurokaCatalog.biographyUnavailable' => '이 서버에서는 전기를 사용할 수 없습니다.',
 			'lurokaCatalog.filmography' => '라이브러리의 영화 및 프로그램',
@@ -5902,9 +6093,32 @@ extension on TranslationsKo {
 			'customPerformance.frameBudget' => '프레임당 예산',
 			'customPerformance.processMemory' => '샘플 종료 시 앱 프로세스 메모리',
 			'customPerformance.noFrames' => '렌더링된 프레임이 캡처되지 않았습니다. 다른 샘플을 시작하고 앱을 찾아보세요.',
+			'homeLayout.manageStudios' => '스튜디오 선택 및 주문',
+			'homeLayout.manageStudiosDescription' => '이 프로필에 표시할 스튜디오를 선택하고 순서를 조정하세요.',
+			'homeLayout.studioUnavailable' => '선택한 라이브러리에 있는 스튜디오만 홈에 표시됩니다.',
+			'homeLayout.showAllStudios' => '모든 스튜디오 보기',
+			'homeLayout.hideAllStudios' => '모든 스튜디오 숨기기',
+			'homeLayout.reorderStudio' => '스튜디오 순서 변경',
+			'homeLayout.episodeThumbnails' => '계속 시청의 에피소드 이미지',
+			'homeLayout.episodeThumbnailsDescription' => '계속 시청 및 다음편에서 시리즈나 시즌 포스터 대신 에피소드 이미지를 표시하세요.',
+			'homeLayout.spotlightSource' => '추천 콘텐츠 소스',
+			'homeLayout.spotlightSourceDescription' => 'For You는 즐겨찾기 및 라이브러리 제목과 함께 이 기기에서 이 프로필의 시청 활동을 사용합니다.',
+			'homeLayout.spotlightForYou' => '당신을 위해',
+			'homeLayout.spotlightForYouDescription' => '이 기기에서 이 프로필의 시청 활동을 사용하여 시청 중인 콘텐츠, 즐겨찾기, 새로운 추가 항목 및 트렌드가 혼합되어 있습니다.',
+			'homeLayout.spotlightTrending' => '인기 급상승',
+			'homeLayout.spotlightTrendingDescription' => '라이브러리에 있는 인기 영화와 프로그램.',
+			'homeLayout.spotlightContinue' => '계속 시청하기',
+			'homeLayout.spotlightContinueDescription' => '시작한 타이틀과 계속할 수 있는 에피소드.',
+			'homeLayout.spotlightFavorites' => '즐겨찾기에서',
+			'homeLayout.spotlightInspired' => '귀하의 시청에서 영감을 얻었습니다.',
+			'homeLayout.spotlightNextUp' => '다음은',
 			'homeLayout.title' => '홈 개인화',
 			'homeLayout.description' => '이 프로필의 행 순서와 공개 여부를 선택하세요. 이동하거나 숨기려면 행을 선택하세요.',
 			'homeLayout.rows' => '홈 행',
+			'homeLayout.progressLayout' => '계속해서 시청하고 다음 단계를 진행하세요',
+			'homeLayout.progressCombined' => '한 줄로 결합',
+			'homeLayout.progressSeparate' => '별도의 행',
+			'homeLayout.progressDescription' => '서버에서 지원하는 경우 Next Up을 분리하세요. 다른 서버는 결합된 상태로 유지됩니다.',
 			'homeLayout.visible' => '보이는',
 			'homeLayout.hidden' => '숨겨진',
 			'homeLayout.showRow' => '행 표시',
@@ -5939,13 +6153,15 @@ extension on TranslationsKo {
 			'activityStats.heroDailyAverage' => '일일 평균',
 			'activityStats.consistency' => '일관성',
 			'activityStats.currentStreak' => '현재 연속',
-			'activityStats.dayCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '${n}일', ), 
+			'activityStats.dayCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '${n}​일', other: '${n}일', ),
 			'activityStats.longestStreak' => '최장 연속 행진',
 			'activityStats.bestDay' => '최고의 날',
 			'activityStats.bestWeek' => '최고의 주',
 			'activityStats.trendTitle' => '시청 시간',
 			'activityStats.trendToday' => '오늘',
 			'activityStats.gapDetail' => ({required Object range, required Object stat}) => '${range}의 ${stat}',
+			'activityStats.patternsTitle' => '당신의 패턴',
+			'activityStats.mostlyKind' => ({required Object kind}) => '주로 ${kind}',
 			'activityStats.weekdayTitle' => '평일 기준',
 			'activityStats.hoursTitle' => '시간대별',
 			'activityStats.amLabel' => '오전',
@@ -5958,6 +6174,8 @@ extension on TranslationsKo {
 			'activityStats.kindOther' => '기타',
 			'activityStats.topTitlesTitle' => '가장 많이 본',
 			'activityStats.sessionsTitle' => '최근 세션',
+			'activityStats.recentViewingTitle' => '최근 시청',
+			'activityStats.recentViewingHint' => '선택한 기간 동안 시청한 총 시간입니다. 날짜는 최근 시청 횟수를 보여줍니다.',
 			'activityStats.showMore' => '더 보기',
 			'activityStats.sessionNoTitle' => '미확인 재생',
 			'activityStats.emptyTitle' => '아직 아무것도 없습니다',
@@ -6140,9 +6358,9 @@ extension on TranslationsKo {
 			'mediaMenu.deleteAnyway' => '그래도 삭제',
 			'mediaMenu.confirmDeleteTarget' => ({required Object title}) => '서버에서 ${title}을(를) 영구 삭제할까요?',
 			'mediaMenu.deleteMultipleWarning' => '모든 에피소드와 파일이 포함됩니다.',
-			'mediaMenu.deleteEpisodeCountWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '포함된 에피소드 ${n}개와 해당 파일이 모두 삭제됩니다.', ), 
-			'mediaMenu.deleteMultiPartWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '이 항목은 파일 ${n}개에 걸쳐 저장되어 있으며, 모든 파일이 삭제됩니다.', ), 
-			'mediaMenu.deleteSharedFileHeading' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '같은 파일에 저장된 다른 에피소드 ${n}개도 함께 삭제됩니다:', ), 
+			'mediaMenu.deleteEpisodeCountWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '이렇게 하면 포함된 모든 ${n} 에피소드와 해당 파일이 삭제됩니다.', other: '포함된 에피소드 ${n}개와 해당 파일이 모두 삭제됩니다.', ),
+			'mediaMenu.deleteMultiPartWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '이 항목은 ${n} 파일로 저장되며 삭제됩니다.', other: '이 항목은 파일 ${n}개에 걸쳐 저장되어 있으며, 모든 파일이 삭제됩니다.', ),
+			'mediaMenu.deleteSharedFileHeading' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '${n} 다른 에피소드도 동일한 파일에 저장되며 삭제됩니다.', other: '같은 파일에 저장된 다른 에피소드 ${n}개도 함께 삭제됩니다:', ),
 			'mediaMenu.deleteScopeUnverifiedProbeFailed' => 'Luroka가 어떤 파일이 삭제될지 확인하지 못해 위 항목보다 더 많은 파일이 삭제될 수 있습니다. 취소하고 다시 시도하거나 그래도 삭제하세요.',
 			'mediaMenu.deleteScopeUnverifiedNoFileInfo' => '서버가 이 항목의 파일 정보를 제공하지 않아 Luroka가 어떤 파일이 삭제될지 확인할 수 없습니다. 위 항목보다 더 많은 파일이 삭제될 수 있습니다.',
 			'mediaMenu.mediaDeletedSuccessfully' => '미디어 항목이 성공적으로 삭제되었습니다',
@@ -6172,6 +6390,8 @@ extension on TranslationsKo {
 			'accessibility.hue' => '색조',
 			'accessibility.saturation' => '채도',
 			'accessibility.brightness' => '밝기',
+			_ => null,
+		} ?? switch (path) {
 			'accessibility.hexColor' => '16진수 색상',
 			'accessibility.expandText' => '텍스트 펼치기',
 			'accessibility.collapseText' => '텍스트 접기',
@@ -6218,8 +6438,6 @@ extension on TranslationsKo {
 			'videoControls.seekBackwardButton' => ({required Object seconds}) => '${seconds}초 뒤로 이동',
 			'videoControls.seekForwardButton' => ({required Object seconds}) => '${seconds}초 앞으로 이동',
 			'videoControls.previousButton' => '이전 에피소드',
-			_ => null,
-		} ?? switch (path) {
 			'videoControls.nextButton' => '다음 에피소드',
 			'videoControls.previousChapterButton' => '이전 챕터',
 			'videoControls.nextChapterButton' => '다음 챕터',
@@ -6289,7 +6507,7 @@ extension on TranslationsKo {
 			'messages.markedAsWatchedOffline' => '시청 완료로 표시됨 (연결 시 동기화됨)',
 			'messages.markedAsUnwatchedOffline' => '미시청으로 표시됨 (연결 시 동기화됨)',
 			'messages.autoRemovedWatchedDownload' => ({required Object title}) => '자동 삭제됨: ${title}',
-			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '시청한 다운로드 ${n}개를 자동 삭제했습니다', ), 
+			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '자동 제거된 ${n} 시청 다운로드', other: '시청한 다운로드 ${n}개를 자동 삭제했습니다', ),
 			'messages.removedFromContinueWatching' => '계속 시청 목록에서 제거됨',
 			'messages.errorLoading' => ({required Object error}) => '오류: ${error}',
 			'messages.searchPartialResults' => '일부 미디어 서버를 검색하지 못했습니다. 사용 가능한 결과만 표시합니다.',
@@ -6321,6 +6539,7 @@ extension on TranslationsKo {
 			'messages.metadataRefreshStarted' => ({required Object title}) => '"${title}" 메타데이터 새로고침 시작됨',
 			'messages.metadataRefreshFailed' => ({required Object error}) => '메타데이터 새로고침 실패: ${error}',
 			'messages.logoutConfirm' => '로그아웃하시겠습니까?',
+			'messages.logoutDeviceConfirm' => '이 기기의 Luroka에서 로그아웃하시겠습니까? 키즈 프로필, 서버 계정, 다운로드한 미디어를 포함한 모든 프로필이 이 기기에서 삭제됩니다. 나중에 다시 로그인할 수 있습니다.',
 			'messages.noSeasonsFound' => '시즌을 찾을 수 없음',
 			'messages.seasonsLoadFailed' => '시즌을 불러오지 못했습니다',
 			'messages.noEpisodesFound' => '시즌 1에서 에피소드를 찾을 수 없습니다',
@@ -6406,6 +6625,9 @@ extension on TranslationsKo {
 			'mpvConfig.removeLine' => '줄 제거',
 			'mpvConfig.embeddedVoHint' => 'Linux에서는 vo, gpu-context, gpu-api가 무시됩니다. 내장 동영상은 항상 비디오 평면에서 vo=libmpv로 렌더링되며, gpu-next(ArtCNN 같은 컴퓨트 셰이더에 필요)는 내장 방식으로 실행할 수 없습니다.',
 			'dialog.confirmAction' => '작업 확인',
+			'profiles.manageProfiles' => '프로필 관리',
+			'profiles.quickAccess' => '빠른 액세스',
+			'profiles.signOutDevice' => '이 기기에서 로그아웃',
 			'profiles.addLurokaProfile' => 'Luroka 프로필 추가',
 			'profiles.switchingProfile' => '프로필 전환 중…',
 			'profiles.deleteThisProfileTitle' => '이 프로필을 삭제하시겠습니까?',
@@ -6497,7 +6719,7 @@ extension on TranslationsKo {
 			'accountPreferences.hubSubtitleSingle' => ({required Object account}) => '${account}에 저장된 오디오, 자막 및 라이브러리 옵션',
 			'accountPreferences.hubSubtitleMultiple' => ({required Object count}) => '${count}개 계정에 저장된 오디오, 자막 및 라이브러리 옵션',
 			'accountPreferences.pickAccount' => '각 계정은 고유한 기본 설정을 저장합니다. 편집할 계정을 선택하세요.',
-			'accountPreferences.storedOnAccount' => '이 옵션은 계정 자체에 저장되므로 해당 계정으로 로그인한 모든 앱에서 사용됩니다 — 다른 기기의 Luroka를 포함합니다.',
+			'accountPreferences.storedOnAccount' => '이러한 옵션은 서버 계정에 저장되며 다른 장치를 포함하여 해당 계정을 사용하는 모든 Luroka 프로필 및 앱에서 공유됩니다.',
 			'accountPreferences.noAccounts' => '구성할 계정이 없습니다',
 			'accountPreferences.noAccountsHint' => 'Plex에 로그인하거나 Jellyfin 또는 Emby 서버에 연결하면 해당 계정에 저장된 기본 설정이 여기에 표시됩니다.',
 			'accountPreferences.unavailable' => '이 계정에 연결할 수 없습니다',
@@ -6574,7 +6796,7 @@ extension on TranslationsKo {
 			'discover.tvShow' => 'TV 시리즈',
 			'discover.minutesLeft' => ({required Object minutes}) => '${minutes}분 남음',
 			'discover.moreLikeThis' => '비슷한 콘텐츠',
-			'discover.titleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '${n}개 타이틀', ), 
+			'discover.titleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '${n} 제목', other: '${n}개 타이틀', ),
 			'discover.person.born' => '태어난',
 			'discover.person.died' => '사망',
 			'discover.person.birthplace' => '출생지',
@@ -6682,6 +6904,8 @@ extension on TranslationsKo {
 			'libraries.sortLabels.dateShared' => '공유된 날짜',
 			'libraries.sortLabels.latestEpisodeAirDate' => '최신 에피소드 방영일',
 			'libraries.sortLabels.lastEpisodeDateAdded' => '최신 에피소드 추가일',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => '다운로드된 날짜',
 			'libraries.sortLabels.size' => '크기',
 			'libraries.sortLabels.library' => '라이브러리',
@@ -6732,8 +6956,6 @@ extension on TranslationsKo {
 			'about.packageLine' => ({required Object package}) => '패키지: ${package}',
 			'about.localeLine' => ({required Object locale}) => '언어: ${locale}',
 			'about.copyDetails' => '세부정보 복사',
-			_ => null,
-		} ?? switch (path) {
 			'about.detailsCopied' => '앱 세부정보가 복사되었습니다.',
 			'about.detailsCopyFailed' => '앱 세부정보를 복사할 수 없습니다.',
 			'about.checkForUpdatesDescription' => '최신 릴리스는 GitHub를 확인하세요.',
@@ -6831,7 +7053,7 @@ extension on TranslationsKo {
 			'explore.status.ended' => '종영',
 			'explore.status.canceled' => '취소됨',
 			'explore.status.upcoming' => '방영 예정',
-			'explore.episodeCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '${n}화', ), 
+			'explore.episodeCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '${n} 에피소드', other: '${n}화', ),
 			'explore.cast' => '출연진',
 			'explore.characters' => '캐릭터',
 			'explore.addToWatchlist' => '관심 목록에 추가',
@@ -6843,7 +7065,7 @@ extension on TranslationsKo {
 			'explore.notInLibrary' => '라이브러리에 없음',
 			'explore.inTheseLibraries' => '이 라이브러리에 있음',
 			'explore.checkingLibrary' => '라이브러리 확인 중...',
-			'explore.libraryCheckFailed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '서버 ${n}개를 확인할 수 없습니다', ), 
+			'explore.libraryCheckFailed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '${n} 서버를 확인할 수 없습니다.', other: '서버 ${n}개를 확인할 수 없습니다', ),
 			'explore.emptyTitle' => '아직 아무것도 없습니다',
 			'explore.emptyMessage' => ({required Object source}) => '${source}에 콘텐츠가 추가되면 여기에 표시됩니다.',
 			'explore.searchHint' => ({required Object source}) => '${source}에서 검색',
@@ -6880,7 +7102,7 @@ extension on TranslationsKo {
 			'explore.stats.planning' => ({required Object n}) => '${n}명 볼 예정',
 			'explore.stats.favorited' => ({required Object n}) => '즐겨찾기 ${n}명',
 			'explore.stats.dropRate' => ({required Object percent}) => '${percent} 하차',
-			'explore.stats.comments' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '댓글 ${n}개', ), 
+			'explore.stats.comments' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '${n} 댓글', other: '댓글 ${n}개', ),
 			'explore.stats.votes' => ({required Object n}) => '투표 ${n}개',
 			'explore.stats.watching' => ({required Object n}) => '시청 중 ${n}명',
 			'explore.stats.completed' => ({required Object n}) => '완료 ${n}명',
@@ -6947,14 +7169,14 @@ extension on TranslationsKo {
 			'explore.detail.crew' => '제작진',
 			'explore.detail.ratings' => '평점',
 			'explore.detail.schedule' => '방영 일정',
-			'explore.detail.recommendedByUsers' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '사용자 ${n}명이 추천', ), 
+			'explore.detail.recommendedByUsers' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '${n} 사용자가 추천함', other: '사용자 ${n}명이 추천', ),
 			'explore.detail.recommendedBy' => ({required Object who}) => '${who} 추천',
 			'explore.detail.favoritedBy' => ({required Object who}) => '${who} 즐겨찾기',
 			'explore.detail.unairedEpisodes' => ({required Object n}) => '미방영 ${n}개',
 			'explore.detail.recommendedByPercent' => ({required Object percent}) => '시청자의 ${percent} 추천',
 			'explore.detail.relatedTitles' => '관련 작품',
 			'explore.detail.background' => '배경',
-			'explore.totalResults' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '결과 ${n}개', ), 
+			'explore.totalResults' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '${n} 결과', other: '결과 ${n}개', ),
 			'liveTv.title' => '실시간 TV',
 			'liveTv.guide' => '편성표',
 			'liveTv.noChannels' => '사용 가능한 채널이 없습니다',
@@ -7099,7 +7321,7 @@ extension on TranslationsKo {
 			'music.playNext' => '다음에 재생',
 			'music.addToQueue' => '대기열에 추가',
 			'music.discNumber' => ({required Object n}) => '디스크 ${n}',
-			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '${n}곡', ), 
+			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '${n} 트랙', other: '${n}곡', ),
 			'music.nowPlaying' => '재생 중',
 			'music.playingFrom' => ({required Object title}) => '${title}에서 재생 중',
 			'music.queue' => '재생 대기열',
@@ -7195,7 +7417,9 @@ extension on TranslationsKo {
 			'watchTogether.offsetPlusTenth' => '+100ms',
 			'watchTogether.offsetPlusSecond' => '+1초',
 			'watchTogether.participants' => '참가자',
-			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '${n} 참가자', ), 
+			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, one: '${n} 참가자', other: '${n} 참가자', ),
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.hostBadge' => '호스트',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (당신)',
 			'watchTogether.playerIdle' => '유휴',
@@ -7246,8 +7470,6 @@ extension on TranslationsKo {
 			'watchTogether.notices.finished' => '완료',
 			'watchTogether.notices.hostChangedTo' => ({required Object name}) => '${name}님이 호스트가 되었습니다',
 			'watchTogether.notices.youAreNowHost' => '이제 호스트입니다',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.notices.joined' => ({required Object name}) => '${name}님이 참여했습니다',
 			'watchTogether.notices.left' => ({required Object name}) => '${name}님이 나갔습니다',
 			'watchTogether.notices.controlRefused' => '호스트만 재생을 제어할 수 있습니다.',
@@ -7710,6 +7932,8 @@ extension on TranslationsKo {
 			'seerr.statusPartiallyAvailable' => '일부 사용 가능',
 			'seerr.statusRequested' => '요청됨',
 			'seerr.statusProcessing' => '처리 중',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusBlocklisted' => '차단 목록에 있음',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => '${url}에 연결할 수 없습니다: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => '${url}에 Seerr 인스턴스가 없습니다(HTTP ${status})',
@@ -7760,8 +7984,6 @@ extension on TranslationsKo {
 			'services.deviceCode.title' => ({required Object service}) => '${service}에서 Luroka 활성화',
 			'services.deviceCode.instructions' => 'QR 코드를 스캔하거나 아래 주소로 이동하여 이 코드를 입력하세요:',
 			'services.deviceCode.openToActivate' => ({required Object service}) => '활성화하려면 ${service} 열기',
-			_ => null,
-		} ?? switch (path) {
 			'services.deviceCode.copyCode' => '활성화 코드 복사',
 			'services.deviceCode.waitingForAuthorization' => '인증을 기다리는 중…',
 			'services.deviceCode.codeCopied' => '코드가 복사되었습니다',
@@ -7782,12 +8004,69 @@ extension on TranslationsKo {
 			'services.libraryFilter.modeHintWhitelist' => '아래에 선택한 라이브러리만 동기화합니다.',
 			'services.libraryFilter.libraries' => '라이브러리',
 			'services.libraryFilter.noLibraries' => '사용 가능한 라이브러리가 없습니다',
+			'offlineRecovery.title' => '서버가 오프라인 상태입니다',
+			'offlineRecovery.description' => '다운로드 항목은 계속 사용할 수 있습니다. 서버가 복구되면 다시 연결해 보거나 다른 서버를 추가하세요.',
+			'offlineRecovery.appleTvDescription' => 'Luroka가 미디어 서버에 연결할 수 없습니다. 사용 가능할 때 다시 연결해 보거나 계속 시청하려면 다른 서버를 추가하세요.',
+			'offlineRecovery.kidsDescription' => '미디어 서버에 연결할 수 없습니다. 다시 연결해 보거나 부모님께 도움을 요청하세요.',
+			'offlineRecovery.retrying' => '연결 중…',
+			'offlineRecovery.addServer' => '서버 추가',
+			'releaseUpdates.manualInstructions' => 'GitHub에서 릴리스 아카이브를 다운로드하고 APK를 추출한 후 Android 장치에 설치합니다.',
+			'releaseUpdates.tvInstructions' => '휴대폰이나 컴퓨터에서 이 주소를 열거나 QR 코드를 스캔하여 릴리스를 다운로드하세요.',
+			'releaseUpdates.pressBackAgain' => '재생을 종료하려면 뒤로를 다시 누르세요.',
+			'profileIntegrations.title' => 'Luroka를 나만의 것으로 만드세요',
+			'profileIntegrations.description' => '즐겨찾는 서비스를 연결하여 시청 내용을 추적하고 새 영화와 프로그램을 요청하세요. 각 Luroka 프로필에는 자체 연결이 있습니다.',
+			'profileIntegrations.step' => '선택적 통합',
+			'profileIntegrations.examples' => 'Trakt · Simkl · AniList · MyAnimeList · Seerr',
+			'profileIntegrations.connect' => '통합 살펴보기',
+			'profileIntegrations.later' => '나중에 설정하세요',
+			'profileIntegrations.manage' => '통합 관리',
+			'profileIntegrations.forProfile' => ({required Object name}) => '${name}에 대한 연결',
+			'profileSetupGuide.title' => '프로필을 나만의 것으로 만드세요',
+			'profileSetupGuide.description' => '이 장치에서 이 프로필에 대한 Luroka의 모양과 느낌을 선택하세요. 나중에 설정에서 모든 내용을 변경할 수 있습니다.',
+			'profileSetupGuide.appearanceStep' => '1/2 · 화면 스타일',
+			'profileSetupGuide.homeStep' => '2/2 · 홈 화면',
+			'profileSetupGuide.preview' => '미리보기',
+			'profileSetupGuide.previewTitle' => '당신의 집',
+			'profileSetupGuide.previewPoster' => '포스터',
+			'profileSetupGuide.posterArtwork' => '예술작품만',
+			'profileSetupGuide.posterWithDetails' => '포스터 세부정보 표시',
+			'profileSetupGuide.musicDescription' => '가능한 경우 세부정보 페이지가 열려 있는 동안 영화나 프로그램의 테마를 재생하세요.',
+			'profileSetupGuide.moreThemes' => '더 많은 테마',
+			'profileSetupGuide.fewerThemes' => '더 적은 테마',
+			'profileSetupGuide.spotlightHeading' => 'Spotlight에는 무엇이 나타나야 합니까?',
+			'profileSetupGuide.progressHeading' => '계속해서 시청하고 다음 단계를 진행하세요',
+			'profileSetupGuide.skip' => '기본값을 사용하고 시청을 시작하세요',
+			'profileSetupGuide.finish' => '시청 시작',
+			'profileSetupGuide.back' => '뒤로',
+			'profileSetupGuide.kContinue' => '계속',
+			'profileSetupGuide.chooseLater' => '나중에 라이브러리 선택',
+			'profileSetupGuide.libraryScope' => '이는 이 프로필의 Luroka에 나타나는 내용을 변경합니다. 서버 권한은 변경되지 않습니다.',
+			'profileSetupGuide.createdTitle' => '프로필이 생성되었습니다.',
+			'profileSetupGuide.createdDescription' => '새 프로필이 준비되었습니다. 소유자는 처음 열 때 이를 개인화할 수 있습니다.',
+			'profileSetupGuide.switchProfile' => '이 프로필로 전환',
+			'profileSetupGuide.stayHere' => '현재 프로필 유지',
+			'animeFavorites.filter' => '애니메이션',
+			'animeFavorites.manage' => '애니메이션 관리',
+			'animeFavorites.description' => '자동 감지에서는 애니메이션 라이브러리 이름과 사용 가능한 애니메이션 태그 또는 ID를 사용합니다. 라이브러리를 선택하고 개별 즐겨찾기를 수정하세요. 프로필에 대한 선택 사항이 이 기기에 저장됩니다.',
+			'animeFavorites.libraries' => '애니메이션 도서관',
+			'animeFavorites.libraryHint' => 'Anime이라는 라이브러리는 자동으로 인식됩니다. 분류를 변경할 라이브러리를 선택하세요.',
+			'animeFavorites.titles' => '좋아하는 제목',
+			'animeFavorites.titleHint' => '제목을 선택하여 애니메이션으로 표시하거나 자동 일치를 수정하세요.',
+			'animeFavorites.automatic' => '자동',
+			'animeFavorites.include' => '애니메이션',
+			'animeFavorites.exclude' => '애니메이션 아님',
+			'animeFavorites.automaticIncluded' => '자동 · 애니메이션',
+			'animeFavorites.automaticExcluded' => '자동 · 애니메이션 아님',
+			'animeFavorites.noLibraries' => '연결된 라이브러리를 사용할 수 없습니다.',
+			'animeFavorites.noTitles' => '좋아하는 영화나 프로그램이 없습니다.',
+			'animeFavorites.empty' => '즐겨찾는 애니메이션을 찾을 수 없습니다. 애니메이션 라이브러리를 확인하거나 제목을 애니메이션으로 표시하세요.',
+			'animeFavorites.saveFailed' => '애니메이션 설정을 저장할 수 없습니다. 다시 시도해 주세요.',
 			'addServer.addMediaBrowserTitle' => ({required Object product}) => '${product} 서버 추가',
 			'addServer.serverUrls' => '서버 URL',
 			'addServer.serverUrlsHelper' => '쉼표로 구분하여 여러 URL을 입력할 수 있습니다.',
 			'addServer.findServer' => '서버 찾기',
 			'addServer.searchingLocalMediaBrowserServers' => ({required Object product}) => '로컬 ${product} 서버를 찾는 중...',
-			'addServer.localMediaBrowserServers' => ({required Object product}) => '로컬 ${product} 서버',
+			'addServer.localMediaBrowserServers' => ({required Object product}) => '저장되어 있고 근처에 있는 ${product} 서버',
 			'addServer.username' => '사용자 이름',
 			'addServer.password' => '비밀번호',
 			'addServer.signIn' => '로그인',

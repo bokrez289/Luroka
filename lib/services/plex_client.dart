@@ -402,6 +402,7 @@ class PlexClient
         _PlexMetadataEditMethods
     implements
         MediaServerClient,
+        PreviewMetadataClient,
         KidsRawLibraryClient,
         ScopedMediaServerClient,
         GracefullyCloseable,
@@ -3586,6 +3587,33 @@ class PlexClient
         shouldFallback: _shouldFallbackPlexItemLookup,
       );
       return KidsProfileService.instance.allowedItem(metadata == null ? null : PlexMappers.mediaItem(metadata));
+    } on MediaServerHttpException catch (error) {
+      if (error.statusCode == 404) return null;
+      rethrow;
+    }
+  }
+
+  /// A cancellable Home-card lookup, separate from the full detail cache.
+  @override
+  Future<MediaItem?> fetchPreviewItem(String id, {required AbortController abort}) async {
+    try {
+      final response = await _getWithFailover(
+        '/library/metadata/${Uri.encodeComponent(id)}',
+        queryParameters: {'includeExtras': 0, 'includeOnDeck': 0, 'includeChapters': 0},
+        timeout: const Duration(seconds: 8),
+        abort: abort,
+        allowEndpointFailover: false,
+      );
+      abort.throwIfAborted();
+      final row = _getFirstMetadataJson(response);
+      if (row == null) return null;
+      final container = _getMediaContainer(response);
+      final metadata = _tagMetadataWithLibrary(
+        PlexMetadataDto.fromJsonWithImages(row),
+        librarySectionID: _librarySectionIdFromJson(row) ?? _librarySectionIdFromJson(container),
+        librarySectionTitle: _librarySectionTitleFromJson(row) ?? _librarySectionTitleFromJson(container),
+      );
+      return KidsProfileService.instance.allowedItem(PlexMappers.mediaItem(metadata));
     } on MediaServerHttpException catch (error) {
       if (error.statusCode == 404) return null;
       rethrow;

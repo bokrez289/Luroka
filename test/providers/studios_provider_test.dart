@@ -175,6 +175,119 @@ void main() {
     await SettingsService.getInstance();
   });
 
+  test('large studio facets stop after one page and resume on demand without losing late brands', () async {
+    final client = StudioTestClient('server')
+      ..listings['movies'] = [
+        for (var i = 0; i < 500; i++) MediaStudio(id: '$i', name: 'Unlisted $i'),
+        const MediaStudio(id: 'late', name: 'Pixar'),
+      ];
+    final libraries = StudioTestLibraries([studioLibrary('movies')]);
+    final hidden = HiddenLibrariesProvider();
+    await hidden.ensureInitialized();
+    final provider = StudiosProvider(
+      libraries: libraries,
+      hidden: hidden,
+      servers: testMultiServer(clients: [client]).provider,
+      isBinding: () => false,
+    );
+    addTearDown(provider.dispose);
+    addTearDown(hidden.dispose);
+    addTearDown(libraries.dispose);
+    provider.ensureLoaded();
+    await settleStudios(provider);
+    expect(client.calls, hasLength(1));
+    expect(provider.groups, isEmpty);
+    expect(provider.hasMore, isTrue);
+    provider.loadMore();
+    await settleStudios(provider);
+    expect(client.calls, hasLength(2));
+    expect(provider.groups.single.name, 'Pixar');
+    expect(provider.hasMore, isFalse);
+  });
+
+  test('a discovered studio may have additional aliases beyond the bounded first facet page', () async {
+    final client = StudioTestClient('server')
+      ..listings['movies'] = [
+        const MediaStudio(id: 'pixar-first', name: 'Pixar'),
+        for (var i = 0; i < 499; i++) MediaStudio(id: 'unlisted-$i', name: 'Unlisted $i'),
+        const MediaStudio(id: 'pixar-later', name: 'Pixar Animation Studios'),
+      ];
+    final libraries = StudioTestLibraries([studioLibrary('movies')]);
+    final hidden = HiddenLibrariesProvider();
+    await hidden.ensureInitialized();
+    final provider = StudiosProvider(
+      libraries: libraries,
+      hidden: hidden,
+      servers: testMultiServer(clients: [client]).provider,
+      isBinding: () => false,
+    );
+    addTearDown(provider.dispose);
+    addTearDown(hidden.dispose);
+    addTearDown(libraries.dispose);
+    provider.ensureLoaded();
+    await settleStudios(provider);
+    expect(client.calls, hasLength(1));
+    expect(provider.group('pixar')!.sources.map((source) => source.studio.id), ['pixar-first']);
+    expect(provider.hasMore, isTrue);
+    provider.loadMore();
+    await settleStudios(provider);
+    expect(client.calls, hasLength(2));
+    expect(provider.group('pixar')!.sources.map((source) => source.studio.id), ['pixar-first', 'pixar-later']);
+    expect(provider.hasMore, isFalse);
+  });
+
+  testWidgets('opening Pixar discovers later movie libraries without expanding Home discovery', (tester) async {
+    final queriedLibraries = <String>{};
+    final client = StudioTestClient('server')
+      ..libraryPageGate = (library, _) async {
+        queriedLibraries.add(library);
+      }
+      ..listings['small'] = [const MediaStudio(id: 'pixar', name: 'Pixar')]
+      ..listings['large'] = [
+        for (var i = 0; i < 500; i++) MediaStudio(id: '$i', name: 'Unlisted $i'),
+        const MediaStudio(id: 'pixar', name: 'Pixar'),
+      ]
+      ..libraryContent['small'] = [
+        MediaItem(id: 'two', backend: MediaBackend.plex, kind: MediaKind.movie, title: 'Inside Out 2', year: 2024),
+      ]
+      ..libraryContent['large'] = [
+        MediaItem(id: 'one', backend: MediaBackend.plex, kind: MediaKind.movie, title: 'Inside Out', year: 2015),
+      ];
+    final libraries = StudioTestLibraries([studioLibrary('small'), studioLibrary('large')]);
+    final hidden = HiddenLibrariesProvider();
+    await hidden.ensureInitialized();
+    final provider = StudiosProvider(
+      libraries: libraries,
+      hidden: hidden,
+      servers: testMultiServer(clients: [client]).provider,
+      isBinding: () => false,
+    );
+    addTearDown(provider.dispose);
+    addTearDown(hidden.dispose);
+    addTearDown(libraries.dispose);
+    provider.ensureLoaded();
+    await tester.runAsync(() => settleStudios(provider));
+    expect(client.calls, hasLength(2));
+    expect(provider.group('pixar')!.sources, hasLength(1));
+    await tester.pumpWidget(
+      ChangeNotifierProvider<StudiosProvider>.value(
+        value: provider,
+        child: InputModeTracker(
+          child: MaterialApp(
+            theme: monoTheme(MonoPalette.dark),
+            home: const StudioBrowserScreen(studioKey: 'pixar'),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(client.calls, hasLength(3));
+    expect(provider.hasMore, isFalse);
+    expect(provider.group('pixar')!.sources, hasLength(2));
+    expect(queriedLibraries, containsAll(['small', 'large']));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('a timed-out studio request is cancelled before another library starts', (tester) async {
     final stalled = Completer<LibraryPage<MediaStudio>>();
     final client = StudioTestClient('server')..gate = () => stalled.future;
@@ -397,7 +510,7 @@ void main() {
     );
   });
 
-  testWidgets('phone Browse All starts loading further pages without scrolling', (tester) async {
+  testWidgets('phone Browse All fetches another page only when scrolling near the end', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(false);
     addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
     tester.view.physicalSize = const Size(390, 844);
@@ -437,6 +550,10 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('mobile_studio_mode')), findsOneWidget);
+    expect(client.contentCalls.map((query) => query.offset), isNot(contains(40)));
+    final scroll = tester.widget<CustomScrollView>(find.byType(CustomScrollView)).controller!;
+    scroll.jumpTo(scroll.position.maxScrollExtent);
+    await tester.pumpAndSettle();
     expect(client.contentCalls.map((query) => query.offset), contains(40));
   });
 
@@ -772,7 +889,7 @@ void main() {
     expect(items.map((item) => item.id), ['movie', 'show']);
   });
 
-  testWidgets('studio layout fits TV and large-text phones and loads every page without scrolling', (tester) async {
+  testWidgets('studio layout fits TV and large-text phones without draining the catalogue', (tester) async {
     addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
     addTearDown(() => tester.view.resetPhysicalSize());
     addTearDown(() => tester.view.resetDevicePixelRatio());
@@ -900,7 +1017,8 @@ void main() {
         expect(FocusManager.instance.primaryFocus, same(selectedFocus));
       }
     }
-    expect(client.contentCalls.map((query) => query.offset).toSet(), {0, 40, 80});
+    expect(client.contentCalls.map((query) => query.offset).toSet(), contains(0));
+    expect(client.contentCalls.map((query) => query.offset), isNot(contains(80)));
     expect(tester.takeException(), isNull);
   });
 
@@ -1025,7 +1143,7 @@ void main() {
     }
     await tester.tap(find.text('${t.studios.browseAll}  ›'));
     await tester.pump();
-    expect(client.contentCalls.any((query) => query.offset == 40), isTrue);
+    // Copy discovery must work even before catalogue pagination reaches it.
     final poster = find.byType(FocusableMediaCard).first;
     tester.widget<FocusableMediaCard>(poster).focusNode!.requestFocus();
     await tester.pump();
@@ -1059,10 +1177,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(observer.opened.last.id, 'hd0');
     expect(observer.opened.last.libraryId, 'HD');
-    // While other libraries are being checked, the known copy is selectable.
+    // A completed lookup with only one copy opens directly without a chooser.
     await tester.tap(find.byType(FocusableMediaCard).at(1));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('HD'));
     await tester.pumpAndSettle();
     expect(observer.opened.last.id, 'hd1');
     expect(find.text(t.libraries.selectLibrary), findsNothing);

@@ -11,6 +11,7 @@ import 'package:luroka/profiles/profile_registry.dart';
 import 'package:luroka/services/credential_vault.dart';
 import 'package:luroka/services/base_shared_preferences_service.dart';
 import 'package:luroka/services/luroka_backup_snapshot.dart';
+import 'package:luroka/services/profile_settings_store.dart';
 import 'package:luroka/services/seerr/seerr_session_store.dart';
 
 import '../test_helpers/backend_client_fixtures.dart';
@@ -48,6 +49,9 @@ void main() {
       ),
     );
     final prefs = await BaseSharedPreferencesService.sharedCache();
+    final settings = ProfileSettingsStore(prefs);
+    await settings.initialize('adult', initialValues: {'theme_mode': 'dark', 'audio_output_device': 'local-output'});
+    await settings.initialize('other', initialValues: {'theme_mode': 'light'});
     await prefs.setString('user_other_seerr_session', 'unrelated');
     await source
         .into(source.screenTimeDaily)
@@ -80,6 +84,9 @@ void main() {
     expect((await ProfileConnectionRegistry(target).listForProfile('adult')).single.userToken, connection.accessToken);
     expect((await const SeerrSessionStore().load('adult'))?.secret, 'test-secret');
     expect((await BaseSharedPreferencesService.sharedCache()).getString('user_other_seerr_session'), isNull);
+    final restoredSettings = ProfileSettingsStore(await BaseSharedPreferencesService.sharedCache());
+    expect(restoredSettings.read('adult'), {'theme_mode': 'dark'});
+    expect(restoredSettings.read('other'), isNull);
     expect((await target.select(target.screenTimeDaily).get()).single.durationMs, 1234);
     await expectLater(LurokaBackupSnapshot.restore(target, backup, 'test passphrase'), throwsStateError);
     expect((await target.select(target.profiles).get()), hasLength(1));

@@ -167,6 +167,28 @@ void main() {
   });
 
   group('ActiveProfileProvider', () {
+    test('committed profile switches change the active settings and notify listeners', () async {
+      final settings = await SettingsService.getInstance();
+      final first = Profile.local(id: 'first', displayName: 'First', createdAt: DateTime(2026));
+      final second = Profile.local(id: 'second', displayName: 'Second', createdAt: DateTime(2026));
+      await registry.upsert(first);
+      await registry.upsert(second);
+      await storage.setActiveProfileId(first.id);
+      await provider.initialize();
+      await settings.prepareProfileSettings([first.id, second.id]);
+      await settings.write(SettingsService.posterDetails, true);
+      final details = settings.listenable(SettingsService.posterDetails);
+
+      expect(await provider.activate(second), isTrue);
+      expect(details.value, isFalse);
+      await settings.write(SettingsService.showThemeMusic, false);
+      expect(await provider.activate(first), isTrue);
+      expect(details.value, isTrue);
+      expect(settings.read(SettingsService.showThemeMusic), isTrue);
+      expect(await provider.activate(second), isTrue);
+      expect(settings.read(SettingsService.showThemeMusic), isFalse);
+    });
+
     test('auto-login resumes an unprotected last profile but not a protected one', () async {
       final settings = await SettingsService.getInstance();
       final first = Profile.local(id: 'first', displayName: 'First', createdAt: DateTime(2026));

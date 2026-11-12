@@ -91,6 +91,7 @@ class LibraryBrowseTab extends BaseLibraryTab<MediaItem> {
   /// bar can badge the Library options action on mobile.
   final ValueChanged<bool>? onFiltersActiveChanged;
   final bool canGroupByFolders;
+  final bool compactTvNavigation;
 
   const LibraryBrowseTab({
     super.key,
@@ -102,6 +103,8 @@ class LibraryBrowseTab extends BaseLibraryTab<MediaItem> {
     super.isActive,
     super.suppressAutoFocus,
     super.onBack,
+    super.onNavigateLibraryMenu,
+    this.compactTvNavigation = false,
     this.onResetScroll,
     this.onFiltersActiveChanged,
   });
@@ -566,7 +569,7 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
   /// Focus the chips bar (for navigating from tab bar to content).
   /// Called by libraries screen when pressing DOWN on tab bar.
   void focusChipsBar() {
-    if (_usesMobileBrowseOptions) {
+    if (_usesMobileBrowseOptions || widget.compactTvNavigation) {
       focusFirstItem();
       return;
     }
@@ -586,6 +589,16 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
     final controller = OverlaySheetController.of(context);
     controller.show(builder: (sheetContext) => _buildBrowseOptionsSheet(sheetContext));
   }
+
+  void showCompactGrouping() => _showGroupingBottomSheet();
+  void showCompactFilters() => _showFiltersBottomSheet();
+  void showCompactSort() => _showSortBottomSheet();
+  void showCompactAlphabet() => _navigateToAlphaJumpBar();
+  void clearCompactAlphabet() => _applyMediaBrowserAlphaPrefix(null);
+  bool get hasCompactFilters => _isFiltersChipVisible;
+  bool get hasCompactSort => _isSortChipVisible;
+  bool get hasCompactAlphabet => _shouldShowAlphaJumpBar;
+  bool get hasCompactAlphabetFilter => _mediaBrowserAlphaPrefix != null;
 
   /// Reset transient browse state before loading a different library.
   void _resetForFullReload() {
@@ -1564,7 +1577,7 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
 
   /// Navigate focus from grid up to the chips bar, or the tab bar on mobile.
   void _navigateToChips() {
-    if (_usesMobileBrowseOptions) {
+    if (_usesMobileBrowseOptions || widget.compactTvNavigation) {
       widget.onBack?.call();
       return;
     }
@@ -1572,6 +1585,10 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
   }
 
   void _navigateToSidebar() {
+    if (widget.onNavigateLibraryMenu case final callback?) {
+      callback();
+      return;
+    }
     MainScreenFocusScope.focusSidebarOf(context);
   }
 
@@ -1749,7 +1766,9 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
             math.max(0, MediaQuery.textScalerOf(context).scale(14) / 14 - 1) * 40
       : 0;
   double get _contentStartScrollOffset =>
-      (_usesMobileBrowseOptions ? 0.0 : _chipsBarHeight) + _effectiveTopPadding + _catalogHeaderHeight;
+      (_usesMobileBrowseOptions || widget.compactTvNavigation ? 0.0 : _chipsBarHeight) +
+      _effectiveTopPadding +
+      _catalogHeaderHeight;
 
   /// Handle a tap on the letter at [targetIndex] in the alpha bar. The
   /// active [LibraryAlphaBarStrategy] owns the per-backend behaviour and
@@ -1943,7 +1962,7 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
             // Floating chips: scroll off with content but snap back into view
             // on upward direction reversal, matching the outer floating
             // SliverAppBar's behavior.
-            if (!_usesMobileBrowseOptions)
+            if (!_usesMobileBrowseOptions && !widget.compactTvNavigation)
               SliverPersistentHeader(
                 floating: true,
                 pinned: false,
@@ -2495,7 +2514,15 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
           itemHeight: geometry.itemHeight,
         );
       },
-      listEpoch: (ViewMode.list, itemCount, libraryDensity, useWideRatio, _shouldShowAlphaJumpBar, isPhone),
+      listEpoch: (
+        ViewMode.list,
+        itemCount,
+        libraryDensity,
+        useWideRatio,
+        _shouldShowAlphaJumpBar,
+        isPhone,
+        widget.compactTvNavigation,
+      ),
       gridEpochBuilder: (geometry) => (
         ViewMode.grid,
         geometry.columnCount,
@@ -2506,6 +2533,7 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
         libraryDensity,
         _shouldShowAlphaJumpBar,
         isPhone,
+        widget.compactTvNavigation,
       ),
       itemBuilder: (context, position) {
         final index = position.index;
@@ -2596,7 +2624,7 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
     }
 
     VoidCallback? navigateLeft;
-    if (isFirstColumn && !(PlatformDetector.isTV() && columnCount > 1 && index > 0)) {
+    if (isFirstColumn && (widget.compactTvNavigation || !(PlatformDetector.isTV() && columnCount > 1 && index > 0))) {
       navigateLeft = _navigateToSidebar;
     } else if (index > 0) {
       navigateLeft = () {

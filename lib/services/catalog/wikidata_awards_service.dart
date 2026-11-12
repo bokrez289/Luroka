@@ -102,7 +102,7 @@ class WikidataAwardsService {
               Uri.https('query.wikidata.org', '/sparql', {'format': 'json', 'query': buildQuery(category, mode)}),
               headers: {
                 'Accept': 'application/sparql-results+json',
-                'User-Agent': 'Luroka/awards (https://github.com/bokrez289/Luroka)',
+                'User-Agent': 'Luroka/awards (https://github.com/bokrez289/plezy)',
               },
             )
             .timeout(const Duration(seconds: 18));

@@ -8,6 +8,7 @@ import 'package:luroka/models/trackers/tracker_context.dart';
 import 'package:luroka/profiles/profile.dart';
 import 'package:luroka/providers/trackers_provider.dart';
 import 'package:luroka/services/base_shared_preferences_service.dart';
+import 'package:luroka/services/settings_service.dart';
 import 'package:luroka/services/trackers/anilist/anilist_tracker.dart';
 import 'package:luroka/services/trackers/tracker_account_store.dart';
 import 'package:luroka/services/trackers/tracker_constants.dart';
@@ -94,6 +95,25 @@ void main() {
   tearDown(_resetTrackerBindings);
 
   group('TrackersProvider', () {
+    test('rebinding applies the selected profile scrobble policy before its session', () async {
+      final settings = await SettingsService.getInstance();
+      await settings.prepareProfileSettings(['one', 'two']);
+      await _malStore.save('one', _mal());
+      await _malStore.save('two', _mal());
+      settings.selectProfile('one');
+      await settings.write(SettingsService.scrobblePref(TrackerService.mal), false);
+      final provider = TrackersProvider();
+      await _bindProfile(provider, 'one');
+      expect(MalTracker.instance.canWriteWatched, isFalse);
+      settings.selectProfile('two');
+      await _bindProfile(provider, 'two');
+      expect(MalTracker.instance.canWriteWatched, isTrue);
+      settings.selectProfile('one');
+      await _bindProfile(provider, 'one');
+      expect(MalTracker.instance.canWriteWatched, isFalse);
+      provider.dispose();
+    });
+
     test('disabled Trakt preserves its session and queued writes without connecting', () async {
       const uuid = 'disabled-trakt';
       final session = _trakt(username: 'alice');

@@ -160,7 +160,18 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
       )
       .firstOrNull;
 
+  // Finish studio-name discovery only while this page is being browsed.
+  // Let the current title batch paint first; Home keeps its bounded discovery.
+  void _continueDiscovery() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _opening || _loading || _studios.loading || _studios.failed) return;
+      if (!(ModalRoute.of(context)?.isCurrent ?? false)) return;
+      if (_studios.hasMore) _studios.loadMore();
+    });
+  }
+
   void _changed() {
+    _continueDiscovery();
     if (_storage == null) return;
     if (_opening) {
       _sourcesChangedWhileOpening = true;
@@ -175,7 +186,9 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
         <StudioSource>[];
     final key = (
       _sort,
-      Object.hashAll(sources.map((source) => (source.library.globalKey, source.client, source.kind, source.studio.id))),
+      Object.hashAllUnordered(
+        sources.map((source) => (source.library.globalKey, source.client, source.kind, source.studio.id)),
+      ),
     );
     if (key == _sourcesKey) return;
     _sourcesKey = key;
@@ -210,7 +223,8 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
           _items = [
             for (final item in _titles.items)
               item.copyWith(raw: {...?item.raw, 'lurokaCopyCount': _titles.copiesFor(item).length}),
-          ]..sort(_sort.compare);
+          ];
+          if (_sort != StudioSort.recentlyAddedEpisode && _sort != StudioSort.recentlyAdded) _items.sort(_sort.compare);
           reconcileGridFocusNodes({for (final (index, item) in _items.indexed) item.globalKey: index});
           _discovery = StudioDiscovery(_items);
         });
@@ -239,12 +253,14 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
         setState(() {
           if (!_cursorHasPublished) {
             _cursorHasPublished = true;
+            _titles = StudioTitles();
           }
           _titles.addAll(items);
           _items = [
             for (final item in _titles.items)
               item.copyWith(raw: {...?item.raw, 'lurokaCopyCount': _titles.copiesFor(item).length}),
-          ]..sort(_sort.compare);
+          ];
+          if (_sort != StudioSort.recentlyAddedEpisode && _sort != StudioSort.recentlyAdded) _items.sort(_sort.compare);
           reconcileGridFocusNodes({for (final (index, item) in _items.indexed) item.globalKey: index});
           if (_discovery.featured == null) _discovery = StudioDiscovery(_items);
         });
@@ -266,13 +282,12 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
         } else {
           _pendingFocus = null;
         }
-        // Paint the first posters immediately, then keep draining in bounded
-        // batches without requiring scrolling or allocating the whole grid.
+        // Yield so the current batch paints before any further work.
         await Future<void>.delayed(Duration.zero);
         if (!mounted || abort.isAborted || cursor != _cursor) return;
-        // The landing shelves need only a preview. Once Browse All is open,
-        // keep paging in the background; opening a title cancels the drain.
-        if (PlatformDetector.isMobile(context) && !_browseAll) break;
+        // Fetch the next batch when navigation approaches the loaded edge.
+        // Do not drain thousands of titles while the user reads the first page.
+        if (_items.isNotEmpty) break;
       }
       setState(() {
         _loading = false;
@@ -288,7 +303,10 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
         _failed = true;
       });
     } finally {
-      if (identical(cursor, _cursor)) _loadTask = null;
+      if (identical(cursor, _cursor)) {
+        _loadTask = null;
+        _continueDiscovery();
+      }
     }
   }
 
@@ -497,6 +515,10 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
       unawaited(_load());
       return;
     }
+    // Warm one next batch before the remote reaches the last three rows.
+    if (!_loading && !_failed && index >= _items.length - _columns * 3 && _cursor?.hasMore == true) {
+      unawaited(_load());
+    }
     index = index.clamp(0, _items.length - 1);
     final generation = ++_focusGeneration;
     final origin = FocusManager.instance.primaryFocus;
@@ -701,9 +723,9 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
 
   @override
   Widget build(BuildContext context) {
-    return SettingValueBuilder<bool>(
-      pref: SettingsService.posterDetails,
-      builder: (context, _, _) => _buildStudioContent(context),
+    return SettingsBuilder(
+      prefs: const [SettingsService.posterDetails, SettingsService.libraryDensity, SettingsService.gridSpacing],
+      builder: _buildStudioContent,
     );
   }
 
@@ -1131,14 +1153,26 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
                                               // Fixed sparse columns left large empty gutters when posters
                                               // shrank to fit below the spotlight and filter controls.
                                               if (tv && !_list) {
-                                                _columns = 5;
+                                                _columns =
+                                                    (8 - SettingsService.instance.read(SettingsService.libraryDensity))
+                                                        .clamp(3, 7)
+                                                        .toInt();
                                               }
                                               final cellWidth = (width - (_columns - 1) * gap) / _columns;
                                               final posterWidth = mobile
                                                   ? cellWidth
                                                   : math.min(
                                                       cellWidth,
-                                                      math.max(1.0, (maxExtent - captionExtent) / 1.5),
+                                                      math.max(1.0, (maxExtent - captionExtent) / 1.5) *
+                                                          (tv
+                                                              ? 0.65 +
+                                                                    0.35 *
+                                                                        LibraryDensity.factor(
+                                                                          SettingsService.instance.read(
+                                                                            SettingsService.libraryDensity,
+                                                                          ),
+                                                                        )
+                                                              : 1.0),
                                                     );
                                               final extent = _list
                                                   ? (tv ? 112.0 : 104.0) * math.max(1.0, scale)
