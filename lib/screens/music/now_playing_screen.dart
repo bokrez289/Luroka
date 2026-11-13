@@ -409,7 +409,11 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
     final tk = tokens(context);
     final textTheme = Theme.of(context).textTheme;
     final sourceTitle = _playingFromTitle(track, service.playContext);
-    final artist = track.trackArtistTitle;
+    final artist = [
+      if (track.trackArtistTitle?.trim().isNotEmpty == true) track.trackArtistTitle!,
+      if (track.albumTitle?.trim().isNotEmpty == true) track.albumTitle!,
+      if (track.albumYear != null) '${track.albumYear}',
+    ].join(' · ');
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 56, vertical: 40),
@@ -445,7 +449,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
                   overflow: .ellipsis,
                   style: textTheme.headlineMedium?.copyWith(fontWeight: .w600, color: tk.text),
                 ),
-                if (artist != null && artist.isNotEmpty) ...[
+                if (artist.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     artist,
@@ -656,7 +660,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
       children: [
         Text(
           track.title ?? '',
-          maxLines: 1,
+          maxLines: 2,
           overflow: .ellipsis,
           textAlign: centered ? TextAlign.center : TextAlign.start,
           style: textTheme.headlineSmall?.copyWith(fontWeight: .w600, color: tk.text),
@@ -815,42 +819,65 @@ class _NowPlayingScreenState extends State<NowPlayingScreen>
   }
 
   Widget _buildUtilityRow({required bool showQueueButton}) {
-    return Center(
-      child: FocusableActionBar(
-        key: _utilityBarKey,
-        spacing: 16,
-        onNavigateUp: _focusTransport,
-        // Bottom of the chain — trap DOWN so focus can't escape the screen.
-        // ignore: no-empty-block
-        onNavigateDown: () {},
-        onBack: _pop,
-        actions: [
-          FocusableAction(
-            debugLabel: 'np_lyrics',
-            onPressed: _toggleLyrics,
-            builder: (context, state) => _transportIcon(
-              state,
-              icon: Symbols.lyrics_rounded,
-              active: _showLyrics,
-              tooltip: t.music.lyrics,
-              onPressed: _toggleLyrics,
-              size: 22,
-            ),
+    Widget action(
+      FocusableActionBuildState state, {
+      required IconData icon,
+      required String label,
+      required VoidCallback onPressed,
+      bool selected = false,
+    }) {
+      final colors = Theme.of(context).colorScheme;
+      return AnimatedContainer(
+        duration: state.animationDuration,
+        decoration: FocusTheme.textFillFocusDecoration(context, isFocused: state.showFocus, borderRadius: 24),
+        child: TextButton.icon(
+          onPressed: onPressed,
+          style: TextButton.styleFrom(
+            foregroundColor: selected ? colors.primary : colors.onSurfaceVariant,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           ),
-          if (showQueueButton)
+          icon: AppIcon(icon, size: 20, fill: 1),
+          label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+        ),
+      );
+    }
+
+    return Center(
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: FocusableActionBar(
+          key: _utilityBarKey,
+          spacing: 16,
+          onNavigateUp: _focusTransport,
+          // Bottom of the chain — trap DOWN so focus can't escape the screen.
+          // ignore: no-empty-block
+          onNavigateDown: () {},
+          onBack: _pop,
+          actions: [
             FocusableAction(
-              debugLabel: 'np_queue',
-              onPressed: () => unawaited(showQueueSheet(_sheetContext)),
-              builder: (context, state) => _transportIcon(
+              debugLabel: 'np_lyrics',
+              onPressed: _toggleLyrics,
+              builder: (context, state) => action(
                 state,
-                icon: Symbols.queue_music_rounded,
-                active: false,
-                tooltip: t.music.queue,
-                onPressed: () => unawaited(showQueueSheet(_sheetContext)),
-                size: 22,
+                icon: Symbols.lyrics_rounded,
+                selected: _showLyrics,
+                label: t.music.lyrics,
+                onPressed: _toggleLyrics,
               ),
             ),
-        ],
+            if (showQueueButton)
+              FocusableAction(
+                debugLabel: 'np_queue',
+                onPressed: () => unawaited(showQueueSheet(_sheetContext)),
+                builder: (context, state) => action(
+                  state,
+                  icon: Symbols.queue_music_rounded,
+                  label: t.music.queue,
+                  onPressed: () => unawaited(showQueueSheet(_sheetContext)),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -879,7 +906,7 @@ class _Artwork extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final side = tvSized
-            ? math.min(constraints.maxWidth, constraints.maxHeight * 0.62)
+            ? math.min(constraints.maxWidth, constraints.maxHeight * 0.76)
             : math.min(constraints.maxWidth * 0.85, constraints.maxHeight);
         if (side <= 0 || !side.isFinite) return const SizedBox.shrink();
         return Center(
@@ -937,6 +964,15 @@ class _Background extends StatelessWidget {
               imagePath: track.thumbPath,
               imageType: ImageType.square,
               fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Theme.of(context).colorScheme.primary.withValues(alpha: .08), tk.bg.withValues(alpha: .35)],
             ),
           ),
         ),

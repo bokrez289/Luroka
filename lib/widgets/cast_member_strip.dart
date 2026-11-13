@@ -38,6 +38,11 @@ class CastMemberStrip extends StatefulWidget {
   final VoidCallback? onNavigateDown;
   final String debugLabel;
 
+  /// Override sizing and shape for compact surfaces such as player details.
+  final double? cardWidth;
+  final bool circularPortraits;
+  final bool Function(int index)? canOpenMember;
+
   const CastMemberStrip({
     super.key,
     required this.members,
@@ -46,6 +51,9 @@ class CastMemberStrip extends StatefulWidget {
     this.onNavigateUp,
     this.onNavigateDown,
     this.debugLabel = 'cast_row',
+    this.cardWidth,
+    this.circularPortraits = false,
+    this.canOpenMember,
   });
 
   /// Card width matching the poster grids' cell width for the user's
@@ -114,7 +122,9 @@ class CastMemberStripState extends State<CastMemberStrip> {
     scrollListToIndex(
       _scrollController,
       _focusedIndex,
-      itemExtent: CastMemberStrip._itemExtentForCardWidth(CastMemberStrip.responsiveCardWidth(context)),
+      itemExtent: CastMemberStrip._itemExtentForCardWidth(
+        widget.cardWidth ?? CastMemberStrip.responsiveCardWidth(context),
+      ),
       leadingPadding: 0,
     );
   }
@@ -130,7 +140,7 @@ class CastMemberStripState extends State<CastMemberStrip> {
   void _activateMember(int index) {
     if (_focusedIndex != index) setState(() => _focusedIndex = index);
     _focusNode.requestFocus();
-    widget.onMemberTap?.call(index);
+    if (widget.canOpenMember?.call(index) ?? true) widget.onMemberTap?.call(index);
   }
 
   KeyEventResult _handleKeyEvent(FocusNode _, KeyEvent event) {
@@ -139,7 +149,9 @@ class CastMemberStripState extends State<CastMemberStrip> {
 
     final onMemberTap = widget.onMemberTap;
     if (onMemberTap != null) {
-      final selectResult = handleOneShotSelect(event, () => onMemberTap(_focusedIndex));
+      final selectResult = handleOneShotSelect(event, () {
+        if (widget.canOpenMember?.call(_focusedIndex) ?? true) onMemberTap(_focusedIndex);
+      });
       if (selectResult != KeyEventResult.ignored) return selectResult;
     }
     if (!event.isActionable) return KeyEventResult.ignored;
@@ -173,8 +185,9 @@ class CastMemberStripState extends State<CastMemberStrip> {
       color: theme.colorScheme.onSurfaceVariant,
       fontSize: mobile ? 10.5 : null,
     );
-    final cardWidth = CastMemberStrip.responsiveCardWidth(context);
+    final cardWidth = widget.cardWidth ?? CastMemberStrip.responsiveCardWidth(context);
     final imageSize = cardWidth;
+    final rounded = mobile || widget.circularPortraits;
 
     return Focus(
       focusNode: _focusNode,
@@ -203,19 +216,21 @@ class CastMemberStripState extends State<CastMemberStrip> {
                   context: context,
                   isFocused: _focusNode.hasFocus && index == _focusedIndex,
                   borderRadius: tokens(context).radiusSm,
-                  onTap: widget.onMemberTap == null ? null : () => _activateMember(index),
+                  onTap: widget.onMemberTap == null || !(widget.canOpenMember?.call(index) ?? true)
+                      ? null
+                      : () => _activateMember(index),
                   delegateFocusBorder: true,
                   child: Padding(
                     padding: const EdgeInsets.all(CastMemberStrip._innerPadding),
                     child: SizedBox(
                       width: cardWidth,
                       child: Column(
-                        crossAxisAlignment: mobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+                        crossAxisAlignment: rounded ? CrossAxisAlignment.center : CrossAxisAlignment.start,
                         children: [
                           CardFocusBorder(
-                            borderRadius: mobile ? imageSize / 2 : tokens(context).radiusSm,
+                            borderRadius: rounded ? imageSize / 2 : tokens(context).radiusSm,
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(mobile ? imageSize / 2 : tokens(context).radiusSm),
+                              borderRadius: BorderRadius.circular(rounded ? imageSize / 2 : tokens(context).radiusSm),
                               child: OptimizedMediaImage(
                                 client: widget.imageClient,
                                 imagePath: member.imagePath,
@@ -230,21 +245,21 @@ class CastMemberStripState extends State<CastMemberStrip> {
                           const SizedBox(height: 8),
                           Expanded(
                             child: Column(
-                              crossAxisAlignment: mobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+                              crossAxisAlignment: rounded ? CrossAxisAlignment.center : CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   member.name,
                                   style: nameStyle,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  textAlign: mobile ? TextAlign.center : null,
+                                  textAlign: rounded ? TextAlign.center : null,
                                 ),
                                 if (member.secondary != null) ...[
                                   const SizedBox(height: 2),
                                   Text(
                                     member.secondary!,
                                     style: secondaryStyle,
-                                    textAlign: mobile ? TextAlign.center : null,
+                                    textAlign: rounded ? TextAlign.center : null,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),

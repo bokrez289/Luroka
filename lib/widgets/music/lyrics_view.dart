@@ -12,6 +12,7 @@ import '../../media/lyrics.dart';
 import '../../screens/libraries/state_messages.dart';
 import '../../services/music/music_playback_service.dart';
 import '../../theme/mono_tokens.dart';
+import '../../utils/platform_detector.dart';
 
 /// Lyrics pane for the now-playing screen (swapped in over the artwork).
 ///
@@ -289,9 +290,9 @@ class _LyricsViewState extends State<LyricsView> {
       line.text.isEmpty ? '…' : line.text,
       textAlign: TextAlign.center,
       style: TextStyle(
-        fontSize: 18,
+        fontSize: PlatformDetector.isTV() ? 25 : 20,
         height: 1.4,
-        fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+        fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
         color: isActive || !lyrics.synced ? tk.text : tk.textMuted,
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/focus/focusable_action_bar.dart';
 import 'package:luroka/i18n/strings.g.dart';
@@ -12,6 +13,7 @@ import 'package:luroka/services/settings_service.dart';
 import 'package:luroka/theme/mono_theme.dart';
 import 'package:luroka/widgets/app_icon.dart';
 import 'package:luroka/widgets/music/track_row.dart';
+import 'package:luroka/utils/platform_detector.dart';
 import 'package:provider/provider.dart';
 
 import '../../test_helpers/media_items.dart';
@@ -38,6 +40,7 @@ MediaItem _track(String id, String title) => testMediaItem(
 class _FakeQueueService extends StubMusicPlaybackService {
   final List<MediaItem> tracks;
   final List<int> jumps = [];
+  final List<(int, int)> moves = [];
 
   _FakeQueueService(this.tracks);
 
@@ -57,6 +60,9 @@ class _FakeQueueService extends StubMusicPlaybackService {
   Future<void> jumpTo(int index) async {
     jumps.add(index);
   }
+
+  @override
+  void reorder(int from, int to) => moves.add((from, to));
 }
 
 void main() {
@@ -136,5 +142,24 @@ void main() {
     await tester.pump();
 
     expect(service.jumps, [2, 0]);
+  });
+
+  testWidgets('TV queue offers remote-accessible move actions', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+    final service = _FakeQueueService([_track('t1', 'Alpha'), _track('t2', 'Beta'), _track('t3', 'Gamma')]);
+    await tester.pumpWidget(wrap(service));
+    await tester.pump(const Duration(milliseconds: 300));
+    final row = find.ancestor(of: find.text('Gamma'), matching: find.byType(TrackRow));
+    final focus = tester.widget<Focus>(find.descendant(of: row, matching: find.byType(Focus)).first).focusNode!;
+    focus.requestFocus();
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.sendKeyEvent(LogicalKeyboardKey.select);
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text(t.homeLayout.moveUp), findsOneWidget);
+    await tester.tap(find.text(t.homeLayout.moveUp));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(service.moves, [(2, 1)]);
   });
 }

@@ -65,6 +65,8 @@ import '../utils/desktop_window_padding.dart';
 import '../utils/live_tv_deep_link.dart';
 import '../watch_together/services/watch_deep_link.dart';
 import '../widgets/music/mini_player.dart';
+import '../services/music/music_playback_service.dart';
+import '../utils/music_navigation.dart';
 import '../widgets/navigation_label_fit.dart';
 import '../widgets/mobile_navigation_rail.dart';
 import '../widgets/side_navigation_rail.dart';
@@ -461,6 +463,7 @@ class _MainScreenState extends State<MainScreen>
   final _dockProfileFocus = FocusNode(debugLabel: 'tv_profile_menu');
   final _dockSearchFocus = FocusNode(debugLabel: 'tv_search');
   final _dockWatchTogetherFocus = FocusNode(debugLabel: 'tv_watch_together');
+  final _dockMusicFocus = FocusNode(debugLabel: 'tv_now_playing');
   ValueListenable<bool>? _showExploreTabListenable;
   ValueListenable<bool>? _showLiveTvListenable;
   RouteObserver<PageRoute<dynamic>>? _profileRouteObserver;
@@ -1126,6 +1129,7 @@ class _MainScreenState extends State<MainScreen>
     _dockProfileFocus.dispose();
     _dockSearchFocus.dispose();
     _dockWatchTogetherFocus.dispose();
+    _dockMusicFocus.dispose();
     if (_watchTogether?.navigatorOpener == _navigateToWatchTogetherMedia) _watchTogether?.navigatorOpener = null;
     WidgetsBinding.instance.removeObserver(this);
     _profileRouteObserver?.unsubscribe(this);
@@ -1584,9 +1588,12 @@ class _MainScreenState extends State<MainScreen>
   }
 
   bool get _showDockSearch => !_isOffline && !KidsProfileService.instance.isActiveKids;
+  bool get _showDockMusic => context.read<MusicPlaybackService?>()?.currentTrack != null;
 
   void _focusFirstDockUtility() {
-    if (context.read<WatchTogetherProvider>().isInSession) {
+    if (_showDockMusic) {
+      _dockMusicFocus.requestFocus();
+    } else if (context.read<WatchTogetherProvider>().isInSession) {
       _dockWatchTogetherFocus.requestFocus();
     } else if (_showDockSearch) {
       _dockSearchFocus.requestFocus();
@@ -1599,7 +1606,7 @@ class _MainScreenState extends State<MainScreen>
     if (context.read<WatchTogetherProvider>().isInSession) {
       _dockWatchTogetherFocus.requestFocus();
     } else {
-      _tvDockKey.currentState?.focusLastItem();
+      if (_showDockMusic) { _dockMusicFocus.requestFocus(); } else { _tvDockKey.currentState?.focusLastItem(); }
     }
   }
 
@@ -1609,7 +1616,7 @@ class _MainScreenState extends State<MainScreen>
     } else if (context.read<WatchTogetherProvider>().isInSession) {
       _dockWatchTogetherFocus.requestFocus();
     } else {
-      _tvDockKey.currentState?.focusLastItem();
+      if (_showDockMusic) { _dockMusicFocus.requestFocus(); } else { _tvDockKey.currentState?.focusLastItem(); }
     }
   }
 
@@ -2482,6 +2489,7 @@ class _MainScreenState extends State<MainScreen>
   Widget _buildTvDockUtilities(BuildContext context) {
     final profile = context.watch<ActiveProfileProvider>();
     final watchTogether = context.watch<WatchTogetherProvider>();
+    final music = context.watch<MusicPlaybackService?>();
     final active = profile.active;
     final homeOptions =
         _currentTab == NavigationTabId.discover && !_isOffline && !KidsProfileService.instance.isActiveKids;
@@ -2489,6 +2497,21 @@ class _MainScreenState extends State<MainScreen>
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (music?.currentTrack != null)
+          FocusableWrapper(
+            key: const ValueKey('tv-now-playing-entry'),
+            focusNode: _dockMusicFocus,
+            disableScale: true,
+            borderRadius: 20,
+            semanticLabel: t.music.nowPlaying,
+            onSelect: () => unawaited(openNowPlaying(context)),
+            onNavigateLeft: () => _tvDockKey.currentState?.focusLastItem(),
+            onNavigateRight: watchTogether.isInSession ? _dockWatchTogetherFocus.requestFocus
+                : _showDockSearch ? _dockSearchFocus.requestFocus : _dockProfileFocus.requestFocus,
+            onNavigateDown: () => unawaited(openNowPlaying(context)),
+            child: Padding(padding: const EdgeInsets.all(8),
+              child: Icon(Symbols.music_note_rounded, color: colors.primary)),
+          ),
         if (watchTogether.isInSession)
           Padding(
             padding: const EdgeInsets.only(right: 6),
@@ -2496,7 +2519,7 @@ class _MainScreenState extends State<MainScreen>
               focusNode: _dockWatchTogetherFocus,
               color: colors.primary,
               onPressed: _openWatchTogetherRoom,
-              onNavigateLeft: () => _tvDockKey.currentState?.focusLastItem(),
+              onNavigateLeft: _showDockMusic ? _dockMusicFocus.requestFocus : () => _tvDockKey.currentState?.focusLastItem(),
               onNavigateRight: _showDockSearch ? _dockSearchFocus.requestFocus : _dockProfileFocus.requestFocus,
             ),
           ),

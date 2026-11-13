@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../media/media_item.dart';
+import '../../../focus/transport_keys.dart';
 import '../../../media/media_version.dart';
 import '../../../media/media_source_info.dart';
 import '../../../models/transcode_quality_preset.dart';
@@ -58,6 +59,7 @@ class TrackControlsState {
   /// player surface so a Watch Together room hears about it; the sheet falls
   /// back to [Player.setRate] when absent.
   final Future<void> Function(double rate)? onRateRequested;
+  final Future<void> Function(TransportCommand command)? onPlayPauseRequested;
   final VoidCallback? onCancelAutoHide;
   final VoidCallback? onStartAutoHide;
   final String? serverId;
@@ -126,6 +128,7 @@ class TrackControlsState {
     this.onSubtitleTrackChanged,
     this.onSecondarySubtitleTrackChanged,
     this.onRateRequested,
+    this.onPlayPauseRequested,
     this.onCancelAutoHide,
     this.onStartAutoHide,
     this.serverId,

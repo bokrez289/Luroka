@@ -1,16 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:luroka/focus/focusable_wrapper.dart';
 import 'package:luroka/focus/input_mode_tracker.dart';
 import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_browser_dialect.dart';
 import 'package:luroka/profiles/profile.dart';
+import 'package:luroka/profiles/active_profile_provider.dart';
+import 'package:luroka/providers/multi_server_provider.dart';
+import 'package:luroka/screens/settings/source_libraries_screen.dart';
+import 'package:luroka/services/storage_service.dart';
+import 'package:luroka/services/settings_service.dart';
+import 'package:provider/provider.dart';
+import '../../test_helpers/multi_server_fixtures.dart';
+import '../../test_helpers/prefs.dart';
 import 'package:luroka/screens/settings/add_connection_screen.dart';
 import 'package:luroka/screens/settings/add_jellyfin_screen.dart';
 import 'package:luroka/screens/settings/add_plex_account_screen.dart';
 import 'package:luroka/theme/mono_theme.dart';
 import 'package:luroka/widgets/backend_badge.dart';
+
+class _Active extends ChangeNotifier implements ActiveProfileProvider {
+  _Active(this.profile);
+  final Profile profile;
+  int generation = 0;
+  @override
+  String? get activeId => profile.id;
+  @override
+  int get identityMutationGeneration => generation;
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 /// The "Add connection" picker is the only route to a new server, so a backend
 /// missing from this list is unreachable no matter how complete its client is.
@@ -103,7 +122,148 @@ void main() {
       if (focused != null) visited.add(focused);
     }
 
-    expect(find.byType(FocusableWrapper), findsNWidgets(3));
+    expect(find.byType(BackendBadge), findsNWidgets(3));
     expect(visited.length, greaterThanOrEqualTo(3), reason: 'D-pad did not reach every backend card');
+  });
+
+  for (final selectedBefore in [true, false]) {
+    testWidgets('successful server add explains ${selectedBefore ? 'explicit selection' : 'default visibility'}', (
+      tester,
+    ) async {
+      resetSharedPreferencesForTest();
+      SettingsService.resetForTesting();
+      await SettingsService.getInstance();
+      final storage = await StorageService.getInstance();
+      final owner = profile('owner');
+      if (selectedBefore) await storage.saveSelectedSourceLibraries({'existing:movies'}, profileId: owner.id);
+      final active = _Active(owner);
+      addTearDown(active.dispose);
+      final servers = testMultiServer();
+      bool? completed;
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ActiveProfileProvider>.value(value: active),
+            ChangeNotifierProvider<MultiServerProvider>.value(value: servers.provider),
+          ],
+          child: app(
+            Builder(
+              builder: (context) => Scaffold(
+                body: TextButton(
+                  onPressed: () async => completed = await Navigator.of(context).push<bool>(
+                    MaterialPageRoute(
+                      builder: (_) => AddConnectionScreen(targetProfile: owner, offerLibrarySelection: true),
+                    ),
+                  ),
+                  child: const Text('Start'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Start'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Connect to Emby'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      tester.state<NavigatorState>(find.byType(Navigator)).pop(true);
+      await tester.pumpAndSettle();
+      expect(find.text('Connected and ready'), findsOneWidget);
+      expect(
+        find.textContaining(selectedBefore ? 'not automatically included' : 'accessible libraries are visible'),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Choose libraries later'));
+      await tester.pumpAndSettle();
+      expect(completed, isTrue);
+      expect(find.byType(SourceLibrariesScreen), findsNothing);
+      expect(storage.getSelectedSourceLibraries(profileId: owner.id), selectedBefore ? {'existing:movies'} : isNull);
+    });
+  }
+
+  testWidgets('library review opens after a successful server connection', (tester) async {
+    resetSharedPreferencesForTest();
+    SettingsService.resetForTesting();
+    await SettingsService.getInstance();
+    final owner = profile('owner');
+    final active = _Active(owner);
+    addTearDown(active.dispose);
+    final servers = testMultiServer();
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ActiveProfileProvider>.value(value: active),
+          ChangeNotifierProvider<MultiServerProvider>.value(value: servers.provider),
+        ],
+        child: app(
+          Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => AddConnectionScreen(targetProfile: owner, offerLibrarySelection: true),
+                  ),
+                ),
+                child: const Text('Start'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Start'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Connect to Emby'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    tester.state<NavigatorState>(find.byType(Navigator)).pop(true);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Choose libraries'));
+    await tester.pumpAndSettle();
+    expect(tester.widget<SourceLibrariesScreen>(find.byType(SourceLibrariesScreen)).profileId, owner.id);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a profile change during sign-in prevents the library prompt', (tester) async {
+    resetSharedPreferencesForTest();
+    SettingsService.resetForTesting();
+    await SettingsService.getInstance();
+    final owner = profile('owner');
+    final active = _Active(owner);
+    addTearDown(active.dispose);
+    final servers = testMultiServer();
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ActiveProfileProvider>.value(value: active),
+          ChangeNotifierProvider<MultiServerProvider>.value(value: servers.provider),
+        ],
+        child: app(
+          Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => AddConnectionScreen(targetProfile: owner, offerLibrarySelection: true),
+                  ),
+                ),
+                child: const Text('Start'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Start'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Connect to Emby'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    active.generation++;
+    tester.state<NavigatorState>(find.byType(Navigator)).pop(true);
+    await tester.pumpAndSettle();
+    expect(find.text('Connected and ready'), findsNothing);
+    expect(find.byType(SourceLibrariesScreen), findsNothing);
   });
 }

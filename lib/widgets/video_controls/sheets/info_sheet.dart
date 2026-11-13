@@ -1,19 +1,26 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../i18n/strings.g.dart';
+import '../../../focus/transport_keys.dart';
 import '../../../media/ids.dart';
 import '../../../media/media_item.dart';
 import '../../../media/media_item_labels.dart';
 import '../../../media/media_item_types.dart';
 import '../../../media/media_role.dart';
 import '../../../services/settings_service.dart';
+import '../../../mpv/mpv.dart';
 import '../../../theme/mono_tokens.dart';
 import '../../../utils/content_utils.dart';
 import '../../../utils/formatters.dart';
 import '../../../utils/platform_detector.dart';
 import '../../../utils/provider_extensions.dart';
+import '../../../utils/media_navigation_helper.dart';
+import '../../../utils/error_dialog.dart';
+import '../../../utils/app_logger.dart';
 import '../../../widgets/cast_member_strip.dart';
 import '../../../widgets/fitted_metadata_line.dart';
 import '../../../widgets/media_rating_badge.dart';
@@ -23,16 +30,28 @@ import 'base_video_control_sheet.dart';
 
 /// Read-only details for the item currently playing — the detail page's
 /// headline facts (title, year/runtime/certification/scores, genres,
-/// synopsis, cast) without leaving playback. Playback is never touched:
-/// the sheet renders over it, and BACK/tap-away returns to the controls.
+/// synopsis, cast) without leaving playback. Selecting a cast member pauses
+/// playback before opening their profile; returning leaves the player paused.
 ///
 /// Sections the playing item's metadata cannot fill are omitted rather than
 /// shown empty, and an unwatched episode's synopsis respects the viewer's
 /// spoiler preference.
 class MediaInfoSheet extends StatefulWidget {
   final MediaItem item;
+  final Player? player;
+  final bool canControl;
+  final Future<void> Function(TransportCommand command)? onPlayPauseRequested;
+  @visibleForTesting
+  final Future<void> Function(BuildContext context, MediaRole role, MediaItem item)? openPerson;
 
-  const MediaInfoSheet({super.key, required this.item});
+  const MediaInfoSheet({
+    super.key,
+    required this.item,
+    this.player,
+    this.canControl = true,
+    this.onPlayPauseRequested,
+    this.openPerson,
+  });
 
   @override
   State<MediaInfoSheet> createState() => _MediaInfoSheetState();
@@ -42,7 +61,46 @@ class _MediaInfoSheetState extends State<MediaInfoSheet> {
   final _scroll = ScrollController();
   final _bodyFocus = FocusNode(debugLabel: 'player_info_body');
   final _castKey = GlobalKey<CastMemberStripState>();
+  bool _openingPerson = false;
+  List<MediaRole>? _loadedRoles;
+  bool _requestedRoles = false;
   MediaItem get item => widget.item;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadRoles();
+  }
+
+  void _loadRoles() {
+    if (_requestedRoles || (item.roles?.isNotEmpty ?? false)) return;
+    final client = context.tryGetMediaClientForServer(serverIdOrNull(item.serverId));
+    if (client == null) return;
+    _requestedRoles = true;
+    final current = item.globalKey;
+    unawaited(() async {
+      try {
+        final details = await client.fetchItem(item.id);
+        if (mounted && widget.item.globalKey == current && details?.roles?.isNotEmpty == true) {
+          setState(() => _loadedRoles = details!.roles);
+        }
+      } catch (_) {
+        // Details remain usable if cast metadata is unavailable.
+      }
+    }());
+  }
+
+  @override
+  void didUpdateWidget(MediaInfoSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.item.globalKey != item.globalKey) {
+      _loadedRoles = null;
+      _requestedRoles = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _loadRoles();
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -78,7 +136,7 @@ class _MediaInfoSheetState extends State<MediaInfoSheet> {
       pref: SettingsService.hideSpoilers,
       builder: (context, hideSpoilers, _) {
         final synopsisMasked = hideSpoilers && item.shouldHideSpoiler;
-        final roles = item.roles ?? const <MediaRole>[];
+        final roles = item.roles?.isNotEmpty == true ? item.roles! : _loadedRoles ?? const <MediaRole>[];
         return BaseVideoControlSheet(
           title: t.videoControls.infoButton,
           icon: Symbols.info_rounded,
@@ -187,6 +245,49 @@ class _MediaInfoSheetState extends State<MediaInfoSheet> {
     return (summary?.isNotEmpty == true) ? summary! : item.displayTitle;
   }
 
+  Future<void> _openCastMember(MediaRole role) async {
+    final personId = role.id;
+    final serverId = item.serverId;
+    if (_openingPerson || personId == null || personId.isEmpty || serverId == null || serverId.isEmpty) return;
+    final player = widget.player;
+    if (player != null && player.state.playing && !widget.canControl) {
+      await showErrorDialog(context, t.watchTogether.notices.controlRefused);
+      return;
+    }
+    _openingPerson = true;
+    try {
+      if (player != null && player.state.playing) {
+        final request = widget.onPlayPauseRequested;
+        if (request != null) {
+          await request(TransportCommand.pause);
+        } else {
+          await player.pause();
+        }
+      }
+      if (!mounted || ModalRoute.of(context)?.isCurrent == false) return;
+      final custom = widget.openPerson;
+      if (custom != null) {
+        await custom(context, role, item);
+      } else {
+        await navigateToPersonMedia(
+          context,
+          personId: personId,
+          name: role.tag,
+          thumbPath: role.thumbPath,
+          characterName: role.role,
+          serverId: serverId,
+          serverName: item.serverName,
+          backend: item.backend,
+        );
+      }
+    } catch (error, stackTrace) {
+      appLogger.w('Could not open a cast profile from the player', error: error, stackTrace: stackTrace);
+    } finally {
+      _openingPerson = false;
+      if (mounted && PlatformDetector.isTV()) _castKey.currentState?.requestFocus();
+    }
+  }
+
   /// Fitted strip: year · runtime · certification · attributed scores, the
   /// same shedding behaviour as the detail title pages on narrow sheets.
   Widget _buildMetaLine(BuildContext context) {
@@ -254,11 +355,18 @@ class _MediaInfoSheetState extends State<MediaInfoSheet> {
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: .w700),
         ),
         const SizedBox(height: 10),
-        CastMemberStrip(
-          key: _castKey,
-          debugLabel: 'player_info_cast',
-          imageClient: client,
-          members: [for (final role in roles) (name: role.tag, secondary: role.role, imagePath: role.thumbPath)],
+        LayoutBuilder(
+          builder: (context, constraints) => CastMemberStrip(
+            key: _castKey,
+            debugLabel: 'player_info_cast',
+            imageClient: client,
+            circularPortraits: true,
+            cardWidth: (constraints.maxWidth / 4).clamp(64.0, 112.0),
+            members: [for (final role in roles) (name: role.tag, secondary: role.role, imagePath: role.thumbPath)],
+            canOpenMember: (index) => roles[index].id?.isNotEmpty == true && item.serverId?.isNotEmpty == true,
+            onMemberTap: (index) => _openCastMember(roles[index]),
+            onNavigateUp: () => _bodyFocus.requestFocus(),
+          ),
         ),
       ],
     );

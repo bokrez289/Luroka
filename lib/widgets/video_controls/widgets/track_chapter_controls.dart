@@ -328,10 +328,6 @@ class TrackChapterControls extends StatelessWidget {
               ),
             );
           }
-          // TV-only: on touch/desktop surfaces the header back control already
-          // reaches the full detail page in one step, so a second info surface
-          // would only duplicate it. The TV player is the place where leaving
-          // playback costs re-navigation, so the details come to it instead.
           if (state.metadata != null) {
             final currentIndex = buttonIndex;
             buttons.add(
@@ -344,7 +340,14 @@ class TrackChapterControls extends StatelessWidget {
                 onPressed: () {
                   state.onCancelAutoHide?.call();
                   OverlaySheetController.of(context)
-                      .show(builder: (_) => MediaInfoSheet(item: state.metadata!))
+                      .show(
+                        builder: (_) => MediaInfoSheet(
+                          item: state.metadata!,
+                          player: player,
+                          canControl: state.canControl,
+                          onPlayPauseRequested: state.onPlayPauseRequested,
+                        ),
+                      )
                       .whenComplete(() => state.onStartAutoHide?.call());
                 },
               ),
@@ -352,6 +355,32 @@ class TrackChapterControls extends StatelessWidget {
             buttonIndex++;
           }
           buttons.add(settingsButton(buttonIndex++));
+        }
+
+        if (isMobile && state.metadata != null) {
+          final currentIndex = buttonIndex++;
+          buttons.add(
+            _buildTrackButton(
+              buttonIndex: currentIndex,
+              icon: Symbols.info_rounded,
+              tooltip: t.videoControls.infoButton,
+              semanticLabel: t.videoControls.infoButton,
+              buttons: buttons,
+              onPressed: () {
+                state.onCancelAutoHide?.call();
+                OverlaySheetController.of(context)
+                    .show(
+                      builder: (_) => MediaInfoSheet(
+                        item: state.metadata!,
+                        player: player,
+                        canControl: state.canControl,
+                        onPlayPauseRequested: state.onPlayPauseRequested,
+                      ),
+                    )
+                    .whenComplete(() => state.onStartAutoHide?.call());
+              },
+            ),
+          );
         }
 
         if (state.onTogglePIPMode != null && !hidePictureInPicture) {

@@ -11,6 +11,7 @@ import '../../services/music/music_playback_service.dart';
 import '../../theme/mono_tokens.dart';
 import '../../utils/platform_detector.dart';
 import '../../widgets/app_icon.dart';
+import '../../widgets/app_menu.dart';
 import '../../widgets/bottom_sheet_page_scaffold.dart';
 import '../../widgets/music/repeat_mode.dart';
 import '../../widgets/music/track_row.dart';
@@ -88,8 +89,7 @@ class QueueSheet extends StatelessWidget {
 /// Touch: long-press drag to reorder (delayed drag listener — TrackRow's
 /// context menu is disabled here so the gesture arena stays clean), swipe to
 /// remove, tap to jump. D-pad: rows are focusable, SELECT jumps, RIGHT
-/// reaches a dedicated remove button; reordering is intentionally not
-/// offered on TV. With [autofocusCurrent] (the sheet) initial focus lands on
+/// reaches a menu with move and remove actions on TV. With [autofocusCurrent] initial focus lands on
 /// the current track's row instead of the first history row.
 class QueueList extends StatefulWidget {
   /// Land initial d-pad/keyboard focus on the current track's row,
@@ -115,6 +115,29 @@ class _QueueListState extends State<QueueList> {
   /// measure-the-first-item scroll helper can't be used because only the
   /// first row lacks a leading gap.
   double _rowOffset(int index, double gap) => index * (TrackRow.height + gap);
+
+  Future<void> _queueActions(MusicPlaybackService service, int index, String key) async {
+    final action = await showAdaptiveAppMenu<String>(
+      context,
+      title: service.queue[index].title ?? t.music.queue,
+      position: Offset(MediaQuery.sizeOf(context).width / 2, MediaQuery.sizeOf(context).height / 3),
+      focusFirstItem: true,
+      entries: [
+        if (index > 0) AppMenuItem(value: 'up', label: t.homeLayout.moveUp),
+        if (index + 1 < service.queue.length) AppMenuItem(value: 'down', label: t.homeLayout.moveDown),
+        AppMenuItem(value: 'remove', label: t.watchTogether.remove),
+      ],
+    );
+    if (!mounted || action == null || index >= service.queue.length || service.queue[index].globalKey != key) return;
+    switch (action) {
+      case 'up':
+        service.reorder(index, index - 1);
+      case 'down':
+        service.reorder(index, index + 1);
+      case 'remove':
+        service.removeAt(index);
+    }
+  }
 
   @override
   void initState() {
@@ -188,7 +211,7 @@ class _QueueListState extends State<QueueList> {
 
     final allowTouchEditing = !PlatformDetector.isTV();
 
-    return ReorderableListView.builder(
+    final list = ReorderableListView.builder(
       scrollController: _scrollController,
       shrinkWrap: true,
       buildDefaultDragHandles: false,
@@ -213,8 +236,10 @@ class _QueueListState extends State<QueueList> {
           dimmed: index < currentIndex,
           showTrackNumber: false,
           focusNode: isCurrent ? _currentRowFocusNode : null,
-          trailingIcon: Symbols.close_rounded,
-          onTrailingTap: () => service.removeAt(index),
+          trailingIcon: allowTouchEditing ? Symbols.close_rounded : Symbols.more_vert_rounded,
+          onTrailingTap: allowTouchEditing
+              ? () => service.removeAt(index)
+              : () => unawaited(_queueActions(service, index, item.globalKey)),
           onTap: () => unawaited(service.jumpTo(index)),
         );
 
@@ -240,6 +265,34 @@ class _QueueListState extends State<QueueList> {
           child: row,
         );
       },
+    );
+    if (currentIndex < 0 || currentIndex >= queue.length) return list;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+          child: Row(
+            children: [
+              Icon(Symbols.graphic_eq_rounded, color: Theme.of(context).colorScheme.primary, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '${t.music.nowPlaying} · ${queue[currentIndex].title ?? ''}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              ),
+              if (currentIndex + 1 < queue.length)
+                Text(
+                  t.referenceDetails.upNext,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(color: tk.textMuted),
+                ),
+            ],
+          ),
+        ),
+        Expanded(child: list),
+      ],
     );
   }
 }

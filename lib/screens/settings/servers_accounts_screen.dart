@@ -131,8 +131,14 @@ class _ServersAccountsScreenState extends State<ServersAccountsScreen> {
                     icon: Symbols.add_link_rounded,
                     title: t.connections.addConnection,
                     subtitle: t.connections.addConnectionSubtitleNoProfile,
-                    onTap: () =>
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AddConnectionScreen())),
+                    onTap: () {
+                      final active = context.read<ActiveProfileProvider>().active;
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => AddConnectionScreen(targetProfile: active, offerLibrarySelection: true),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

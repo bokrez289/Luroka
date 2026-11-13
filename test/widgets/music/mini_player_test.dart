@@ -331,18 +331,15 @@ void main() {
     service.emitPosition(const Duration(minutes: 2));
     await tester.pump();
 
-    Iterable<double?> progressWidths() => tester
-        .widgetList<FractionallySizedBox>(find.byType(FractionallySizedBox))
-        .where((box) => box.heightFactor == 1)
-        .map((box) => box.widthFactor);
+    double? progress() =>
+        tester.widget<LinearProgressIndicator>(find.byKey(const ValueKey('mini-player-progress-line'))).value;
 
-    expect(progressWidths(), contains(closeTo(2 / 3, 0.001)));
+    expect(progress(), closeTo(2 / 3, 0.001));
 
     service.advanceTo(nextTrack);
     await tester.pump();
 
-    expect(progressWidths(), contains(0.0));
-    expect(progressWidths(), isNot(contains(closeTo(2 / 3, 0.001))));
+    expect(progress(), 0.0);
   });
 
   testWidgets('tapping the card edge opens the named Now Playing route', (tester) async {

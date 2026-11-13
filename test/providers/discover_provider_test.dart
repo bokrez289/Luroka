@@ -310,6 +310,26 @@ void main() {
     expect(homeProgressRole(provider.onDeck.single), HomeProgressRole.resume);
   });
 
+  test('favoriting a recently added item keeps its selected library and shelf position', () async {
+    final first = _item('first').copyWith(libraryId: 'movies', libraryTitle: 'Movies', addedAt: 100);
+    final second = _item('second').copyWith(libraryId: 'movies');
+    aggregation.hubsResult = () => [
+      _hub('recentlyAdded', items: [first, second]),
+    ];
+    await hiddenLibraries.setSelectedSourceLibraries({'server_1:movies'});
+    await provider.load();
+    // The single-item endpoint returns the new favorite state but no Home
+    // library attribution, as can happen with Emby.
+    client.itemResult = _item('first').copyWith(isFavorite: true);
+    await provider.updateItem(first);
+    final items = provider.hubs.single.items;
+    expect(items.map((item) => item.id), ['first', 'second']);
+    expect(items.first.isFavorite, isTrue);
+    expect(items.first.libraryId, 'movies');
+    expect(items.first.libraryTitle, 'Movies');
+    expect(items.first.addedAt, 100);
+  });
+
   test('changing split mode during Home loading schedules the correct follow-up', () async {
     final gate = Completer<void>();
     final started = Completer<void>();

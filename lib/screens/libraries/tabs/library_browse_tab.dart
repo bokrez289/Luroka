@@ -40,6 +40,7 @@ import '../library_alpha_bar_strategy.dart';
 import '../library_alpha_scroll_metrics.dart';
 import '../../../widgets/anchored_option_menus.dart';
 import '../../../widgets/focusable_media_card.dart';
+import '../../../widgets/focusable_tab_chip.dart';
 import '../../../widgets/options_chips_bar.dart';
 import '../../../widgets/luroka_catalog_header.dart';
 import '../../../widgets/poster_loading_placeholder.dart';
@@ -1762,6 +1763,7 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
 
   double get _catalogHeaderHeight => _usesMobileBrowseOptions
       ? 100 +
+            (widget.library.kind.isMusic ? 52 : 0) +
             (_selectedFilters.isNotEmpty ? 38 * (MediaQuery.textScalerOf(context).scale(12) / 12).clamp(1, 2) : 0) +
             math.max(0, MediaQuery.textScalerOf(context).scale(14) / 14 - 1) * 40
       : 0;
@@ -2235,7 +2237,7 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
                 _selectedSort!.title.toLowerCase().contains('date')
           ? t.mobileLibrary.latestEpisode
           : _selectedSort!.title;
-      return LurokaCatalogHeader(
+      final header = LurokaCatalogHeader(
         count: _kidsGroupedPager?.knownTitleCount ?? totalSize,
         countIsLowerBound: _kidsGroupedPager?.hasMore ?? false,
         loading: isLoading,
@@ -2287,6 +2289,23 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
         ],
         onClearFilters: _selectedFilters.isEmpty ? null : _resetFilters,
       );
+      if (!widget.library.kind.isMusic) return header;
+      final groupings = _getGroupingOptions().where((value) => value != browseGroupingFolders).toList();
+      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        SizedBox(height: 52, child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+          child: TabChipStrip(children: [
+            for (final grouping in groupings)
+              Padding(padding: const EdgeInsets.only(right: 6), child: FocusableTabChip(
+                key: ValueKey('music-grouping-$grouping'),
+                label: _getGroupingLabel(grouping),
+                isSelected: _selectedGrouping == grouping,
+                onSelect: () => _handleGroupingSelection(grouping),
+              )),
+          ]),
+        )),
+        Expanded(child: header),
+      ]);
     }
     if (!PlatformDetector.isTV()) return bar;
     return Container(

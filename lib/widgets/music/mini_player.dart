@@ -303,7 +303,12 @@ class _MiniPlayerCardState extends State<_MiniPlayerCard> with ContextMenuTapMix
           height: _MusicMiniPlayerOverlayState._cardHeight,
           child: Stack(
             children: [
-              Positioned.fill(child: _MiniPlayerProgress(key: ValueKey(widget.track.globalKey))),
+              PositionedDirectional(
+                start: 8,
+                end: 8,
+                bottom: 2,
+                child: _MiniPlayerProgress(key: ValueKey(widget.track.globalKey)),
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
@@ -410,7 +415,18 @@ class _MiniPlayerCardState extends State<_MiniPlayerCard> with ContextMenuTapMix
       child: card,
     );
 
-    card = MediaContextMenu(key: contextMenuKey, item: widget.track, child: card);
+    card = MediaContextMenu(
+      key: contextMenuKey,
+      item: widget.track,
+      extraEntries: [
+        MediaMenuExtraEntry(
+          icon: Symbols.stop_circle_rounded,
+          label: t.music.stopPlayback,
+          onSelected: widget.onDismissed,
+        ),
+      ],
+      child: card,
+    );
 
     card = Dismissible(
       key: const ValueKey('mini_player_dismiss'),
@@ -424,9 +440,7 @@ class _MiniPlayerCardState extends State<_MiniPlayerCard> with ContextMenuTapMix
 }
 
 /// Isolated progress leaf — positionStream ticks rebuild only this
-/// background layer, never the card content above it. The played fraction
-/// renders as a subtle full-height tint that fills the card left-to-right —
-/// deliberately the card's only progress display; precise seeking lives on
+/// progress line, never the card content above it. Precise seeking lives on
 /// the now-playing screen's seek bar.
 class _MiniPlayerProgress extends StatelessWidget {
   const _MiniPlayerProgress({super.key});
@@ -434,20 +448,19 @@ class _MiniPlayerProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final service = context.read<MusicPlaybackService>();
-    final tk = tokens(context);
     return StreamBuilder<Duration>(
       stream: service.positionStream,
       builder: (context, snapshot) {
         final position = snapshot.data ?? service.position;
         final durationMs = service.duration?.inMilliseconds ?? 0;
         final fraction = durationMs <= 0 ? 0.0 : (position.inMilliseconds / durationMs).clamp(0.0, 1.0);
-        return Align(
-          alignment: .centerLeft,
-          child: FractionallySizedBox(
-            widthFactor: fraction,
-            heightFactor: 1,
-            child: ColoredBox(color: tk.text.withValues(alpha: 0.08)),
-          ),
+        return LinearProgressIndicator(
+          key: const ValueKey('mini-player-progress-line'),
+          value: fraction,
+          minHeight: 3,
+          color: Theme.of(context).colorScheme.primary,
+          backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: .12),
+          borderRadius: BorderRadius.circular(3),
         );
       },
     );

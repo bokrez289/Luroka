@@ -5,6 +5,7 @@ import '../../i18n/strings.g.dart';
 import '../../media/media_library.dart';
 import '../../profiles/active_profile_binder.dart';
 import '../../profiles/active_profile_provider.dart';
+import '../../profiles/profile.dart';
 import '../../providers/hidden_libraries_provider.dart';
 import '../../providers/multi_server_provider.dart';
 import '../../services/storage_service.dart';
@@ -12,12 +13,19 @@ import '../../services/profile_appearance_service.dart';
 import '../../widgets/focusable_list_tile.dart';
 import '../../focus/focusable_button.dart';
 import '../../widgets/focused_scroll_scaffold.dart';
+import 'add_connection_screen.dart';
 
 /// Profile-owned source access is independent of Home's row presentation.
 class SourceLibrariesScreen extends StatefulWidget {
-  const SourceLibrariesScreen({super.key, required this.profileId, this.firstRun = false});
+  const SourceLibrariesScreen({
+    super.key,
+    required this.profileId,
+    this.firstRun = false,
+    this.preferredServerIds = const {},
+  });
   final String profileId;
   final bool firstRun;
+  final Set<String> preferredServerIds;
 
   @override
   State<SourceLibrariesScreen> createState() => _SourceLibrariesScreenState();
@@ -31,6 +39,8 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
   String? _error;
   bool _partial = false;
   bool _hasDraft = false;
+  bool _addedFromPicker = false;
+  late final Set<String> _preferredServerIds = Set.of(widget.preferredServerIds);
 
   @override
   void initState() {
@@ -45,15 +55,16 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
     });
     try {
       final active = context.read<ActiveProfileProvider>();
+      final generation = active.identityMutationGeneration;
       if (widget.firstRun) {
         context.read<ActiveProfileBinder>().start();
         await active.awaitBindingSettle();
       }
-      if (!mounted || active.activeId != widget.profileId) return;
+      if (!mounted || active.activeId != widget.profileId || active.identityMutationGeneration != generation) return;
       final servers = context.read<MultiServerProvider>();
       final result = await servers.aggregationService.getMediaLibrariesFromAllServers();
       final storage = await StorageService.getInstance();
-      if (!mounted || active.activeId != widget.profileId) return;
+      if (!mounted || active.activeId != widget.profileId || active.identityMutationGeneration != generation) return;
       final libraries = result.libraries;
       final saved = storage.getSelectedSourceLibraries(profileId: widget.profileId);
       final hidden = storage.getHiddenLibrariesForProfile(widget.profileId);
@@ -73,7 +84,7 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
             servers.expectedServerIds.any((id) => !result.succeededServerIds.contains(id));
         _loading = false;
       });
-      if (widget.firstRun && !_partial && libraries.length == 1 && saved == null) {
+      if (widget.firstRun && !_addedFromPicker && !_partial && libraries.length == 1 && saved == null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted && ModalRoute.of(context)?.isCurrent == true) _save();
         });
@@ -90,18 +101,21 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
 
   Future<void> _save() async {
     if (_saving || _selected.isEmpty) return;
+    final active = context.read<ActiveProfileProvider>();
+    final generation = active.identityMutationGeneration;
     setState(() => _saving = true);
     try {
       final storage = await StorageService.getInstance();
-      if (!mounted || context.read<ActiveProfileProvider>().activeId != widget.profileId) return;
+      if (!mounted || active.activeId != widget.profileId || active.identityMutationGeneration != generation) return;
       await storage.saveSelectedSourceLibraries(_selected, profileId: widget.profileId);
+      if (!mounted || active.activeId != widget.profileId || active.identityMutationGeneration != generation) return;
       // A formerly hidden library explicitly selected here becomes available.
       final hidden = storage.getHiddenLibrariesForProfile(widget.profileId)..removeAll(_selected);
       await storage.saveHiddenLibrariesForProfile(widget.profileId, hidden);
-      if (!mounted) return;
+      if (!mounted || active.activeId != widget.profileId || active.identityMutationGeneration != generation) return;
       await context.read<HiddenLibrariesProvider?>()?.refresh();
       if (widget.firstRun) await ProfileAppearanceService.instance.completeSourceSelection(widget.profileId);
-      if (mounted && context.read<ActiveProfileProvider>().activeId == widget.profileId) {
+      if (mounted && active.activeId == widget.profileId && active.identityMutationGeneration == generation) {
         Navigator.of(context).pop(true);
       }
     } catch (_) {
@@ -111,10 +125,39 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
     }
   }
 
+  Future<void> _addServer() async {
+    if (_loading || _saving) return;
+    final active = context.read<ActiveProfileProvider>();
+    final Profile? owner = active.active;
+    if (owner == null || owner.id != widget.profileId) return;
+    final generation = active.identityMutationGeneration;
+    final previous = _libraries.map((library) => library.serverId).whereType<String>().toSet();
+    final added = await Navigator.of(
+      context,
+    ).push<bool>(MaterialPageRoute(builder: (_) => AddConnectionScreen(targetProfile: owner)));
+    if (!mounted || added != true || active.activeId != owner.id || active.identityMutationGeneration != generation) {
+      return;
+    }
+    _addedFromPicker = true;
+    await active.awaitBindingSettle();
+    if (!mounted || active.activeId != owner.id || active.identityMutationGeneration != generation) return;
+    await _load();
+    if (!mounted || active.activeId != owner.id || active.identityMutationGeneration != generation) return;
+    setState(
+      () => _preferredServerIds.addAll(
+        _libraries.map((library) => library.serverId).whereType<String>().toSet().difference(previous),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final groups = <String, List<MediaLibrary>>{};
-    for (final library in _libraries) {
+    final orderedLibraries = [
+      ..._libraries.where((library) => _preferredServerIds.contains(library.serverId)),
+      ..._libraries.where((library) => !_preferredServerIds.contains(library.serverId)),
+    ];
+    for (final library in orderedLibraries) {
       (groups[library.serverId ?? ''] ??= []).add(library);
     }
     return FocusedScrollScaffold(
@@ -163,6 +206,21 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
                     const SizedBox(height: 8),
                     Text(t.profileSetupGuide.libraryScope, style: Theme.of(context).textTheme.bodySmall),
                     const SizedBox(height: 16),
+                    Text(t.connections.addConnectionSubtitleNoProfile, style: Theme.of(context).textTheme.bodyMedium),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: FocusableButton(
+                        onPressed: _loading || _saving ? null : _addServer,
+                        child: OutlinedButton.icon(
+                          key: const ValueKey('source-libraries-add-server'),
+                          onPressed: _loading || _saving ? null : _addServer,
+                          icon: const Icon(Icons.add_link_rounded),
+                          label: Text(t.connections.addConnection),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     if (_loading)
                       const Center(child: CircularProgressIndicator())
                     else ...[
@@ -187,6 +245,7 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
                                   : null,
                               tristate: true,
                               title: Text(entry.value.first.serverName ?? entry.key),
+                              subtitle: _preferredServerIds.contains(entry.key) ? const Text('Newly connected') : null,
                               secondary: const Icon(Icons.dns_rounded),
                               onChanged: _saving
                                   ? null

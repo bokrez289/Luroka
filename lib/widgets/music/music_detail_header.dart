@@ -29,38 +29,52 @@ class MusicDetailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth < ScreenBreakpoints.mobile) {
-            return Column(
-              children: [
-                artworkBuilder(compactArtworkSize),
-                SizedBox(height: compactArtworkSpacing),
-                infoBuilder(centered: true),
-                const SizedBox(height: 16),
-                actionBar,
-                if (compactBottomSpacing > 0) SizedBox(height: compactBottomSpacing),
-              ],
-            );
-          }
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [colors.primary.withValues(alpha: .13), colors.surfaceContainerLow.withValues(alpha: .5)],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < ScreenBreakpoints.mobile) {
+                return Column(
+                  children: [
+                    artworkBuilder(compactArtworkSize.clamp(0.0, constraints.maxWidth)),
+                    SizedBox(height: compactArtworkSpacing),
+                    infoBuilder(centered: true),
+                    const SizedBox(height: 16),
+                    actionBar,
+                    if (compactBottomSpacing > 0) SizedBox(height: compactBottomSpacing),
+                  ],
+                );
+              }
 
-          return Row(
-            crossAxisAlignment: wideAlignment,
-            children: [
-              artworkBuilder(180),
-              const SizedBox(width: 24),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [infoBuilder(centered: false), const SizedBox(height: 16), actionBar],
-                ),
-              ),
-            ],
-          );
-        },
+              return Row(
+                crossAxisAlignment: wideAlignment,
+                children: [
+                  artworkBuilder((constraints.maxWidth * .24).clamp(180.0, 240.0)),
+                  const SizedBox(width: 24),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [infoBuilder(centered: false), const SizedBox(height: 16), actionBar],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }

@@ -196,6 +196,7 @@ extension _PlexVideoControlsTrackMethods on _PlexVideoControlsState {
       onSubtitleTrackChanged: _onSubtitleTrackChanged,
       onSecondarySubtitleTrackChanged: widget.onSecondarySubtitleTrackChanged,
       onRateRequested: widget.onRateRequested,
+      onPlayPauseRequested: (command) => _playOrPause(command: command),
       onCancelAutoHide: widget.chromeController.cancelAutoHide,
       onStartAutoHide: _startHideTimer,
       serverId: widget.metadata.serverId,

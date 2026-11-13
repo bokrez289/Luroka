@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:luroka/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
 
 import '../../focus/focusable_wrapper.dart';
 import '../../i18n/strings.g.dart';
 import '../../media/media_backend.dart';
 import '../../media/media_browser_dialect.dart';
+import '../../media/ids.dart';
 import '../../theme/mono_tokens.dart';
 import '../../utils/platform_detector.dart';
 import '../../services/kids_profile_service.dart';
 import '../../profiles/profile.dart';
+import '../../profiles/active_profile_provider.dart';
+import '../../providers/multi_server_provider.dart';
+import '../../services/storage_service.dart';
+import '../../utils/dialogs.dart';
 import '../../widgets/backend_badge.dart';
+import '../../widgets/dialog_action_button.dart';
 import '../../widgets/focused_scroll_scaffold.dart';
 import '../profile/borrow_connection_screen.dart';
 import 'add_jellyfin_screen.dart';
 import 'add_plex_account_screen.dart';
 import 'phone_server_pairing_screen.dart';
 import 'tv_server_pairing_dialog.dart';
+import 'source_libraries_screen.dart';
 
 /// Picker shown when the user taps "Add connection".
 ///
@@ -31,7 +39,11 @@ import 'tv_server_pairing_dialog.dart';
 class AddConnectionScreen extends StatelessWidget {
   final Profile? targetProfile;
 
-  const AddConnectionScreen({super.key, this.targetProfile});
+  /// Settings entry points can offer library selection after a successful add.
+  /// Onboarding and the library picker itself have their own continuation.
+  final bool offerLibrarySelection;
+
+  const AddConnectionScreen({super.key, this.targetProfile, this.offerLibrarySelection = false});
 
   @override
   Widget build(BuildContext context) {
@@ -104,8 +116,74 @@ class AddConnectionScreen extends StatelessWidget {
                   title: options[i].title,
                   subtitle: options[i].subtitle,
                   onTap: () async {
+                    final active = offerLibrarySelection ? context.read<ActiveProfileProvider?>() : null;
+                    final ownerId = active?.activeId;
+                    final generation = active?.identityMutationGeneration;
+                    final servers = offerLibrarySelection ? context.read<MultiServerProvider?>() : null;
+                    final previousServers = servers?.expectedServerIds.toSet() ?? <String>{};
                     final added = await Navigator.push<bool>(context, MaterialPageRoute(builder: options[i].builder));
                     if (added == true && context.mounted) {
+                      if (offerLibrarySelection &&
+                          options[i].backend != null &&
+                          active != null &&
+                          ownerId != null &&
+                          active.activeId == ownerId &&
+                          active.identityMutationGeneration == generation &&
+                          (targetProfile == null || targetProfile!.id == ownerId)) {
+                        final storage = await StorageService.getInstance();
+                        if (!context.mounted ||
+                            active.activeId != ownerId ||
+                            active.identityMutationGeneration != generation) {
+                          return;
+                        }
+                        final selected = storage.getSelectedSourceLibraries(profileId: ownerId);
+                        final newServers = servers?.expectedServerIds.toSet().difference(previousServers) ?? <String>{};
+                        final serverName = newServers.length == 1
+                            ? servers?.getClientForServer(ServerId(newServers.single))?.serverName
+                            : null;
+                        final choose =
+                            await showScopedDialog<bool>(
+                              context: context,
+                              builder: (dialog) => AlertDialog(
+                                title: Text(
+                                  serverName?.isNotEmpty == true ? '$serverName connected' : t.onboarding.connected,
+                                ),
+                                content: Text(
+                                  '${t.sourceLibraries.description}\n\n${selected == null ? 'Unless hidden, accessible libraries are visible if you choose later.' : 'New libraries are not automatically included in your saved selection if you choose later.'}',
+                                ),
+                                actions: [
+                                  DialogActionButton(
+                                    label: t.profileSetupGuide.chooseLater,
+                                    onPressed: () => Navigator.pop(dialog, false),
+                                  ),
+                                  DialogActionButton(
+                                    label: 'Choose libraries',
+                                    isPrimary: true,
+                                    autofocus: true,
+                                    onPressed: () => Navigator.pop(dialog, true),
+                                  ),
+                                ],
+                              ),
+                            ) ??
+                            false;
+                        if (!context.mounted ||
+                            active.activeId != ownerId ||
+                            active.identityMutationGeneration != generation) {
+                          return;
+                        }
+                        if (choose) {
+                          await Navigator.of(context).push<bool>(
+                            MaterialPageRoute(
+                              builder: (_) => SourceLibrariesScreen(profileId: ownerId, preferredServerIds: newServers),
+                            ),
+                          );
+                        }
+                        if (!context.mounted ||
+                            active.activeId != ownerId ||
+                            active.identityMutationGeneration != generation) {
+                          return;
+                        }
+                      }
                       Navigator.of(context).pop(true);
                     }
                   },

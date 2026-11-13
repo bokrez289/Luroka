@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -43,6 +43,7 @@ Future<void> showCloudBackupCreation(BuildContext context, {CloudBackupClient? c
   if (active.activeId == null || kids.isActiveKids || kids.activeId != active.activeId) return;
   await showScopedDialog<void>(
     context: context,
+    barrierDismissible: false,
     builder: (_) => _CloudBackupCreation(active: active, database: database, client: client),
   );
 }
@@ -65,6 +66,7 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
   int _policyRevision = 0;
   bool _includeCredentials = false;
   bool _busy = false;
+  String? _progress;
   CloudBackupRecoveryCode? _recoveryCode;
   String? _preparedEnvelope;
   Set<String>? _preparedIds;
@@ -183,8 +185,9 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
       // Retain the same code across a failed or ambiguous upload response so
       // retrying cannot silently orphan an already stored backup.
       final code = _recoveryCode ??= CloudBackupRecoveryCode.generate();
-      final saved = await _confirmRecoveryCode(context, code);
+      final saved = await _confirmRecoveryCode(context, code, retrying: _uploadAttempted);
       if (!saved || !current()) return;
+      setState(() => _progress = 'Encrypting your selected data…');
       final unchanged =
           _preparedIds?.length == selection.profileIds.length &&
           _preparedIds!.containsAll(selection.profileIds) &&
@@ -206,33 +209,56 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
       }
       selection.requireCurrent();
       if (!mounted || !current()) return;
+      setState(() => _progress = null);
       final localDecision = await _offerLocalCopy(context, _preparedEnvelope!);
       if (!localDecision || !current()) return;
       _uploadAttempted = true;
+      setState(() => _progress = 'Uploading your encrypted backup…');
       final receipt = await _client.uploadSelectedEnvelope(
         selection: selection,
         recoveryCode: code,
         envelope: _preparedEnvelope!,
       );
       if (!mounted) return;
+      final expiry = MaterialLocalizations.of(context).formatMediumDate(receipt.expiresAt.toLocal());
+      setState(() => _progress = null);
       await showScopedDialog<void>(
         context: context,
         builder: (dialog) => AlertDialog(
-          title: const Text('Encrypted backup created'),
-          content: Text('Expires ${receipt.expiresAt.toLocal()}. Keep the recovery code you saved.'),
-          actions: [DialogActionButton(label: 'Done', isPrimary: true, onPressed: () => Navigator.pop(dialog))],
+          title: const Text('Cloud backup created'),
+          content: Text(
+            'Your encrypted backup is available until $expiry. Keep your recovery code safe; you need it to restore or delete this backup.',
+          ),
+          actions: [
+            DialogActionButton(label: 'Done', isPrimary: true, autofocus: true, onPressed: () => Navigator.pop(dialog)),
+          ],
         ),
       );
       if (mounted) Navigator.pop(context);
     } catch (_) {
       if (mounted) {
-        await showErrorDialog(
-          context,
-          'Backup could not be created. Check the selection and connection and try again.',
+        await showScopedDialog<void>(
+          context: context,
+          builder: (dialog) => AlertDialog(
+            title: Text(_uploadAttempted ? 'Upload status unknown' : 'Backup not uploaded'),
+            content: Text(
+              _uploadAttempted
+                  ? 'We could not confirm the upload. It may have completed. Keep your recovery code and retry from this screen to check the same backup.'
+                  : 'The backup was not uploaded. Check the selection and try again.',
+            ),
+            actions: [
+              DialogActionButton(label: 'OK', isPrimary: true, autofocus: true, onPressed: () => Navigator.pop(dialog)),
+            ],
+          ),
         );
       }
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _progress = null;
+        });
+      }
     }
   }
 
@@ -254,53 +280,76 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
   Widget build(BuildContext context) {
     final profiles = widget.active.profiles;
     final requiresPlexConnection = profiles.any((profile) => _selected.contains(profile.id) && profile.isPlexHome);
-    return AlertDialog(
-      title: const Text('Create encrypted cloud backup'),
-      content: SizedBox(
-        width: 520,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Select profiles. Include the linked parent with each Kids profile.'),
-              if (requiresPlexConnection && !_includeCredentials)
-                const Text('Plex Home profiles require their parent Plex account credentials to be included.'),
-              for (final profile in profiles)
-                FocusableListTile(
-                  key: ValueKey('cloud-backup-profile-${profile.id}'),
-                  title: Text(profile.displayName),
-                  subtitle: _kids.isKids(profile.id) ? const Text('Kids profile') : null,
-                  selected: _selected.contains(profile.id),
-                  trailing: Icon(_selected.contains(profile.id) ? Icons.check_box : Icons.check_box_outline_blank),
-                  onTap: _busy || _uploadAttempted
-                      ? null
-                      : () => setState(() {
-                          if (!_selected.remove(profile.id)) _selected.add(profile.id);
-                        }),
-                ),
-              FocusableListTile(
-                title: const Text('Include saved server and integration credentials'),
-                subtitle: const Text('Shared server access may include access beyond a single profile.'),
-                selected: _includeCredentials,
-                trailing: Icon(_includeCredentials ? Icons.check_box : Icons.check_box_outline_blank),
-                onTap: _busy || _uploadAttempted
-                    ? null
-                    : () => setState(() => _includeCredentials = !_includeCredentials),
-              ),
-              const Text('Backups expire after 90 days. Downloads are not included.'),
-            ],
+    return PopScope(
+      canPop: !_busy,
+      child: AlertDialog(
+        title: Text(_progress == null ? 'Step 1 of 3: Choose profiles' : 'Creating your backup…'),
+        content: SizedBox(
+          width: 520,
+          child: SingleChildScrollView(
+            child: _progress != null
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      Text(_progress!, textAlign: TextAlign.center),
+                      const SizedBox(height: 8),
+                      const Text('Please keep Luroka open.', textAlign: TextAlign.center),
+                    ],
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Select the profiles to include. Your backup is encrypted before upload and is available for 90 days.',
+                      ),
+                      const SizedBox(height: 8),
+                      const Text('Include the linked parent with each Kids profile.'),
+                      if (requiresPlexConnection && !_includeCredentials)
+                        const Text('Plex Home profiles require their parent Plex account credentials to be included.'),
+                      for (final profile in profiles)
+                        FocusableListTile(
+                          key: ValueKey('cloud-backup-profile-${profile.id}'),
+                          title: Text(profile.displayName),
+                          subtitle: _kids.isKids(profile.id) ? const Text('Kids profile') : null,
+                          selected: _selected.contains(profile.id),
+                          trailing: Icon(
+                            _selected.contains(profile.id) ? Icons.check_box : Icons.check_box_outline_blank,
+                          ),
+                          onTap: _busy || _uploadAttempted
+                              ? null
+                              : () => setState(() {
+                                  if (!_selected.remove(profile.id)) _selected.add(profile.id);
+                                }),
+                        ),
+                      FocusableListTile(
+                        title: const Text('Include saved server and integration logins'),
+                        subtitle: const Text(
+                          'Helps reconnect after restoring. Anyone with the recovery code may be able to use these logins.',
+                        ),
+                        selected: _includeCredentials,
+                        trailing: Icon(_includeCredentials ? Icons.check_box : Icons.check_box_outline_blank),
+                        onTap: _busy || _uploadAttempted
+                            ? null
+                            : () => setState(() => _includeCredentials = !_includeCredentials),
+                      ),
+                      const Text('Downloads are not included.'),
+                    ],
+                  ),
           ),
         ),
+        actions: [
+          DialogActionButton(label: 'Cancel', onPressed: _busy ? null : () => Navigator.pop(context)),
+          DialogActionButton(
+            label: _uploadAttempted ? 'Retry upload' : 'Continue',
+            isPrimary: true,
+            autofocus: true,
+            onPressed: _busy || _selected.isEmpty || (requiresPlexConnection && !_includeCredentials) ? null : _create,
+          ),
+        ],
       ),
-      actions: [
-        DialogActionButton(label: 'Cancel', onPressed: _busy ? null : () => Navigator.pop(context)),
-        DialogActionButton(
-          label: 'Continue',
-          isPrimary: true,
-          onPressed: _busy || (requiresPlexConnection && !_includeCredentials) ? null : _create,
-        ),
-      ],
     );
   }
 }
@@ -309,12 +358,21 @@ Future<bool> _offerLocalCopy(BuildContext context, String envelope) async {
   final choice = await showScopedDialog<bool>(
     context: context,
     builder: (dialog) => AlertDialog(
-      title: const Text('Keep a local copy?'),
-      content: const Text('The local copy is encrypted with the same recovery code. Keep both somewhere safe.'),
+      title: const Text('Step 3 of 3: Upload backup'),
+      content: Text(
+        PlatformDetector.isTV() && Theme.of(dialog).platform == TargetPlatform.android
+            ? 'Choose whether to save a local copy before uploading. On Android TV, the local copy is saved in Luroka’s app storage and may be difficult to access with a remote. The recovery code is needed for both copies.'
+            : 'Choose whether to save a local copy before uploading. The same recovery code is needed for both copies.',
+      ),
       actions: [
         DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(dialog)),
-        DialogActionButton(label: 'Cloud only', onPressed: () => Navigator.pop(dialog, false)),
-        DialogActionButton(label: 'Save local copy', isPrimary: true, onPressed: () => Navigator.pop(dialog, true)),
+        DialogActionButton(
+          label: 'Cloud only — upload backup',
+          isPrimary: true,
+          autofocus: true,
+          onPressed: () => Navigator.pop(dialog, false),
+        ),
+        DialogActionButton(label: 'Save local copy, then upload', onPressed: () => Navigator.pop(dialog, true)),
       ],
     ),
   );
@@ -344,7 +402,14 @@ Future<bool> _offerLocalCopy(BuildContext context, String envelope) async {
       builder: (dialog) => AlertDialog(
         title: const Text('Local backup saved'),
         content: SelectableText(path!),
-        actions: [DialogActionButton(label: 'Continue', isPrimary: true, onPressed: () => Navigator.pop(dialog))],
+        actions: [
+          DialogActionButton(
+            label: 'Continue to upload',
+            isPrimary: true,
+            autofocus: true,
+            onPressed: () => Navigator.pop(dialog),
+          ),
+        ],
       ),
     );
     return context.mounted;
@@ -354,35 +419,186 @@ Future<bool> _offerLocalCopy(BuildContext context, String envelope) async {
   }
 }
 
-Future<bool> _confirmRecoveryCode(BuildContext context, CloudBackupRecoveryCode code) async {
-  final value = code.reveal();
+Future<bool> _confirmRecoveryCode(BuildContext context, CloudBackupRecoveryCode code, {required bool retrying}) async {
   return await showScopedDialog<bool>(
         context: context,
         barrierDismissible: false,
-        builder: (dialog) => AlertDialog(
-          title: const Text('Save your recovery code'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Anyone with this code can restore your backup. If you lose it, Luroka cannot recover it.'),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: 180,
-                  height: 180,
-                  child: QrImageView(data: value, size: 180, backgroundColor: Colors.white),
-                ),
-                SelectableText(value),
-              ],
-            ),
-          ),
-          actions: [
-            DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(dialog, false)),
-            DialogActionButton(label: 'I saved it', isPrimary: true, onPressed: () => Navigator.pop(dialog, true)),
-          ],
-        ),
+        builder: (_) => _SaveRecoveryCodeDialog(code: code, retrying: retrying),
       ) ??
       false;
+}
+
+class _SaveRecoveryCodeDialog extends StatefulWidget {
+  const _SaveRecoveryCodeDialog({required this.code, required this.retrying});
+  final CloudBackupRecoveryCode code;
+  final bool retrying;
+  @override
+  State<_SaveRecoveryCodeDialog> createState() => _SaveRecoveryCodeDialogState();
+}
+
+class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
+  bool _showQr = false;
+  bool _saving = false;
+  String? _status;
+
+  Future<void> _copy() async {
+    try {
+      await Clipboard.setData(ClipboardData(text: widget.code.reveal()));
+      if (mounted) setState(() => _status = 'Recovery code copied. Save it somewhere private.');
+    } catch (_) {
+      if (mounted) setState(() => _status = 'Could not copy the recovery code.');
+    }
+  }
+
+  Future<void> _saveFile() async {
+    if (_saving) return;
+    setState(() {
+      _saving = true;
+      _status = null;
+    });
+    try {
+      final path = await FilePickerService.instance.saveFile(
+        dialogTitle: 'Save recovery code privately',
+        fileName: 'luroka-recovery-code.txt',
+        bytes: Uint8List.fromList(utf8.encode(widget.code.reveal())),
+        type: FileType.custom,
+        allowedExtensions: const ['txt'],
+      );
+      if (mounted && path != null) setState(() => _status = 'Recovery code saved. Keep the file private.');
+    } catch (_) {
+      if (mounted) setState(() => _status = 'Could not save the recovery code. Try copying it instead.');
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tv = PlatformDetector.isTV();
+    final mobile = PlatformDetector.isMobile(context);
+    final showQr = tv || _showQr;
+    if (tv) {
+      final size = MediaQuery.sizeOf(context);
+      final qrSize = (size.height * .34).clamp(108.0, 220.0);
+      return AlertDialog(
+        title: const Text('Step 2 of 3: Save your recovery code'),
+        content: SizedBox(
+          width: 650,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                key: const ValueKey('tv-backup-recovery-qr'),
+                width: qrSize,
+                height: qrSize,
+                child: QrImageView(data: widget.code.reveal(), size: qrSize, backgroundColor: Colors.white),
+              ),
+              const SizedBox(width: 24),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Scan this QR code with your phone to save your recovery code.'),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'You need this code to restore or delete your backup. Anyone with it can access the backup. If you lose it, Luroka cannot recover it.',
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        widget.retrying
+                            ? 'The previous upload may have completed. Continue to retry with the same code.'
+                            : 'Your backup has not been uploaded yet.',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+                      ),
+                      const SizedBox(height: 8),
+                      SelectableText(widget.code.reveal()),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(context, false)),
+          DialogActionButton(
+            label: 'I saved my code — continue',
+            isPrimary: true,
+            autofocus: true,
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      );
+    }
+    return AlertDialog(
+      title: const Text('Step 2 of 3: Save your recovery code'),
+      content: SizedBox(
+        width: 460,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'You need this code to restore or delete your backup. Anyone with it can access the backup. If you lose it, Luroka cannot recover it.',
+              ),
+              const SizedBox(height: 12),
+              Text(
+                widget.retrying
+                    ? 'The previous upload may have completed. This is the same recovery code; continue to retry or check it.'
+                    : 'Your backup has not been uploaded yet.',
+                style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+              ),
+              if (showQr) ...[
+                const SizedBox(height: 12),
+                Center(
+                  child: QrImageView(data: widget.code.reveal(), size: 180, backgroundColor: Colors.white),
+                ),
+              ],
+              const SizedBox(height: 12),
+              SelectableText(widget.code.reveal(), textAlign: TextAlign.center),
+              if (mobile) ...[
+                const SizedBox(height: 8),
+                const Text('Only copy or save the code somewhere private. A saved code file is not encrypted.'),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  children: [
+                    TextButton.icon(
+                      onPressed: _saving ? null : _copy,
+                      icon: const Icon(Icons.copy),
+                      label: const Text('Copy code'),
+                    ),
+                    TextButton.icon(
+                      onPressed: _saving ? null : _saveFile,
+                      icon: const Icon(Icons.save_alt),
+                      label: const Text('Save code to file'),
+                    ),
+                    TextButton.icon(
+                      onPressed: _saving ? null : () => setState(() => _showQr = !_showQr),
+                      icon: const Icon(Icons.qr_code),
+                      label: Text(_showQr ? 'Hide QR code' : 'Show QR code'),
+                    ),
+                  ],
+                ),
+              ],
+              if (_status != null) ...[const SizedBox(height: 8), Text(_status!, textAlign: TextAlign.center)],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        DialogActionButton(label: 'Cancel', onPressed: _saving ? null : () => Navigator.pop(context, false)),
+        DialogActionButton(
+          label: 'I saved my code — continue',
+          isPrimary: true,
+          autofocus: true,
+          onPressed: _saving ? null : () => Navigator.pop(context, true),
+        ),
+      ],
+    );
+  }
 }
 
 /// Restores only after a preview and an explicit confirmation. This is intended
@@ -390,7 +606,20 @@ Future<bool> _confirmRecoveryCode(BuildContext context, CloudBackupRecoveryCode 
 Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? client}) async {
   final db = context.read<AppDatabase>();
   if ((await db.select(db.profiles).get()).isNotEmpty || (await db.select(db.connections).get()).isNotEmpty) {
-    if (context.mounted) await showErrorDialog(context, 'Restore requires an empty installation.');
+    if (context.mounted) {
+      await showScopedDialog<void>(
+        context: context,
+        builder: (dialog) => AlertDialog(
+          title: const Text('Restore on an empty installation'),
+          content: const Text(
+            'Cloud backups cannot be merged with profiles or connections already on this device. On an empty installation, choose “Restore cloud backup” on the welcome screen and enter your recovery code.',
+          ),
+          actions: [
+            DialogActionButton(label: 'OK', isPrimary: true, autofocus: true, onPressed: () => Navigator.pop(dialog)),
+          ],
+        ),
+      );
+    }
     return false;
   }
   if (!context.mounted) return false;
@@ -540,7 +769,7 @@ class _TvRecoveryCodeDialogState extends State<_TvRecoveryCodeDialog> {
               else ...[
                 const Text('Scan with your phone, then use Luroka to scan or paste your saved recovery code.'),
                 const SizedBox(height: 12),
-              QrImageView(data: invite.toBrowserUri().toString(), size: 240, backgroundColor: Colors.white),
+                QrImageView(data: invite.toBrowserUri().toString(), size: 240, backgroundColor: Colors.white),
                 if (code != null) ...[const SizedBox(height: 12), Text('Confirm this code on your phone: $code')],
               ],
             ],

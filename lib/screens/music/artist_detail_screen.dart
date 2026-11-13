@@ -175,7 +175,7 @@ class _ArtistDetailScreenState extends BaseMediaListDetailScreen<ArtistDetailScr
       artworkBuilder: portrait,
       infoBuilder: info,
       actionBar: actionRow,
-      compactArtworkSize: 140,
+      compactArtworkSize: 170,
       compactArtworkSpacing: 12,
       compactBottomSpacing: 8,
     );

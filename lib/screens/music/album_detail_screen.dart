@@ -317,7 +317,7 @@ class _AlbumDetailScreenState extends BaseMediaListDetailScreen<AlbumDetailScree
       artworkBuilder: cover,
       infoBuilder: info,
       actionBar: actionRow,
-      compactArtworkSize: 200,
+      compactArtworkSize: 220,
       compactArtworkSpacing: 16,
       wideAlignment: CrossAxisAlignment.end,
     );

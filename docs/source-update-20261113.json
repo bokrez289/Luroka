@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-13",
+  "base_commit": "0c15f7bfe468283973df4f3cef71d2d41371a4ce",
+  "version": "1.0.9+2042",
+  "scope": [
+    "Music browsing, now playing, queue, lyrics, mini-player and TV navigation",
+    "Cloud backup selection/recovery-code/progress/retry interface",
+    "Continue Watching library-context preservation",
+    "Server connection and library selection flows",
+    "Player information and cast navigation"
+  ],
+  "validation": {
+    "locked_dependencies": "passed",
+    "flutter_tests": {
+      "feature_and_privacy_suites": 144,
+      "music_and_settings_layout_suites": 42,
+      "total_passed": 186
+    },
+    "analysis": "229 existing diagnostics: 76 errors, 5 warnings, 148 informational. Diagnostic messages and paths match the prior baseline, ignoring moved line numbers. No new diagnostics; not a clean full-analysis pass.",
+    "secret_scan": "No candidates in the selected 30 application/test/version files.",
+    "diff_check": "passed"
+  },
+  "preserved": [
+    "GitHub README and contribution guidance",
+    "Offline privacy page and legal assets",
+    "Native build input options and platform tests",
+    "License notices and existing provenance records"
+  ],
+  "excluded": "Website, backend deployment, desktop projects, screenshots, private configuration, builds, release archives, and unresolved unrelated tooling/license-file differences.",
+  "limitations": [
+    "No APK or platform build performed for this Dart/UI update.",
+    "No real-device validation performed in this update.",
+    "This source update does not close existing distribution-license or full build-reproducibility review items."
+  ],
+  "files": [
+    "lib/providers/discover_provider.dart",
+    "test/providers/discover_provider_test.dart",
+    "lib/screens/libraries/tabs/library_browse_tab.dart",
+    "lib/screens/main_screen.dart",
+    "lib/screens/music/album_detail_screen.dart",
+    "lib/screens/music/artist_detail_screen.dart",
+    "lib/screens/music/now_playing_screen.dart",
+    "lib/screens/music/queue_sheet.dart",
+    "lib/widgets/music/lyrics_view.dart",
+    "lib/widgets/music/mini_player.dart",
+    "lib/widgets/music/music_detail_header.dart",
+    "test/screens/libraries/library_browse_music_test.dart",
+    "test/screens/music/now_playing_screen_test.dart",
+    "test/screens/music/queue_sheet_test.dart",
+    "test/widgets/music/mini_player_test.dart",
+    "lib/screens/profile/cloud_backup_actions.dart",
+    "test/screens/profile/cloud_backup_actions_test.dart",
+    "lib/widgets/cast_member_strip.dart",
+    "lib/widgets/video_controls/models/track_controls_state.dart",
+    "lib/widgets/video_controls/parts/track_controls.dart",
+    "lib/widgets/video_controls/sheets/info_sheet.dart",
+    "lib/widgets/video_controls/widgets/track_chapter_controls.dart",
+    "test/widgets/player_info_sheet_test.dart",
+    "lib/screens/settings/add_connection_screen.dart",
+    "lib/screens/settings/servers_accounts_screen.dart",
+    "lib/screens/settings/settings_screen.dart",
+    "lib/screens/settings/source_libraries_screen.dart",
+    "test/screens/settings/add_connection_screen_test.dart",
+    "test/screens/settings/source_libraries_screen_test.dart",
+    "pubspec.yaml"
+  ]
+}

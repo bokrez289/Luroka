@@ -245,8 +245,9 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
 
   Object _continueWatchingScope() => (
     KidsProfileService.instance.activeId,
-    Object.hashAllUnordered(_multiServer.onlineServerIds.map((id) =>
-        (id, _multiServer.getClientForServer(ServerId(id))))),
+    Object.hashAllUnordered(
+      _multiServer.onlineServerIds.map((id) => (id, _multiServer.getClientForServer(ServerId(id)))),
+    ),
     Object.hashAllUnordered(_hiddenLibraries.hiddenLibraryKeys),
     _hiddenLibraries.selectedSourceLibraries == null
         ? null
@@ -259,6 +260,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     _lastContinueWatchingRefresh = DateTime.now();
     _continueWatchingFreshScope = _continueWatchingScope();
   }
+
   bool _continueWatchingRefreshQueued = false;
 
   Set<String> _lastSeenHiddenKeys = {};
@@ -636,7 +638,8 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
           }
           _applyOnDeck(_excludingHiddenLibraries(items));
           if (fetchedOnDeck.succeededServerIds.isNotEmpty &&
-              fetchedOnDeck.failedServerIds.isEmpty && fetchedOnDeck.cancelledServerIds.isEmpty &&
+              fetchedOnDeck.failedServerIds.isEmpty &&
+              fetchedOnDeck.cancelledServerIds.isEmpty &&
               freshnessScope == _continueWatchingScope()) {
             _markContinueWatchingFresh();
           }
@@ -1006,7 +1009,9 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     if (coalesce && _loadCoordinator.isFullActive) {
       return _loadCoordinator.inFlight ?? Future<void>.value();
     }
-    if (coalesce && !isProfileBinding() && _continueWatchingFreshScope == _continueWatchingScope() &&
+    if (coalesce &&
+        !isProfileBinding() &&
+        _continueWatchingFreshScope == _continueWatchingScope() &&
         _lastContinueWatchingRefresh != null &&
         DateTime.now().difference(_lastContinueWatchingRefresh!) < const Duration(seconds: 30)) {
       return Future<void>.value();
@@ -1096,7 +1101,8 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
         return;
       }
       _applyOnDeck(_excludingHiddenLibraries(items));
-      if (fetched.failedServerIds.isEmpty && fetched.cancelledServerIds.isEmpty &&
+      if (fetched.failedServerIds.isEmpty &&
+          fetched.cancelledServerIds.isEmpty &&
           freshnessScope == _continueWatchingScope()) {
         _markContinueWatchingFresh();
       }
@@ -1183,13 +1189,29 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   }
 
   void _updateItemInLists(String sourceGlobalKey, MediaItem updatedItem) {
+    // MediaBrowser's single-item response may omit the library context that
+    // Home attached when loading the shelf. Losing it makes the selected-source
+    // filter hide the refreshed item until the next full Home reload.
+    MediaItem preserveShelfContext(MediaItem previous) {
+      if ((updatedItem.libraryId != null || previous.libraryId == null) &&
+          (updatedItem.libraryTitle != null || previous.libraryTitle == null) &&
+          (updatedItem.addedAt != null || previous.addedAt == null)) {
+        return updatedItem;
+      }
+      return updatedItem.copyWith(
+        libraryId: updatedItem.libraryId ?? previous.libraryId,
+        libraryTitle: updatedItem.libraryTitle ?? previous.libraryTitle,
+        addedAt: updatedItem.addedAt ?? previous.addedAt,
+      );
+    }
     final onDeckIndex = _onDeck.indexWhere((item) => item.globalKey == sourceGlobalKey);
     if (onDeckIndex != -1) {
       final previous = _onDeck[onDeckIndex];
       final rawRole = previous.raw?[homeProgressRoleKey];
+      final refreshed = preserveShelfContext(previous);
       final preserved = rawRole == null
-          ? updatedItem
-          : updatedItem.copyWith(raw: {...?updatedItem.raw, homeProgressRoleKey: rawRole});
+          ? refreshed
+          : refreshed.copyWith(raw: {...?refreshed.raw, homeProgressRoleKey: rawRole});
       _replaceOnDeck(List.of(_onDeck)..[onDeckIndex] = preserved, hasMore: _hasMoreContinueWatching);
     }
 
@@ -1199,7 +1221,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
       final itemIndex = hub.items.indexWhere((item) => item.globalKey == sourceGlobalKey);
       if (itemIndex != -1) {
         final newItems = List<MediaItem>.from(hub.items);
-        newItems[itemIndex] = updatedItem;
+        newItems[itemIndex] = preserveShelfContext(hub.items[itemIndex]);
         (updatedHubs ??= List.of(_hubs))[i] = hub.copyWith(items: newItems);
       }
     }

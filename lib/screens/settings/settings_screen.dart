@@ -61,6 +61,7 @@ import '../../watch_together/services/watch_party_relays.dart';
 import 'about_screen.dart';
 import 'add_connection_screen.dart';
 import 'servers_accounts_screen.dart';
+import 'source_libraries_screen.dart';
 import 'account_preferences_screen.dart';
 import 'appearance_settings_screen.dart';
 import 'general_settings_screen.dart';
@@ -939,9 +940,23 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
           subtitle: subtitle,
           onTap: () {
             final active = context.read<ActiveProfileProvider>().active;
-            Navigator.push(context, MaterialPageRoute(builder: (_) => AddConnectionScreen(targetProfile: active)));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AddConnectionScreen(targetProfile: active, offerLibrarySelection: true),
+              ),
+            );
           },
         ),
+        if (active != null)
+          SettingNavigationTile(
+            icon: Symbols.video_library_rounded,
+            title: t.sourceLibraries.title,
+            subtitle: t.sourceLibraries.description,
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => SourceLibrariesScreen(profileId: active.id))),
+          ),
         if (context.select<AccountPreferencesController, bool>((c) => c.accounts.isNotEmpty))
           _buildAccountPreferencesTile(context),
       ],
@@ -1176,7 +1191,7 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
           SettingNavigationTile(
             icon: Symbols.cloud_download_rounded,
             title: 'Restore cloud backup',
-            subtitle: 'Restore using your recovery code',
+            subtitle: 'Restore on an empty installation using your recovery code',
             onTap: () async {
               await showCloudBackupRestore(context);
             },

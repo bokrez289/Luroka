@@ -63,6 +63,35 @@ void main() {
     expect(find.descendant(of: find.byType(MediaCard), matching: find.byType(ClipOval)), findsOneWidget);
   });
 
+  testWidgets('phone music browse exposes artist, album and song shortcuts without extra initial requests', (
+    tester,
+  ) async {
+    final harness = _MusicBrowseHarness();
+    addTearDown(harness.dispose);
+    await pumpLibraryTab(
+      tester,
+      provider: harness.provider,
+      size: const Size(390, 844),
+      tab: Builder(
+        builder: (context) => Theme(
+          data: Theme.of(context).copyWith(platform: TargetPlatform.android),
+          child: LibraryBrowseTab(
+            library: _musicLibrary,
+            canGroupByFolders: true,
+            suppressAutoFocus: true,
+            onBack: () {},
+          ),
+        ),
+      ),
+    );
+    await pumpRequestFrames(tester);
+    expect(find.byKey(const ValueKey('music-grouping-artists')), findsOneWidget);
+    expect(find.byKey(const ValueKey('music-grouping-albums')), findsOneWidget);
+    expect(find.byKey(const ValueKey('music-grouping-tracks')), findsOneWidget);
+    expect(harness.browseRequestCount, 1);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('D-pad down focuses Retry and select reloads music browse', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(true);
     final harness = _MusicBrowseHarness(failFirstBrowse: true);

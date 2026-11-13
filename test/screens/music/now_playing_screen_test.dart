@@ -190,6 +190,18 @@ void main() {
     });
   }
 
+  testWidgets('TV now playing provides clearly labeled lyrics and queue controls', (tester) async {
+    final service = _FakeMusicService(
+      track: _track(id: 'one', title: 'First Track', album: 'First Album', year: 1973),
+      context: const MusicPlayContext(title: 'First Album', kind: MusicPlayContextKind.album),
+    );
+    await pumpNowPlaying(tester, service, isTv: true);
+    expect(find.text(t.music.lyrics), findsOneWidget);
+    expect(find.text(t.music.queue), findsOneWidget);
+    expect(find.text('Artist one · First Album · 1973'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('an ended session removes a covered Now Playing without closing the screen above it', (tester) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(1200, 700);
