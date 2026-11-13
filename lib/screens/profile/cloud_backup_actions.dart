@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+import '../../widgets/secure_transfer_qr.dart';
 
 import '../../database/app_database.dart';
 import '../../connection/connection.dart';
@@ -491,7 +491,7 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
                 key: const ValueKey('tv-backup-recovery-qr'),
                 width: qrSize,
                 height: qrSize,
-                child: QrImageView(data: widget.code.reveal(), size: qrSize, backgroundColor: Colors.white),
+                child: SecureTransferQr(data: widget.code.reveal(), size: qrSize),
               ),
               const SizedBox(width: 24),
               Expanded(
@@ -500,7 +500,9 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Scan this QR code with your phone to save your recovery code.'),
+                      const Text(
+                        'Keep a private copy of this code. To restore on your phone, open Luroka’s cloud backup restore option and choose Scan recovery code.',
+                      ),
                       const SizedBox(height: 8),
                       const Text(
                         'You need this code to restore or delete your backup. Anyone with it can access the backup. If you lose it, Luroka cannot recover it.',
@@ -553,9 +555,7 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
               ),
               if (showQr) ...[
                 const SizedBox(height: 12),
-                Center(
-                  child: QrImageView(data: widget.code.reveal(), size: 180, backgroundColor: Colors.white),
-                ),
+                Center(child: SecureTransferQr(data: widget.code.reveal(), size: 220)),
               ],
               const SizedBox(height: 12),
               SelectableText(widget.code.reveal(), textAlign: TextAlign.center),
@@ -769,7 +769,7 @@ class _TvRecoveryCodeDialogState extends State<_TvRecoveryCodeDialog> {
               else ...[
                 const Text('Scan with your phone, then use Luroka to scan or paste your saved recovery code.'),
                 const SizedBox(height: 12),
-                QrImageView(data: invite.toBrowserUri().toString(), size: 240, backgroundColor: Colors.white),
+                SecureTransferQr(data: invite.toBrowserUri().toString(), size: 240),
                 if (code != null) ...[const SizedBox(height: 12), Text('Confirm this code on your phone: $code')],
               ],
             ],

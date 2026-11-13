@@ -42,6 +42,7 @@ class _ScannerScreenState extends State<_ScannerScreen> with WidgetsBindingObser
   StreamSubscription<Barcode>? _subscription;
   bool _accepted = false;
   bool _cameraUnavailable = false;
+  bool _unrecognizedCode = false;
 
   @override
   void initState() {
@@ -88,7 +89,10 @@ class _ScannerScreenState extends State<_ScannerScreen> with WidgetsBindingObser
   void _detected(Barcode barcode) {
     if (_accepted || !mounted || WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed) return;
     final value = barcode.code;
-    if (!isSecureTransferQr(value, widget.kind)) return;
+    if (!isSecureTransferQr(value, widget.kind)) {
+      if (!_unrecognizedCode) setState(() => _unrecognizedCode = true);
+      return;
+    }
     _accepted = true;
     unawaited(_setCameraActive(false));
     Navigator.of(context).pop(value);
@@ -120,7 +124,11 @@ class _ScannerScreenState extends State<_ScannerScreen> with WidgetsBindingObser
                   child: Text(
                     _cameraUnavailable
                         ? 'Camera unavailable. Go back to enter the code manually, or allow camera access in device settings.'
-                        : 'Point the camera at the Luroka QR code. Scanning happens on your device.',
+                        : _unrecognizedCode
+                        ? widget.kind == SecureTransferQrKind.recovery
+                              ? 'That is not a backup recovery code. Scan the QR shown when you saved your backup recovery code.'
+                              : 'That is not a TV invitation. Scan the QR shown on the TV connection screen.'
+                        : 'Center the entire QR code in the camera, including its white border. Move closer if needed. Scanning happens on your device.',
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white),
                   ),

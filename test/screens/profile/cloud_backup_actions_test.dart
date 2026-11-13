@@ -302,7 +302,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Authorize'));
     await tester.pumpAndSettle();
-    expect(find.text('Scan this QR code with your phone to save your recovery code.'), findsOneWidget);
+    expect(find.text('Keep a private copy of this code. To restore on your phone, open Luroka’s cloud backup restore option and choose Scan recovery code.'), findsOneWidget);
     expect(find.byType(QrImageView), findsOneWidget);
     final qr = tester.getRect(find.byKey(const ValueKey('tv-backup-recovery-qr')));
     final dialog = tester.getRect(find.byType(AlertDialog).last);
