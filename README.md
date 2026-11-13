@@ -24,6 +24,16 @@
 
 ---
 
+## Built on Plezy
+
+Luroka is based on [Plezy](https://github.com/edde746/plezy), created by
+edde746 and its contributors. Their open-source work provides the foundation
+for this project, and we thank everyone who built and contributed to Plezy.
+
+Luroka continues from that foundation with redesigned screens, additional
+features and support for more media servers. It is developed independently and
+is not endorsed by or affiliated with the Plezy project.
+
 ## The experience
 
 Bring your Plex, Jellyfin and Emby libraries together in a media experience
@@ -179,15 +189,12 @@ entered in the app; without one, Cinemeta discovery remains available.
 
 Flutter and Dart · Kotlin and Swift · mpv · Media3 · Provider · Drift
 
-## Our roots, our direction
+## Source history and attribution
 
-Luroka started as a fork of [Plezy](https://github.com/edde746/plezy) by
-edde746 and contributors. Thank you to Plezy’s authors and contributors for
-the open-source foundation.
-
-Since then, Luroka has grown into its own experience, with a distinct design,
-extensively reworked screens and an expanding set of features shaped around
-personal libraries and household viewing.
+This repository began with a Luroka source snapshot; it does not include
+Plezy’s original commit history. The original authors' work and contributions
+can be explored in the [Plezy repository](https://github.com/edde746/plezy) and
+its [commit history](https://github.com/edde746/plezy/commits).
 
 Upstream copyright and modification notices are preserved in [LICENSE](LICENSE).
 
