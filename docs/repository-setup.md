@@ -27,10 +27,12 @@ for the branch, review and push workflow.
 
 ## Platform rollout
 
-Android phone and Android TV are in device testing. iOS/iPadOS and tvOS need
-Apple hardware validation. Fire TV and desktop platforms require further
-testing before being presented as supported releases. This repository excludes
-desktop platform projects while retaining shared app and dependency code.
+Android phone and Android TV are in closed testing. iOS/iPadOS and tvOS are in
+TestFlight testing, and the Apple TV app is available on the App Store. Further
+Apple hardware validation is still needed. Fire TV and desktop platforms
+require further testing before being presented as supported releases. This
+repository excludes desktop platform projects while retaining shared app and
+dependency code.
 
 ## Optional TMDb build configuration
 

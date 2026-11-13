@@ -4,7 +4,7 @@
 
 <h1 align="center">Luroka</h1>
 
-<p align="center"><strong>Your media, beautifully at home.</strong></p>
+<p align="center"><strong>Your collection. Your space. Your way to watch.</strong></p>
 
 <p align="center">
   Your Plex, Jellyfin and Emby libraries, together in a cinematic experience<br />
@@ -26,17 +26,13 @@
 
 ## The experience
 
-**Your collection is personal. Your media app should feel that way, too.**
-Luroka brings your connected libraries into a single home, with artwork-led
-browsing, thoughtful playback controls and layouts designed for touch and TV
-remotes.
+Bring your Plex, Jellyfin and Emby libraries together in a media experience
+designed to feel at home on your phone, tablet and TV.
 
-| | |
-| :--- | :--- |
-| **A home for your library** | Browse movies, series, music, collections and favorites across supported servers. |
-| **Made for the big screen** | Find your way from the couch with remote-friendly navigation and clear focus states. |
-| **A space for everyone** | Create profiles, set up a Kids space, and make the experience your own. |
-| **Watch together** | Invite friends into a room and keep playback in sync, even from different sofas. |
+Luroka has its own visual identity, with nearly every screen redesigned or
+rebuilt—from home and discovery to profiles, settings and playback. Personalized
+browsing, rich media details and layouts tailored to each screen make your
+collection easier to explore and more enjoyable to watch.
 
 ## A closer look
 
@@ -65,60 +61,85 @@ remotes.
 
 <p align="center"><sub>App screens in illustrative frames. Media shown is not included with Luroka.</sub></p>
 
-## Make it yours
+## Your libraries, beautifully together
 
-<details>
-<summary><strong>Playback &amp; subtitles</strong></summary>
+Spend more time choosing what to watch and less time navigating between servers.
 
-- Choose media versions, audio tracks and subtitles, with support for styled ASS/SSA subtitles.
-- Navigate chapters, adjust playback speed and sync, and use intro and credits skip where supported.
-- Enjoy HDR, Dolby Vision and multichannel audio on compatible hardware and player backends.
+- **One title, fewer duplicates.** Browse a unified poster for matched titles and choose which available library to watch from.
+- **The version you want.** Find and select different versions of a movie.
+- **More behind every title.** Explore trailers, cast information, filmographies and upcoming episodes.
+- **More ways to discover.** Browse studios, collections and discovery pages alongside your own libraries.
 
-</details>
+## A home that feels like yours
 
-<details>
-<summary><strong>Profiles, Kids &amp; Watch Together</strong></summary>
+Shape Luroka around your collection and your habits.
 
-- Create personal profiles with their own connections and optional integrations.
-- Configure Kids profiles with a parent PIN, library choices and viewing controls.
-- Share a Watch Together room code and synchronize playback with others who have access to the media.
+Customize your spotlight, arrange home shelves, choose themes and adjust poster
+sizes. Guided setup helps you get started, while layouts designed for touch and
+TV remotes keep everyday navigation comfortable.
 
-</details>
+Your viewing activity brings your history to life through visual statistics—
+explore what you have watched and how your viewing habits develop over time.
 
-<details>
-<summary><strong>Downloads, music &amp; live TV</strong></summary>
+## Made for the way you watch
 
-- Download supported media for offline viewing on supported devices.
-- Browse artists and albums, build a music queue and follow synced lyrics.
-- Explore a channel guide and manage recordings with supported Live TV and DVR servers.
+### Playback and subtitles
 
-</details>
+Choose media versions, audio tracks and subtitles, search for subtitles, and
+adjust their appearance. Navigate chapters, fine-tune playback speed and
+synchronization, and use intro or credits skipping where supported.
 
-<details>
-<summary><strong>Discovery &amp; integrations</strong></summary>
+HDR, Dolby Vision, multichannel audio and styled ASS/SSA subtitles are available
+with compatible devices, media and player backends.
 
-- Search connected libraries, browse studios and collections, and explore people and filmographies.
-- Connect optional services including AniList, MyAnimeList, SIMKL, MDBList and Seerr.
-- Personalize your Home, themes and supported settings for the way you watch.
+### Downloads, music and live TV
 
-</details>
+Take supported titles offline with download and automatic sync options. Explore
+music libraries, build a queue and follow synced lyrics. Connect supported Live
+TV and DVR servers to browse channels, view the guide and manage recordings.
 
-Feature, codec, HDR, passthrough and download availability varies by device,
-player backend, server and configuration. Kids restrictions and viewing activity
-are stored on the device. Luroka is a client: it does not provide media or a
-media-server subscription.
+### A space for everyone
+
+Create personal profiles with their own connections and preferences. Set up Kids
+spaces with parent authorization, library choices and viewing controls.
+
+Watch Together lets people with access to the media join a shared room and
+synchronize playback. Optional integrations include AniList, MyAnimeList, SIMKL,
+MDBList and Seerr.
+
+### Easier setup and a way back
+
+Use your phone to help connect a TV to Jellyfin or Emby. Back up and restore
+profiles and settings without creating a Luroka account, with these features
+available in enabled builds.
+
+Full profile restoration requires an empty profile database. Kids exports have
+a separate restore flow. Protect backups that contain connection information.
+
+Features vary by platform, server and configuration. Kids controls and viewing
+activity are device-local. Luroka does not include media or a media-server
+subscription.
 
 ## Platforms
 
 | Screen | Platform | Status |
 | :--- | :--- | :--- |
-| Phone &amp; tablet | Android | In testing |
-| TV | Android TV | In testing |
-| iPhone &amp; iPad | iOS / iPadOS | In testing |
-| Apple TV | tvOS | In testing |
+| Phone &amp; tablet | Android | Closed testing |
+| TV | Android TV | Closed testing |
+| iPhone &amp; iPad | iOS / iPadOS | TestFlight testing |
+| Apple TV | tvOS | Available on the App Store; TestFlight testing also continues |
 
 Luroka is actively being developed. Follow the [website](https://luroka.app) or
 [community](https://discord.gg/YerMrFBM5T) for testing and release updates.
+
+Official store releases are planned as a one-time purchase to help support
+development and running costs.
+
+Compressed Android APK archives (`.tar.gz`) and IPA files are planned for a
+future release; no download links are available here yet. An APK or IPA is an
+installable build, while the repository contains source code to compile yourself.
+Apple installations require an appropriately signed IPA and a supported
+installation method.
 
 ## Getting started
 
@@ -158,16 +179,26 @@ entered in the app; without one, Cinemeta discovery remains available.
 
 Flutter and Dart · Kotlin and Swift · mpv · Media3 · Provider · Drift
 
-## Open-source acknowledgments
+## Our roots, our direction
 
-Luroka is independently developed on the open-source foundation of
-[Plezy](https://github.com/edde746/plezy) by edde746 and contributors, with its
-own interface, household features and phone-to-TV workflows. Upstream copyright
-and modification notices are preserved in [LICENSE](LICENSE).
+Luroka started as a fork of [Plezy](https://github.com/edde746/plezy) by
+edde746 and contributors. Thank you to Plezy’s authors and contributors for
+the open-source foundation.
+
+Since then, Luroka has grown into its own experience, with a distinct design,
+extensively reworked screens and an expanding set of features shaped around
+personal libraries and household viewing.
+
+Upstream copyright and modification notices are preserved in [LICENSE](LICENSE).
 
 ## License
 
 Licensed under [GPL-3.0](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.md)
-for component licenses and credits.
+for component licenses and credits. A price for an official build does not
+remove the GPL rights to use, study, modify and redistribute the covered code
+under its terms. Distributors must also meet the applicable source, notice and
+other license obligations. Native-component provenance, corresponding source,
+notices and store distribution terms remain under review; see the
+[license review](docs/license-review.md).
 
 <p align="center"><sub>Made for the stories you already love.</sub></p>

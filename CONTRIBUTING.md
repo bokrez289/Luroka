@@ -14,10 +14,13 @@ Thank you for considering a contribution! This document explains how to set up a
 ```bash
 git clone https://github.com/bokrez289/Luroka.git
 cd Luroka
-flutter pub get
+flutter pub get --enforce-lockfile --no-example
 dart run slang                    # generate translations
-dart run build_runner build --delete-conflicting-outputs  # generate Drift/freezed code
+dart run build_runner build       # generate Drift/freezed code
 ```
+
+The checked-in generated files may show comment or whitespace changes after
+generation. Review generated diffs before including them in a contribution.
 
 ### Running
 
