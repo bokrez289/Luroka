@@ -8,13 +8,10 @@ import '../../providers/seerr_account_provider.dart';
 import '../../providers/catalog_sources_provider.dart';
 import '../../profiles/active_profile_provider.dart';
 import 'tmdb_settings_screen.dart';
-import '../../services/discord_rpc_service.dart';
-import '../../services/settings_service.dart';
 import '../../widgets/app_icon.dart';
 import '../../widgets/catalog_source_logo.dart';
 import '../../widgets/focused_scroll_scaffold.dart';
 import '../../widgets/focusable_list_tile.dart';
-import '../../widgets/setting_tile.dart';
 import '../../widgets/settings_section.dart';
 import 'seerr_connect_screen.dart';
 import 'seerr_settings_screen.dart';
@@ -82,18 +79,6 @@ class ServicesSettingsScreen extends StatelessWidget {
               title: t.services.trackingSection,
               children: [for (final info in TrackerServiceInfo.all) _TrackerHubRow(info)],
             ),
-            if (DiscordRPCService.isAvailable)
-              SettingsGroup(
-                title: t.services.integrations,
-                children: [
-                  SettingSwitchTile(
-                    pref: SettingsService.enableDiscordRPC,
-                    icon: Symbols.chat_rounded,
-                    title: t.settings.discordRichPresence,
-                    subtitle: t.settings.discordRichPresenceDescription,
-                  ),
-                ],
-              ),
             const SizedBox(height: 24),
           ]),
         ),

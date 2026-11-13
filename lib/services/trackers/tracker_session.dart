@@ -1,4 +1,5 @@
 import 'oauth_proxy_client.dart';
+import 'mdblist/mdblist_constants.dart';
 import 'simkl/simkl_constants.dart';
 import 'tracker_constants.dart';
 import 'tracker_exceptions.dart';
@@ -10,6 +11,7 @@ class TrackerSession {
   final int? expiresAt;
   final String? username;
   final int createdAt;
+  final String? clientId;
 
   const TrackerSession({
     required this.accessToken,
@@ -17,6 +19,7 @@ class TrackerSession {
     this.refreshToken,
     this.expiresAt,
     this.username,
+    this.clientId,
   });
 
   bool get needsRefresh => expiresAt != null && trackerTokenNeedsRefresh(expiresAt!);
@@ -30,6 +33,7 @@ class TrackerSession {
       expiresAt: expiresAt,
       username: username ?? this.username,
       createdAt: createdAt,
+      clientId: clientId,
     );
   }
 
@@ -39,6 +43,7 @@ class TrackerSession {
     'expires_at': expiresAt,
     'username': username,
     'created_at': createdAt,
+    if (clientId != null) 'client_id': clientId,
   };
 
   String encode() => encodeTrackerSessionJson(toJson());
@@ -50,6 +55,7 @@ class TrackerSession {
       expiresAt: (json['expires_at'] as num?)?.toInt(),
       username: json['username'] as String?,
       createdAt: (json['created_at'] as num).toInt(),
+      clientId: json['client_id'] as String?,
     );
     // When decoding a persisted blob we know the service, so re-impose the
     // per-service invariants the old json_serializable decoders guaranteed.
@@ -67,6 +73,14 @@ class TrackerSession {
       }
     }
 
+    if (service == TrackerService.simkl || service == TrackerService.mdblist) {
+      final expected = service == TrackerService.simkl ? SimklConstants.v2ClientId : MdblistConstants.clientId;
+      if (expected.isEmpty ||
+          clientId != expected ||
+          (service == TrackerService.simkl && !SimklConstants.isV2AccessToken(accessToken))) {
+        throw TrackerAuthException(service: service, message: 'Reconnect this account for Luroka', isPermanent: true);
+      }
+    }
     switch (service) {
       case TrackerService.mal:
       case TrackerService.trakt:
@@ -75,10 +89,7 @@ class TrackerSession {
         requireExpiry();
       case TrackerService.anilist:
         requireExpiry();
-      // AUTH V2 tokens expire weekly and refresh; legacy V1 tokens live for
-      // years with neither, and stay valid until Simkl retires V1.
       case TrackerService.simkl:
-        if (!SimklConstants.isV2AccessToken(accessToken)) return;
         _validateRefreshToken(service, refreshToken);
         requireExpiry();
     }
@@ -114,6 +125,7 @@ class TrackerSession {
       // Every new Simkl sign-in is AUTH V2: a 7-day access token plus a
       // refresh token.
       TrackerService.simkl => TrackerSession(
+        clientId: SimklConstants.v2ClientId,
         accessToken: json['access_token'] as String,
         refreshToken: _requireRefreshToken(service, json['refresh_token'] as String?),
         expiresAt: createdAt + (json['expires_in'] as num).toInt(),
@@ -121,6 +133,7 @@ class TrackerSession {
       ),
       // MDBList issues a 30-day access token plus a refresh token.
       TrackerService.mdblist => TrackerSession(
+        clientId: MdblistConstants.clientId,
         accessToken: json['access_token'] as String,
         refreshToken: _requireRefreshToken(service, json['refresh_token'] as String?),
         expiresAt: createdAt + (json['expires_in'] as num).toInt(),

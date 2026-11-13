@@ -13,7 +13,7 @@ WORKDIR /opt/plezy-demo
 COPY scripts/maestro/maestro_fixtures.py scripts/maestro/maestro_real_jellyfin.py scripts/maestro/prepare_maestro_media.py ./
 COPY .maestro/jellyfin-demo/seed.sh ./seed.sh
 
-ARG PLEZY_DEMO_MEDIA_BASE_URL=https://demo-files.plezy.app/media-samples/
+ARG PLEZY_DEMO_MEDIA_BASE_URL=
 ARG PLEZY_DEMO_MEDIA_REVISION=2026-07-14
 ARG PLEZY_DEMO_MEDIA_DURATION=300
 RUN test -n "${PLEZY_DEMO_MEDIA_REVISION}" \

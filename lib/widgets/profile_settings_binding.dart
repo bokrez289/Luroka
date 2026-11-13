@@ -6,7 +6,6 @@ import 'package:intl/date_symbol_data_local.dart';
 import '../i18n/app_locale_utils.dart';
 import '../i18n/strings.g.dart';
 import '../services/settings_service.dart';
-import '../services/discord_rpc_service.dart';
 import '../services/device_performance.dart';
 import '../utils/app_logger.dart';
 
@@ -18,14 +17,12 @@ class ProfileSettingsBinding extends StatefulWidget {
     required this.updateServerLanguage,
     required this.child,
     this.applyLocale,
-    this.applyDiscord,
   });
 
   final SettingsService settings;
   final void Function(String language) updateServerLanguage;
   final Widget child;
   final Future<void> Function(AppLocale locale)? applyLocale;
-  final Future<void> Function(bool enabled)? applyDiscord;
 
   @override
   State<ProfileSettingsBinding> createState() => _ProfileSettingsBindingState();
@@ -33,7 +30,6 @@ class ProfileSettingsBinding extends StatefulWidget {
 
 class _ProfileSettingsBindingState extends State<ProfileSettingsBinding> {
   late ValueNotifier<AppLocale> _locale;
-  late ValueNotifier<bool> _discord;
   late ValueNotifier<bool> _debug;
   late ValueNotifier<bool> _fireStick;
   late ValueNotifier<VisualEffectsSetting> _effects;
@@ -53,7 +49,6 @@ class _ProfileSettingsBindingState extends State<ProfileSettingsBinding> {
 
   void _attach() {
     _locale = widget.settings.listenable(SettingsService.appLocale)..addListener(_changed);
-    _discord = widget.settings.listenable(SettingsService.enableDiscordRPC)..addListener(_changed);
     _debug = widget.settings.listenable(SettingsService.enableDebugLogging)..addListener(_changed);
     _fireStick = widget.settings.listenable(SettingsService.fireStickMode)..addListener(_changed);
     _effects = widget.settings.listenable(SettingsService.visualEffects)..addListener(_changed);
@@ -62,7 +57,6 @@ class _ProfileSettingsBindingState extends State<ProfileSettingsBinding> {
 
   void _detach(SettingsService settings) {
     _locale.removeListener(_changed);
-    _discord.removeListener(_changed);
     _debug.removeListener(_changed);
     _fireStick.removeListener(_changed);
     _effects.removeListener(_changed);
@@ -95,15 +89,6 @@ class _ProfileSettingsBindingState extends State<ProfileSettingsBinding> {
       if (_appliedEffects != effects) {
         _appliedEffects = effects;
         DevicePerformance.setOverrideSync(effects);
-      }
-      final apply =
-          widget.applyDiscord ?? (DiscordRPCService.isAvailable ? DiscordRPCService.instance.setEnabled : null);
-      if (apply != null) {
-        unawaited(
-          apply(widget.settings.read(SettingsService.enableDiscordRPC)).catchError((Object error, StackTrace stack) {
-            appLogger.w('Could not apply profile Discord setting', error: error, stackTrace: stack);
-          }),
-        );
       }
     }
     if (_scheduled) return;

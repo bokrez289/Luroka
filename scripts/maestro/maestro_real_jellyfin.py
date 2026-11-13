@@ -61,7 +61,7 @@ ALPHABET_TITLES = (
     "Zulu Zone",
 )
 _MANAGED_MARKER = ".plezy-jellyfin-e2e-media"
-DEFAULT_CODEC_BASE_URL = "https://demo-files.plezy.app/media-samples/"
+DEFAULT_CODEC_BASE_URL = ""
 _DOWNLOAD_CHUNK_SIZE = 1024 * 1024
 
 
@@ -179,6 +179,8 @@ def _valid_codec_file(path: Path, expected_size: int, expected_sha256: str) -> b
 
 
 def download_codec_media(output_dir: Path, base_url: str = DEFAULT_CODEC_BASE_URL) -> list[str]:
+    if not base_url.strip():
+        raise ValueError("Set PLEZY_DEMO_MEDIA_BASE_URL or --base-url to an authorized fixture host")
     output = output_dir.expanduser().resolve()
     output.mkdir(parents=True, exist_ok=True)
     normalized_base_url = base_url.rstrip("/") + "/"

@@ -36,6 +36,9 @@ class MdblistAuthService extends DeviceCodeAuthServiceBase {
 
   @override
   Future<DeviceCode> createDeviceCode() async {
+    if (MdblistConstants.clientId.isEmpty) {
+      throw StateError('MDBList is not configured in this build.');
+    }
     final uri = Uri.parse(MdblistConstants.deviceAuthorizationUrl);
     final res = await sendAbortableHttpRequest(
       httpClient,

@@ -24,12 +24,8 @@ DateTime _systemNow() => clock.now();
 
 /// HTTP wrapper for the Simkl REST API.
 ///
-/// Serves both token generations while AUTH V1 is being retired. The
-/// `client_id` always follows the session's token ([SimklConstants.clientIdFor]).
-/// AUTH V2 access tokens live seven days: they refresh shortly before expiry
-/// or on a 401, retried once, with concurrent refreshes coalesced so this
-/// client stays the grant's single refresh owner. Legacy V1 tokens never
-/// expire, so a 401 on one is terminal (the user revoked access on simkl.com).
+/// AUTH V2 sessions refresh before expiry or after a 401. Concurrent refreshes
+/// are coalesced so this client remains the grant's single refresh owner.
 ///
 /// Writes to the main API host run one at a time, [writeSpacing] apart, since
 /// Simkl allows one POST per second per user and extends a throttling block on
@@ -86,8 +82,6 @@ class SimklClient implements DisposableTrackerClient {
        _now = clock ?? _systemNow;
 
   TrackerSession get session => _session;
-
-  bool get _isV2 => SimklConstants.isV2AccessToken(_session.accessToken);
 
   /// Created on first refresh: legacy sessions and the provider's short-lived
   /// clients never need one.
@@ -219,7 +213,7 @@ class SimklClient implements DisposableTrackerClient {
   /// already gone by the time this runs, and Simkl answers 200 regardless.
   Future<void> revoke() async {
     final session = _session;
-    if (!SimklConstants.isV2AccessToken(session.accessToken)) return;
+    if (SimklConstants.v2ClientId.isEmpty || !SimklConstants.isV2AccessToken(session.accessToken)) return;
     try {
       await _http.sendForm(
         'POST',
@@ -323,7 +317,7 @@ class SimklClient implements DisposableTrackerClient {
   }) async {
     _throwIfHeld();
 
-    if (_isV2 && _session.needsRefresh) {
+    if (_session.needsRefresh) {
       try {
         await _refresh();
       } catch (_) {
@@ -334,10 +328,6 @@ class SimklClient implements DisposableTrackerClient {
     var sent = await _send(method, path, body: body, query: query, followRedirects: followRedirects);
 
     if (sent.response.statusCode == 401) {
-      if (!SimklConstants.isV2AccessToken(sent.accessToken)) {
-        // Legacy V1 tokens never expire: a 401 means the user revoked access.
-        _invalidate();
-      }
       // A request that raced a refresh already holds a superseded token; it
       // retries with the current one rather than refreshing again, since every
       // refresh kills the grant's previous access token. A failed refresh

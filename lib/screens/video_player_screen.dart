@@ -51,7 +51,6 @@ import '../providers/companion_remote_provider.dart';
 import '../services/fullscreen_state_manager.dart';
 import '../services/car_ux_restrictions_service.dart';
 import '../services/driver_distraction.dart';
-import '../services/discord_rpc_service.dart';
 import '../services/trackers/tracker_coordinator.dart';
 import '../services/episode_navigation_service.dart';
 import '../services/apple_tv_remote_touch_service.dart';
@@ -2522,7 +2521,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
     _mediaControlsManager?.clear();
     _mediaControlsManager?.dispose();
 
-    DiscordRPCService.instance.stopPlayback();
     TrackerCoordinator.instance.stopPlayback();
 
     // Released before the scope closes and the display mode is restored, so

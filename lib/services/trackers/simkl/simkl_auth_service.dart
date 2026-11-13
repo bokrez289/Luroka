@@ -34,6 +34,7 @@ class SimklAuthService extends DeviceCodeAuthServiceBase {
 
   @override
   Future<DeviceCode> createDeviceCode() async {
+    SimklConstants.clientIdFor(null);
     final uri = Uri.parse(SimklConstants.deviceAuthorizationUrl);
     final res = await sendAbortableHttpRequest(
       httpClient,

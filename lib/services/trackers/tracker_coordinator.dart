@@ -163,6 +163,10 @@ class TrackerCoordinator {
     }
   }
 
+  /// Fail closed if writes for the previous account cannot be cleared.
+  Future<void> purgeWriteQueueForProfile(String userUuid, TrackerService service) =>
+      _writeQueue.removeService(userUuid, service);
+
   /// Drop [service]'s queued writes for the active profile.
   ///
   /// Called on explicit disconnect and on session invalidation, before another

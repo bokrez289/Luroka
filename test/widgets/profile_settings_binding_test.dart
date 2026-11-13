@@ -16,7 +16,6 @@ void main() {
     await settings.prepareProfileSettings(['one', 'two']);
     settings.selectProfile('one');
     await settings.write(SettingsService.appLocale, AppLocale.fr);
-    await settings.write(SettingsService.enableDiscordRPC, true);
     settings.selectProfile('two');
     await settings.write(SettingsService.appLocale, AppLocale.de);
     settings.selectProfile('one');
@@ -24,12 +23,10 @@ void main() {
     final firstApply = Completer<void>();
     final applied = <AppLocale>[];
     final serverLanguages = <String>[];
-    final discord = <bool>[];
     await tester.pumpWidget(
       ProfileSettingsBinding(
         settings: settings,
         updateServerLanguage: serverLanguages.add,
-        applyDiscord: (enabled) async => discord.add(enabled),
         applyLocale: (locale) async {
           applied.add(locale);
           if (applied.length == 1) await firstApply.future;
@@ -38,9 +35,7 @@ void main() {
       ),
     );
     expect(applied, [AppLocale.fr]);
-    expect(discord.last, isTrue);
     settings.selectProfile('two');
-    expect(discord.last, isFalse);
     await tester.pump();
     firstApply.complete();
     await tester.pump();

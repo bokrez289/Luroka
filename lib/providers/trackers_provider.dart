@@ -16,7 +16,6 @@ import '../services/trackers/mdblist/mdblist_tracker.dart';
 import '../services/trackers/oauth_proxy_client.dart';
 import '../services/trackers/simkl/simkl_auth_service.dart';
 import '../services/trackers/simkl/simkl_client.dart';
-import '../services/trackers/simkl/simkl_constants.dart';
 import '../services/trackers/simkl/simkl_tracker.dart';
 import '../services/trackers/trakt/trakt_auth_service.dart';
 import '../services/trackers/trakt/trakt_client.dart';
@@ -134,13 +133,6 @@ class TrackersProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   bool get isSimklConnected => _simkl.session != null;
   bool get isTraktConnected => _trakt.session != null;
   bool get isMdblistConnected => _mdblist.session != null;
-
-  /// Whether the bound Simkl session predates AUTH V2. It keeps working until
-  /// Simkl retires V1; settings offers [reconnectSimkl] meanwhile.
-  bool get isSimklLegacy {
-    final session = _simkl.session;
-    return session != null && !SimklConstants.isV2AccessToken(session.accessToken);
-  }
 
   /// The live MAL client for the Explore catalog, shared with the scrobble
   /// tracker so both ride one session (MAL rotates refresh tokens — a second
@@ -267,35 +259,7 @@ class TrackersProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   Future<bool> connectSimkl({required void Function(DeviceCode code) onCodeReady}) =>
       _runConnect(_simkl, authorize: () => _authorizeSimkl(onCodeReady), enrich: _enrichSimkl);
 
-  /// Move a legacy AUTH V1 session onto AUTH V2 through the device flow,
-  /// replacing it in place. Only runs while a legacy session is bound.
-  ///
-  /// Queued Simkl writes survive only when both tokens verifiably belong to
-  /// the same account; they then replay through the new token. A different or
-  /// unknown account gets the disconnect treatment: its rows are purged so
-  /// they cannot land in someone else's history.
-  Future<bool> reconnectSimkl({required void Function(DeviceCode code) onCodeReady}) {
-    final legacy = _simkl.session;
-    if (legacy == null || SimklConstants.isV2AccessToken(legacy.accessToken)) return Future.value(false);
-
-    var sameAccount = false;
-    return _runConnect(
-      _simkl,
-      replaces: legacy,
-      authorize: () => _authorizeSimkl(onCodeReady),
-      enrich: (raw) async {
-        final (fresh, previous) = await (_fetchSimklAccount(raw), _fetchSimklAccount(legacy)).wait;
-        sameAccount = fresh.accountId != null && fresh.accountId == previous.accountId;
-        if (!sameAccount) appLogger.i('Simkl: reconnected account differs or is unknown; dropping queued writes');
-        return fresh.username == null ? raw : raw.copyWith(username: fresh.username);
-      },
-      keepQueuedWrites: () => sameAccount,
-    );
-  }
-
-  /// AUTH V2 grants are revoked server-side, like MDBList's. Local state goes
-  /// first, so a failed revoke still leaves the user disconnected here. Legacy
-  /// V1 sessions have no revoke endpoint and stay valid on Simkl's side.
+  /// Disconnect the current Simkl account.
   Future<void> disconnectSimkl() async {
     final session = _simkl.session;
     await _clearAndRebind(_simkl);
@@ -409,6 +373,11 @@ class TrackersProvider extends ChangeNotifier with DisposableChangeNotifierMixin
         enrich: enrich,
         save: (session) async {
           if (!_isCurrentConnect(service, userUuid, generation)) return;
+          // Discard writes associated with an older registration before binding.
+          if (service == TrackerService.simkl || service == TrackerService.mdblist) {
+            await TrackerCoordinator.instance.purgeWriteQueueForProfile(userUuid, service);
+            if (!_isCurrentConnect(service, userUuid, generation)) return;
+          }
           await slot.store.save(userUuid, session);
         },
         assign: (session) {

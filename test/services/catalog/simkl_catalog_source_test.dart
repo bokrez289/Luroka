@@ -19,7 +19,7 @@ import 'package:luroka/services/trackers/tracker_session.dart';
 TrackerSession _session() {
   final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   return TrackerSession(
-    accessToken: 'access',
+    accessToken: 'simkl_at_test',
     refreshToken: null,
     expiresAt: now + 86400,
     createdAt: now - 3600,
@@ -225,7 +225,7 @@ void main() {
       expect(request.url.host, 'data.simkl.in');
       expect(request.url.path, '/discover/trending/movies/week_100.json');
       final appVersion = await SimklConstants.appVersion();
-      expect(request.url.queryParameters['client_id'], SimklConstants.legacyClientId);
+      expect(request.url.queryParameters['client_id'], SimklConstants.v2ClientId);
       expect(request.url.queryParameters['app-name'], SimklConstants.appName);
       expect(request.url.queryParameters['app-version'], appVersion);
       expect(request.headers, isNot(contains('authorization')));
@@ -318,7 +318,7 @@ void main() {
       responder = (request) {
         expect(request.url.path, '/sync/all-items/all/plantowatch');
         expect(request.url.queryParameters['extended'], 'full');
-        expect(request.headers['authorization'], 'Bearer access');
+        expect(request.headers['authorization'], 'Bearer simkl_at_test');
         return _json(_allItemsBody());
       };
 
@@ -571,7 +571,7 @@ void main() {
       final redirect = requests.first;
       expect(redirect.url.host, 'api.simkl.com');
       expect(redirect.followRedirects, isFalse);
-      expect(redirect.headers['authorization'], 'Bearer access');
+      expect(redirect.headers['authorization'], 'Bearer simkl_at_test');
       expect(
         redirect.url.query,
         startsWith('to=simkl&imdb=tt0877057&tmdb=13916&type=tv&mal=1535&anilist=1535&client_id='),

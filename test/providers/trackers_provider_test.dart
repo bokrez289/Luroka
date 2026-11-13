@@ -17,6 +17,7 @@ import 'package:luroka/services/trackers/tracker_session.dart';
 import 'package:luroka/services/trackers/tracker_write_queue.dart';
 import 'package:luroka/services/trackers/mal/mal_tracker.dart';
 import 'package:luroka/services/trackers/mdblist/mdblist_tracker.dart';
+import 'package:luroka/services/trackers/mdblist/mdblist_constants.dart';
 import 'package:luroka/services/trackers/simkl/simkl_constants.dart';
 import 'package:luroka/services/trackers/simkl/simkl_tracker.dart';
 import 'package:luroka/services/trackers/trakt/trakt_tracker.dart';
@@ -47,14 +48,17 @@ TrackerSession _anilist({String? username}) => TrackerSession(
 );
 
 TrackerSession _simkl({String? username}) => TrackerSession(
-  accessToken: 'simkl-at',
+  accessToken: 'simkl_at_test',
+  refreshToken: 'simkl_rt_test',
+  expiresAt: 2000000000,
+  clientId: SimklConstants.v2ClientId,
   createdAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
   username: username,
 );
 
 /// An AUTH V2 Simkl session, as every new sign-in now produces.
 TrackerSession _simklV2({String token = 'simkl_at_new'}) =>
-    TrackerSession(accessToken: token, refreshToken: 'simkl_rt_new', expiresAt: 2000000000, createdAt: 1900000000);
+    TrackerSession(accessToken: token, refreshToken: 'simkl_rt_new', expiresAt: 2000000000, createdAt: 1900000000, clientId: SimklConstants.v2ClientId);
 
 TrackerSession _trakt({String? username}) => TrackerSession(
   accessToken: 'trakt-at',
@@ -570,6 +574,23 @@ void main() {
       freshProvider.dispose();
     });
 
+    test('new Simkl account clears old queued writes before binding', () async {
+      const uuid = 'profile-simkl-registration-change';
+      final queue = TrackerWriteQueue();
+      await queue.enqueue(uuid, _queuedItem(TrackerService.simkl));
+      await queue.enqueue(uuid, _queuedItem(TrackerService.trakt));
+      await SimklTracker.instance.setEnabled(false);
+      final simkl = _SimklAccounts({'simkl_at_new': 7});
+      final p = TrackersProvider.forTesting(
+        connectPipeline: _enrichingPipeline(_simklV2()),
+        httpClientFactory: simkl.client,
+      );
+      await _bindProfile(p, uuid);
+      expect(await p.connectSimkl(onCodeReady: (_) {}), isTrue);
+      expect((await queue.load(uuid)).map((item) => item.service), [TrackerService.trakt]);
+      p.dispose();
+    });
+
     group('Simkl AUTH V2', () {
       test('a refreshed Simkl session is persisted and published', () async {
         const uuid = 'profile-simkl-refresh';
@@ -602,7 +623,6 @@ void main() {
           httpClientFactory: simkl.client,
         );
         await _bindProfile(p, uuid);
-        expect(p.isSimklLegacy, isFalse);
 
         await p.disconnectSimkl();
 
@@ -614,110 +634,7 @@ void main() {
         p.dispose();
       });
 
-      test('disconnecting a legacy session sends nothing: AUTH V1 has no revoke', () async {
-        const uuid = 'profile-simkl-legacy-disconnect';
-        await _simklStore.save(uuid, _simkl(username: 'carol'));
-        BaseSharedPreferencesService.resetForTesting();
-        final simkl = _SimklAccounts(const {});
 
-        final p = TrackersProvider.forTesting(
-          connectPipeline: _ControlledConnectPipeline(_mal()).call,
-          httpClientFactory: simkl.client,
-        );
-        await _bindProfile(p, uuid);
-        expect(p.isSimklLegacy, isTrue);
-
-        await p.disconnectSimkl();
-
-        expect(p.isSimklConnected, isFalse);
-        expect(simkl.requests, isEmpty);
-        p.dispose();
-      });
-
-      test('reconnect only runs while a legacy session is bound', () async {
-        const uuid = 'profile-simkl-reconnect-guard';
-        var pipelineRuns = 0;
-        final p = TrackersProvider.forTesting(
-          connectPipeline:
-              ({required logLabel, required authorize, required enrich, required save, required assign}) async {
-                pipelineRuns++;
-                return true;
-              },
-        );
-        await _bindProfile(p, uuid);
-        expect(p.isSimklLegacy, isFalse);
-        expect(await p.reconnectSimkl(onCodeReady: (_) {}), isFalse);
-
-        await _simklStore.save(uuid, _simklV2());
-        BaseSharedPreferencesService.resetForTesting();
-        await _bindProfile(p, uuid);
-        expect(p.isSimklConnected, isTrue);
-        expect(p.isSimklLegacy, isFalse);
-        expect(await p.reconnectSimkl(onCodeReady: (_) {}), isFalse);
-
-        expect(pipelineRuns, 0);
-        p.dispose();
-      });
-
-      test('reconnecting to the same account replaces the session and keeps queued writes', () async {
-        const uuid = 'profile-simkl-reconnect-same';
-        await _simklStore.save(uuid, _simkl(username: 'carol'));
-        BaseSharedPreferencesService.resetForTesting();
-        final queue = TrackerWriteQueue();
-        await queue.enqueue(uuid, _queuedItem(TrackerService.simkl));
-        // Replay stays off so the kept row is observable rather than sent.
-        await SimklTracker.instance.setEnabled(false);
-        final simkl = _SimklAccounts({'simkl-at': 7, 'simkl_at_new': 7});
-
-        final p = TrackersProvider.forTesting(
-          connectPipeline: _enrichingPipeline(_simklV2()),
-          httpClientFactory: simkl.client,
-        );
-        await _bindProfile(p, uuid);
-        expect(p.isSimklLegacy, isTrue);
-
-        expect(await p.reconnectSimkl(onCodeReady: (_) {}), isTrue);
-        await TrackerCoordinator.instance.flushWriteQueue();
-
-        expect(simkl.settingsTokens, unorderedEquals(['simkl-at', 'simkl_at_new']));
-        expect(p.isSimklLegacy, isFalse);
-        expect(p.simkl?.accessToken, 'simkl_at_new');
-        expect(p.simklUsername, 'user-7');
-        expect(SimklTracker.instance.client?.session.accessToken, 'simkl_at_new');
-        expect((await _simklStore.load(uuid))?.accessToken, 'simkl_at_new');
-        expect((await queue.load(uuid)).map((item) => item.service), [TrackerService.simkl]);
-        p.dispose();
-      });
-
-      for (final (label, accounts) in [
-        ('a different account', <String, Object>{'simkl-at': 7, 'simkl_at_new': 8}),
-        ('an unverifiable account', <String, Object>{'simkl_at_new': 8}),
-      ]) {
-        test('reconnecting to $label purges the legacy queued writes', () async {
-          const uuid = 'profile-simkl-reconnect-other';
-          await _simklStore.save(uuid, _simkl(username: 'carol'));
-          BaseSharedPreferencesService.resetForTesting();
-          final queue = TrackerWriteQueue();
-          await queue.enqueue(uuid, _queuedItem(TrackerService.simkl));
-          await queue.enqueue(uuid, _queuedItem(TrackerService.trakt));
-          await SimklTracker.instance.setEnabled(false);
-          final simkl = _SimklAccounts(accounts);
-
-          final p = TrackersProvider.forTesting(
-            connectPipeline: _enrichingPipeline(_simklV2()),
-            httpClientFactory: simkl.client,
-          );
-          await _bindProfile(p, uuid);
-
-          expect(await p.reconnectSimkl(onCodeReady: (_) {}), isTrue);
-          await TrackerCoordinator.instance.flushWriteQueue();
-
-          expect(p.simkl?.accessToken, 'simkl_at_new');
-          expect(SimklTracker.instance.client?.session.accessToken, 'simkl_at_new');
-          expect((await queue.load(uuid)).map((item) => item.service), [TrackerService.trakt]);
-          p.dispose();
-        });
-      }
     });
   });
 }
@@ -752,7 +669,7 @@ TrackerSession _session(TrackerService service, String owner) => switch (service
     createdAt: 1900000000,
     username: owner,
   ),
-  TrackerService.simkl => TrackerSession(accessToken: '$owner-simkl-at', createdAt: 1900000000, username: owner),
+  TrackerService.simkl => TrackerSession(accessToken: 'simkl_at_$owner', refreshToken: 'simkl_rt_$owner', expiresAt: 2000000000, createdAt: 1900000000, username: owner, clientId: SimklConstants.v2ClientId),
   TrackerService.trakt => TrackerSession(
     accessToken: '$owner-trakt-at',
     refreshToken: '$owner-trakt-rt',
@@ -762,6 +679,7 @@ TrackerSession _session(TrackerService service, String owner) => switch (service
   ),
   TrackerService.mdblist => TrackerSession(
     accessToken: '$owner-mdblist-at',
+    clientId: MdblistConstants.clientId,
     refreshToken: '$owner-mdblist-rt',
     expiresAt: 2000000000,
     createdAt: 1900000000,

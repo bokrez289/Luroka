@@ -10,24 +10,14 @@ extension SimklCatalogTypeApi on SimklCatalogType {
   String get detailPath => this == SimklCatalogType.movies ? 'movies' : name;
 }
 
-/// Bundled Simkl API credentials and endpoints.
-///
-/// Two registrations run side by side until Simkl retires AUTH V1 (around
-/// April 2027). Every new sign-in mints an AUTH V2 token; sessions created
-/// before that keep their V1 token. Each `client_id` only works with its own
-/// tokens, so the id is always derived from the session's token through
-/// [clientIdFor] rather than chosen independently.
+/// Simkl configuration. The distributor supplies its own public V2 app ID.
 class SimklConstants {
   SimklConstants._();
 
-  /// AUTH V1 app. Only used for sessions minted before the V2 cutover; nothing
-  /// signs in with it any more. Its tokens never expire and cannot be revoked.
-  static const String legacyClientId = 'ac97718a469c33eab948b63f92226106157e58fdcdd70c1b5857f1779b1d3a6a';
-
-  /// AUTH V2 app, registered as "TV, devices & command line": device flow
-  /// only, no client secret. Public by design — on its own it reaches nothing
-  /// but public catalog data.
-  static const String v2ClientId = 'ec68bc6a9d04b3c50af8cc495f9c9bf478c2371b979aed7e3385bdb771b9b18d';
+  static const String v2ClientId = String.fromEnvironment(
+    'LUROKA_SIMKL_CLIENT_ID',
+    defaultValue: 'e02d33a16a2515f0a6a8fb9186f26be6806e105e0bc746d6f0535618dc0b9e42',
+  );
 
   static const String apiBase = 'https://api.simkl.com';
   static const String dataBase = 'https://data.simkl.in';
@@ -60,10 +50,14 @@ class SimklConstants {
   /// characters with none.
   static bool isV2AccessToken(String token) => token.startsWith(_v2AccessTokenPrefix);
 
-  /// The `client_id` that matches [accessToken]. Anything without a token
-  /// (a new sign-in) uses the V2 app.
-  static String clientIdFor(String? accessToken) =>
-      accessToken == null || isV2AccessToken(accessToken) ? v2ClientId : legacyClientId;
+  /// Legacy tokens belong to a different application and require a new login.
+  static String clientIdFor(String? accessToken) {
+    if (accessToken != null && !isV2AccessToken(accessToken)) {
+      throw StateError('Reconnect Simkl using Luroka’s own application.');
+    }
+    if (v2ClientId.isEmpty) throw StateError('Simkl is not configured in this build.');
+    return v2ClientId;
+  }
 
   static String? _appVersion;
   static Future<String>? _appVersionLoad;

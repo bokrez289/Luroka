@@ -1,15 +1,11 @@
-/// Bundled MDBList API credentials and endpoints.
-///
-/// Registered as a **Device Code** app at https://mdblist.com/developer. That
-/// app type takes no client secret and no redirect URI, so the public client
-/// ID below is the only credential in the binary — unlike Trakt, there is no
-/// extractable secret to worry about.
+/// MDBList device-code configuration. This public ID identifies Luroka.
 class MdblistConstants {
   MdblistConstants._();
 
-  /// Registered MDBList Device Code app client ID. Public by design: the
-  /// device-code grant authenticates the user, not the binary.
-  static const String clientId = 'xOUwKUPdGEbHif6aKwW2gCxCAvFx7m0Q3jX0ZxXZ';
+  static const String clientId = String.fromEnvironment(
+    'LUROKA_MDBLIST_CLIENT_ID',
+    defaultValue: 'b2HWt7kNAaWjOGWVzn6l7te9LcZ9mmDqH8p7jo6I',
+  );
 
   static const String apiBase = 'https://api.mdblist.com';
   static const String webBase = 'https://mdblist.com';

@@ -53,14 +53,13 @@ void main() {
     test('clientIdFor follows the token generation', () {
       expect(SimklConstants.clientIdFor(null), SimklConstants.v2ClientId);
       expect(SimklConstants.clientIdFor('simkl_at_abc'), SimklConstants.v2ClientId);
-      expect(SimklConstants.clientIdFor(_legacyToken), SimklConstants.legacyClientId);
+      expect(() => SimklConstants.clientIdFor(_legacyToken), throwsStateError);
       expect(SimklConstants.isV2AccessToken('simkl_at_abc'), isTrue);
       expect(SimklConstants.isV2AccessToken(_legacyToken), isFalse);
     });
 
     for (final (label, session, clientId) in [
       ('V2', _v2(), SimklConstants.v2ClientId),
-      ('legacy', _legacy(), SimklConstants.legacyClientId),
     ]) {
       test('a $label session sends its own client id, the app version and its token', () async {
         late http.Request captured;
@@ -80,9 +79,9 @@ void main() {
 
         expect(captured.url.queryParameters['client_id'], clientId);
         expect(captured.headers['simkl-api-key'], clientId);
-        expect(captured.url.queryParameters['app-name'], 'plezy');
+        expect(captured.url.queryParameters['app-name'], 'luroka');
         expect(captured.url.queryParameters['app-version'], appVersion);
-        expect(captured.headers['user-agent'], 'plezy/$appVersion');
+        expect(captured.headers['user-agent'], 'luroka/$appVersion');
         expect(captured.headers['authorization'], 'Bearer ${session.accessToken}');
       });
     }
@@ -286,7 +285,7 @@ void main() {
       expect(invalidated, 1);
     });
 
-    test('a legacy 401 invalidates without refreshing', () async {
+    test('a legacy token is rejected before a request', () async {
       var invalidated = 0;
       var requests = 0;
       final client = SimklClient(
@@ -303,10 +302,10 @@ void main() {
 
       await expectLater(
         client.getUserSettings(),
-        throwsA(isA<TrackerAuthException>().having((e) => e.isPermanent, 'isPermanent', isTrue)),
+        throwsStateError,
       );
-      expect(requests, 1);
-      expect(invalidated, 1);
+      expect(requests, 0);
+      expect(invalidated, 0);
     });
   });
 
@@ -434,7 +433,7 @@ void main() {
       final started = <String>[];
       final done = <String>[];
       final client = SimklClient(
-        _legacy(),
+        _v2(),
         onSessionInvalidated: () => fail('no invalidation expected'),
         authService: _noRefresh(),
         httpClient: MockClient((request) {
