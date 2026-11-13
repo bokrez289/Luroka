@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.webkit.JavascriptInterface
@@ -30,6 +31,8 @@ class TrailerEmbedActivity : Activity() {
   private lateinit var seek: SeekBar
   private lateinit var clock: TextView
   private lateinit var loading: ProgressBar
+  private lateinit var header: LinearLayout
+  private lateinit var transport: LinearLayout
   private val handler = Handler(Looper.getMainLooper())
   private var started = false
   private var playing = false
@@ -39,6 +42,19 @@ class TrailerEmbedActivity : Activity() {
   private var destroyed = false
   private var watchPage = false
   private var videoKey = ""
+  private var controlsVisible = true
+  private var suppressTouchSequence = false
+  private var suppressKeyUp = false
+  private val hideControls = Runnable {
+    if (playing && started && !tracking && !destroyed) {
+      controlsVisible = false
+      for (view in listOf(header, transport)) {
+        view.animate().alpha(0f).setDuration(250).withEndAction {
+          if (!controlsVisible) view.visibility = View.GONE
+        }.start()
+      }
+    }
+  }
   private val timeout = Runnable {
     if (!started && !isFinishing) {
       if (!watchPage) openWatchPage() else fail(0)
@@ -60,7 +76,7 @@ class TrailerEmbedActivity : Activity() {
       orientation = LinearLayout.VERTICAL
       setBackgroundColor(Color.BLACK)
     }
-    val header = LinearLayout(this).apply { setPadding(dp(16), dp(8), dp(16), dp(8)); gravity = android.view.Gravity.CENTER_VERTICAL }
+    header = LinearLayout(this).apply { setPadding(dp(16), dp(8), dp(16), dp(8)); gravity = android.view.Gravity.CENTER_VERTICAL }
     header.addView(button("‹", accent) { finish() }.apply { contentDescription = intent.getStringExtra("closeLabel") })
     header.addView(TextView(this).apply {
       text = intent.getStringExtra("title").orEmpty()
@@ -96,7 +112,7 @@ class TrailerEmbedActivity : Activity() {
       addJavascriptInterface(Bridge(), "LumoraPreview")
     }
     root.addView(web, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
-    val transport = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(20), dp(4), dp(20), dp(12)) }
+    transport = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(20), dp(4), dp(20), dp(12)) }
     val buttons = LinearLayout(this).apply { gravity = android.view.Gravity.CENTER }
     buttons.addView(button("−10 s", accent) { seekTo(position - 10) })
     play = button(intent.getStringExtra("playLabel") ?: "Play", accent) { toggle() }
@@ -106,8 +122,8 @@ class TrailerEmbedActivity : Activity() {
     seek = SeekBar(this).apply {
       max = 1000; progressTintList = ColorStateList.valueOf(accent); thumbTintList = ColorStateList.valueOf(accent)
       setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-        override fun onStartTrackingTouch(bar: SeekBar) { tracking = true }
-        override fun onStopTrackingTouch(bar: SeekBar) { tracking = false; seekTo(duration * bar.progress / 1000) }
+        override fun onStartTrackingTouch(bar: SeekBar) { tracking = true; handler.removeCallbacks(hideControls) }
+        override fun onStopTrackingTouch(bar: SeekBar) { tracking = false; seekTo(duration * bar.progress / 1000); scheduleHideControls() }
         override fun onProgressChanged(bar: SeekBar, progress: Int, user: Boolean) {}
       })
     }
@@ -189,6 +205,49 @@ class TrailerEmbedActivity : Activity() {
     })();""", null)
   }
   private fun toggle() { javascript(if (playing) "player.pauseVideo()" else "player.playVideo()") }
+  private fun scheduleHideControls() {
+    handler.removeCallbacks(hideControls)
+    if (playing && started && !tracking && !destroyed) handler.postDelayed(hideControls, 4000)
+  }
+  private fun showControls(focus: Boolean = false) {
+    if (destroyed) return
+    val wasVisible = controlsVisible
+    controlsVisible = true
+    for (view in listOf(header, transport)) {
+      view.animate().cancel()
+      view.visibility = View.VISIBLE
+      if (!wasVisible) view.alpha = 0f
+      view.animate().alpha(1f).setDuration(250).start()
+    }
+    if (focus) play.requestFocus()
+    scheduleHideControls()
+  }
+  override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+    if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+      suppressTouchSequence = !controlsVisible
+      showControls()
+    }
+    if (suppressTouchSequence) {
+      if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) suppressTouchSequence = false
+      return true
+    }
+    return super.dispatchTouchEvent(event)
+  }
+  override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+    val wakeKey = event.keyCode in setOf(KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER,
+      KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT)
+    if (event.action == KeyEvent.ACTION_DOWN && wakeKey && !controlsVisible) {
+      suppressKeyUp = true
+      showControls(focus = true)
+      return true
+    }
+    if (event.action == KeyEvent.ACTION_UP && suppressKeyUp && wakeKey) {
+      suppressKeyUp = false
+      return true
+    }
+    if (event.action == KeyEvent.ACTION_DOWN && controlsVisible) scheduleHideControls()
+    return super.dispatchKeyEvent(event)
+  }
   private fun seekTo(seconds: Double) { javascript("player.seekTo(${seconds.coerceIn(0.0, duration.coerceAtLeast(0.0))},true)") }
   private fun format(seconds: Double): String {
     val total = seconds.toInt().coerceAtLeast(0)
@@ -228,7 +287,12 @@ class TrailerEmbedActivity : Activity() {
       if (playing) {
         started = true
         handler.removeCallbacks(timeout)
-        if (!wasPlaying) android.util.Log.i("LumoraTrailers", "YouTube preview playing")
+        if (!wasPlaying) {
+          android.util.Log.i("LumoraTrailers", "YouTube preview playing")
+          scheduleHideControls()
+        }
+      } else if (value == 2) {
+        showControls()
       }
       if (value == 0) finish()
     } }
