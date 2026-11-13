@@ -1,7 +1,7 @@
 # Luroka repository setup
 
-The canonical repository is <https://github.com/bokrez289/Luroka>. It is private
-while the project is being tested. See [CONTRIBUTING.md](../CONTRIBUTING.md)
+The canonical repository is <https://github.com/bokrez289/Luroka>. The source is public;
+binary releases are published separately after their release checks. See [CONTRIBUTING.md](../CONTRIBUTING.md)
 for the branch, review and push workflow.
 
 ## Ongoing repository and release checks

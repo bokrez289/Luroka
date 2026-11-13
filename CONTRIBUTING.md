@@ -62,8 +62,8 @@ tvos/                  — Apple TV native (Swift)
 Android phone, Android TV, iOS/iPadOS and tvOS are being tested. Please describe
 the devices or simulators used when verifying a platform-specific change.
 
-The canonical repository is the private [bokrez289/Luroka](https://github.com/bokrez289/Luroka).
-Ask the owner for access and use a separate clone of this repository; don't push
+The canonical repository is the public [bokrez289/Luroka](https://github.com/bokrez289/Luroka).
+Fork the repository and use a separate clone for contributions; don't push
 from an older Plezy or Luroka working tree. Coordinate if others are editing the
 same files.
 
@@ -93,7 +93,7 @@ same files.
   attribution intact. Discuss dependency or license changes with the owner.
 - The repository targets Android, Android TV, iOS/iPadOS and tvOS. Check with
   the owner before adding desktop projects, changing release/signing settings,
-  publishing artifacts, or making the repository public.
+  publishing artifacts, or changing repository visibility.
 
 See [repository setup](docs/repository-setup.md) for dependency and release
 context. Coding assistants should also follow [AGENTS.md](AGENTS.md).

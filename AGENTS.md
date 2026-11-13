@@ -1,6 +1,6 @@
 # Luroka coding-agent guidance
 
-- The canonical repository is the private `bokrez289/Luroka` repository. Work
+- The canonical repository is the public `bokrez289/Luroka` repository. Work
   in the requested checkout; inspect its branch and `git status` first. Other
   developers may be working concurrently, so preserve unrelated changes and
   never reset, clean, overwrite or stage them blindly.
@@ -15,5 +15,5 @@
   attribution, and dependency provenance. Don't rename compatibility identifiers
   or upstream references without checking their purpose.
 - The source snapshot targets Android, Android TV, iOS/iPadOS and tvOS. Don't
-  add desktop platform projects, change release/signing setup or make the
-  repository public without an explicit request.
+  add desktop platform projects, change release/signing setup or change
+  repository visibility without an explicit request.
