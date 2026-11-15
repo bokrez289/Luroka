@@ -170,7 +170,8 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
       if (code == null || !attempt.confirm(code)) throw StateError('Pairing expired');
       final paired = await attempt.takeConnection();
       if (!mounted || !_requireAuthorization()) return;
-      if (paired.backend != widget.dialect.name) throw const FormatException('Wrong server type');
+      // The phone chooses between the supported backends. Validation below
+      // checks the actual server against that choice before persisting it.
       var allowHttp = false;
       if (Uri.parse(paired.baseUrl).scheme == 'http') {
         allowHttp =
@@ -229,34 +230,41 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
     final attempt = _attempt;
     final code = attempt?.checkCode;
     return AlertDialog(
-      title: Text('Connect ${widget.dialect.productName} with your phone'),
+      title: const Text('Connect Jellyfin or Emby with your phone'),
       content: SizedBox(
-        width: 440,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (_error != null)
-                Text(_error!)
-              else if (attempt == null)
-                const CircularProgressIndicator()
-              else ...[
-                const Text(
-                  'Scan the code with your phone camera or in Luroka. The invitation expires in five minutes.',
-                ),
-                const SizedBox(height: 12),
-                SecureTransferQr(data: attempt.invite.toBrowserUri().toString(), size: 240),
-                const SizedBox(height: 12),
-                const Text('TV SETUP · JELLYFIN / EMBY', style: TextStyle(fontWeight: FontWeight.w700)),
-                if (code != null) ...[
-                  const SizedBox(height: 12),
-                  Text('Check that your phone shows: $code'),
-                  const Text('Confirm the matching code on your phone, then finish sign-in there.'),
+        width: 650,
+        child: _error != null
+            ? Text(_error!)
+            : attempt == null
+            ? const Center(child: CircularProgressIndicator())
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SecureTransferQr(
+                    data: attempt.invite.toBrowserUri().toString(),
+                    size: (MediaQuery.sizeOf(context).height * .34).clamp(130.0, 220.0),
+                  ),
+                  const SizedBox(width: 24),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Scan with your phone. The invitation expires in five minutes.'),
+                        const SizedBox(height: 16),
+                        if (code == null)
+                          const Text('Waiting for your phone to connect…')
+                        else ...[
+                          const Text('Compare this code with your phone:'),
+                          Text(code, key: const ValueKey('tv-pairing-check-code'),
+                              style: Theme.of(context).textTheme.headlineMedium),
+                          const Text('If the codes match, confirm on your phone.'),
+                        ],
+                      ],
+                    ),
+                  ),
                 ],
-              ],
-            ],
-          ),
-        ),
+              ),
       ),
       actions: [DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(context))],
     );

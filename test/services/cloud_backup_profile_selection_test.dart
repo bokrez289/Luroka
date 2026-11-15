@@ -117,6 +117,9 @@ void main() {
     CredentialVault.resetKeyForTesting();
     final restored = AppDatabase.forTesting(NativeDatabase.memory());
     addTearDown(restored.close);
+    // Full device logout leaves this empty document rather than removing the
+    // preference. Restoring the selected parent and child must still work.
+    await (await BaseSharedPreferencesService.sharedCache()).setString('luroka_kids_profiles_v1', '{}');
     await LurokaBackupSnapshot.restore(restored, encrypted, 'strong test phrase');
     expect((await restored.select(restored.profiles).get()).map((p) => p.id).toSet(), {'adult-one', 'child-one'});
     expect((await restored.select(restored.connections).get()).map((c) => c.id), [first.id]);

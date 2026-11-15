@@ -14,9 +14,11 @@ import 'package:luroka/profiles/profile.dart';
 import 'package:luroka/profiles/profile_registry.dart';
 import 'package:luroka/screens/profile/cloud_backup_actions.dart';
 import 'package:luroka/services/cloud_backup_client.dart';
+import 'package:luroka/services/cloud_backup_recovery.dart';
 import 'package:luroka/services/file_picker_service.dart';
 import 'package:luroka/services/kids_profile_service.dart';
 import 'package:luroka/services/settings_service.dart';
+import 'package:luroka/services/secure_server_pairing_client.dart';
 import 'package:luroka/utils/platform_detector.dart';
 import 'package:luroka/widgets/dialog_action_button.dart';
 import 'package:provider/provider.dart';
@@ -86,6 +88,63 @@ void main() {
     SettingsService.resetForTesting();
     FilePickerService.setDelegateForTesting(null);
     TvDetectionService.debugSetAppleTVOverride(null);
+  });
+
+  testWidgets('restore shows progress while the cloud request is pending', (tester) async {
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+    final gate = Completer<http.Response>();
+    final client = CloudBackupClient.forTesting(
+      client: MockClient((_) => gate.future),
+      endpoint: Uri.https('backup.invalid', '/v1/backups'),
+    );
+    await tester.pumpWidget(Provider<AppDatabase>.value(
+      value: db,
+      child: MaterialApp(home: Scaffold(body: Builder(builder: (context) => TextButton(
+        onPressed: () => unawaited(showCloudBackupRestore(context, client: client)),
+        child: const Text('Start restore'),
+      )))),
+    ));
+    await tester.tap(find.text('Start restore'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), CloudBackupRecoveryCode.generate().reveal());
+    await tester.tap(find.text('Review'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Finding and opening your encrypted backup…'), findsOneWidget);
+    gate.complete(http.Response('', 404));
+    await _waitForWidget(tester, find.textContaining('No cloud backup was found'));
+    expect(find.textContaining('No cloud backup was found'), findsOneWidget);
+  });
+
+  testWidgets('TV restore QR fits within the dialog on a 540p viewport', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    tester.view.physicalSize = const Size(960, 540);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+    final relay = ServerPairingClient.forTesting(
+      client: MockClient((request) async => http.Response(request.method == 'GET' ? '{}' : '',
+          request.method == 'POST' ? 201 : request.method == 'GET' ? 200 : 204)),
+      base: Uri.https('connect.invalid'),
+    );
+    await tester.pumpWidget(Provider<AppDatabase>.value(
+      value: db,
+      child: MaterialApp(home: Scaffold(body: Builder(builder: (context) => TextButton(
+        onPressed: () => unawaited(showCloudBackupRestore(context, pairingClient: relay)),
+        child: const Text('Start restore'),
+      )))),
+    ));
+    await tester.tap(find.text('Start restore'));
+    await _waitForWidget(tester, find.byKey(const ValueKey('tv-restore-transfer-qr')));
+    final qr = tester.getRect(find.byKey(const ValueKey('tv-restore-transfer-qr')));
+    final dialog = tester.getRect(find.byType(AlertDialog).last);
+    expect(dialog.contains(qr.topLeft), isTrue);
+    expect(dialog.contains(qr.bottomRight - const Offset(1, 1)), isTrue);
+    expect(qr.height, qr.width);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets('backup shows recovery code before any upload and allows cancellation', (tester) async {

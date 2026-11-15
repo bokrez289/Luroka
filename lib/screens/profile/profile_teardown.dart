@@ -24,6 +24,7 @@ import '../../providers/multi_server_provider.dart';
 import '../../providers/playback_state_provider.dart';
 import '../../services/multi_server_manager.dart';
 import '../../services/storage_service.dart';
+import '../../services/kids_profile_service.dart';
 import '../../services/profile_appearance_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/system_shelf_service.dart';
@@ -201,7 +202,20 @@ Future<bool> confirmAndDeleteProfile(
 Future<void> deleteProfile(BuildContext context, Profile profile) async {
   final scope = SessionTeardownScope.of(context);
   final endedOwner = scope.active.activeId == profile.id ? profile.id : null;
-  await withEndedProfileSession(scope, endedOwner, () async {
+  final progress = endedOwner == null ? null : ScopedLoadingDialogController();
+  if (progress != null) {
+    progress.show(scope.navigator.context, builder: (_) => const PopScope(
+      canPop: false,
+      child: Dialog.fullscreen(child: Center(child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [CircularProgressIndicator(), SizedBox(height: 20), Text('Removing profile…')],
+      ))),
+    ));
+    await progress.ready;
+    await WidgetsBinding.instance.endOfFrame;
+  }
+  try {
+    await withEndedProfileSession(scope, endedOwner, () async {
     await scope.downloads.deleteDownloadsForProfile(profile.id);
     await scope.database.deleteSyncRulesForProfile(profile.id);
     await scope.database.deleteDownloadCollectionsForProfile(profile.id);
@@ -219,7 +233,11 @@ Future<void> deleteProfile(BuildContext context, Profile profile) async {
     await scope.storage.clearUserScopedPreferencesForProfile(profile.id);
 
     await settleSessionAfterRemoval(scope, endedShelfOwner: endedOwner);
-  });
+    });
+    if (progress != null) await WidgetsBinding.instance.endOfFrame;
+  } finally {
+    await progress?.dismiss();
+  }
 }
 
 /// Ends [endedOwner]'s system-shelf session (when non-null), runs [body], and
@@ -365,9 +383,9 @@ Future<bool> confirmAndLogoutAllProfiles(BuildContext context) async {
   if (!await ensureParentAccess(context) || !context.mounted) return false;
   final confirmed = await showConfirmDialog(
     context,
-    title: t.common.logout,
+    title: t.profiles.signOutDevice,
     message: t.messages.logoutDeviceConfirm,
-    confirmText: t.common.logout,
+    confirmText: t.profiles.signOutDevice,
     isDestructive: true,
   );
   if (!confirmed || !context.mounted) return false;
@@ -381,9 +399,64 @@ Future<bool> confirmAndLogoutAllProfiles(BuildContext context) async {
   }
 }
 
+/// Remove the active local profile only when another local adult remains and
+/// no child is left without its linked parent.
+Future<void> confirmAndRemoveCurrentProfile(BuildContext context) async {
+  final active = context.read<ActiveProfileProvider>();
+  final profile = active.active;
+  final kids = KidsProfileService.instance;
+  bool eligible() => profile != null && profile.isLocal && active.activeId == profile.id && !kids.isActiveKids &&
+      active.profiles.any((p) => p.id != profile.id && p.isLocal && !kids.isKids(p.id)) &&
+      !active.profiles.any((p) => kids.parentFor(p.id) == profile.id);
+  if (!eligible() || !await ensureParentAccess(context) || !context.mounted || !eligible()) return;
+  final confirmed = await showConfirmDialog(
+    context,
+    title: t.profiles.deleteProfileTitle,
+    message: 'Remove ${profile!.displayName} from this device? This deletes the profile’s local settings, activity and downloads. Other profiles remain.',
+    confirmText: t.profiles.deleteProfileButton,
+    isDestructive: true,
+  );
+  if (!confirmed || !context.mounted || !eligible()) return;
+  try {
+    await deleteProfile(context, profile);
+  } catch (error, stackTrace) {
+    appLogger.w('Failed to remove current profile', error: error, stackTrace: stackTrace);
+    if (context.mounted) await showErrorDialog(context, t.errors.failedToDeleteProfile(displayName: profile.displayName));
+  }
+}
+
 /// Full device logout clears profiles, credentials, downloads, and account
 /// data, then returns to the first sign-in screen. The caller confirms first.
 Future<void> logoutAllProfiles(BuildContext context) async {
+  final progress = ScopedLoadingDialogController();
+  final rootNavigator = Navigator.of(context, rootNavigator: true);
+  progress.show(rootNavigator.context, builder: (_) => const PopScope(
+    canPop: false,
+    child: Dialog.fullscreen(
+      child: Center(child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 20),
+          Text('Signing out of this device…'),
+        ],
+      )),
+    ),
+  ));
+  try {
+    await progress.ready;
+    if (!context.mounted) return;
+    // Paint the opaque transition before server/profile notifications rebuild
+    // the outgoing Discover page with its now-disconnected session.
+    await WidgetsBinding.instance.endOfFrame;
+    if (!context.mounted) return;
+    await _logoutAllProfiles(context);
+  } finally {
+    await progress.dismiss();
+  }
+}
+
+Future<void> _logoutAllProfiles(BuildContext context) async {
   final scope = SessionTeardownScope.of(context);
   final accountPreferences = context.read<AccountPreferencesController>();
   final companionRemote = context.read<CompanionRemoteProvider>();
@@ -411,7 +484,10 @@ Future<void> logoutAllProfiles(BuildContext context) async {
   await ProfileAppearanceService.instance.clearForLogout();
   await scope.connections.clear();
   await scope.plexHome.clearAll();
-  await scope.storage.clearActiveProfileId();
+  // Clear the provider as well as the persisted marker before returning to
+  // sign-in. Otherwise a new server can bind to the previous in-memory user.
+  await scope.active.clearActiveProfile();
+  await scope.active.reloadFromStorage();
   await scope.storage.clearAllProfileLastUsed();
   await scope.storage.clearAllUserScopedPreferences();
   // Queued watch actions, sync rules and downloads' collection membership are

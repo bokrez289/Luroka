@@ -790,6 +790,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       unawaited(_handleLogout());
       return;
     }
+    if (value == 'remove_current_profile') {
+      await confirmAndRemoveCurrentProfile(context);
+      return;
+    }
     if (value == 'switch_profile') {
       _handleSwitchProfile(context);
       return;

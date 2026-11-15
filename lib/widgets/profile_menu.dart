@@ -5,6 +5,7 @@ import '../i18n/strings.g.dart';
 import '../profiles/active_profile_provider.dart';
 import '../profiles/profile.dart';
 import '../profiles/profile_avatar.dart';
+import '../services/kids_profile_service.dart';
 import 'app_icon.dart';
 import 'app_menu.dart';
 
@@ -20,6 +21,10 @@ List<AppMenuEntry<String>> buildProfileMenuEntries({
   bool showDirectProfiles = false,
 }) {
   final active = provider.active;
+  final kids = KidsProfileService.instance;
+  final canRemoveCurrent = active != null && active.isLocal && !isKids &&
+      provider.profiles.any((p) => p.id != active.id && p.isLocal && !kids.isKids(p.id)) &&
+      !provider.profiles.any((p) => kids.parentFor(p.id) == active.id);
   final switchable = showDirectProfiles ? provider.pickerProfiles.where((p) => p.id != active?.id) : <Profile>[];
   return [
     if (active != null)
@@ -60,6 +65,13 @@ List<AppMenuEntry<String>> buildProfileMenuEntries({
       AppMenuItem<String>(value: 'together', icon: Symbols.group_rounded, label: t.watchTogether.title),
     if (!isKids) ...[
       const AppMenuDivider<String>(),
+      if (canRemoveCurrent)
+        AppMenuItem<String>(
+          value: 'remove_current_profile',
+          icon: Symbols.person_remove_rounded,
+          label: t.profiles.deleteProfileButton,
+          destructive: true,
+        ),
       AppMenuItem<String>(
         value: 'logout',
         icon: Symbols.logout_rounded,

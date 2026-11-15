@@ -370,7 +370,8 @@ class _AuthScreenState extends State<AuthScreen> {
           fadeRoute(const SetupScreen(databaseRecoveryOutcome: TvosDatabaseRecoveryOutcome.notApplicable)),
         ),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      appLogger.e('Failed to activate restored backup', error: error, stackTrace: stackTrace);
       if (mounted) setState(() => _loadingRestore = false);
     }
   }
@@ -392,7 +393,14 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget _buildAuthBody() {
     if (_backupRestored) {
       return _loadingRestore
-          ? const Center(child: CircularProgressIndicator())
+          ? const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Loading your restored profiles and connections…', textAlign: TextAlign.center),
+              ],
+            )
           : Column(
               mainAxisSize: MainAxisSize.min,
               children: [

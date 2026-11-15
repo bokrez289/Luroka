@@ -45,10 +45,10 @@ class _AdultProfile extends ChangeNotifier implements ActiveProfileProvider {
 }
 
 void main() {
-  for (final scenario in [(false, false), (true, false), (false, true)]) {
-    final (firstRun, useHttp) = scenario;
+  for (final scenario in [(false, false, false), (true, false, false), (false, true, false), (true, false, true)]) {
+    final (firstRun, useHttp, chooseEmby) = scenario;
     testWidgets(
-      'phone and TV pair ${firstRun ? 'on first run' : 'with an adult profile'} over ${useHttp ? 'HTTP with approval' : 'HTTPS'} without exposing credentials',
+      'phone and TV pair ${firstRun ? 'on first run' : 'with an adult profile'} over ${useHttp ? 'HTTP with approval' : 'HTTPS'} with Emby=$chooseEmby without exposing credentials',
       (tester) async {
         tester.view.physicalSize = const Size(1600, 900);
         tester.view.devicePixelRatio = 1;
@@ -87,7 +87,8 @@ void main() {
           expect(request.followRedirects, isFalse);
           if (request.url.path == '/System/Info/Public') {
             expect(request.headers.containsKey('Authorization'), isFalse);
-            return http.Response('{"Id":"server-id","ServerName":"Private home","ProductName":"Jellyfin Server"}', 200);
+            return http.Response(jsonEncode({'Id': 'server-id', 'ServerName': 'Private home',
+              'ProductName': chooseEmby ? 'Emby Server' : 'Jellyfin Server'}), 200);
           }
           if (request.url.path == '/Users/AuthenticateByName') {
             expect(jsonDecode(request.body), {'Username': 'Alice', 'Pw': 'private-password'});
@@ -156,8 +157,17 @@ void main() {
         await tester.pump(const Duration(seconds: 2));
         await _pumpUi(tester);
         expect(find.text('Codes match'), findsOneWidget);
+        final tvCode = tester.widget<Text>(find.byKey(const ValueKey('tv-pairing-check-code'))).data!;
+        expect(find.text('Check that your TV shows the same code: $tvCode'), findsOneWidget);
         await tester.tap(find.text('Codes match'));
         await _pumpUi(tester);
+        expect(find.text('Server type'), findsOneWidget);
+        expect(find.text('Emby'), findsOneWidget);
+        expect(find.text('Jellyfin'), findsOneWidget);
+        if (chooseEmby) {
+          await tester.tap(find.text('Emby'));
+          await tester.pump();
+        }
         await tester.enterText(
           find.widgetWithText(TextField, 'Server URL'),
           '${useHttp ? 'http' : 'https'}://media.example',
@@ -186,6 +196,7 @@ void main() {
           await _pumpUi(tester);
         }
         expect(result?.userName, 'Alice');
+        expect(result?.dialect, chooseEmby ? MediaBrowserDialect.emby : MediaBrowserDialect.jellyfin);
         expect(result?.accessToken, 'private-token');
         final observed = relayTraffic.join('\n');
         for (final secret in ['media.example', 'Private home', 'Alice', 'private-password', 'private-token']) {
