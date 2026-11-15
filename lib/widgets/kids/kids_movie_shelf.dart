@@ -467,7 +467,7 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.video_library_rounded, size: 12, color: Colors.white),
+                                    const Icon(Icons.file_copy_rounded, size: 12, color: Colors.white),
                                     const SizedBox(width: 3),
                                     Text(
                                       '$copyCount',

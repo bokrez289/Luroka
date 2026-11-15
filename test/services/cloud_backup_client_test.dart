@@ -84,6 +84,22 @@ void main() {
     await expectLater(client.create({'profile': 'test'}), throwsA(isA<CloudBackupException>()));
   });
 
+  test('restore distinguishes a missing backup from a service failure', () async {
+    final code = CloudBackupRecoveryCode.generate();
+    for (final status in [404, 429, 503]) {
+      final client = CloudBackupClient.forTesting(
+        client: MockClient((_) async => http.Response('', status)),
+        endpoint: Uri.https('backup.invalid', '/v1/backups'),
+      );
+      await expectLater(
+        client.prepareRestore(code),
+        throwsA(status == 404
+            ? isA<CloudBackupNotFoundException>()
+            : isA<CloudBackupHttpException>().having((e) => e.statusCode, 'status', status)),
+      );
+    }
+  });
+
   test('selected snapshot can be restored into a clean installation', () async {
     resetSharedPreferencesForTest();
     CredentialVault.resetKeyForTesting();

@@ -40,6 +40,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
   bool _recoveryTransfer = false;
   PhonePairingAttempt? _attempt;
   String _backend = 'jellyfin';
+  String _scheme = 'https';
   bool _confirmed = false;
   bool _busy = false;
   bool _sent = false;
@@ -149,7 +150,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
     final clients = [
       for (final id in servers?.onlineServerIds ?? <String>[])
         if (servers?.getClientForServer(ServerId(id)) case final JellyfinClient client)
-          if (Uri.tryParse(client.connection.baseUrl)?.scheme == 'https') client,
+          if (const {'http', 'https'}.contains(Uri.tryParse(client.connection.baseUrl)?.scheme)) client,
     ];
     if (clients.isEmpty) return const [];
     return [
@@ -163,6 +164,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
               ? null
               : () => setState(() {
                   _server.text = client.connection.baseUrl;
+                  _scheme = Uri.parse(client.connection.baseUrl).scheme;
                   _username.text = client.connection.userName;
                   _backend = client.connection.dialect.name;
                 }),
@@ -183,10 +185,26 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
     final attempt = _attempt;
     if (_busy || !_confirmed || attempt == null || !_requireAuthorization()) return;
     final input = _server.text.trim();
-    final server = Uri.tryParse(input.contains('://') ? input : 'https://$input');
-    if (server == null || server.scheme != 'https' || server.host.isEmpty) {
-      setState(() => _error = 'Pairing requires HTTPS with a trusted certificate.');
+    final server = Uri.tryParse(input.contains('://') ? input : '$_scheme://$input');
+    if (server == null || !const {'http', 'https'}.contains(server.scheme) || server.host.isEmpty) {
+      setState(() => _error = 'Enter a valid HTTP or HTTPS server address.');
       return;
+    }
+    if (server.scheme == 'http') {
+      final approved = await showDialog<bool>(
+        context: context,
+        builder: (dialog) => AlertDialog(
+          title: const Text('Use HTTP for this server?'),
+          content: const Text(
+            'Your server login and media traffic will not be encrypted. People on the network may be able to read them. HTTPS is recommended. The Luroka transfer stays encrypted.',
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialog, false), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(dialog, true), child: const Text('Use HTTP')),
+          ],
+        ),
+      );
+      if (approved != true || !_requireAuthorization()) return;
     }
     final username = _username.text;
     final password = _password.text;
@@ -203,7 +221,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
         baseUrl: server.toString(),
         username: username,
         password: password,
-        allowInsecureHttp: false,
+        allowInsecureHttp: server.scheme == 'http',
       );
       if (!_requireAuthorization()) return;
       sending = true;
@@ -264,7 +282,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
       );
       if (!mounted) return;
       if (servers.isEmpty) {
-        setState(() => _error = 'No servers found. Enter the HTTPS server address manually.');
+        setState(() => _error = 'No servers found. Enter the server address manually.');
         return;
       }
       final selected = await showDialog<String>(
@@ -293,6 +311,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
       if (mounted && selected != null) {
         setState(() {
           _server.text = selected;
+          _scheme = Uri.tryParse(selected)?.scheme == 'http' ? 'http' : 'https';
         });
       }
     } catch (_) {
@@ -336,111 +355,172 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
   Widget build(BuildContext context) {
     final attempt = _attempt;
     return Scaffold(
-      appBar: AppBar(title: const Text('Connect a TV')),
+      appBar: AppBar(title: Text(_recoveryTransfer ? 'Restore on your TV' : 'Connect a TV')),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (_sent)
-                Text(
-                  _recoveryTransfer
-                      ? 'Recovery code sent. Continue on your TV.'
-                      : 'Connection sent. Finish setup on your TV.',
-                )
-              else if (attempt == null) ...[
-                const Text('Scan the TV code or paste the invitation.'),
-                OutlinedButton.icon(
-                  onPressed: _busy ? null : _scan,
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: const Text('Scan TV code'),
-                ),
-                TextField(
-                  controller: _invite,
-                  autocorrect: false,
-                  enableSuggestions: false,
-                  decoration: const InputDecoration(labelText: 'TV invitation'),
-                ),
-                const SizedBox(height: 16),
-                FilledButton(onPressed: _busy ? null : _join, child: const Text('Connect')),
-              ] else if (!_confirmed) ...[
-                Text('Check that your TV shows the same code: ${attempt.checkCode}'),
-                const SizedBox(height: 16),
-                FilledButton(onPressed: _busy ? null : _confirm, child: const Text('Codes match')),
-              ] else if (_recoveryTransfer) ...[
-                const Text('Scan or paste your saved recovery code. It will be encrypted for your TV.'),
-                TextField(
-                  controller: _recovery,
-                  obscureText: true,
-                  autocorrect: false,
-                  enableSuggestions: false,
-                  decoration: const InputDecoration(labelText: 'Recovery code'),
-                ),
-                TextButton.icon(
-                  onPressed: _busy
-                      ? null
-                      : () async {
-                          final code = await scanSecureTransferQr(context, SecureTransferQrKind.recovery);
-                          if (mounted && code != null) _recovery.text = code;
-                        },
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: const Text('Scan recovery code'),
-                ),
-                FilledButton(onPressed: _busy || _terminal ? null : _sendRecovery, child: const Text('Send to TV')),
-              ] else ...[
-                ..._savedServerChoices(),
-                const Text('Sign in to your server. Your password is sent to that server, not to Luroka.'),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  key: ValueKey(_backend),
-                  initialValue: _backend,
-                  items: const [
-                    DropdownMenuItem(value: 'jellyfin', child: Text('Jellyfin')),
-                    DropdownMenuItem(value: 'emby', child: Text('Emby')),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    margin: const EdgeInsets.only(bottom: 24),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          _recoveryTransfer ? Icons.settings_backup_restore_rounded : Icons.connected_tv_rounded,
+                          size: 40,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          _recoveryTransfer
+                              ? 'Your profiles, back on the big screen'
+                              : 'A little help for your big screen',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _recoveryTransfer
+                              ? 'Send your private recovery code to your TV. Review the backup there before restoring.'
+                              : 'Connect Jellyfin or Emby without typing with a remote. Scan, compare, then sign in.',
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_busy) const LinearProgressIndicator(),
+                  if (_sent)
+                    Text(
+                      _recoveryTransfer
+                          ? 'Recovery code sent. Continue on your TV.'
+                          : 'Connection sent. Finish setup on your TV.',
+                    )
+                  else if (attempt == null) ...[
+                    const Text('Scan the TV code or paste the invitation.'),
+                    OutlinedButton.icon(
+                      onPressed: _busy ? null : _scan,
+                      icon: const Icon(Icons.qr_code_scanner),
+                      label: const Text('Scan TV code'),
+                    ),
+                    TextField(
+                      controller: _invite,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: const InputDecoration(labelText: 'TV invitation'),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(onPressed: _busy ? null : _join, child: const Text('Connect')),
+                  ] else if (!_confirmed) ...[
+                    Text('Check that your TV shows the same code: ${attempt.checkCode}'),
+                    const SizedBox(height: 16),
+                    FilledButton(onPressed: _busy ? null : _confirm, child: const Text('Codes match')),
+                  ] else if (_recoveryTransfer) ...[
+                    const Text('Scan or paste your saved recovery code. It will be encrypted for your TV.'),
+                    TextField(
+                      controller: _recovery,
+                      obscureText: true,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: const InputDecoration(labelText: 'Recovery code'),
+                    ),
+                    TextButton.icon(
+                      onPressed: _busy
+                          ? null
+                          : () async {
+                              final code = await scanSecureTransferQr(context, SecureTransferQrKind.recovery);
+                              if (mounted && code != null) _recovery.text = code;
+                            },
+                      icon: const Icon(Icons.qr_code_scanner),
+                      label: const Text('Scan recovery code'),
+                    ),
+                    FilledButton(onPressed: _busy || _terminal ? null : _sendRecovery, child: const Text('Send to TV')),
+                  ] else ...[
+                    ..._savedServerChoices(),
+                    const Text('Sign in to your server. Your password is sent to that server, not to Luroka.'),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      key: ValueKey(_backend),
+                      initialValue: _backend,
+                      items: const [
+                        DropdownMenuItem(value: 'jellyfin', child: Text('Jellyfin')),
+                        DropdownMenuItem(value: 'emby', child: Text('Emby')),
+                      ],
+                      onChanged: _busy
+                          ? null
+                          : (value) {
+                              if (value != null) setState(() => _backend = value);
+                            },
+                    ),
+                    TextButton.icon(
+                      onPressed: _busy ? null : _findServers,
+                      icon: const Icon(Icons.travel_explore),
+                      label: const Text('Find servers on this network'),
+                    ),
+                    const SizedBox(height: 16),
+                    SegmentedButton<String>(
+                      segments: const [
+                        ButtonSegment(value: 'https', label: Text('HTTPS'), icon: Icon(Icons.lock_outline)),
+                        ButtonSegment(value: 'http', label: Text('HTTP'), icon: Icon(Icons.lock_open)),
+                      ],
+                      selected: {_scheme},
+                      onSelectionChanged: _busy
+                          ? null
+                          : (values) => setState(() {
+                              _scheme = values.single;
+                              final uri = Uri.tryParse(_server.text.trim());
+                              if (uri != null && uri.hasScheme) _server.text = uri.replace(scheme: _scheme).toString();
+                            }),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _server,
+                      onChanged: (value) {
+                        final scheme = Uri.tryParse(value.trim())?.scheme;
+                        if (scheme == 'http' || scheme == 'https') setState(() => _scheme = scheme!);
+                      },
+                      keyboardType: TextInputType.url,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: InputDecoration(
+                        labelText: 'Server URL',
+                        hintText: 'media.example.com',
+                        helperText: 'Default: $_scheme://',
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                    TextField(
+                      controller: _username,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: const InputDecoration(labelText: 'Username'),
+                    ),
+                    TextField(
+                      controller: _password,
+                      obscureText: true,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: const InputDecoration(labelText: 'Password'),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: _busy || _terminal ? null : _authenticateAndSend,
+                      child: const Text('Sign in and send'),
+                    ),
                   ],
-                  onChanged: _busy
-                      ? null
-                      : (value) {
-                          if (value != null) setState(() => _backend = value);
-                        },
-                ),
-                TextButton.icon(
-                  onPressed: _busy ? null : _findServers,
-                  icon: const Icon(Icons.travel_explore),
-                  label: const Text('Find servers on this network'),
-                ),
-                TextField(
-                  controller: _server,
-                  keyboardType: TextInputType.url,
-                  autocorrect: false,
-                  enableSuggestions: false,
-                  decoration: const InputDecoration(labelText: 'Server URL', hintText: 'https://'),
-                ),
-                TextField(
-                  controller: _username,
-                  autocorrect: false,
-                  enableSuggestions: false,
-                  decoration: const InputDecoration(labelText: 'Username'),
-                ),
-                TextField(
-                  controller: _password,
-                  obscureText: true,
-                  autocorrect: false,
-                  enableSuggestions: false,
-                  decoration: const InputDecoration(labelText: 'Password'),
-                ),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: _busy || _terminal ? null : _authenticateAndSend,
-                  child: const Text('Sign in and send'),
-                ),
-              ],
-              if (_error != null) ...[
-                const SizedBox(height: 12),
-                Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-              ],
-            ],
+                  if (_error != null) ...[
+                    const SizedBox(height: 12),
+                    Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
       ),

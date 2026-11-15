@@ -100,44 +100,86 @@ class _ScannerScreenState extends State<_ScannerScreen> with WidgetsBindingObser
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Scan QR code')),
-    body: Stack(
-      fit: StackFit.expand,
-      children: [
-        QRView(
-          key: _qrKey,
-          onQRViewCreated: _created,
-          formatsAllowed: const [BarcodeFormat.qrcode],
-          onPermissionSet: (_, granted) {
-            if (mounted) setState(() => _cameraUnavailable = !granted);
-          },
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: DecoratedBox(
-                decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(12)),
+    appBar: AppBar(
+      title: Text(widget.kind == SecureTransferQrKind.recovery ? 'Scan backup recovery code' : 'Scan TV invitation'),
+    ),
+    body: LayoutBuilder(
+      builder: (context, bounds) => Column(
+        children: [
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final cutout = (constraints.biggest.shortestSide * .78).clamp(100.0, 360.0);
+                return QRView(
+                  key: _qrKey,
+                  onQRViewCreated: _created,
+                  formatsAllowed: const [BarcodeFormat.qrcode],
+                  overlay: QrScannerOverlayShape(
+                    borderColor: widget.kind == SecureTransferQrKind.recovery
+                        ? Colors.tealAccent
+                        : Colors.lightBlueAccent,
+                    borderRadius: 16,
+                    borderLength: 32,
+                    borderWidth: 4,
+                    cutOutSize: cutout,
+                  ),
+                  onPermissionSet: (_, granted) {
+                    if (mounted) setState(() => _cameraUnavailable = !granted);
+                  },
+                );
+              },
+            ),
+          ),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: bounds.maxHeight * .5),
+            child: SingleChildScrollView(
+              child: SafeArea(
+                top: false,
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    _cameraUnavailable
-                        ? 'Camera unavailable. Go back to enter the code manually, or allow camera access in device settings.'
-                        : _unrecognizedCode
-                        ? widget.kind == SecureTransferQrKind.recovery
-                              ? 'That is not a backup recovery code. Scan the QR shown when you saved your backup recovery code.'
-                              : 'That is not a TV invitation. Scan the QR shown on the TV connection screen.'
-                        : 'Center the entire QR code in the camera, including its white border. Move closer if needed. Scanning happens on your device.',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white),
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            widget.kind == SecureTransferQrKind.recovery
+                                ? Icons.settings_backup_restore
+                                : Icons.connected_tv,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            widget.kind == SecureTransferQrKind.recovery ? 'BACKUP RECOVERY' : 'TV CONNECTION',
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        _cameraUnavailable
+                            ? 'Camera unavailable. Allow camera access in device settings or enter the code manually.'
+                            : _unrecognizedCode
+                            ? widget.kind == SecureTransferQrKind.recovery
+                                  ? 'This is not a saved backup code. For a TV invitation, use Connect a TV instead.'
+                                  : 'This is not a TV invitation. For a saved backup code, use Restore cloud backup instead.'
+                            : 'Fit the whole QR and its white border inside the frame. Keep your phone steady; move back slightly if the image is blurry. Avoid reflections on the TV.',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      TextButton.icon(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.keyboard_outlined),
+                        label: const Text('Enter code manually instead'),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }

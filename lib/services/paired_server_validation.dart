@@ -9,15 +9,14 @@ import 'secure_server_pairing_client.dart';
 
 /// Validate the target server and token before persisting a paired connection.
 /// The phone must authenticate with a new TV-specific device ID, not reuse the
-/// phone's existing session. Pairing requires trusted HTTPS; the legacy
-/// allowInsecureHttp argument cannot bypass that requirement.
+/// phone's existing session. HTTP requires explicit approval on the TV.
 Future<JellyfinConnection> validatePairedServer(
   PairedServerConnection paired, {
   required http.Client client,
   bool allowInsecureHttp = false,
 }) async {
   final base = Uri.parse(paired.baseUrl);
-  if (base.scheme != 'https') {
+  if (base.scheme != 'https' && !(base.scheme == 'http' && allowInsecureHttp)) {
     throw const FormatException('A secure server connection is required');
   }
   final prefix = base.pathSegments.where((part) => part.isNotEmpty).toList();
@@ -45,7 +44,7 @@ Future<JellyfinConnection> validatePairedServer(
   // server whose identity differs from the one approved on the phone.
   final info = await getJson(endpoint(['System', 'Info', 'Public']));
   if (info['Id'] != paired.serverId) throw const FormatException('Server verification failed');
-  // Server identity and tokens are verified only over trusted HTTPS.
+  // No redirects or implicit downgrade from HTTPS are permitted.
   final product = info['ProductName'];
   if (product is String) {
     final normalized = product.toLowerCase();

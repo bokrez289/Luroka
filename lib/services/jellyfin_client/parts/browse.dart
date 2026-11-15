@@ -2982,8 +2982,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   }
 
   /// Stamp Emby's zero-position Next Up rows with their series' newest play
-  /// date and apply the [_nextUpDateCutoff] window Jellyfin enforces
-  /// server-side.
+  /// date without changing the membership of Emby's server-provided shelf.
   ///
   /// A Next Up episode has never been played, so its own `UserData` carries no
   /// date and the shelf's recency sort would degrade to when the episode was
@@ -2997,55 +2996,23 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   }) async {
     if (rows.isEmpty) return rows;
     final scannedSeries = await _fetchRecentlyPlayedSeriesIds(parentId: parentId, abort: abort);
-    final recentSeries = _withinNextUpCutoff(scannedSeries, _nextUpDateCutoff());
-    // An incomplete or failed enrichment scan must not hide server-provided
-    // Next Up rows. Only exclude a series with a known out-of-window date.
-    final expiredSeries = scannedSeries.map((entry) => entry.$1).toSet()
-      ..removeAll(recentSeries.map((entry) => entry.$1));
-    final lastPlayedBySeries = {for (final (seriesId, lastPlayed) in recentSeries) seriesId: lastPlayed};
+    // Emby's hide-aware resume response is authoritative. History enriches
+    // sorting only; a Jellyfin-specific cutoff must never remove its rows.
+    final lastPlayedBySeries = {for (final (seriesId, lastPlayed) in scannedSeries) seriesId: lastPlayed};
     return [
       for (final row in rows)
-        if (!expiredSeries.contains(row['SeriesId']))
-          if (lastPlayedBySeries[row['SeriesId']] case final lastPlayed?)
-            {
-              ...row,
-              // Tolerant read: a dto whose `UserData` is absent or not an object
-              // still gets a date rather than raising past the shelf's guards.
-              'UserData': {
-                ...?(row['UserData'] is Map<String, dynamic> ? row['UserData'] as Map<String, dynamic> : null),
-                'LastPlayedDate': lastPlayed,
-              },
-            }
-          else
-            row,
-    ];
-  }
-
-  /// Drop series whose newest play predates [cutoff], the window Jellyfin's own
-  /// `/Shows/NextUp` applies through `NextUpDateCutoff`.
-  ///
-  /// Measured on Emby 4.9.5: nothing on the server applies the window — a
-  /// `NextUpDateCutoff` of 2030 still returned the row that a 2019 cutoff did,
-  /// while Jellyfin 10.11 returned nothing for a future cutoff. Without this the
-  /// Next Up shelf would resurrect series the user abandoned years ago that
-  /// Jellyfin hides.
-  ///
-  /// Filtered here rather than on the server because Emby has no played-date
-  /// filter for this scan: `MinDatePlayed` and `MinDateLastPlayed` are both
-  /// silently ignored (`TotalRecordCount` unchanged at 53 with a cutoff of 2030),
-  /// while `MinDateLastSaved`, `MinDateCreated` and `MinPremiereDate` do filter
-  /// but on unrelated dates. The scan's own cap therefore still counts rows
-  /// outside the window; that only shortens an already best-effort shelf.
-  ///
-  /// A series the server gave no date for is kept: the date is missing only when
-  /// the server withheld it, and an unfiltered row is a better failure than a
-  /// silently empty shelf.
-  List<(String, String?)> _withinNextUpCutoff(List<(String, String?)> series, String? cutoff) {
-    final threshold = cutoff == null ? null : DateTime.tryParse(cutoff);
-    if (threshold == null) return series;
-    return [
-      for (final entry in series)
-        if (entry.$2 == null || !(DateTime.tryParse(entry.$2!)?.isBefore(threshold) ?? false)) entry,
+        if (lastPlayedBySeries[row['SeriesId']] case final lastPlayed?)
+          {
+            ...row,
+            // Tolerant read: a dto whose `UserData` is absent or not an object
+            // still gets a date rather than raising past the shelf's guards.
+            'UserData': {
+              ...?(row['UserData'] is Map<String, dynamic> ? row['UserData'] as Map<String, dynamic> : null),
+              'LastPlayedDate': lastPlayed,
+            },
+          }
+        else
+          row,
     ];
   }
 
@@ -3057,8 +3024,8 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   /// signal Emby exposes for series: a series dto carries neither a usable
   /// `PlayCount` nor a `DatePlayed` sort key, so the episodes have to supply the
   /// order. Because the rows arrive newest-first, the first row naming a series
-  /// *is* that series' newest play, so this one request yields both the cutoff
-  /// input and the timestamp each of [_stampEmbyNextUpRows]'s rows needs — no
+  /// *is* that series' newest play, so this one request yields the
+  /// timestamp each of [_stampEmbyNextUpRows]'s rows needs — no
   /// per-series enrichment round trip.
   Future<List<(String, String?)>> _fetchRecentlyPlayedSeriesIds({String? parentId, AbortController? abort}) async {
     final rows = await _safeFetchItemsArray(

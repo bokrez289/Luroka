@@ -216,7 +216,11 @@ class AppearanceWorkspaceState extends State<AppearanceWorkspace> {
     final navigable = Focus(
       canRequestFocus: false,
       onKeyEvent: (_, event) {
-        if (event.logicalKey.isBackKey && _scopes[_selected].hasFocus) {
+        // Embedded TV settings use Back to return to the category rail.
+        // Standalone appearance keeps its own tab-level navigation.
+        if (SettingsWorkspaceScope.maybeOf(context) == null &&
+            event.logicalKey.isBackKey &&
+            _scopes[_selected].hasFocus) {
           return handleBackKeyAction(event, _tabs[_selected].requestFocus);
         }
         return KeyEventResult.ignored;

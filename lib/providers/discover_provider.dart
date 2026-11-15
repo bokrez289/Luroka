@@ -628,6 +628,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
             aggregation,
             fetchedOnDeck,
             completedOnDeckLibraries,
+            previousItems: previousOnDeck,
             limit: _continueWatchingProbeLimit,
           );
           if (isDisposed ||
@@ -1051,6 +1052,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
       final freshnessScope = _continueWatchingScope();
       final observation = _beginObservation();
       final completedLibraries = <String>{};
+      final previousOnDeck = List<MediaItem>.of(_onDeck);
       final owner = KidsProfileService.instance.activeId;
       var acceptingPartial = true;
       final fetched = await _multiServer.aggregationService.getOnDeckFromAllServers(
@@ -1092,6 +1094,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
         _multiServer.aggregationService,
         fetched,
         completedLibraries,
+        previousItems: previousOnDeck,
         limit: _continueWatchingProbeLimit,
       );
       if (isDisposed ||
@@ -1139,11 +1142,19 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     DataAggregationService aggregation,
     OnDeckAggregationResult fetched,
     Set<String> completedLibraries, {
+    List<MediaItem> previousItems = const [],
     int? limit,
   }) async {
     final disrupted = {...fetched.failedServerIds, ...fetched.cancelledServerIds};
     if (disrupted.isEmpty) return fetched.items;
-    final retained = _withoutHiddenLibraries(_onDeck, _hiddenLibraries.hiddenLibraryKeys).where((item) {
+    // A fast partial result may temporarily fill the preview and evict a slow
+    // library's rows. Retain from the pre-refresh snapshot as well as current
+    // rows, so a later failure cannot make that eviction permanent.
+    final candidates = <String, MediaItem>{
+      for (final item in previousItems) item.globalKey: item,
+      for (final item in _onDeck) item.globalKey: item,
+    }.values.toList();
+    final retained = _withoutHiddenLibraries(candidates, _hiddenLibraries.hiddenLibraryKeys).where((item) {
       if (!disrupted.contains(item.serverId)) return false;
       final library = item.libraryGlobalKey;
       return library == null || !completedLibraries.contains(library);
@@ -1204,6 +1215,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
         addedAt: updatedItem.addedAt ?? previous.addedAt,
       );
     }
+
     final onDeckIndex = _onDeck.indexWhere((item) => item.globalKey == sourceGlobalKey);
     if (onDeckIndex != -1) {
       final previous = _onDeck[onDeckIndex];

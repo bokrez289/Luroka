@@ -129,7 +129,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Step 2 of 3: Save your recovery code'), findsOneWidget);
     expect(find.textContaining('If you lose it'), findsOneWidget);
-    expect(find.text('Your backup has not been uploaded yet.'), findsOneWidget);
+    expect(find.text('Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.'), findsOneWidget);
     expect(uploads, 0);
     await tester.tap(find.text('Cancel').last);
     await tester.pumpAndSettle();
@@ -245,7 +245,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Authorize'));
     await tester.pumpAndSettle();
-    expect(find.text('Your backup has not been uploaded yet.'), findsOneWidget);
+    expect(find.text('Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.'), findsOneWidget);
     expect(find.byType(QrImageView), findsNothing);
     await tester.ensureVisible(find.text('Show QR code'));
     await tester.tap(find.text('Show QR code'));
