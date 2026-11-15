@@ -597,7 +597,18 @@ abstract final class LurokaBackupSnapshot {
     final prefs = await BaseSharedPreferencesService.sharedCache();
     final existingPolicy = prefs.getString(_kidsKey);
     final incomingPolicy = values[_kidsKey];
-    if (existingPolicy != null && incomingPolicy is String && existingPolicy != incomingPolicy) {
+    bool conflictsWithPolicy(String? existing) {
+      if (existing == null || incomingPolicy is! String || existing == incomingPolicy) return false;
+      // Full logout persists an empty document. It is not a parental policy
+      // to preserve. Malformed or non-empty documents remain protected.
+      try {
+        final decoded = jsonDecode(existing);
+        return decoded is! Map || decoded.isNotEmpty;
+      } catch (_) {
+        return true;
+      }
+    }
+    if (conflictsWithPolicy(existingPolicy)) {
       // Never silently replace existing parental policy, even when the identity
       // database is empty. Recovery must be resolved explicitly by the owner.
       throw StateError('Existing parental controls prevent backup restore');
@@ -607,7 +618,7 @@ abstract final class LurokaBackupSnapshot {
     try {
       await db.runIdentityMutation(() async {
         final currentPolicy = prefs.getString(_kidsKey);
-        if (currentPolicy != null && incomingPolicy is String && currentPolicy != incomingPolicy) {
+        if (conflictsWithPolicy(currentPolicy)) {
           throw StateError('Existing parental controls prevent backup restore');
         }
         await prefs.setString(_journalKey, jsonEncode({'id': journalId, 'preferences': values}));

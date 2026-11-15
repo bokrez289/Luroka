@@ -45,6 +45,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
   bool _busy = false;
   bool _sent = false;
   bool _terminal = false;
+  Timer? _completionTimer;
   String? _error;
   ActiveProfileProvider? _activeProfiles;
   String? _ownerId;
@@ -227,7 +228,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
       sending = true;
       await attempt.sendConnection(connection);
       if (!_requireAuthorization()) return;
-      setState(() => _sent = true);
+      _completeTransfer();
     } catch (_) {
       if (mounted) {
         setState(() {
@@ -253,7 +254,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
       });
       await attempt.sendRecoveryCode(code);
       _recovery.clear();
-      if (_requireAuthorization()) setState(() => _sent = true);
+      if (_requireAuthorization()) _completeTransfer();
     } on FormatException {
       if (mounted) setState(() => _error = 'Enter a valid recovery code.');
     } catch (_) {
@@ -266,6 +267,17 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  void _completeTransfer() {
+    setState(() => _sent = true);
+    final route = ModalRoute.of(context);
+    final navigator = Navigator.of(context);
+    _completionTimer?.cancel();
+    _completionTimer = Timer(const Duration(seconds: 4), () {
+      if (!mounted || route == null || !route.isCurrent || !navigator.canPop()) return;
+      navigator.pop();
+    });
   }
 
   Future<void> _findServers() async {
@@ -330,6 +342,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
 
   @override
   void dispose() {
+    _completionTimer?.cancel();
     _activeProfiles?.removeListener(_profileChanged);
     KidsProfileService.instance.removeListener(_policyChanged);
     _invite.dispose();
@@ -445,18 +458,15 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
                     ..._savedServerChoices(),
                     const Text('Sign in to your server. Your password is sent to that server, not to Luroka.'),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      key: ValueKey(_backend),
-                      initialValue: _backend,
-                      items: const [
-                        DropdownMenuItem(value: 'jellyfin', child: Text('Jellyfin')),
-                        DropdownMenuItem(value: 'emby', child: Text('Emby')),
+                    const Text('Server type'),
+                    const SizedBox(height: 8),
+                    SegmentedButton<String>(
+                      segments: const [
+                        ButtonSegment(value: 'emby', label: Text('Emby')),
+                        ButtonSegment(value: 'jellyfin', label: Text('Jellyfin')),
                       ],
-                      onChanged: _busy
-                          ? null
-                          : (value) {
-                              if (value != null) setState(() => _backend = value);
-                            },
+                      selected: {_backend},
+                      onSelectionChanged: _busy ? null : (values) => setState(() => _backend = values.single),
                     ),
                     TextButton.icon(
                       onPressed: _busy ? null : _findServers,

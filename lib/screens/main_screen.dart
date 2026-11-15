@@ -2601,6 +2601,8 @@ class _MainScreenState extends State<MainScreen>
                 await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WatchTogetherScreen()));
               case 'logout':
                 await confirmAndLogoutAllProfiles(context);
+              case 'remove_current_profile':
+                await confirmAndRemoveCurrentProfile(context);
             }
           },
           onNavigateLeft: _focusLeftOfDockProfile,

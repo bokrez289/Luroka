@@ -283,7 +283,7 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
     return PopScope(
       canPop: !_busy,
       child: AlertDialog(
-        title: Text(_progress == null ? 'Step 1 of 3: Choose profiles' : 'Creating your backup…'),
+        title: Text(_progress == null ? 'Step 1 of 3: Choose profiles' : 'Preparing your cloud backup'),
         content: SizedBox(
           width: 520,
           child: SingleChildScrollView(
@@ -291,11 +291,13 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const CircularProgressIndicator(),
+                      Icon(_uploadAttempted ? Icons.cloud_upload_outlined : Icons.lock_outline, size: 40),
                       const SizedBox(height: 16),
                       Text(_progress!, textAlign: TextAlign.center),
+                      const SizedBox(height: 16),
+                      const LinearProgressIndicator(),
                       const SizedBox(height: 8),
-                      const Text('Please keep Luroka open.', textAlign: TextAlign.center),
+                      const Text('Your data stays encrypted. This can take a moment on a TV. Please keep Luroka open.', textAlign: TextAlign.center),
                     ],
                   )
                 : Column(
@@ -603,7 +605,7 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
 
 /// Restores only after a preview and an explicit confirmation. This is intended
 /// for the sign-in screen, before any profile/database content exists.
-Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? client}) async {
+Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? client, ServerPairingClient? pairingClient}) async {
   final db = context.read<AppDatabase>();
   if ((await db.select(db.profiles).get()).isNotEmpty || (await db.select(db.connections).get()).isNotEmpty) {
     if (context.mounted) {
@@ -626,15 +628,39 @@ Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? cl
   final code = await showScopedDialog<String>(
     context: context,
     builder: (_) => PlatformDetector.isTV()
-        ? const _TvRecoveryCodeDialog()
+        ? _TvRecoveryCodeDialog(relay: pairingClient)
         : const _RecoveryCodeDialog(title: 'Restore cloud backup', action: 'Review'),
   );
   if (code == null || !context.mounted) return false;
   final service = client ?? CloudBackupClient();
   var applying = false;
+  ScopedLoadingDialogController? progress;
+  Future<void> showProgress(String message) async {
+    progress = ScopedLoadingDialogController()..show(
+      context,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 24),
+              Flexible(child: Text(message)),
+            ],
+          ),
+        ),
+      ),
+    );
+    await progress!.ready;
+  }
   try {
     final parsed = CloudBackupRecoveryCode.parse(code);
+    await showProgress('Finding and opening your encrypted backup…');
+    if (!context.mounted) return false;
     final prepared = await service.prepareRestore(parsed);
+    await progress?.dismiss();
+    progress = null;
     if (!context.mounted) return false;
     final confirmed = await showConfirmDialog(
       context,
@@ -647,11 +673,29 @@ Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? cl
     );
     if (!confirmed || !context.mounted) return false;
     applying = true;
+    await showProgress('Restoring your profiles and settings…');
+    if (!context.mounted) return false;
     await prepared.apply(db);
+    await progress?.dismiss();
+    progress = null;
     return true;
   } catch (error) {
-    // Only an interrupted apply can have committed a restore journal.
-    if (applying && (await db.select(db.profiles).get()).isNotEmpty) return true;
+    await progress?.dismiss();
+    progress = null;
+    // Finish any committed preference journal before handing off to setup.
+    // A Plex Home-only backup can have connections and joins but no local
+    // profile rows, so checking profiles alone misses a committed restore.
+    if (applying) {
+      try {
+        await LurokaBackupSnapshot.recoverInterruptedRestore(db);
+        if ((await db.select(db.profiles).get()).isNotEmpty ||
+            (await db.select(db.connections).get()).isNotEmpty) {
+          return true;
+        }
+      } catch (_) {
+        // Keep the restore failure visible if journal recovery also fails.
+      }
+    }
     if (context.mounted) {
       final String message;
       if (applying) {
@@ -674,18 +718,20 @@ Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? cl
     }
     return false;
   } finally {
+    await progress?.dismiss();
     if (client == null) service.close();
   }
 }
 
 class _TvRecoveryCodeDialog extends StatefulWidget {
-  const _TvRecoveryCodeDialog();
+  const _TvRecoveryCodeDialog({this.relay});
+  final ServerPairingClient? relay;
   @override
   State<_TvRecoveryCodeDialog> createState() => _TvRecoveryCodeDialogState();
 }
 
 class _TvRecoveryCodeDialogState extends State<_TvRecoveryCodeDialog> {
-  final _relay = ServerPairingClient();
+  late final _relay = widget.relay ?? ServerPairingClient();
   TvPairingAttempt? _attempt;
   Timer? _timer;
   bool _polling = false;
@@ -756,9 +802,11 @@ class _TvRecoveryCodeDialogState extends State<_TvRecoveryCodeDialog> {
     _timer?.cancel();
     final attempt = _attempt;
     if (attempt == null) {
-      _relay.close();
+      if (widget.relay == null) _relay.close();
     } else {
-      unawaited(attempt.cancel().catchError((Object _) {}).whenComplete(_relay.close));
+      unawaited(attempt.cancel().catchError((Object _) {}).whenComplete(() {
+        if (widget.relay == null) _relay.close();
+      }));
     }
     super.dispose();
   }
@@ -778,30 +826,39 @@ class _TvRecoveryCodeDialogState extends State<_TvRecoveryCodeDialog> {
     return AlertDialog(
       title: const Text('Restore with your phone'),
       content: SizedBox(
-        width: 440,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (_error != null)
-                Text(_error!)
-              else if (invite == null)
-                const CircularProgressIndicator()
-              else ...[
-                const Icon(Icons.settings_backup_restore_rounded, size: 40),
-                const SizedBox(height: 12),
-                const Text('BACKUP RESTORE', style: TextStyle(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 8),
-                const Text(
-                  'This QR connects your phone to this TV. After connecting, scan or paste your saved backup recovery code on your phone.',
-                ),
-                const SizedBox(height: 12),
-                SecureTransferQr(data: invite.toBrowserUri().toString(), size: 240),
-                if (code != null) ...[const SizedBox(height: 12), Text('Confirm this code on your phone: $code')],
-              ],
-            ],
-          ),
-        ),
+        width: 650,
+        child: _error != null
+            ? Text(_error!)
+            : invite == null
+            ? const Center(child: CircularProgressIndicator())
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SecureTransferQr(
+                    key: const ValueKey('tv-restore-transfer-qr'),
+                    data: invite.toBrowserUri().toString(),
+                    size: (MediaQuery.sizeOf(context).height * .34).clamp(130.0, 220.0),
+                  ),
+                  const SizedBox(width: 24),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Scan with your phone, then scan or paste your saved recovery code there.'),
+                        const SizedBox(height: 16),
+                        if (code == null)
+                          const Text('Waiting for your phone to connect…')
+                        else ...[
+                          const Text('Compare this code with your phone:'),
+                          Text(code, key: const ValueKey('tv-restore-check-code'),
+                              style: Theme.of(context).textTheme.headlineMedium),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
       ),
       actions: [
         DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(context)),

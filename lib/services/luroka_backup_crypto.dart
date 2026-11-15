@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:cryptography/cryptography.dart';
+import 'package:flutter/foundation.dart' show compute;
 
 /// Password-encrypted, authenticated portable backup envelope.
 /// The caller is responsible for producing and validating the payload.
@@ -18,7 +19,11 @@ abstract final class LurokaBackupCrypto {
     bits: 256,
   ).deriveKey(secretKey: SecretKey(utf8.encode(password)), nonce: salt);
 
-  static Future<String> encrypt(Map<String, Object?> payload, String password) async {
+  static Future<String> encrypt(Map<String, Object?> payload, String password) =>
+      compute(_encrypt, (payload, password));
+
+  static Future<String> _encrypt((Map<String, Object?>, String) input) async {
+    final (payload, password) = input;
     if (password.isEmpty) throw ArgumentError.value(password, 'password', 'must not be empty');
     final bytes = utf8.encode(jsonEncode(payload));
     if (bytes.length > _maxBytes) throw const FormatException('Backup is too large');
@@ -37,7 +42,11 @@ abstract final class LurokaBackupCrypto {
     });
   }
 
-  static Future<Map<String, dynamic>> decrypt(String encoded, String password) async {
+  static Future<Map<String, dynamic>> decrypt(String encoded, String password) =>
+      compute(_decrypt, (encoded, password));
+
+  static Future<Map<String, dynamic>> _decrypt((String, String) input) async {
+    final (encoded, password) = input;
     if (password.isEmpty || encoded.length > _maxBytes * 2) throw const FormatException('Invalid backup');
     final raw = jsonDecode(encoded);
     if (raw is! Map<String, dynamic> ||

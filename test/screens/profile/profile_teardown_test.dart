@@ -9,6 +9,10 @@ import 'package:luroka/connection/connection_registry.dart';
 import 'package:luroka/database/app_database.dart';
 import 'package:luroka/database/download_operations.dart';
 import 'package:luroka/media/ids.dart';
+import 'package:luroka/media/media_backend.dart';
+import 'package:luroka/media/media_kind.dart';
+import 'package:luroka/media/media_library.dart';
+import 'package:luroka/media/media_server_client.dart';
 import 'package:luroka/profiles/active_profile_binder.dart';
 import 'package:luroka/profiles/active_profile_provider.dart';
 import 'package:luroka/profiles/plex_home_service.dart';
@@ -23,6 +27,9 @@ import 'package:luroka/providers/multi_server_provider.dart';
 import 'package:luroka/providers/playback_state_provider.dart';
 import 'package:luroka/screens/profile/profile_teardown.dart';
 import 'package:luroka/screens/auth_screen.dart';
+import 'package:luroka/screens/settings/source_libraries_screen.dart';
+import 'package:luroka/theme/mono_theme.dart';
+import 'package:luroka/services/settings_service.dart';
 import 'package:luroka/services/plex_auth_service.dart';
 import 'package:luroka/services/credential_vault.dart';
 import 'package:luroka/services/multi_server_manager.dart';
@@ -61,6 +68,9 @@ class _Binder implements ActiveProfileBinder {
 
   @override
   Future<void> rebindIfActive(String profileId) async => events.add('rebind:$profileId');
+
+  @override
+  void markUserInitiatedActivation(String profileId) {}
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -114,6 +124,24 @@ class _Playback extends ChangeNotifier implements PlaybackStateProvider {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class _EmbyLibraries implements MediaServerClient {
+  @override
+  ServerId get serverId => ServerId('srv-1');
+  @override
+  String get serverName => 'Emby server';
+  @override
+  MediaBackend get backend => MediaBackend.emby;
+  @override
+  Future<List<MediaLibrary>> fetchLibraries() async => [
+    MediaLibrary(id: 'movies', title: 'Movies', kind: MediaKind.movie, backend: backend,
+        serverId: 'srv-1', serverName: serverName),
+  ];
+  @override
+  void close() {}
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   const channel = MethodChannel('test/profile_teardown_shelf');
@@ -137,10 +165,47 @@ void main() {
     addTearDown(harness.dispose);
     final target = harness.active.active!;
 
-    await expectLater(deleteProfile(harness.context, target), throwsStateError);
+    final deletion = expectLater(deleteProfile(harness.context, target), throwsStateError);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await deletion;
 
     expect(events.take(2), ['clear:${target.id}', 'delete-downloads:${target.id}']);
     expect(events, contains('rebind:${target.id}'));
+  });
+
+  testWidgets('removing an Emby server unlinks only the active profile', (tester) async {
+    await SettingsService.getInstance();
+    final events = <String>[];
+    final harness = await _pumpHarness(tester, events: events, channel: channel);
+    addTearDown(harness.dispose);
+    final other = Profile.local(id: 'other', displayName: 'Other', createdAt: DateTime(2026));
+    await harness.profileRegistry.upsert(other);
+    final connection = testEmbyConnection();
+    await harness.connections.upsert(connection);
+    for (final id in ['active', 'other']) {
+      await harness.profileConnections.upsert(ProfileConnection(
+        profileId: id, connectionId: connection.id, userIdentifier: connection.userId,
+        userToken: connection.accessToken,
+      ));
+    }
+    await harness.active.reloadFromStorage();
+    harness.manager.debugRegisterClientForTesting(_EmbyLibraries());
+    Navigator.of(harness.context).push(MaterialPageRoute<void>(builder: (_) => Theme(
+      data: monoTheme(MonoPalette.dark),
+      child: const SourceLibrariesScreen(profileId: 'active'),
+    )));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Remove server'));
+    await tester.pumpAndSettle();
+    expect(find.text('Remove server?'), findsOneWidget);
+    await tester.tap(find.text('Remove').last);
+    await tester.pumpAndSettle();
+    expect(await harness.profileConnections.listForProfile('active'), isEmpty);
+    expect(await harness.profileConnections.listForProfile('other'), hasLength(1));
+    expect(await harness.connections.get(connection.id), isNotNull);
+    expect(events, contains('release-downloads:active:[srv-1]'));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('inactive deletion does not clear the active owner', (tester) async {
@@ -153,6 +218,33 @@ void main() {
     await expectLater(deleteProfile(harness.context, inactive), throwsStateError);
 
     expect(events, ['delete-downloads:inactive']);
+  });
+
+  testWidgets('removing the current profile preserves another adult and their connection', (tester) async {
+    final events = <String>[];
+    final harness = await _pumpHarness(tester, events: events, channel: channel);
+    addTearDown(harness.dispose);
+    final other = Profile.local(id: 'other', displayName: 'Other', createdAt: DateTime(2026));
+    await harness.profileRegistry.upsert(other);
+    final connection = testEmbyConnection();
+    await harness.connections.upsert(connection);
+    for (final id in ['active', 'other']) {
+      await harness.profileConnections.upsert(ProfileConnection(
+        profileId: id, connectionId: connection.id, userIdentifier: connection.userId,
+        userToken: connection.accessToken,
+      ));
+    }
+    await harness.active.reloadFromStorage();
+    (harness.context.read<DownloadProvider>() as _Downloads).deleteFailuresRemaining = 0;
+    final removal = confirmAndRemoveCurrentProfile(harness.context);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Other profiles remain'), findsOneWidget);
+    await tester.tap(find.text(t.profiles.deleteProfileButton).last);
+    await tester.pumpAndSettle();
+    await removal;
+    expect((await harness.profileRegistry.list()).map((p) => p.id), ['other']);
+    expect(await harness.profileConnections.listForProfile('other'), hasLength(1));
+    expect(harness.active.activeId, 'other');
   });
 
   testWidgets(
@@ -312,7 +404,10 @@ void main() {
     final harness = await _pumpHarness(tester, events: events, channel: channel);
     addTearDown(harness.dispose);
 
-    await expectLater(logoutAllProfiles(harness.context), throwsStateError);
+    final logout = expectLater(logoutAllProfiles(harness.context), throwsStateError);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await logout;
 
     expect(events.take(2), ['clear:active', 'companion-reset']);
   });
@@ -361,13 +456,19 @@ void main() {
     await ProfileAppearanceService.instance.completeSetup();
     await ProfileAppearanceService.instance.choosePreset(child.id, ProfileAvatarPreset.cat);
 
-    await logoutAllProfiles(harness.context);
+    final logout = logoutAllProfiles(harness.context);
+    await tester.pump();
+    expect(find.text('Signing out of this device…'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 300));
+    await logout;
     await tester.pumpAndSettle();
 
     expect(events.take(3), ['clear:active', 'companion-reset', 'delete-all-downloads']);
     expect(await harness.profileRegistry.list(), isEmpty);
     expect(await harness.profileConnections.listAll(), isEmpty);
     expect(await harness.connections.list(), isEmpty);
+    expect(harness.active.activeId, isNull);
+    expect(harness.active.profiles, isEmpty);
     expect(kids.hasKids, isFalse);
     expect(ProfileAppearanceService.instance.setupComplete, isFalse);
     expect(ProfileAppearanceService.instance.hasOverride(child.id), isFalse);

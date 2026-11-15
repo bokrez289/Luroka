@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../i18n/strings.g.dart';
+import '../../connection/connection.dart';
 import '../../media/media_library.dart';
 import '../../profiles/active_profile_binder.dart';
 import '../../profiles/active_profile_provider.dart';
@@ -13,6 +14,10 @@ import '../../services/profile_appearance_service.dart';
 import '../../widgets/focusable_list_tile.dart';
 import '../../focus/focusable_button.dart';
 import '../../widgets/focused_scroll_scaffold.dart';
+import '../../utils/dialogs.dart';
+import '../../utils/error_dialog.dart';
+import '../profile/parent_access.dart';
+import '../profile/profile_teardown.dart';
 import 'add_connection_screen.dart';
 
 /// Profile-owned source access is independent of Home's row presentation.
@@ -150,6 +155,89 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
     );
   }
 
+  Future<void> _removeServer(String serverId, String serverName) async {
+    if (_loading || _saving || !await ensureParentAccess(context) || !mounted) return;
+    final active = context.read<ActiveProfileProvider>();
+    final owner = active.active;
+    if (owner == null || owner.id != widget.profileId) return;
+    final generation = active.identityMutationGeneration;
+    final scope = SessionTeardownScope.of(context);
+    final rows = await scope.profileConnections.listForProfile(owner.id);
+    final connections = await scope.connections.list();
+    final linkedIds = rows.map((row) => row.connectionId).toSet();
+    final matching = connections.whereType<JellyfinConnection>().where(
+      (connection) => linkedIds.contains(connection.id) && connection.serverMachineId == serverId,
+    ).toList();
+    if (!mounted || active.activeId != owner.id || active.identityMutationGeneration != generation) return;
+    if (matching.isEmpty) {
+      await showErrorDialog(context, 'This server is provided by a Plex account. Manage that account under Servers & Accounts.');
+      return;
+    }
+    final connection = matching.length == 1 ? matching.single : await showScopedDialog<JellyfinConnection>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: const Text('Choose the server account to remove'),
+        content: SizedBox(width: 440, child: SingleChildScrollView(child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [for (final candidate in matching) FocusableListTile(
+            title: Text(candidate.userName),
+            subtitle: Text(candidate.serverName),
+            onTap: () => Navigator.pop(dialog, candidate),
+          )],
+        ))),
+      ),
+    );
+    if (connection == null || !mounted || active.activeId != owner.id || active.identityMutationGeneration != generation) return;
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Remove server?',
+      message: 'Remove $serverName from ${owner.displayName}? Downloads owned by this profile for this server may also be removed. Other profiles using it will keep their access.',
+      confirmText: 'Remove',
+      isDestructive: true,
+    );
+    if (!confirmed || !mounted || active.activeId != owner.id || active.identityMutationGeneration != generation) return;
+    setState(() => _saving = true);
+    try {
+      await withEndedProfileSession(scope, owner.id, () async {
+        final currentLinks = await scope.profileConnections.listForProfile(owner.id);
+        final currentConnections = await scope.connections.list();
+        if (scope.active.activeId != owner.id || scope.active.identityMutationGeneration != generation ||
+            !currentLinks.any((row) => row.connectionId == connection.id)) {
+          throw StateError('Profile or connection changed');
+        }
+        final retainedIds = currentLinks.map((row) => row.connectionId).toSet()..remove(connection.id);
+        if (owner.isPlexHome && owner.parentConnectionId != null) retainedIds.add(owner.parentConnectionId!);
+        final retained = currentConnections.where((other) => retainedIds.contains(other.id));
+        final stillReferenced = retained.any((other) => switch (other) {
+          JellyfinConnection(:final serverMachineId) => serverMachineId == serverId,
+          PlexAccountConnection(:final servers) => servers.any((server) => server.clientIdentifier == serverId),
+        });
+        if (!stillReferenced) await scope.downloads.releaseDownloadsForProfileServers(owner.id, {serverId});
+        await scope.cleanup.removeProfileConnection(profileId: owner.id, connection: connection);
+        await scope.hiddenLibraries?.refresh();
+        await scope.binder.rebindIfActive(owner.id);
+        if (scope.active.activeId == owner.id) {
+          scope.shelf.beginProfileSession(owner.id);
+          if (scope.multiServer.hasConnectedServers) await scope.discover?.load();
+        }
+      });
+      if (!mounted || active.activeId != owner.id) return;
+      final remainingLinks = await scope.profileConnections.listForProfile(owner.id);
+      final remainingConnections = await scope.connections.list();
+      final stillConnected = remainingConnections.whereType<JellyfinConnection>().any((candidate) =>
+        candidate.serverMachineId == serverId && remainingLinks.any((row) => row.connectionId == candidate.id));
+      if (!stillConnected) {
+        _selected.removeAll(_libraries.where((library) => library.serverId == serverId).map((library) => library.globalKey));
+      }
+      if (!mounted) return;
+      await _load();
+    } catch (_) {
+      if (mounted) await showErrorDialog(context, 'Could not remove the server. Please try again.');
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final groups = <String, List<MediaLibrary>>{};
@@ -160,6 +248,12 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
     for (final library in orderedLibraries) {
       (groups[library.serverId ?? ''] ??= []).add(library);
     }
+    final active = context.watch<ActiveProfileProvider>();
+    final offlineConnections = [
+      for (final row in active.connectionsByProfile[widget.profileId] ?? const [])
+        if (active.connectionsById[row.connectionId] case final JellyfinConnection connection)
+          if (!groups.containsKey(connection.serverMachineId)) connection,
+    ];
     return FocusedScrollScaffold(
       title: Text(t.sourceLibraries.title),
       bottomBar: SafeArea(
@@ -236,7 +330,14 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
                             final selected = entry.value
                                 .where((library) => _selected.contains(library.globalKey))
                                 .length;
-                            return FocusableCheckboxListTile(
+                            final active = context.read<ActiveProfileProvider>();
+                            final linked = active.connectionsByProfile[widget.profileId] ?? const [];
+                            final canRemove = linked.any((row) {
+                              final connection = active.connectionsById[row.connectionId];
+                              return connection is JellyfinConnection && connection.serverMachineId == entry.key;
+                            });
+                            return Row(children: [
+                              Expanded(child: FocusableCheckboxListTile(
                               autofocus: entry.key == groups.keys.first,
                               value: selected == 0
                                   ? false
@@ -255,7 +356,21 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
                                           ? _selected.removeAll(keys)
                                           : _selected.addAll(keys);
                                     }),
-                            );
+                              )),
+                              if (canRemove)
+                                FocusableButton(
+                                  onPressed: _saving ? null : () => _removeServer(
+                                    entry.key, entry.value.first.serverName ?? entry.key,
+                                  ),
+                                  child: IconButton(
+                                    tooltip: 'Remove server',
+                                    onPressed: _saving ? null : () => _removeServer(
+                                      entry.key, entry.value.first.serverName ?? entry.key,
+                                    ),
+                                    icon: const Icon(Icons.link_off_rounded),
+                                  ),
+                                ),
+                            ]);
                           },
                         ),
                         for (final library in entry.value)
@@ -275,6 +390,24 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
                           ),
                         const Divider(),
                       ],
+                      for (final connection in offlineConnections)
+                        Row(
+                          children: [
+                            Expanded(child: ListTile(
+                              leading: const Icon(Icons.dns_rounded),
+                              title: Text(connection.displayLabel),
+                              subtitle: Text(t.serversAccounts.offline),
+                            )),
+                            FocusableButton(
+                              onPressed: _saving ? null : () => _removeServer(connection.serverMachineId, connection.displayLabel),
+                              child: IconButton(
+                                tooltip: 'Remove server',
+                                onPressed: _saving ? null : () => _removeServer(connection.serverMachineId, connection.displayLabel),
+                                icon: const Icon(Icons.link_off_rounded),
+                              ),
+                            ),
+                          ],
+                        ),
                       TextButton.icon(
                         onPressed: _saving ? null : _load,
                         icon: const Icon(Icons.refresh_rounded),

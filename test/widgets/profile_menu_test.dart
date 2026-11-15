@@ -19,6 +19,8 @@ class _Profiles extends Fake implements ActiveProfileProvider {
   @override
   final List<Profile> pickerProfiles;
   @override
+  List<Profile> get profiles => pickerProfiles;
+  @override
   String? avatarUrlFor(String profileId) => null;
 }
 
@@ -47,6 +49,7 @@ void main() {
       'downloads',
       'live_tv',
       'together',
+      'remove_current_profile',
       'logout',
     ]);
     expect(entries.whereType<AppMenuItem<String>>().last.destructive, isTrue);
@@ -73,7 +76,7 @@ void main() {
     expect(actions, ['switch_profile', 'manage_profiles', 'settings', 'logout']);
   });
 
-  testWidgets('TV profile sheet focuses and scrolls through all actions with the remote', (tester) async {
+  testWidgets('TV profile menu focuses and scrolls through all actions with the remote', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(true);
     addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
     tester.view.physicalSize = const Size(1280, 720);
@@ -95,6 +98,7 @@ void main() {
                     selection = await showAdaptiveAppMenu<String>(
                       context,
                       focusFirstItem: true,
+                      anchorRect: const Rect.fromLTWH(24, 24, 160, 48),
                       entries: buildProfileMenuEntries(
                         provider: _Profiles(alex, [alex, sam]),
                         isKids: false,
@@ -132,7 +136,7 @@ void main() {
       FocusManager.instance.primaryFocus?.context?.findAncestorWidgetOfExactType<AppMenuItemTile<String>>()?.item.value,
       'manage_profiles',
     );
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < 8; i++) {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
       await tester.pumpAndSettle();
     }
