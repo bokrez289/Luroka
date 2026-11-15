@@ -458,6 +458,31 @@ void main() {
     expect(provider.onDeck.map((item) => item.id), ['recovered']);
   });
 
+  test('failed library survives temporary eviction by an incomplete preview', () async {
+    final old = _item('keep-slow').copyWith(libraryId: 'slow', lastViewedAt: 1);
+    aggregation.onDeckResult = () => [old];
+    await provider.load();
+    final gate = Completer<void>();
+    aggregation.onDeckGate = gate.future;
+    aggregation.onDeckStarted = Completer<void>();
+    aggregation.partialOnDeck = [
+      (
+        serverId: 'server_1',
+        libraryId: 'fast',
+        items: [for (var i = 0; i < 30; i++) _item('partial-$i').copyWith(libraryId: 'fast', lastViewedAt: 100 + i)],
+        complete: false,
+      ),
+      (serverId: 'server_1', libraryId: 'fast', items: <MediaItem>[], complete: true),
+    ];
+    aggregation.onDeckFailedServerIds = {'server_1'};
+    aggregation.onDeckResult = () => [];
+    final refresh = provider.refreshContinueWatching();
+    await aggregation.onDeckStarted!.future;
+    gate.complete();
+    await refresh;
+    expect(provider.onDeck.map((item) => item.id), contains('keep-slow'));
+  });
+
   test('late Continue Watching callbacks respect current source selection and binding', () async {
     final gate = Completer<void>();
     aggregation.onDeckGate = gate.future;

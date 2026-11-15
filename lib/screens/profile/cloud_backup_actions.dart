@@ -479,7 +479,7 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
     final showQr = tv || _showQr;
     if (tv) {
       final size = MediaQuery.sizeOf(context);
-      final qrSize = (size.height * .34).clamp(108.0, 220.0);
+      final qrSize = (size.height * .42).clamp(150.0, 280.0);
       return AlertDialog(
         title: const Text('Step 2 of 3: Save your recovery code'),
         content: SizedBox(
@@ -511,7 +511,7 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
                       Text(
                         widget.retrying
                             ? 'The previous upload may have completed. Continue to retry with the same code.'
-                            : 'Your backup has not been uploaded yet.',
+                            : 'Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.',
                         style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
                       ),
                       const SizedBox(height: 8),
@@ -550,7 +550,7 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
               Text(
                 widget.retrying
                     ? 'The previous upload may have completed. This is the same recovery code; continue to retry or check it.'
-                    : 'Your backup has not been uploaded yet.',
+                    : 'Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.',
                 style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
               ),
               if (showQr) ...[
@@ -631,8 +631,10 @@ Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? cl
   );
   if (code == null || !context.mounted) return false;
   final service = client ?? CloudBackupClient();
+  var applying = false;
   try {
-    final prepared = await service.prepareRestore(CloudBackupRecoveryCode.parse(code));
+    final parsed = CloudBackupRecoveryCode.parse(code);
+    final prepared = await service.prepareRestore(parsed);
     if (!context.mounted) return false;
     final confirmed = await showConfirmDialog(
       context,
@@ -644,13 +646,32 @@ Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? cl
       confirmText: 'Restore',
     );
     if (!confirmed || !context.mounted) return false;
+    applying = true;
     await prepared.apply(db);
     return true;
-  } catch (_) {
-    // Match the local restore flow: a committed restore with an outstanding
-    // recovery journal must restart rather than continue with stale policy.
-    if ((await db.select(db.profiles).get()).isNotEmpty) return true;
-    if (context.mounted) await showErrorDialog(context, 'Backup unavailable or recovery code incorrect.');
+  } catch (error) {
+    // Only an interrupted apply can have committed a restore journal.
+    if (applying && (await db.select(db.profiles).get()).isNotEmpty) return true;
+    if (context.mounted) {
+      final String message;
+      if (applying) {
+        message = 'The backup was downloaded but could not be restored on this device. Try again or contact support.';
+      } else if (error is CloudBackupNotFoundException) {
+        message =
+            'No cloud backup was found for this code. On the original device, finish step 3 and wait for Cloud backup created. Check that you are using the code saved for that backup; it may also have expired or been deleted.';
+      } else if (error is CloudBackupHttpException) {
+        message = error.statusCode == 429
+            ? 'The backup service is busy. Please wait a moment and try again.'
+            : 'The backup service could not complete the request. Please try again later.';
+      } else if (error is SocketException || error is TimeoutException || error is HttpException) {
+        message = 'Could not connect to the backup service. Check your internet connection and try again.';
+      } else if (error is FormatException) {
+        message = 'The recovery code or backup format could not be read. Check the complete code and try again.';
+      } else {
+        message = 'The backup could not be opened. Check your recovery code and try again.';
+      }
+      await showErrorDialog(context, message);
+    }
     return false;
   } finally {
     if (client == null) service.close();
@@ -767,7 +788,13 @@ class _TvRecoveryCodeDialogState extends State<_TvRecoveryCodeDialog> {
               else if (invite == null)
                 const CircularProgressIndicator()
               else ...[
-                const Text('Scan with your phone, then use Luroka to scan or paste your saved recovery code.'),
+                const Icon(Icons.settings_backup_restore_rounded, size: 40),
+                const SizedBox(height: 12),
+                const Text('BACKUP RESTORE', style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                const Text(
+                  'This QR connects your phone to this TV. After connecting, scan or paste your saved backup recovery code on your phone.',
+                ),
                 const SizedBox(height: 12),
                 SecureTransferQr(data: invite.toBrowserUri().toString(), size: 240),
                 if (code != null) ...[const SizedBox(height: 12), Text('Confirm this code on your phone: $code')],
@@ -864,24 +891,32 @@ class _RecoveryCodeDialogState extends State<_RecoveryCodeDialog> {
   @override
   Widget build(BuildContext context) => AlertDialog(
     title: Text(widget.title),
-    content: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        FocusableTextField(
-          controller: controller,
-          obscureText: true,
-          decoration: const InputDecoration(labelText: 'Recovery code'),
-        ),
-        if (PlatformDetector.isMobile(context))
-          TextButton.icon(
-            onPressed: () async {
-              final scanned = await scanSecureTransferQr(context, SecureTransferQrKind.recovery);
-              if (mounted && scanned != null) controller.text = scanned;
-            },
-            icon: const Icon(Icons.qr_code_scanner),
-            label: const Text('Scan recovery code'),
+    content: SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.settings_backup_restore_rounded, size: 40),
+          const SizedBox(height: 12),
+          const Text(
+            'Use the private recovery code saved when you created your backup. A TV setup invitation will not restore a backup.',
           ),
-      ],
+          const SizedBox(height: 20),
+          FocusableTextField(
+            controller: controller,
+            obscureText: true,
+            decoration: const InputDecoration(labelText: 'Recovery code'),
+          ),
+          if (PlatformDetector.isMobile(context))
+            TextButton.icon(
+              onPressed: () async {
+                final scanned = await scanSecureTransferQr(context, SecureTransferQrKind.recovery);
+                if (mounted && scanned != null) controller.text = scanned;
+              },
+              icon: const Icon(Icons.qr_code_scanner),
+              label: const Text('Scan recovery code'),
+            ),
+        ],
+      ),
     ),
     actions: [
       DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(context)),

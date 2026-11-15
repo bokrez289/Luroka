@@ -179,7 +179,8 @@ final class CloudBackupClient {
 
   Future<({String body, DateTime expiresAt})> _download(CloudBackupKeys keys) async {
     final response = await _send('GET', headers: {'X-Luroka-Backup-Lookup': keys.lookup});
-    if (response.status != 200) throw const CloudBackupException('Backup unavailable');
+    if (response.status == 404) throw const CloudBackupNotFoundException();
+    if (response.status != 200) throw CloudBackupHttpException(response.status);
     final expiresAt = DateTime.tryParse(response.expiry ?? '')?.toUtc();
     final now = DateTime.now().toUtc();
     if (expiresAt == null || !expiresAt.isAfter(now) || expiresAt.isAfter(now.add(const Duration(days: 91)))) {
@@ -260,4 +261,15 @@ final class CloudBackupException implements Exception {
   final String message;
   @override
   String toString() => message;
+}
+
+/// No backup matched this capability, or it has expired or been deleted.
+final class CloudBackupNotFoundException implements Exception {
+  const CloudBackupNotFoundException();
+}
+
+/// A service or proxy rejected the request. No capability or response body is retained.
+final class CloudBackupHttpException implements Exception {
+  const CloudBackupHttpException(this.statusCode);
+  final int statusCode;
 }

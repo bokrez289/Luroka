@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+import '../../widgets/secure_transfer_qr.dart';
 
 import '../../connection/connection.dart';
 import '../../media/media_browser_dialect.dart';
@@ -169,9 +169,33 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
       final code = attempt.checkCode;
       if (code == null || !attempt.confirm(code)) throw StateError('Pairing expired');
       final paired = await attempt.takeConnection();
-      if (!_requireAuthorization()) return;
+      if (!mounted || !_requireAuthorization()) return;
       if (paired.backend != widget.dialect.name) throw const FormatException('Wrong server type');
-      final connection = await validatePairedServer(paired, client: _http);
+      var allowHttp = false;
+      if (Uri.parse(paired.baseUrl).scheme == 'http') {
+        allowHttp =
+            await showDialog<bool>(
+              context: context,
+              builder: (dialog) => AlertDialog(
+                title: const Text('Use an unencrypted server?'),
+                content: const Text(
+                  'Your phone selected HTTP. People on this network may be able to read your TV access token and media traffic. Use only a network you trust. HTTPS is recommended.',
+                ),
+                actions: [
+                  TextButton(
+                    autofocus: true,
+                    onPressed: () => Navigator.pop(dialog, false),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(onPressed: () => Navigator.pop(dialog, true), child: const Text('Use HTTP')),
+                ],
+              ),
+            ) ==
+            true;
+        if (!allowHttp) throw const FormatException('HTTP not approved');
+      }
+      if (!_requireAuthorization()) return;
+      final connection = await validatePairedServer(paired, client: _http, allowInsecureHttp: allowHttp);
       if (!mounted || !_requireAuthorization()) return;
       Navigator.of(context).pop(connection);
     } catch (_) {
@@ -221,15 +245,9 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
                   'Scan the code with your phone camera or in Luroka. The invitation expires in five minutes.',
                 ),
                 const SizedBox(height: 12),
-                SizedBox(
-                  width: 240,
-                  height: 240,
-                  child: QrImageView(
-                    data: attempt.invite.toBrowserUri().toString(),
-                    size: 240,
-                    backgroundColor: Colors.white,
-                  ),
-                ),
+                SecureTransferQr(data: attempt.invite.toBrowserUri().toString(), size: 240),
+                const SizedBox(height: 12),
+                const Text('TV SETUP · JELLYFIN / EMBY', style: TextStyle(fontWeight: FontWeight.w700)),
                 if (code != null) ...[
                   const SizedBox(height: 12),
                   Text('Check that your phone shows: $code'),

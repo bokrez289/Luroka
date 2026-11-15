@@ -207,7 +207,17 @@ String mediaCardSemanticLabel(Object item) {
   }
 
   final copies = item.raw?['lurokaCopyCount'];
-  return copies is int && copies > 1 ? '$baseLabel, ${t.personSpotlight.copies(n: copies)}' : baseLabel;
+  if (copies is int && copies > 1) return '$baseLabel, ${t.personSpotlight.copies(n: copies)}';
+  final versions = item.mediaVersions?.length ?? 0;
+  return versions > 1 ? '$baseLabel, ${t.personSpotlight.versions(n: versions)}' : baseLabel;
+}
+
+int? _cardCopyCount(Object item) {
+  if (item is! MediaItem) return null;
+  final copies = item.raw?['lurokaCopyCount'];
+  if (copies is int && copies > 1) return copies;
+  final versions = item.mediaVersions?.length ?? 0;
+  return versions > 1 ? versions : null;
 }
 
 class MediaCard extends StatefulWidget {
@@ -497,6 +507,7 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
             density: SettingsService.instance.read(SettingsService.libraryDensity),
             isOffline: widget.isOffline,
             localPosterPath: localPosterPath,
+            usesContinueWatchingAction: widget.usesContinueWatchingAction,
             showServerName: widget.showServerName && showServerLabels(context),
             libraryName: widget.libraryName,
             episodePosterModeOverride: widget.episodePosterModeOverride,
@@ -665,19 +676,6 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
     final tvContinue =
         PlatformDetector.isTV() && widget.cinemaArtwork && widget.isInContinueWatching && item is MediaItem;
     final overlays = <Widget>[
-      if (widget.usesContinueWatchingAction &&
-          item is MediaItem &&
-          item.isEpisode &&
-          SettingsService.instance.read(SettingsService.showRemainingEpisodes))
-        Positioned(
-          left: 6,
-          right: 6,
-          top: 6,
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: RemainingEpisodesBadge(key: ValueKey(item.globalKey), item: item),
-          ),
-        ),
       if (tvContinue)
         Positioned.fill(
           child: Align(
@@ -798,11 +796,16 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
           ),
         ),
       if (!tvContinue && item is MediaItem && _showsWatchedIndicator(item)) WatchedIndicator(item: item),
-      if (!tvContinue &&
-          (badgeLabels.isNotEmpty || (item is MediaItem && (item.raw?['lurokaCopyCount'] as int? ?? 0) > 1)))
+      if ((!tvContinue && badgeLabels.isNotEmpty) ||
+          _cardCopyCount(item) != null ||
+          (widget.usesContinueWatchingAction &&
+              item is MediaItem &&
+              item.isEpisode &&
+              SettingsService.instance.read(SettingsService.showRemainingEpisodes)))
         _CatalogBadges(
-          copyCount: item is MediaItem ? (item.raw?['lurokaCopyCount'] as int?) : null,
-          labels: [...badgeLabels],
+          copyCount: _cardCopyCount(item),
+          remainingItem: widget.usesContinueWatchingAction && item is MediaItem && item.isEpisode ? item : null,
+          labels: tvContinue ? const [] : badgeLabels,
         ),
     ];
     return ExcludeSemantics(
@@ -966,6 +969,7 @@ class _MediaCardList extends StatelessWidget {
   final int density;
   final bool isOffline;
   final String? localPosterPath;
+  final bool usesContinueWatchingAction;
   final bool showServerName;
   final String? libraryName;
   final EpisodePosterMode? episodePosterModeOverride;
@@ -984,6 +988,7 @@ class _MediaCardList extends StatelessWidget {
     required this.density,
     this.isOffline = false,
     this.localPosterPath,
+    this.usesContinueWatchingAction = false,
     this.showServerName = false,
     this.libraryName,
     this.episodePosterModeOverride,
@@ -1137,8 +1142,18 @@ class _MediaCardList extends StatelessWidget {
                       ),
                       if (item is MediaItem && _showsWatchedIndicator(item as MediaItem))
                         WatchedIndicator(item: item as MediaItem),
-                      if (item is MediaItem && ((item as MediaItem).raw?['lurokaCopyCount'] as int? ?? 0) > 1)
-                        _CatalogBadges(labels: const [], copyCount: (item as MediaItem).raw!['lurokaCopyCount'] as int),
+                      if (_cardCopyCount(item) != null ||
+                          (usesContinueWatchingAction &&
+                              item is MediaItem &&
+                              (item as MediaItem).isEpisode &&
+                              SettingsService.instance.read(SettingsService.showRemainingEpisodes)))
+                        _CatalogBadges(
+                          labels: const [],
+                          copyCount: _cardCopyCount(item),
+                          remainingItem: usesContinueWatchingAction && item is MediaItem && (item as MediaItem).isEpisode
+                              ? item as MediaItem
+                              : null,
+                        ),
                     ],
                   ),
                 ),
@@ -1720,8 +1735,9 @@ class _TvContinueArtwork extends StatelessWidget {
 class _CatalogBadges extends StatelessWidget {
   final List<String> labels;
   final int? copyCount;
+  final MediaItem? remainingItem;
 
-  const _CatalogBadges({required this.labels, this.copyCount});
+  const _CatalogBadges({required this.labels, this.copyCount, this.remainingItem});
 
   @override
   Widget build(BuildContext context) {
@@ -1733,26 +1749,35 @@ class _CatalogBadges extends StatelessWidget {
       child: Column(
         crossAxisAlignment: .start,
         children: [
-          if ((copyCount ?? 0) > 1) ...[
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.76),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.video_library_rounded, size: 12, color: Colors.white),
-                    const SizedBox(width: 3),
-                    Text(
-                      '$copyCount',
-                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
+          if (remainingItem != null || (copyCount ?? 0) > 1) ...[
+            Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: [
+                if (remainingItem case final item?) RemainingEpisodesBadge(key: ValueKey(item.globalKey), item: item),
+                if ((copyCount ?? 0) > 1)
+                  DecoratedBox(
+                    key: const ValueKey('media-copy-count'),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.76),
+                      borderRadius: BorderRadius.circular(4),
                     ),
-                  ],
-                ),
-              ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.file_copy_rounded, size: 12, color: Colors.white),
+                          const SizedBox(width: 3),
+                          Text(
+                            '$copyCount',
+                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
             ),
             if (labels.isNotEmpty) const SizedBox(height: 3),
           ],

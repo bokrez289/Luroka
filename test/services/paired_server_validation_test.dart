@@ -74,11 +74,8 @@ void main() {
       }
       return http.Response('{"Id":"user-id","Name":"Alice"}', 200);
     });
-    await expectLater(
-      validatePairedServer(connection(url: 'http://media.example'), client: insecure, allowInsecureHttp: true),
-      throwsFormatException,
-    );
-    expect(calls, 0);
+    await validatePairedServer(connection(url: 'http://media.example'), client: insecure, allowInsecureHttp: true);
+    expect(calls, 2);
     final redirect = MockClient(
       (request) async => http.Response('', 302, headers: {'location': 'https://attacker.invalid'}),
     );

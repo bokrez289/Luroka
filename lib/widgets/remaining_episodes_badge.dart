@@ -18,6 +18,10 @@ import 'package:material_symbols_icons/symbols.dart';
 class RemainingEpisodesBadge extends StatefulWidget {
   const RemainingEpisodesBadge({super.key, required this.item});
   final MediaItem item;
+
+  @visibleForTesting
+  static void resetQueueForTesting() => _RemainingEpisodesBadgeState._queue = Future.value();
+
   @override
   State<RemainingEpisodesBadge> createState() => _RemainingEpisodesBadgeState();
 }
@@ -116,7 +120,7 @@ class _RemainingEpisodesBadgeState extends State<RemainingEpisodesBadge> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const AppIcon(Symbols.video_library_rounded, size: 14, color: Colors.white),
+                        const AppIcon(Symbols.format_list_numbered_rounded, size: 14, color: Colors.white),
                         const SizedBox(width: 4),
                         Text(
                           '$_count',

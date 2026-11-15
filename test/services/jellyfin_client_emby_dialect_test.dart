@@ -1137,9 +1137,8 @@ void main() {
   });
 
   group('MediaBrowser Next Up cutoff', () {
-    test('Emby drops series last played before the cutoff Jellyfin enforces', () async {
-      // Nothing on the Emby server applies NextUpDateCutoff, so the window has
-      // to be applied to the recency scan instead.
+    test('Emby retains server-provided Next Up even with old play history', () async {
+      // Emby's shelf membership must not depend on Jellyfin's age cutoff.
       final requests = _RequestCapture((request) {
         if (request.url.path.endsWith('/Items/Resume')) {
           return jsonResponse({
@@ -1182,7 +1181,10 @@ void main() {
 
       final shelf = await client.fetchContinueWatching(count: 10);
 
-      expect(shelf.map((item) => item.id), ['next-series-recent', 'next-series-undated']);
+      expect(
+        shelf.map((item) => item.id),
+        containsAll(['next-series-recent', 'next-series-undated', 'next-series-abandoned']),
+      );
     });
   });
 

@@ -171,6 +171,13 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
       await tester.pumpAndSettle();
       expect(FocusManager.instance.primaryFocus?.debugLabel, 'SettingsCategory:appearance');
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      expect(
+        FocusManager.instance.primaryFocus?.debugLabel,
+        'SettingsCategory:appearance',
+        reason: 'Down at the last category must not enter the content panel',
+      );
       expect(find.text('Hide spoilers'), findsNothing, reason: 'Focus and selection remain independent until OK');
       expect(second.hasFocus, isFalse, reason: 'previewing must not enter or change the setting');
       expect(find.text('Watched indicators'), findsOneWidget);

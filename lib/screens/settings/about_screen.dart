@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../i18n/strings.g.dart';
 import '../../media/media_backend.dart';
 import '../../services/android_update_service.dart';
@@ -8,6 +9,7 @@ import '../../services/settings_service.dart' hide ThemeMode;
 import '../../services/update_service.dart';
 import '../../utils/app_identity.dart';
 import '../../utils/error_dialog.dart';
+import '../../utils/platform_detector.dart';
 import '../../utils/update_dialog.dart';
 import '../../widgets/backend_badge.dart';
 import '../../widgets/luroka_mark.dart';
@@ -76,6 +78,18 @@ class _AboutScreenState extends State<AboutScreen> {
 
   Future<void> _showUpdate(Map<String, dynamic> update) =>
       showUpdateAvailableDialog(context, update, title: t.update.available, dismissLabel: t.common.later);
+
+  Future<void> _openPrivacyPolicy() async {
+    var opened = false;
+    try {
+      opened = await launchUrl(Uri.parse(AppIdentity.privacyUrl), mode: LaunchMode.externalApplication);
+    } catch (_) {
+      // Some TV devices do not have a browser installed.
+    }
+    if (!opened && mounted) {
+      await showErrorDialog(context, '${t.about.linkOpenFailed}\n${AppIdentity.privacyUrl}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +197,8 @@ class _AboutScreenState extends State<AboutScreen> {
               icon: Icons.privacy_tip_outlined,
               title: t.about.privacyPolicy,
               subtitle: t.about.privacyPolicyDescription,
-              destinationBuilder: (_) => const PrivacyPolicyScreen(),
+              onTap: PlatformDetector.isTV() ? null : _openPrivacyPolicy,
+              destinationBuilder: PlatformDetector.isTV() ? (_) => const PrivacyPolicyScreen() : null,
             ),
             SettingNavigationTile(
               icon: Icons.description_outlined,

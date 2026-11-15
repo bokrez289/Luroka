@@ -6,7 +6,7 @@ import '../../utils/platform_detector.dart';
 import '../../widgets/settings_surface.dart';
 import 'privacy_policy_content.g.dart';
 
-/// The policy is bundled so it is readable on TVs without a browser or network.
+/// Bundled policy remains readable on TVs without a browser or network.
 class PrivacyPolicyScreen extends StatefulWidget {
   const PrivacyPolicyScreen({super.key});
 
@@ -16,6 +16,7 @@ class PrivacyPolicyScreen extends StatefulWidget {
 
 class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
   final _scroll = ScrollController();
+
   @override
   void dispose() {
     _scroll.dispose();

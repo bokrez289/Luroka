@@ -45,9 +45,10 @@ class _AdultProfile extends ChangeNotifier implements ActiveProfileProvider {
 }
 
 void main() {
-  for (final firstRun in [false, true]) {
+  for (final scenario in [(false, false), (true, false), (false, true)]) {
+    final (firstRun, useHttp) = scenario;
     testWidgets(
-      'phone and TV pair ${firstRun ? 'on first run' : 'with an adult profile'} without exposing credentials',
+      'phone and TV pair ${firstRun ? 'on first run' : 'with an adult profile'} over ${useHttp ? 'HTTP with approval' : 'HTTPS'} without exposing credentials',
       (tester) async {
         tester.view.physicalSize = const Size(1600, 900);
         tester.view.devicePixelRatio = 1;
@@ -157,17 +158,30 @@ void main() {
         expect(find.text('Codes match'), findsOneWidget);
         await tester.tap(find.text('Codes match'));
         await _pumpUi(tester);
-        await tester.enterText(find.widgetWithText(TextField, 'Server URL'), 'https://media.example');
+        await tester.enterText(
+          find.widgetWithText(TextField, 'Server URL'),
+          '${useHttp ? 'http' : 'https'}://media.example',
+        );
         await tester.enterText(find.widgetWithText(TextField, 'Username'), 'Alice');
         await tester.enterText(find.widgetWithText(TextField, 'Password'), 'private-password');
         await tester.ensureVisible(find.text('Sign in and send'));
         await tester.tap(find.text('Sign in and send'));
+        if (useHttp) {
+          await _pumpUi(tester);
+          expect(find.text('Use HTTP for this server?'), findsOneWidget);
+          await tester.tap(find.text('Use HTTP'));
+        }
         for (var i = 0; i < 10 && find.text('Connection sent. Finish setup on your TV.').evaluate().isEmpty; i++) {
           await _pumpUi(tester);
         }
         expect(find.text('Could not sign in or complete pairing. Check the server and try again.'), findsNothing);
         expect(find.text('Connection sent. Finish setup on your TV.'), findsOneWidget);
         await tester.pump(const Duration(seconds: 2));
+        if (useHttp) {
+          await _pumpUi(tester);
+          expect(find.text('Use an unencrypted server?'), findsOneWidget);
+          await tester.tap(find.text('Use HTTP'));
+        }
         for (var i = 0; i < 10 && result == null; i++) {
           await _pumpUi(tester);
         }

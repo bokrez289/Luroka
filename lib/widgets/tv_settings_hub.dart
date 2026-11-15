@@ -178,11 +178,7 @@ class TvSettingsHubState extends State<TvSettingsHub> {
 
   void _back() {
     final category = _category;
-    if (category?.firstFocus.context?.findAncestorStateOfType<AppearanceWorkspaceState>()?.focusTabsFromContent() ==
-        true) {
-      return;
-    }
-    if (category != null && _scope(category.id).hasFocus) {
+    if (category != null && (_scope(category.id).hasFocus || _previewFocus.hasFocus)) {
       _node(category.id).requestFocus();
     } else {
       widget.onExitLeft();
@@ -396,8 +392,18 @@ class TvSettingsHubState extends State<TvSettingsHub> {
                                             if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
                                               return KeyEventResult.handled;
                                             }
-                                            if (index == 0 && event.logicalKey == LogicalKeyboardKey.arrowUp) {
-                                              (_advanced ? _advancedFocus : _everyday).requestFocus();
+                                            if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+                                              if (index + 1 < _visible.length) {
+                                                _node(_visible[index + 1].id).requestFocus();
+                                              }
+                                              return KeyEventResult.handled;
+                                            }
+                                            if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+                                              if (index > 0) {
+                                                _node(_visible[index - 1].id).requestFocus();
+                                              } else {
+                                                (_advanced ? _advancedFocus : _everyday).requestFocus();
+                                              }
                                               return KeyEventResult.handled;
                                             }
                                             return KeyEventResult.ignored;
