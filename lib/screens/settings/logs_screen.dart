@@ -280,18 +280,19 @@ class _LogsScreenState extends State<LogsScreen> with MountedSetStateMixin {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${t.messages.logId}:'),
+                Text('${t.messages.logSupportReference}:'),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
                       child: SelectableText(
-                        id,
+                        logSupportReference(id),
                         style: const TextStyle(fontWeight: .bold, fontFamily: 'monospace', fontSize: 18),
                       ),
                     ),
                     const SizedBox(width: 8),
                     IconButton(
+                      tooltip: t.messages.copyFullLogId,
                       icon: const AppIcon(Symbols.content_copy_rounded, size: 20),
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: id));

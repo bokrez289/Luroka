@@ -90,10 +90,10 @@ void main() {
       ),
     );
 
-    // No brand logo exists for an unattributed community score, so it keeps
-    // the generic icon and the neutral 0-10 rendering.
+    // Generic community scores use the preferred visual badge, without
+    // changing their source in the model.
     expect(find.text('8.3'), findsOneWidget);
-    expect(find.byType(SvgPicture), findsNothing);
+    expect(find.byType(SvgPicture), findsOneWidget);
   });
 
   testWidgets('dashboard spotlight omits the rating slot when the item has no score', (tester) async {

@@ -122,6 +122,58 @@ void main() {
     expect(find.text('Audio Passthrough'), findsNothing);
   });
 
+  testWidgets('resync seeks to the current position once and preserves manual offsets', (tester) async {
+    final gate = Completer<void>();
+    final positions = <Duration>[];
+    final writes = <String>[];
+    final player = _FakeSettingsPlayer(
+      state: const PlayerState(seekable: true, playing: false, position: Duration(seconds: 12)),
+      currentPosition: const Duration(seconds: 13, milliseconds: 250),
+      onSeek: (position) { positions.add(position); return gate.future; },
+      onSetProperty: (name, value) async => writes.add(name),
+    );
+    await _pumpSheet(tester, player: player, canControl: true);
+    await _openPlayerSection(tester, 'sound');
+    await tester.tap(find.byKey(const ValueKey('resync_playback')));
+    await tester.pump();
+    expect(positions, [const Duration(seconds: 13, milliseconds: 250)]);
+    expect(tester.widget<FocusableListTile>(find.byKey(const ValueKey('resync_playback'))).onTap, isNull);
+    expect(writes, isEmpty, reason: 'resync must not change manual delays');
+    gate.complete();
+    await tester.pumpAndSettle();
+    expect(find.text(t.videoSettings.resyncPlaybackDone), findsOneWidget);
+  });
+
+  testWidgets('resync is unavailable for live, unseekable, and restricted playback', (tester) async {
+    final player = _FakeSettingsPlayer(state: const PlayerState(seekable: true));
+    await _pumpSheet(tester, player: player, canControl: true, isLive: true);
+    await _openPlayerSection(tester, 'sound');
+    expect(find.byKey(const ValueKey('resync_playback')), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await _pumpSheet(tester, player: _FakeSettingsPlayer(), canControl: true);
+    await _openPlayerSection(tester, 'sound');
+    expect(find.byKey(const ValueKey('resync_playback')), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await _pumpSheet(tester, player: player, canControl: false);
+    await _openPlayerSection(tester, 'sound');
+    expect(find.byKey(const ValueKey('resync_playback')), findsNothing);
+  });
+
+  testWidgets('resync reports a player failure and allows retry', (tester) async {
+    final player = _FakeSettingsPlayer(
+      state: const PlayerState(seekable: true),
+      onSeek: (_) async => throw StateError('seek failed'),
+    );
+    await _pumpSheet(tester, player: player, canControl: true);
+    await _openPlayerSection(tester, 'sound');
+    await tester.tap(find.byKey(const ValueKey('resync_playback')));
+    await tester.pumpAndSettle();
+    expect(find.text(t.videoSettings.resyncPlaybackFailed), findsOneWidget);
+    await tester.tap(find.text(t.common.ok));
+    await tester.pumpAndSettle();
+    expect(tester.widget<FocusableListTile>(find.byKey(const ValueKey('resync_playback'))).onTap, isNotNull);
+  });
+
   testWidgets('TV root puts tracks first and each toggle is one remote focus stop', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(true);
     addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
@@ -796,6 +848,7 @@ Future<void> _pumpSheet(
   // Option views that dismiss themselves on selection reach
   // OverlaySheetController.of(), which asserts without a host above it.
   bool withSheetHost = false,
+  bool isLive = false,
   // The default is short enough that the ListView is lazy: callers that need a
   // row present without dragging to it pass a taller sheet, which builds all of
   // them.
@@ -807,7 +860,7 @@ Future<void> _pumpSheet(
     child: VideoSettingsSheet(
       player: player ?? _FakeSettingsPlayer(),
       supportsHdrControl: supportsHdrControl,
-      trackControlsState: TrackControlsState(canControl: canControl),
+      trackControlsState: TrackControlsState(canControl: canControl, isLive: isLive),
     ),
   );
   await tester.pumpWidget(
@@ -865,6 +918,8 @@ class _FakeSettingsPlayer implements Player {
     this.onSetRate,
     this.onSetAudioChannelLimit,
     this.onSetAudioDevice,
+    this.onSeek,
+    this.currentPosition = Duration.zero,
     this.state = const PlayerState(),
     this.hdrOutputSupported = false,
   });
@@ -886,6 +941,9 @@ class _FakeSettingsPlayer implements Player {
   final Future<void> Function(double rate)? onSetRate;
   final Future<void> Function(AudioChannelLimit limit, int centerBoostDb, bool normalize)? onSetAudioChannelLimit;
   final Future<void> Function(AudioDevice device)? onSetAudioDevice;
+  final Future<void> Function(Duration position)? onSeek;
+  @override
+  final Duration currentPosition;
   bool hdrOutputSupported;
   int probeCount = 0;
 
@@ -926,6 +984,9 @@ class _FakeSettingsPlayer implements Player {
   Future<void> setAudioDevice(AudioDevice device) {
     return onSetAudioDevice?.call(device) ?? Future<void>.value();
   }
+
+  @override
+  Future<void> seek(Duration position) => onSeek?.call(position) ?? Future<void>.value();
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

@@ -72,12 +72,13 @@ void main() {
     for (final text in ['2019', 'PG-13', '1h 46min', '1080p', 'HDR', '9.2', '7.4', '6.4']) {
       expect(find.text(text), findsOneWidget);
     }
-    expect(find.byType(AppIcon), findsNWidgets(3));
+    expect(find.byType(AppIcon), findsOneWidget);
+    expect(find.byType(SvgPicture), findsNWidgets(2));
     expect(find.text(FittedMetadataLine.separator), findsNWidgets(5));
   });
 
   testWidgets('sheds surplus rating badges from the end before anything else', (tester) async {
-    await _pumpLine(tester, width: 600);
+    await _pumpLine(tester, width: 620);
 
     expect(find.text('6.4'), findsNothing);
     expect(find.text('9.2'), findsOneWidget);
@@ -138,7 +139,8 @@ void main() {
   testWidgets('keeps everything when the width is unbounded', (tester) async {
     await _pumpLine(tester, width: 100, unboundedWidth: true);
 
-    expect(find.byType(AppIcon), findsNWidgets(3));
+    expect(find.byType(AppIcon), findsOneWidget);
+    expect(find.byType(SvgPicture), findsNWidgets(2));
     expect(find.text('6.4'), findsOneWidget);
   });
 

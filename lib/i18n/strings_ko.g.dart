@@ -3415,6 +3415,10 @@ class _Translations$videoSettings$ko extends Translations$videoSettings$en {
 	@override String get zoom => '확대/축소';
 	@override String get sleepTimer => '취침 타이머';
 	@override String get audioSync => '오디오 동기화';
+	@override String get resyncPlayback => '재생 다시 동기화';
+	@override String get resyncPlaybackDescription => '현재 위치에서 오디오와 비디오 새로 고침';
+	@override String get resyncPlaybackDone => '다시 동기화를 요청했습니다';
+	@override String get resyncPlaybackFailed => '재생을 다시 동기화할 수 없습니다';
 	@override String get subtitleSync => '자막 동기화';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => '여기서는 HDR을 사용할 수 없습니다. 이 데스크톱 컴포지터 또는 비디오 출력에서 HDR을 전달할 수 없습니다.';
@@ -7712,6 +7716,10 @@ extension on TranslationsKo {
 			'videoSettings.zoom' => '확대/축소',
 			'videoSettings.sleepTimer' => '취침 타이머',
 			'videoSettings.audioSync' => '오디오 동기화',
+			'videoSettings.resyncPlayback' => '재생 다시 동기화',
+			'videoSettings.resyncPlaybackDescription' => '현재 위치에서 오디오와 비디오 새로 고침',
+			'videoSettings.resyncPlaybackDone' => '다시 동기화를 요청했습니다',
+			'videoSettings.resyncPlaybackFailed' => '재생을 다시 동기화할 수 없습니다',
 			'videoSettings.subtitleSync' => '자막 동기화',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => '여기서는 HDR을 사용할 수 없습니다. 이 데스크톱 컴포지터 또는 비디오 출력에서 HDR을 전달할 수 없습니다.',
@@ -7928,12 +7936,12 @@ extension on TranslationsKo {
 			'seerr.requestFailed' => ({required Object error}) => '요청 실패: ${error}',
 			'seerr.requestsLoadFailed' => '요청 옵션을 불러올 수 없습니다',
 			'seerr.nothingToRequest' => '모두 이미 사용 가능하거나 요청되었습니다.',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusAvailable' => '사용 가능',
 			'seerr.statusPartiallyAvailable' => '일부 사용 가능',
 			'seerr.statusRequested' => '요청됨',
 			'seerr.statusProcessing' => '처리 중',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => '차단 목록에 있음',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => '${url}에 연결할 수 없습니다: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => '${url}에 Seerr 인스턴스가 없습니다(HTTP ${status})',

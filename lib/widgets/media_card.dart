@@ -359,6 +359,15 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
 
   String _semanticLabel(Object item) {
     final mediaItem = item is MediaItem ? item : null;
+    if (mediaItem?.raw?['upcomingShow'] is MediaItem) {
+      final date = DateTime.tryParse(mediaItem!.originallyAvailableAt ?? '');
+      return [
+        mediaItem.grandparentTitle,
+        formatSeasonEpisodeLabel(mediaItem.parentIndex, mediaItem.index),
+        if (!SettingsService.instance.read(SettingsService.hideSpoilers)) mediaItem.title,
+        if (date != null) t.homeLayout.airDate(date: _upcomingDate(context, date)),
+      ].whereType<String>().where((text) => text.isNotEmpty).join(', ');
+    }
     final isWatched = mediaItem?.isWatched;
     final viewOffsetMs = mediaItem?.viewOffsetMs;
     final durationMs = mediaItem?.durationMs;
@@ -396,6 +405,7 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
 
   /// True when [MediaCard.onLongPress] or the catalog menu took the gesture.
   bool _showOverridingContextMenu({Offset? position}) {
+    if (widget.item is MediaItem && (widget.item as MediaItem).raw?['upcomingShow'] is MediaItem) return true;
     if (widget.onLongPress case final onLongPress?) {
       onLongPress();
       return true;
@@ -422,6 +432,13 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
     // Ignore taps while context menu is open to avoid double-activating
     if (contextMenuKey.currentState?.isContextMenuOpen == true) {
       return;
+    }
+    if (item is MediaItem) {
+      final show = item.raw?['upcomingShow'];
+      if (show is MediaItem) {
+        await navigateToMediaItemDetails(context, show, onRefresh: widget.onRefresh);
+        return;
+      }
     }
     if (widget.onTap case final onTap?) {
       onTap();
@@ -489,7 +506,7 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
 
     final semanticLabel = _semanticLabel(item);
     final accessibleNavigation = MediaQuery.accessibleNavigationOf(context);
-    final enableDetailLinks = widget.onTap == null;
+    final enableDetailLinks = widget.onTap == null && !(item is MediaItem && item.raw?['upcomingShow'] is MediaItem);
     final preservePointerDetailSemantics = !PlatformDetector.isTV() || accessibleNavigation;
     final preserveDetailSemantics =
         preservePointerDetailSemantics && enableDetailLinks && item is MediaItem && _hasPointerDetailLinks(item);
@@ -676,6 +693,32 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
     final tvContinue =
         PlatformDetector.isTV() && widget.cinemaArtwork && widget.isInContinueWatching && item is MediaItem;
     final overlays = <Widget>[
+      if (item is MediaItem && item.raw?['upcomingShow'] is MediaItem)
+        Positioned(
+          left: 0, right: 0, bottom: 0,
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: const BoxDecoration(gradient: LinearGradient(
+              begin: Alignment.topCenter, end: Alignment.bottomCenter,
+              colors: [Colors.transparent, Color(0xee10131b)],
+            )),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+              Text(item.grandparentTitle ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+              Text([formatSeasonEpisodeLabel(item.parentIndex, item.index),
+                if (!SettingsService.instance.read(SettingsService.hideSpoilers)) item.title,
+              ].whereType<String>().join(' · '),
+                maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white70)),
+              if (DateTime.tryParse(item.originallyAvailableAt ?? '') case final date?)
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(_upcomingDate(context, date), maxLines: 1,
+                    style: const TextStyle(color: Colors.white70)),
+                ),
+            ]),
+          ),
+        ),
       if (tvContinue)
         Positioned.fill(
           child: Align(
@@ -709,6 +752,7 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
       if (!tvContinue &&
           widget.cinemaArtwork &&
           item is MediaItem &&
+          item.raw?['upcomingShow'] is! MediaItem &&
           (item.isEpisode || widget.cardShapeOverride == CardShape.wide || item.raw?['detailChapterStart'] is int)) ...[
         Positioned(
           left: 0,
@@ -956,6 +1000,15 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
   }
 
   bool _impliesShowTitle(MediaItem item) => widget.showTitleImplied && item.isEpisode;
+}
+
+String _upcomingDate(BuildContext context, DateTime date) {
+  final local = date.toLocal();
+  final now = DateTime.now();
+  final day = DateUtils.dateOnly(local);
+  if (day == DateUtils.dateOnly(now)) return t.showSchedule.today;
+  if (day == DateTime(now.year, now.month, now.day + 1)) return t.showSchedule.tomorrow;
+  return MaterialLocalizations.of(context).formatMediumDate(local);
 }
 
 class _MediaCardList extends StatelessWidget {
@@ -1750,11 +1803,10 @@ class _CatalogBadges extends StatelessWidget {
         crossAxisAlignment: .start,
         children: [
           if (remainingItem != null || (copyCount ?? 0) > 1) ...[
-            Wrap(
-              spacing: 4,
-              runSpacing: 4,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (remainingItem case final item?) RemainingEpisodesBadge(key: ValueKey(item.globalKey), item: item),
                 if ((copyCount ?? 0) > 1)
                   DecoratedBox(
                     key: const ValueKey('media-copy-count'),
@@ -1777,6 +1829,8 @@ class _CatalogBadges extends StatelessWidget {
                       ),
                     ),
                   ),
+                if ((copyCount ?? 0) <= 1) const SizedBox.shrink(),
+                if (remainingItem case final item?) RemainingEpisodesBadge(key: ValueKey(item.globalKey), item: item),
               ],
             ),
             if (labels.isNotEmpty) const SizedBox(height: 3),
@@ -1884,7 +1938,8 @@ bool _hasClickableTitle(MediaItem mi) {
 }
 
 void _navigateToFocusedDetail(BuildContext context, MediaItem item, {bool isOffline = false}) {
-  navigateToMediaItemDetails(context, item, isOffline: isOffline);
+  final show = item.raw?['upcomingShow'];
+  navigateToMediaItemDetails(context, show is MediaItem ? show : item, isOffline: isOffline);
 }
 
 /// Text widget that shows hover underline + pointer cursor only in pointer mode.

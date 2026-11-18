@@ -1260,6 +1260,10 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     final handled = await widget.onActivateItem?.call(hub, item);
     if (handled == true) return;
     if (!mounted) return;
+    if (item.raw?['upcomingShow'] case final MediaItem show) {
+      await navigateToMediaItemDetails(context, show, onRefresh: widget.onRefresh);
+      return;
+    }
     await navigateToMediaItem(
       context,
       item,

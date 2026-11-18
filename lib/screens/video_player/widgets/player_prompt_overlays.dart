@@ -331,9 +331,9 @@ class VideoPlayerPlayNextOverlay extends StatelessWidget {
     // visible=false for the whole episode, and the lookup hashes the artwork
     // path per call.
     final backdrop = visible ? _buildThumbnailBackdrop(context, episode) : null;
-    if (PlatformDetector.isTV()) {
-      if (!visible) return const SizedBox.shrink();
-      return ValueListenableBuilder<bool>(
+    if (!visible) return const SizedBox.shrink();
+    final tv = PlatformDetector.isTV();
+    return ValueListenableBuilder<bool>(
         valueListenable: PipService().isPipActive,
         builder: (context, inPip, _) => inPip
             ? const SizedBox.shrink()
@@ -342,34 +342,44 @@ class VideoPlayerPlayNextOverlay extends StatelessWidget {
                 child: _VideoPlayerPromptInteractionHold(
                   chromeController: chromeController,
                   focusNodes: [cancelFocusNode, confirmFocusNode],
-                  child: _VideoPlayerPromptCard(
+                  child: _NextEpisodeCard(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        if (tv) ...[
+                          const _PlayNextLabel(badge: true),
+                          const SizedBox(height: 12),
+                        ],
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: tv ? CrossAxisAlignment.center : CrossAxisAlignment.start,
                           children: [
-                            if (backdrop != null) ...[
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: SizedBox(width: 112, height: 72, child: backdrop),
+                            _NextEpisodeArtwork(image: backdrop),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                   _PlayNextEpisodeHeader(episode: episode, showLabel: !tv),
+                                  if (episode.durationMs != null) ...[
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      formatDurationTextual(episode.durationMs!),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(color: Colors.white60, fontSize: 12),
+                                    ),
+                                  ],
+                                ],
                               ),
-                              const SizedBox(width: 14),
-                            ],
-                            Expanded(child: _PlayNextEpisodeHeader(episode: episode)),
+                            ),
                           ],
                         ),
-                        if (episode.durationMs != null) ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            formatDurationTextual(episode.durationMs!),
-                            style: const TextStyle(color: Colors.white70, fontSize: 12),
-                          ),
-                        ],
                         _PlayNextCountdown(countdown: autoPlayCountdown),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 12),
                         _VideoPlayerPromptActions(
+                          nextEpisodeStyle: true,
                           cancelLabel: t.lurokaPlayerDesign.keepWatching,
                           cancelFocusNode: cancelFocusNode,
                           onCancel: onCancel,
@@ -387,48 +397,9 @@ class VideoPlayerPlayNextOverlay extends StatelessWidget {
                 ),
               ),
       );
-    }
-    return _VideoPlayerPromptShell(
-      visible: visible,
-      chromeController: chromeController,
-      focusNodes: [cancelFocusNode, confirmFocusNode],
-      backdrop: backdrop,
-      children: [
-        // Clear region that keeps the still visible above the scrimmed text.
-        if (backdrop != null) const SizedBox(height: 110),
-        _PlayNextEpisodeHeader(episode: episode),
-        const SizedBox(height: 12),
-        _VideoPlayerPromptActions(
-          cancelLabel: t.common.cancel,
-          cancelFocusNode: cancelFocusNode,
-          onCancel: onCancel,
-          confirmFocusNode: confirmFocusNode,
-          onConfirm: onPlayNext,
-          confirmChildren: [
-            ValueListenableBuilder<int>(
-              valueListenable: autoPlayCountdown,
-              builder: (context, countdown, child) {
-                if (countdown <= 0) return Text(t.videoControls.playNext);
-                return Row(
-                  mainAxisSize: .min,
-                  children: [
-                    Flexible(child: Text(t.videoControls.playNext, maxLines: 1, overflow: TextOverflow.ellipsis)),
-                    const SizedBox(width: 8),
-                    Text('$countdown'),
-                    const SizedBox(width: 4),
-                    const AppIcon(Symbols.play_arrow_rounded, fill: 1, size: 18),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-      ],
-    );
   }
 
-  /// The next episode's 16:9 video-frame still, painted edge-to-edge behind
-  /// the prompt text under the card's scrim.
+  /// The next episode's video-frame still, shown in the card's artwork slot.
   ///
   /// Null keeps the original text-only card: the item has no thumb, or
   /// nothing could serve one (no live client and no artwork directory for a
@@ -465,10 +436,82 @@ class VideoPlayerPlayNextOverlay extends StatelessWidget {
   }
 }
 
+/// A compact cinema surface: one distinct tile rather than the generic player
+/// dialog, so the episode stays in view while the next action is easy to find.
+class _NextEpisodeCard extends StatelessWidget {
+  const _NextEpisodeCard({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = Theme.of(context).colorScheme.primary;
+    final width = (MediaQuery.sizeOf(context).width - 32).clamp(0.0, PlatformDetector.isTV() ? 420.0 : 360.0);
+    return Container(
+      key: const ValueKey('up-next-card'),
+      width: width,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+         gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+           colors: [
+             Color.alphaBlend(accent.withValues(alpha: .14), const Color(0xf5222732)),
+             const Color(0xf2161922),
+             const Color(0xf2101219),
+           ],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Color.alphaBlend(accent.withValues(alpha: .18), const Color(0x40ffffff))),
+        boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 24, offset: Offset(0, 10))],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _NextEpisodeArtwork extends StatelessWidget {
+  const _NextEpisodeArtwork({required this.image});
+  final Widget? image;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = PlatformDetector.isTV() ? 148.0 : 100.0;
+    final accent = Theme.of(context).colorScheme.primary;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: SizedBox(
+        width: width,
+        height: width * 9 / 16,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [accent.withValues(alpha: .35), const Color(0xff202531), const Color(0xff11141d)],
+              )),
+            ),
+            ?image,
+            const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.transparent, Color(0x55000000)],
+            ))),
+             if (image == null)
+               const Center(child: Icon(Symbols.play_circle_rounded, color: Colors.white70, size: 28)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _PlayNextEpisodeHeader extends StatelessWidget {
   final MediaItem episode;
+  final bool showLabel;
 
-  const _PlayNextEpisodeHeader({required this.episode});
+  const _PlayNextEpisodeHeader({required this.episode, required this.showLabel});
 
   @override
   Widget build(BuildContext context) {
@@ -478,39 +521,17 @@ class _PlayNextEpisodeHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: .start,
             children: [
-              Consumer<PlaybackStateProvider>(
-                builder: (context, playbackState, child) {
-                  final isShuffleActive = playbackState.isShuffleActive;
-                  return Row(
-                    children: [
-                      Text(
-                        PlatformDetector.isTV() ? t.lurokaPlayerDesign.upNext : t.videoControls.nextEpisode,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 11,
-                          fontWeight: .w700,
-                          letterSpacing: 1.6,
-                        ),
-                      ),
-                      if (isShuffleActive) ...[
-                        const SizedBox(width: 4),
-                        AppIcon(Symbols.shuffle_rounded, fill: 1, size: 12, color: Colors.white.withValues(alpha: 0.7)),
-                      ],
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(height: 4),
+              if (showLabel) ...[const _PlayNextLabel(), const SizedBox(height: 4)],
               if (episode.parentIndex != null && episode.index != null)
                 Text(
-                  'S${episode.parentIndex} E${episode.index} · ${episode.title}',
+                  'S${episode.parentIndex} E${episode.index} · ${episode.displayTitle}',
                   style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: .w600),
                   maxLines: 2,
                   overflow: .ellipsis,
                 )
               else
                 Text(
-                  episode.title!,
+                  episode.displayTitle,
                   style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: .w600),
                   maxLines: 2,
                   overflow: .ellipsis,
@@ -519,6 +540,42 @@ class _PlayNextEpisodeHeader extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PlayNextLabel extends StatelessWidget {
+  const _PlayNextLabel({this.badge = false});
+  final bool badge;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = Theme.of(context).colorScheme.primary;
+    final shuffle = context.select<PlaybackStateProvider, bool>((state) => state.isShuffleActive);
+    final label = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (badge) ...[
+          AppIcon(Symbols.play_arrow_rounded, size: 15, color: accent, fill: 1),
+          const SizedBox(width: 5),
+        ],
+        Flexible(child: Text(
+          badge ? t.lurokaPlayerDesign.upNext : t.videoControls.nextEpisode,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: accent, fontSize: badge ? 12 : 11, fontWeight: .w700, letterSpacing: 1.4),
+        )),
+        if (shuffle) ...[
+          const SizedBox(width: 5),
+          const AppIcon(Symbols.shuffle_rounded, fill: 1, size: 12, color: Colors.white70),
+        ],
+      ],
+    );
+    if (!badge) return label;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(color: accent.withValues(alpha: .14), borderRadius: BorderRadius.circular(20)),
+      child: label,
     );
   }
 }
@@ -552,7 +609,8 @@ class _PlayNextCountdownState extends State<_PlayNextCountdown> {
               value: (seconds / _total).clamp(0, 1),
               minHeight: 3,
               borderRadius: BorderRadius.circular(3),
-              backgroundColor: Colors.white12,
+               backgroundColor: Colors.white12,
+               color: Theme.of(context).colorScheme.primary,
             ),
           ],
         ),
@@ -626,15 +684,12 @@ class _VideoPlayerPromptShell extends StatelessWidget {
   final PlayerChromeController chromeController;
   final List<FocusNode> focusNodes;
 
-  /// Full-bleed artwork painted behind [children] under a darkening scrim.
-  final Widget? backdrop;
   final List<Widget> children;
 
   const _VideoPlayerPromptShell({
     required this.visible,
     required this.chromeController,
     required this.focusNodes,
-    this.backdrop,
     required this.children,
   });
 
@@ -652,7 +707,6 @@ class _VideoPlayerPromptShell extends StatelessWidget {
             chromeController: chromeController,
             focusNodes: focusNodes,
             child: _VideoPlayerPromptCard(
-              backdrop: backdrop,
               child: Column(mainAxisSize: .min, crossAxisAlignment: .start, children: children),
             ),
           ),
@@ -669,6 +723,7 @@ class _VideoPlayerPromptActions extends StatelessWidget {
   final FocusNode confirmFocusNode;
   final VoidCallback onConfirm;
   final List<Widget> confirmChildren;
+  final bool nextEpisodeStyle;
 
   const _VideoPlayerPromptActions({
     required this.cancelLabel,
@@ -677,6 +732,7 @@ class _VideoPlayerPromptActions extends StatelessWidget {
     required this.confirmFocusNode,
     required this.onConfirm,
     required this.confirmChildren,
+    this.nextEpisodeStyle = false,
   });
 
   @override
@@ -695,11 +751,11 @@ class _VideoPlayerPromptActions extends StatelessWidget {
               onPressed: onCancel,
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.white,
-                side: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                side: BorderSide(color: Colors.white.withValues(alpha: nextEpisodeStyle ? 0.2 : 0.5)),
+                padding: EdgeInsets.symmetric(vertical: nextEpisodeStyle ? 10 : 12, horizontal: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(nextEpisodeStyle ? 14 : 10)),
               ),
-              child: Text(cancelLabel),
+              child: FittedBox(fit: BoxFit.scaleDown, child: Text(cancelLabel, maxLines: 1)),
             ),
           ),
         ),
@@ -718,12 +774,16 @@ class _VideoPlayerPromptActions extends StatelessWidget {
               style: FilledButton.styleFrom(
                 backgroundColor: PlatformDetector.isTV() ? Theme.of(context).colorScheme.primary : Colors.white,
                 foregroundColor: PlatformDetector.isTV() ? Theme.of(context).colorScheme.onPrimary : Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: EdgeInsets.symmetric(vertical: nextEpisodeStyle ? 10 : 12, horizontal: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(nextEpisodeStyle ? 14 : 10)),
               ),
-              child: Row(
-                mainAxisAlignment: .center,
-                children: [for (final child in confirmChildren) Flexible(child: child)],
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: confirmChildren,
+                ),
               ),
             ),
           ),
@@ -760,15 +820,12 @@ class _VideoPlayerPromptPosition extends StatelessWidget {
 }
 
 class _VideoPlayerPromptCard extends StatelessWidget {
-  /// See [_VideoPlayerPromptShell.backdrop].
-  final Widget? backdrop;
   final Widget child;
 
-  const _VideoPlayerPromptCard({this.backdrop, required this.child});
+  const _VideoPlayerPromptCard({required this.child});
 
   @override
   Widget build(BuildContext context) {
-    final backdrop = this.backdrop;
     final content = Padding(padding: const EdgeInsets.all(20), child: child);
     final width = (MediaQuery.sizeOf(context).width - 64).clamp(0.0, PlatformDetector.isTV() ? 420.0 : 360.0);
     final decoration = BoxDecoration(
@@ -776,36 +833,7 @@ class _VideoPlayerPromptCard extends StatelessWidget {
       border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: .3)),
       borderRadius: const BorderRadius.all(Radius.circular(18)),
     );
-    if (backdrop == null) {
-      return Container(width: width, decoration: decoration, child: content);
-    }
-    return Container(
-      width: width,
-      clipBehavior: Clip.antiAlias,
-      decoration: decoration,
-      child: Stack(
-        children: [
-          Positioned.fill(child: backdrop),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: const [0.0, 0.35, 0.78],
-                  colors: [
-                    Colors.black.withValues(alpha: 0.05),
-                    Colors.black.withValues(alpha: 0.25),
-                    Colors.black.withValues(alpha: 0.92),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          content,
-        ],
-      ),
-    );
+    return Container(width: width, decoration: decoration, child: content);
   }
 }
 

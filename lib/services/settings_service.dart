@@ -1,5 +1,7 @@
 import 'dart:convert';
 import '../media/ids.dart';
+import '../media/icon_style.dart';
+import '../media/show_detail_layout.dart';
 import '../media/playback_rate.dart';
 import '../media/media_version_preference.dart';
 import 'dart:io';
@@ -759,6 +761,12 @@ class SettingsService extends BaseSharedPreferencesService {
     defaultValue: HdrToneMapping.compositor,
   );
   static const viewMode = EnumPref<ViewMode>('view_mode', values: ViewMode.values, defaultValue: ViewMode.grid);
+  static const iconStyle = EnumPref<AppIconStyle>(
+    'luroka_icon_style', values: AppIconStyle.values, defaultValue: AppIconStyle.current,
+  );
+  static const showDetailLayout = EnumPref<ShowDetailLayout>(
+    'luroka_show_detail_layout', values: ShowDetailLayout.values, defaultValue: ShowDetailLayout.cinematic,
+  );
   static const seekTimeSmall = IntPref('seek_time_small', defaultValue: 10);
   static const seekTimeLarge = IntPref('seek_time_large', defaultValue: 30);
   static const rewindOnResume = IntPref('rewind_on_resume');
@@ -929,6 +937,7 @@ class SettingsService extends BaseSharedPreferencesService {
   /// Restore the last music session parked-paused on launch.
   static const resumeMusicOnLaunch = BoolPref('resume_music_on_launch', defaultValue: true);
   static const autoPlayNextEpisode = BoolPref('auto_play_next_episode', defaultValue: true);
+  static const showEarlyNextEpisode = BoolPref('show_early_next_episode', defaultValue: true);
 
   /// Shuffled video queues start every episode at 0:00 instead of resuming
   /// from the server-side view offset. Off preserves resume behavior.
@@ -1151,6 +1160,7 @@ class SettingsService extends BaseSharedPreferencesService {
   );
   static const automotiveUiScale = _AutomotiveUiScalePref();
   static const tvCornerSpotlightBackdrop = BoolPref('tv_corner_spotlight_backdrop');
+  static const backdropBrightness = IntPref('backdrop_brightness', defaultValue: 100);
   static const episodePosterMode = _EpisodePosterModePref();
   static const continueWatchingAction = EnumPref<ContinueWatchingAction>(
     'continue_watching_action',
@@ -1267,6 +1277,8 @@ class SettingsService extends BaseSharedPreferencesService {
   // to profile changes as well.
   static final Set<String> profileSettingKeys = {
     themeMode.key,
+    iconStyle.key,
+    showDetailLayout.key,
     customThemePalette.key,
     posterDetails.key,
     groupRecentEpisodes.key,
@@ -1295,6 +1307,7 @@ class SettingsService extends BaseSharedPreferencesService {
     libraryDensity.key,
     gridSpacing.key,
     tvCornerSpotlightBackdrop.key,
+    backdropBrightness.key,
     viewMode.key,
     seekTimeSmall.key,
     seekTimeLarge.key,
@@ -1327,6 +1340,7 @@ class SettingsService extends BaseSharedPreferencesService {
     directPlayCoveredQuality.key,
     musicQualityPreset.key,
     autoPlayNextEpisode.key,
+    showEarlyNextEpisode.key,
     playNextCountdown.key,
     shuffleStartsFromBeginning.key,
     gestureBrightnessSwipe.key,
@@ -1485,20 +1499,24 @@ class SettingsService extends BaseSharedPreferencesService {
   Future<void> saveProfileAppearanceChoices({
     required String profileId,
     ThemeMode? theme,
+    AppIconStyle? iconStyleChoice,
     bool? showPosterDetails,
     bool? playThemeMusic,
     bool? showSpotlight,
     bool? showEpisodeThumbnails,
+    ShowDetailLayout? showLayout,
   }) async {
     if (!_profileSettingsEnabled || _settingsProfileId != profileId) {
       throw StateError('The active profile changed during setup');
     }
     final changes = <String, Object?>{
       if (theme != null) themeMode.key: theme.name,
+      if (iconStyleChoice != null) iconStyle.key: iconStyleChoice.name,
       posterDetails.key: ?showPosterDetails,
       showThemeMusic.key: ?playThemeMusic,
       showHeroSection.key: ?showSpotlight,
       homeEpisodeThumbnails.key: ?showEpisodeThumbnails,
+      if (showLayout != null) showDetailLayout.key: showLayout.name,
     };
     if (changes.isEmpty) return;
     final store = _profileSettings;
@@ -1929,6 +1947,7 @@ class SettingsService extends BaseSharedPreferencesService {
     showThemeMusic,
     catalogEpisodeInfo,
     homeHeroSize,
+    backdropBrightness,
     homePosterSize,
     sleepTimerDuration,
     audioSyncOffset,
@@ -1961,6 +1980,7 @@ class SettingsService extends BaseSharedPreferencesService {
     musicVolume,
     resumeMusicOnLaunch,
     autoPlayNextEpisode,
+    showEarlyNextEpisode,
     playNextCountdown,
     shuffleStartsFromBeginning,
     gestureBrightnessSwipe,

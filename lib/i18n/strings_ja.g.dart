@@ -3415,6 +3415,10 @@ class _Translations$videoSettings$ja extends Translations$videoSettings$en {
 	@override String get zoom => 'ズーム';
 	@override String get sleepTimer => 'スリープタイマー';
 	@override String get audioSync => '音声同期';
+	@override String get resyncPlayback => '再生を再同期';
+	@override String get resyncPlaybackDescription => '現在位置で音声と映像を更新';
+	@override String get resyncPlaybackDone => '再同期を要求しました';
+	@override String get resyncPlaybackFailed => '再生を再同期できませんでした';
 	@override String get subtitleSync => '字幕同期';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => 'ここではHDRを利用できません。このデスクトップコンポジターまたは映像出力はHDRに対応していません。';
@@ -7712,6 +7716,10 @@ extension on TranslationsJa {
 			'videoSettings.zoom' => 'ズーム',
 			'videoSettings.sleepTimer' => 'スリープタイマー',
 			'videoSettings.audioSync' => '音声同期',
+			'videoSettings.resyncPlayback' => '再生を再同期',
+			'videoSettings.resyncPlaybackDescription' => '現在位置で音声と映像を更新',
+			'videoSettings.resyncPlaybackDone' => '再同期を要求しました',
+			'videoSettings.resyncPlaybackFailed' => '再生を再同期できませんでした',
 			'videoSettings.subtitleSync' => '字幕同期',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'ここではHDRを利用できません。このデスクトップコンポジターまたは映像出力はHDRに対応していません。',
@@ -7928,12 +7936,12 @@ extension on TranslationsJa {
 			'seerr.requestFailed' => ({required Object error}) => 'リクエストに失敗しました: ${error}',
 			'seerr.requestsLoadFailed' => 'リクエストオプションを読み込めませんでした',
 			'seerr.nothingToRequest' => 'すべてすでに利用可能またはリクエスト済みです。',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusAvailable' => '利用可能',
 			'seerr.statusPartiallyAvailable' => '一部利用可能',
 			'seerr.statusRequested' => 'リクエスト済み',
 			'seerr.statusProcessing' => '処理中',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'ブロックリスト登録済み',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => '${url}に接続できませんでした: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => '${url}にSeerrインスタンスがありません（HTTP ${status}）',

@@ -3441,6 +3441,10 @@ class _Translations$videoSettings$ru extends Translations$videoSettings$en {
 	@override String get zoom => 'Масштаб';
 	@override String get sleepTimer => 'Таймер сна';
 	@override String get audioSync => 'Синхронизация аудио';
+	@override String get resyncPlayback => 'Повторно синхронизировать воспроизведение';
+	@override String get resyncPlaybackDescription => 'Обновить звук и видео в текущей позиции';
+	@override String get resyncPlaybackDone => 'Повторная синхронизация запрошена';
+	@override String get resyncPlaybackFailed => 'Не удалось синхронизировать воспроизведение';
 	@override String get subtitleSync => 'Синхронизация субтитров';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => 'HDR здесь недоступен: этот композитор рабочего стола или видеовыход не поддерживает его передачу.';
@@ -7742,6 +7746,10 @@ extension on TranslationsRu {
 			'videoSettings.zoom' => 'Масштаб',
 			'videoSettings.sleepTimer' => 'Таймер сна',
 			'videoSettings.audioSync' => 'Синхронизация аудио',
+			'videoSettings.resyncPlayback' => 'Повторно синхронизировать воспроизведение',
+			'videoSettings.resyncPlaybackDescription' => 'Обновить звук и видео в текущей позиции',
+			'videoSettings.resyncPlaybackDone' => 'Повторная синхронизация запрошена',
+			'videoSettings.resyncPlaybackFailed' => 'Не удалось синхронизировать воспроизведение',
 			'videoSettings.subtitleSync' => 'Синхронизация субтитров',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'HDR здесь недоступен: этот композитор рабочего стола или видеовыход не поддерживает его передачу.',
@@ -7958,12 +7966,12 @@ extension on TranslationsRu {
 			'seerr.requestFailed' => ({required Object error}) => 'Ошибка запроса: ${error}',
 			'seerr.requestsLoadFailed' => 'Не удалось загрузить параметры запроса',
 			'seerr.nothingToRequest' => 'Всё уже доступно или запрошено.',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Доступно',
 			'seerr.statusPartiallyAvailable' => 'Частично доступно',
 			'seerr.statusRequested' => 'Запрошено',
 			'seerr.statusProcessing' => 'Обработка',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'В списке блокировки',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Не удалось связаться с ${url}: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'По адресу ${url} нет экземпляра Seerr (HTTP ${status})',

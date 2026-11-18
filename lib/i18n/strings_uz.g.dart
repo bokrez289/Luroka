@@ -3415,6 +3415,10 @@ class _Translations$videoSettings$uz extends Translations$videoSettings$en {
 	@override String get zoom => 'Masshtab';
 	@override String get sleepTimer => 'Uyqu taymeri';
 	@override String get audioSync => 'Audio sinxronlash';
+	@override String get resyncPlayback => 'Ijroni qayta sinxronlash';
+	@override String get resyncPlaybackDescription => 'Joriy joyda audio va videoni yangilash';
+	@override String get resyncPlaybackDone => 'Qayta sinxronlash soʻraldi';
+	@override String get resyncPlaybackFailed => 'Ijroni qayta sinxronlab boʻlmadi';
 	@override String get subtitleSync => 'Subtitr sinxronlash';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => 'Bu yerda HDR mavjud emas — ish stoli kompozitori yoki video chiqishi uni uzata olmaydi.';
@@ -7712,6 +7716,10 @@ extension on TranslationsUz {
 			'videoSettings.zoom' => 'Masshtab',
 			'videoSettings.sleepTimer' => 'Uyqu taymeri',
 			'videoSettings.audioSync' => 'Audio sinxronlash',
+			'videoSettings.resyncPlayback' => 'Ijroni qayta sinxronlash',
+			'videoSettings.resyncPlaybackDescription' => 'Joriy joyda audio va videoni yangilash',
+			'videoSettings.resyncPlaybackDone' => 'Qayta sinxronlash soʻraldi',
+			'videoSettings.resyncPlaybackFailed' => 'Ijroni qayta sinxronlab boʻlmadi',
 			'videoSettings.subtitleSync' => 'Subtitr sinxronlash',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'Bu yerda HDR mavjud emas — ish stoli kompozitori yoki video chiqishi uni uzata olmaydi.',
@@ -7928,12 +7936,12 @@ extension on TranslationsUz {
 			'seerr.requestFailed' => ({required Object error}) => 'Soʻrov xatoligi: ${error}',
 			'seerr.requestsLoadFailed' => 'Parametrlarni yuklab boʻlmadi',
 			'seerr.nothingToRequest' => 'Barchasi avvaldan bor yoki soʻralgan.',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Mavjud',
 			'seerr.statusPartiallyAvailable' => 'Qisman mavjud',
 			'seerr.statusRequested' => 'Soʻraldi',
 			'seerr.statusProcessing' => 'Ishlanmoqda',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Bloklangan roʻyxatda',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => '${url} manziliga ulanib boʻlmadi: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => '${url} manzilida Seerr nusxasi yoʻq (HTTP ${status})',

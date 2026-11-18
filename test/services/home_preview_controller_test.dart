@@ -50,6 +50,71 @@ MediaItem item(String id, {String server = 'server', String? summary}) => MediaI
 );
 
 void main() {
+  test('Home prefers a resolved IMDb rating while retaining server-score provenance', () => fakeAsync((clock) {
+    final client = _Client('server');
+    final requested = <String>[];
+    final controller = HomePreviewController(
+      resolveClient: (_) => client,
+      includeShowMetadata: true,
+      lookupImdb: (item, _, current) async {
+        requested.add(item.id);
+        return const MediaRatingSource(source: 'imdb', value: 7.6);
+      },
+    );
+    final episode = MediaItem.plex(id: 'ep', kind: MediaKind.episode, serverId: 'server',
+      grandparentId: 'show', grandparentTitle: 'Show', ratings: const [MediaRatingSource(source: 'audience', value: 8)]);
+    controller.select(episode, rowTitle: 'Continue Watching');
+    clock.elapse(const Duration(milliseconds: 220));
+    client.replies.single.complete(episode.copyWith(genres: ['Drama']));
+    clock.flushMicrotasks();
+    expect(requested, ['show']);
+    expect(controller.value!.item.ratings!.map((rating) => rating.source), ['imdb', 'audience']);
+    controller.dispose();
+  }));
+
+  test('a late IMDb reply cannot replace a newer Home selection', () => fakeAsync((clock) {
+    final client = _Client('server');
+    final rating = Completer<MediaRatingSource?>();
+    final controller = HomePreviewController(resolveClient: (_) => client,
+      lookupImdb: (_, _, _) => rating.future);
+    controller.select(item('a'), rowTitle: 'Movies');
+    clock.elapse(const Duration(milliseconds: 220));
+    client.replies.single.complete(item('a', summary: 'A'));
+    clock.flushMicrotasks();
+    controller.select(item('b'), rowTitle: 'Movies');
+    rating.complete(const MediaRatingSource(source: 'imdb', value: 8.5));
+    clock.flushMicrotasks();
+    expect(controller.value!.item.id, 'b');
+    expect(controller.value!.item.ratings, isNull);
+    controller.dispose();
+  }));
+
+  test('Home enriches an episode from its series without losing playback identity', () => fakeAsync((clock) {
+    final client = _Client('server');
+    final controller = HomePreviewController(resolveClient: (_) => client, includeShowMetadata: true);
+    final episode = MediaItem.plex(id: 'episode', kind: MediaKind.episode, title: 'Episode',
+      serverId: 'server', grandparentId: 'series', grandparentTitle: 'Series',
+      parentIndex: 1, index: 2, summary: 'Episode synopsis', durationMs: 3600000, viewOffsetMs: 5000);
+    controller.select(episode, rowTitle: 'Continue Watching', usesContinueWatchingAction: true);
+    clock.elapse(const Duration(milliseconds: 220));
+    expect(client.requests, ['episode']);
+    client.replies[0].complete(episode);
+    clock.flushMicrotasks();
+    expect(client.requests, ['episode', 'series']);
+    client.replies[1].complete(MediaItem.plex(id: 'series', kind: MediaKind.show, title: 'Series',
+      serverId: 'server', genres: ['Drama'], directors: ['Director'],
+      ratings: const [MediaRatingSource(source: 'imdb', value: 8.4)]));
+    clock.flushMicrotasks();
+    final result = controller.value!.item;
+    expect(result.id, 'episode');
+    expect(result.viewOffsetMs, 5000);
+    expect(result.summary, 'Episode synopsis');
+    expect(result.genres, ['Drama']);
+    expect(result.directors, ['Director']);
+    expect(result.ratings!.single.source, 'imdb');
+    controller.dispose();
+  }));
+
   test('preview deadline cancels the transport', () => fakeAsync((clock) {
     final client = _PreviewClient('server');
     final controller = HomePreviewController(

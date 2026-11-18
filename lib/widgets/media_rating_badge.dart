@@ -14,14 +14,15 @@ import 'app_icon.dart';
 /// episode's.
 List<MediaRatingSource> mediaRatingsFor(MediaItem item, {MediaItem? fallbackItem}) {
   final ratings = _ratingsFor(item);
-  if (ratings.isNotEmpty || fallbackItem == null) return ratings;
-  return _ratingsFor(fallbackItem);
+  final available = ratings.isNotEmpty || fallbackItem == null ? ratings : _ratingsFor(fallbackItem);
+  if (!available.any((rating) => rating.source == 'imdb')) return available;
+  return available.where((rating) => rating.source != 'audience' && rating.source.isNotEmpty).toList();
 }
 
 /// Formatted value for [rating] — the brand badge's own formatting where the
 /// source has one, otherwise the neutral 0-10 rendering.
 String mediaRatingLabel(MediaRatingSource rating) =>
-    ratingInfoForSource(rating.source, rating.value)?.formattedValue ?? formatRating(rating.value);
+    ratingInfoForSource(_visualRatingSource(rating.source), rating.value)?.formattedValue ?? formatRating(rating.value);
 
 List<MediaRatingSource> _ratingsFor(MediaItem item) {
   final ratings = item.ratings;
@@ -57,7 +58,7 @@ double inlineRatingBadgeWidth(
   double? spacing,
 }) {
   final size = iconSize ?? textStyle.fontSize ?? 13;
-  final info = ratingInfoForSource(rating.source, rating.value);
+  final info = ratingInfoForSource(_visualRatingSource(rating.source), rating.value);
   final labelWidth = cachedSingleLineTextSize(
     mediaRatingLabel(rating),
     style: textStyle,
@@ -66,6 +67,10 @@ double inlineRatingBadgeWidth(
   ).width;
   return size * (info?.iconAspect ?? 1) + (spacing ?? 4) + labelWidth;
 }
+
+// Generic server scores retain their original provenance for semantics and
+// merging; only their visual badge follows the user's preferred presentation.
+String _visualRatingSource(String source) => source.isEmpty || source == 'audience' ? 'imdb' : source;
 
 /// The bare badge row for an explicit list of scores, for single-line
 /// metadata strips that already own their separators.
@@ -142,7 +147,7 @@ Widget _buildContent({
   required double? spacing,
 }) {
   final size = iconSize ?? style.fontSize ?? 13;
-  final info = source == null ? null : ratingInfoForSource(source, value);
+  final info = source == null ? null : ratingInfoForSource(_visualRatingSource(source), value);
   return Row(
     mainAxisSize: MainAxisSize.min,
     children: [

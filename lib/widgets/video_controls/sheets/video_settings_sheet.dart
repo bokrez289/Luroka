@@ -370,6 +370,8 @@ class _VideoSettingsSheetState extends State<VideoSettingsSheet> {
   String? _activeSection;
   late int _audioSyncOffset;
   late int _subtitleSyncOffset;
+  bool _resyncInFlight = false;
+  bool _resyncRequested = false;
   late double _zoomScale;
   String _dvConversionMode = 'auto';
   int _dvConversionWriteGeneration = 0;
@@ -387,6 +389,29 @@ class _VideoSettingsSheetState extends State<VideoSettingsSheet> {
   late AudioChannelLimit _audioChannelLimit;
 
   TrackControlsState get _state => widget.trackControlsState;
+
+  bool get _canResync => _state.canControl && !_state.isLive && widget.player.state.seekable &&
+      !(context.read<WatchTogetherProvider?>()?.isInSession ?? false);
+
+  Future<void> _resyncPlayback() async {
+    if (_resyncInFlight || !_canResync) return;
+    setState(() {
+      _resyncInFlight = true;
+      _resyncRequested = false;
+    });
+    try {
+      // A seek to the current timeline position flushes both renderers and
+      // rebuilds their clocks without altering the user's manual offsets or
+      // paused/playing state. Live and watch-party sessions are excluded.
+      await widget.player.seek(widget.player.currentPosition);
+      if (mounted) setState(() => _resyncRequested = true);
+    } catch (error, stack) {
+      appLogger.w('Playback resync failed', error: error, stackTrace: stack);
+      if (mounted) unawaited(showErrorDialog(context, t.videoSettings.resyncPlaybackFailed));
+    } finally {
+      if (mounted) setState(() => _resyncInFlight = false);
+    }
+  }
 
   // An explicit value from the caller wins. Otherwise the capability is static
   // per platform, except on the Linux video plane where it depends on the
@@ -929,6 +954,16 @@ class _VideoSettingsSheetState extends State<VideoSettingsSheet> {
           icon: Symbols.spatial_audio_rounded,
           description: t.lurokaPlayer.soundDescription,
           children: [
+            if (_canResync)
+              FocusableListTile(
+                key: const ValueKey('resync_playback'),
+                leading: AppIcon(Symbols.sync_rounded, fill: 1, color: Theme.of(context).colorScheme.primary),
+                title: Text(t.videoSettings.resyncPlayback),
+                subtitle: Text(_resyncRequested
+                    ? t.videoSettings.resyncPlaybackDone
+                    : t.videoSettings.resyncPlaybackDescription),
+                onTap: _resyncInFlight ? null : () => unawaited(_resyncPlayback()),
+              ),
             _SettingsMenuItem(
               icon: Symbols.sync_rounded,
               title: t.videoSettings.audioSync,

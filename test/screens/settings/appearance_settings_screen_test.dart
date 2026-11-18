@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/i18n/strings.g.dart';
+import 'package:luroka/media/icon_style.dart';
+import 'package:luroka/media/show_detail_layout.dart';
 import 'package:luroka/providers/theme_provider.dart';
 import 'package:luroka/providers/home_layout_provider.dart';
 import 'package:luroka/screens/settings/appearance_settings_screen.dart';
@@ -29,6 +31,47 @@ void main() {
     LocaleSettings.setLocaleSync(AppLocale.en);
   });
   tearDown(DevicePerformance.debugReset);
+
+  testWidgets('icon style picker previews and applies the chosen style', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+    final supporter = SupporterService.forTesting(availability: SupporterAvailability.hidden);
+    addTearDown(supporter.dispose);
+    final theme = ThemeProvider(supporter: supporter);
+    addTearDown(theme.dispose);
+    await tester.pumpWidget(ChangeNotifierProvider<ThemeProvider>.value(value: theme,
+      child: MaterialApp(theme: monoTheme(MonoPalette.dark),
+        home: const AppearanceSettingsScreen(section: AppearanceSettingsSection.appearance))));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(t.iconStyles.title));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('icon-style-lucide')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('icon-style-lucide')));
+    await tester.pumpAndSettle();
+    expect(SettingsService.instance.read(SettingsService.iconStyle), AppIconStyle.lucide);
+    await tester.tap(find.text(t.common.close));
+    await tester.pumpAndSettle();
+    expect(find.text(t.iconStyles.lucide), findsOneWidget);
+  });
+
+  testWidgets('TV show detail layout defaults to cinematic and can be changed', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+    final supporter = SupporterService.forTesting(availability: SupporterAvailability.hidden);
+    addTearDown(supporter.dispose);
+    final theme = ThemeProvider(supporter: supporter);
+    addTearDown(theme.dispose);
+    await tester.pumpWidget(ChangeNotifierProvider<ThemeProvider>.value(value: theme,
+      child: MaterialApp(theme: monoTheme(MonoPalette.dark),
+        home: const AppearanceSettingsScreen(section: AppearanceSettingsSection.appearance))));
+    await tester.pumpAndSettle();
+    expect(SettingsService.instance.read(SettingsService.showDetailLayout), ShowDetailLayout.cinematic);
+    await tester.tap(find.text(t.showDetailLayout.title));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(t.showDetailLayout.compact).last);
+    await tester.pumpAndSettle();
+    expect(SettingsService.instance.read(SettingsService.showDetailLayout), ShowDetailLayout.compact);
+  });
 
   testWidgets('TV library settings expose the optional compact navigation switch', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(true);
@@ -162,6 +205,8 @@ void main() {
       tester.getTopLeft(find.text(t.settings.visualEffects)).dy,
       lessThan(tester.getTopLeft(find.text(t.customPerformance.fireStickMode)).dy),
     );
+    await tester.ensureVisible(find.text(t.customPerformance.fireStickMode));
+    await tester.pumpAndSettle();
     await tester.tap(find.byType(Switch).first);
     await tester.pumpAndSettle();
     expect(SettingsService.instance.read(SettingsService.fireStickMode), isTrue);
@@ -331,6 +376,6 @@ void main() {
     await tester.tap(find.text(t.settings.homeScreen).first);
     await tester.pumpAndSettle();
     expect(find.text(t.settings.homeHeroSize), findsOneWidget);
-    expect(find.text(t.settings.homeHeroSizeMedium), findsOneWidget);
+    expect(find.text(t.settings.homeHeroSizeSmall), findsOneWidget);
   });
 }

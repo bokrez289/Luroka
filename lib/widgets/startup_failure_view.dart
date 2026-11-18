@@ -108,15 +108,19 @@ class _StartupFailureViewState extends State<StartupFailureView> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('${t.messages.logId}:'),
+              Text('${t.messages.logSupportReference}:'),
               const SizedBox(height: 8),
               SelectableText(
-                id,
+                logSupportReference(id),
                 style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace', fontSize: 18),
               ),
             ],
           ),
           actions: [
+            DialogActionButton(
+              onPressed: () => Clipboard.setData(ClipboardData(text: id)),
+              label: t.messages.copyFullLogId,
+            ),
             DialogActionButton(
               autofocus: true,
               onPressed: () => Navigator.of(dialogContext).pop(),

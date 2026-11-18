@@ -318,6 +318,11 @@ extension _VideoPlayerBuildMethods on VideoPlayerScreenState {
                         onBack: _handleBackButton,
                         onReachedEnd: ({skipAutoPlayCountdown = false}) =>
                             _onVideoCompleted(true, skipAutoPlayCountdown: skipAutoPlayCountdown),
+                        onMarkersLoaded: (markers) {
+                          final credits = markers.where((marker) => marker.isCredits).toList()
+                            ..sort((a, b) => a.startTimeOffset.compareTo(b.startTimeOffset));
+                          _episode.creditsStartMs = credits.isEmpty ? null : credits.first.startTimeOffset;
+                        },
                         canControl: authority.canControlPlayback,
                         canNavigateMediaItems: authority.canNavigateMediaItems,
                         hasFirstFrame: _firstFrame.uiReady,

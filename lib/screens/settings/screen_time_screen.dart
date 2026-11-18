@@ -974,7 +974,11 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
           entries: data.titles,
           artworkFor: (entry) {
             final row = _artworkFor(entry, data);
-            return row == null ? null : (client: _clientFor(row.serverKey), path: row.thumbPath);
+            return row == null ? null : (
+              client: _clientFor(row.serverKey),
+              path: row.thumbPath,
+              episodeId: entry.kind == ScreenTimeMediaKind.episode ? row.itemKey : null,
+            );
           },
           onOpenFor: (entry) {
             final row = _sessionFor(entry, data);

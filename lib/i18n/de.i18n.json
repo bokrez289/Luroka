@@ -3151,6 +3151,25 @@
     },
     "closedBeforeAuth": "Die Verbindung wurde vor der Authentifizierung geschlossen"
   },
+  "showDetailLayout": {
+    "title": "Seriendetails-Ansicht",
+    "description": "Darstellung von Serien und Folgen auf dem Fernseher auswählen.",
+    "cinematic": "Kinostil",
+    "compact": "Kompakte Episodenliste",
+    "seasons": "Staffel auswählen",
+    "episodes": "Episoden",
+    "details": "Details",
+    "cast": "Besetzung",
+    "related": "Ähnliche Titel"
+  },
+  "iconStyles": {
+    "title": "Symbolstil",
+    "description": "Darstellung der Bedienelemente für dieses Profil auswählen.",
+    "current": "Luroka kräftig",
+    "outline": "Material Kontur",
+    "lucide": "Lucide",
+    "lucideDescription": "Linien-Symbole mit Material-Ersatz für fehlende Symbole."
+  },
   "videoSettings": {
     "playbackSpeed": "Wiedergabegeschwindigkeit",
     "normalSpeed": "Normal",
@@ -3158,6 +3177,10 @@
     "zoom": "Zoom",
     "sleepTimer": "Schlaftimer",
     "audioSync": "Audio-Synchronisation",
+    "resyncPlayback": "Wiedergabe synchronisieren",
+    "resyncPlaybackDescription": "Audio und Video an der aktuellen Position neu synchronisieren",
+    "resyncPlaybackDone": "Synchronisierung angefordert",
+    "resyncPlaybackFailed": "Synchronisierung fehlgeschlagen",
     "subtitleSync": "Untertitel-Synchronisation",
     "hdr": "HDR",
     "hdrUnsupported": "HDR ist hier nicht verfügbar – dieser Desktop-Compositor oder Videoausgang kann es nicht übertragen.",

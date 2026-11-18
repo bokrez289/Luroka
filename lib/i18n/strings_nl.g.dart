@@ -3415,6 +3415,10 @@ class _Translations$videoSettings$nl extends Translations$videoSettings$en {
 	@override String get zoom => 'Zoom';
 	@override String get sleepTimer => 'Slaaptimer';
 	@override String get audioSync => 'Audiosynchronisatie';
+	@override String get resyncPlayback => 'Afspelen opnieuw synchroniseren';
+	@override String get resyncPlaybackDescription => 'Audio en video vernieuwen op de huidige positie';
+	@override String get resyncPlaybackDone => 'Synchronisatie aangevraagd';
+	@override String get resyncPlaybackFailed => 'Afspelen kon niet worden gesynchroniseerd';
 	@override String get subtitleSync => 'Ondertitelsynchronisatie';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => 'HDR is hier niet beschikbaar — deze desktopcompositor of video-uitvoer kan HDR niet doorgeven.';
@@ -7712,6 +7716,10 @@ extension on TranslationsNl {
 			'videoSettings.zoom' => 'Zoom',
 			'videoSettings.sleepTimer' => 'Slaaptimer',
 			'videoSettings.audioSync' => 'Audiosynchronisatie',
+			'videoSettings.resyncPlayback' => 'Afspelen opnieuw synchroniseren',
+			'videoSettings.resyncPlaybackDescription' => 'Audio en video vernieuwen op de huidige positie',
+			'videoSettings.resyncPlaybackDone' => 'Synchronisatie aangevraagd',
+			'videoSettings.resyncPlaybackFailed' => 'Afspelen kon niet worden gesynchroniseerd',
 			'videoSettings.subtitleSync' => 'Ondertitelsynchronisatie',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'HDR is hier niet beschikbaar — deze desktopcompositor of video-uitvoer kan HDR niet doorgeven.',
@@ -7928,12 +7936,12 @@ extension on TranslationsNl {
 			'seerr.requestFailed' => ({required Object error}) => 'Aanvraag mislukt: ${error}',
 			'seerr.requestsLoadFailed' => 'Aanvraagopties konden niet worden geladen',
 			'seerr.nothingToRequest' => 'Alles is al beschikbaar of aangevraagd.',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Beschikbaar',
 			'seerr.statusPartiallyAvailable' => 'Gedeeltelijk beschikbaar',
 			'seerr.statusRequested' => 'Aangevraagd',
 			'seerr.statusProcessing' => 'Verwerken',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Op de blokkeerlijst',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Kon ${url} niet bereiken: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'Geen Seerr-instantie op ${url} (HTTP ${status})',

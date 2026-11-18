@@ -8,6 +8,10 @@ import '../utils/media_server_timeouts.dart';
 import 'package:flutter/material.dart';
 import '../widgets/mobile_playback_actions.dart';
 import '../models/catalog/catalog_item.dart';
+import '../media/media_backend.dart';
+import '../media/show_detail_layout.dart';
+import '../utils/season_labels.dart';
+import '../widgets/focusable_list_tile.dart';
 import '../services/catalog/cinemeta_catalog_source.dart';
 
 import '../navigation/profile_navigation_scope.dart';
@@ -60,6 +64,7 @@ import '../media/media_rating.dart';
 import '../media/media_role.dart';
 import '../media/paged_media_list_state.dart';
 import '../widgets/media_rating_badge.dart';
+import '../widgets/watched_indicator.dart';
 import '../widgets/fitted_metadata_line.dart';
 import '../i18n/strings.g.dart';
 import '../theme/mono_tokens.dart';
@@ -86,6 +91,7 @@ import '../providers/download_provider.dart';
 import '../providers/multi_server_provider.dart';
 import '../providers/offline_watch_provider.dart';
 import '../providers/watch_state_store.dart';
+import '../providers/trackers_provider.dart';
 import '../services/catalog/catalog_source.dart';
 import '../services/catalog/community_ratings.dart';
 import '../services/catalog/library_watchlist_candidates.dart';
@@ -120,6 +126,7 @@ import '../widgets/focusable_tab_chip.dart';
 import '../widgets/hub_section.dart';
 import '../widgets/loading_indicator_box.dart';
 import '../widgets/rasterized_gradient.dart';
+import '../widgets/backdrop_scrim.dart';
 import '../widgets/tv_browse_rail.dart';
 import '../widgets/title_page_layout.dart';
 import '../widgets/series_season_browser.dart';
@@ -136,6 +143,7 @@ part 'media_detail/playback_tracks_status.dart';
 part 'media_detail/title_page.dart';
 part 'media_detail/show_schedule.dart';
 part 'media_detail/enrichment.dart';
+part 'media_detail/compact_show.dart';
 
 /// Ceiling for the detail hero's backdrop box, as a fraction of the window
 /// height. Roughly the natural height of a 16:9 backdrop on a 16:10 desktop
@@ -318,6 +326,8 @@ class MediaDetailScreen extends StatefulWidget {
   final bool showLibrarySource;
   final List<MediaItem> catalogCopies;
   final bool catalogPreviewOnly;
+  /// Renders the real TV details page inside a non-interactive settings preview.
+  final ShowDetailLayout? previewShowLayout;
 
   /// If provided, auto-selects this season index when the screen loads.
   /// Used when navigating to a show from a season context.
@@ -332,6 +342,7 @@ class MediaDetailScreen extends StatefulWidget {
     this.showLibrarySource = false,
     this.catalogCopies = const [],
     this.catalogPreviewOnly = false,
+    this.previewShowLayout,
     this.initialSeasonIndex,
     this.initialSeasonId,
     this.initialEpisodeId,
@@ -458,6 +469,13 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
   String? _titleSeasonEnterId;
   bool _restoreSeasonAfterPop = false;
   Timer? _titleSeasonPreviewTimer;
+  final FocusNode _compactSeasonFocus = FocusNode(debugLabel: 'compact_show_season');
+  final FocusNode _compactEpisodesTabFocus = FocusNode(debugLabel: 'compact_show_episodes_tab');
+  final FocusNode _compactCastTabFocus = FocusNode(debugLabel: 'compact_show_cast_tab');
+  final FocusNode _compactRelatedTabFocus = FocusNode(debugLabel: 'compact_show_related_tab');
+  final GlobalKey<CastMemberStripState> _compactCastKey = GlobalKey<CastMemberStripState>();
+  final GlobalKey<HubSectionState> _compactRelatedKey = GlobalKey<HubSectionState>();
+  int _compactShowTab = 0;
   // ValueNotifier (not setState) so d-pad scrubbing across episodes rebuilds
   // only the foreground info panel, never the whole screen with its rail
   // (same isolation pattern as DiscoverScreen._spotlightItem).
@@ -979,7 +997,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
   /// title through the watchlist's cached ids, so this costs no extra
   /// media-server request. No-ops offline and for non-movie/show kinds.
   void _initCommunityRatings() {
-    if (widget.isOffline) return;
+    if (widget.isOffline || widget.previewShowLayout != null) return;
     final catalogSources = Provider.of<CatalogSourcesProvider?>(context, listen: false);
     if (catalogSources == null) return;
     unawaited(_loadRemoteTrailer(catalogSources));
@@ -1030,14 +1048,17 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
   }
 
   /// [metadata]'s scores with the connected trackers' merged in.
-  List<MediaRatingSource> _titleRatings(MediaItem metadata) =>
-      withCommunityRatings(mediaRatingsFor(metadata), _communityRatings);
+  List<MediaRatingSource> _titleRatings(MediaItem metadata) {
+    final ratings = withCommunityRatings(mediaRatingsFor(metadata), _communityRatings);
+    if (!ratings.any((rating) => rating.source == 'imdb')) return ratings;
+    return ratings.where((rating) => rating.source != 'audience' && rating.source.isNotEmpty).toList();
+  }
 
   /// Hook up the watchlist action's data: every watchlist-capable catalog
   /// source this item resolves in, with its per-source ids. No-ops offline
   /// and for non-movie/show kinds.
   void _initWatchlistState() {
-    if (widget.isOffline || (!_metadata.isMovie && !_metadata.isShow)) return;
+    if (widget.isOffline || widget.previewShowLayout != null || (!_metadata.isMovie && !_metadata.isShow)) return;
     final catalogSources = Provider.of<CatalogSourcesProvider?>(context, listen: false);
     final sources = catalogSources?.watchlistCapableSources ?? const <CatalogSource>[];
     if (catalogSources == null || sources.isEmpty) return;
@@ -1103,6 +1124,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
   void _syncShowTheme() {
     if (!mounted) return;
     final active =
+        widget.previewShowLayout == null &&
         (PlatformDetector.isTV() || PlatformDetector.isMobile(context)) &&
         (widget.metadata.isShow || widget.metadata.isMovie) &&
         !widget.isOffline &&
@@ -1250,6 +1272,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
       });
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!_canUseDetail) return;
+        if (widget.previewShowLayout != null) return;
         if (focusPrimaryAction) {
           _playButtonFocusNode.requestFocus();
         } else {
@@ -1284,6 +1307,10 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
 
   @override
   void dispose() {
+    _compactSeasonFocus.dispose();
+    _compactEpisodesTabFocus.dispose();
+    _compactCastTabFocus.dispose();
+    _compactRelatedTabFocus.dispose();
     WidgetsBinding.instance.removeObserver(this);
     SettingsService.instanceOrNull?.listenable(SettingsService.showThemeMusic).removeListener(_syncShowTheme);
     _musicService?.removeListener(_syncShowTheme);
@@ -1534,7 +1561,8 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
     // against the budget so dropping other chips actually makes room for it.
     Widget? userRatingChip;
     var userRatingChipWidth = 0.0;
-    if (!scoresOnly && !widget.isOffline) {
+    if (!scoresOnly && !widget.isOffline &&
+        canRateMediaItem(_getMediaClientForMetadata(context), context.watch<TrackersProvider?>())) {
       userRatingChip = _buildUserRatingChip(metadata);
       userRatingChipWidth =
           chipPadding +
@@ -1582,9 +1610,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
     ];
   }
 
-  /// Numeric backends show the formatted rating when set; favorite backends
-  /// rely on the filled heart to communicate the favorite state and keep the
-  /// "Rate" label as the action prompt either way.
+  /// Numeric server ratings display their score; tracker-only actions say Rate.
   String _userRatingChipLabel(MediaItem metadata) {
     final isNumeric = _getMediaClientForMetadata(context)?.capabilities.numericUserRating ?? true;
     final hasRating = metadata.userRating != null && metadata.userRating! > 0;
@@ -1595,10 +1621,10 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
     final mediaClient = _getMediaClientForMetadata(context);
     final isNumeric = mediaClient?.capabilities.numericUserRating ?? true;
     final hasRating = metadata.userRating != null && metadata.userRating! > 0;
-    final active = isNumeric ? hasRating : metadata.isFavorite == true;
+    final active = isNumeric && hasRating;
 
-    final iconData = isNumeric ? Symbols.star_rounded : Symbols.favorite_rounded;
-    final activeIconColor = isNumeric ? Colors.amber : Colors.redAccent;
+    const iconData = Symbols.star_rounded;
+    const activeIconColor = Colors.amber;
     final label = _userRatingChipLabel(metadata);
 
     return ListenableBuilder(
@@ -1673,11 +1699,6 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
         onServerRatingChanged: (rating) {
           setStateIfMounted(() {
             _fullMetadata = _metadata.copyWith(userRating: rating);
-          });
-        },
-        onServerFavoriteChanged: (favorite) {
-          setStateIfMounted(() {
-            _fullMetadata = _metadata.copyWith(isFavorite: favorite);
           });
         },
       ),
@@ -1876,7 +1897,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
       startedSupplemental = true;
       unawaited(_loadExtras());
       unawaited(_loadRelatedHubs());
-      unawaited(_loadDetailEnrichment());
+      if (widget.previewShowLayout == null) unawaited(_loadDetailEnrichment());
     }
 
     try {
@@ -2012,7 +2033,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
           }
         }
         if (!startedSeasonsEarly) unawaited(_loadSeasons());
-        unawaited(_loadShowContext());
+        if (widget.previewShowLayout == null) unawaited(_loadShowContext());
       } else if (base.isSeason && !startedEpisodesEarly) {
         _seasons = [base];
         _showEpisodesDirectly = true;
@@ -2757,6 +2778,10 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
     final metadata = _metadata;
 
     if (PlatformDetector.isTV()) {
+      if (metadata.isShow && (widget.previewShowLayout ?? SettingsService.instance.read(SettingsService.showDetailLayout)) == ShowDetailLayout.compact) {
+        _compactEpisodesTabFocus.requestFocus();
+        return;
+      }
       if (_hasTitleSeasonBrowser) {
         _focusTitleSeasons();
       } else if (_tvDetailRailKey.currentState != null) {
@@ -4085,7 +4110,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
                     right: MediaQuery.paddingOf(context).right + 16,
                     child: IconButton(
                       key: const ValueKey('mobile_title_favorite'),
-                      tooltip: metadata.isFavorite == true ? t.rateSheet.favorited : t.rateSheet.favorite,
+                      tooltip: metadata.isFavorite == true ? t.rateSheet.removeFavorite : t.rateSheet.addFavorite,
                       onPressed: _favoriteMutationInFlight
                           ? null
                           : () async {
@@ -4133,6 +4158,9 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
     MediaItem metadata,
     KeyEventResult Function(FocusNode, KeyEvent) handleBack,
   ) {
+    if (metadata.isShow && (widget.previewShowLayout ?? SettingsService.instance.read(SettingsService.showDetailLayout)) == ShowDetailLayout.compact) {
+      return _buildCompactShowScreen(context, metadata, handleBack);
+    }
     if (_restoreSeasonAfterPop) {
       _restoreSeasonAfterPop = false;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -4215,7 +4243,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
     final content = OverlaySheetHost(
       // blockSystemBack keeps the route from double-popping on Android keyboard/
       // TV (the key handler owns dpad back); the host also closes an open sheet.
-      canPop: !blockSystemBack,
+      canPop: widget.previewShowLayout == null ? !blockSystemBack : null,
       onSystemBack: _handleMediaDetailSystemBack,
       child: Focus(
         onKeyEvent: handleBack,
@@ -5206,7 +5234,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
                     const scrimAlphas = [0.20, 0.234, 0.325, 0.453, 0.60, 0.747, 0.875, 0.985, 0.998, 1.0];
                     const scrimXs = [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 0.9375, 1.0];
                     const solidStop = 0.94;
-                    return RasterizedGradient(
+                    return BackdropScrim(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,

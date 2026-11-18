@@ -97,8 +97,8 @@ void main() {
                   onPressed: () async {
                     selection = await showAdaptiveAppMenu<String>(
                       context,
+                      position: const Offset(100, 64),
                       focusFirstItem: true,
-                      anchorRect: const Rect.fromLTWH(24, 24, 160, 48),
                       entries: buildProfileMenuEntries(
                         provider: _Profiles(alex, [alex, sam]),
                         isKids: false,

@@ -55,6 +55,12 @@ extension _VideoPlayerEpisodeNavigationMethods on VideoPlayerScreenState {
     // from EOF re-presents the Play Next prompt instead of parking on the
     // finished episode's last frame.
     final wasAtCompletion = _episode.completionLatch.triggered;
+    final wasEarly = _episode.earlyPrompt;
+    if (_episode.earlyPrompt) {
+      // A failed advance must not restart an automatic countdown in a loop.
+      _episode.earlyPromptDismissed = true;
+      _episode.earlyPrompt = false;
+    }
 
     _episode.autoPlayTimer?.cancel();
     _unfocusPlayNextPrompt();
@@ -67,6 +73,7 @@ extension _VideoPlayerEpisodeNavigationMethods on VideoPlayerScreenState {
 
     final outcome = await _navigateToEpisode(_episode.next!);
     if (outcome == MediaReloadOutcome.failed) {
+      if (wasEarly) _episode.earlyPromptDismissed = true;
       _presentPlayNextRetryPrompt(wasAtCompletion: wasAtCompletion);
     }
   }

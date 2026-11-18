@@ -522,23 +522,27 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
 
     final favoriteClient = itemServerId == null ? null : context.tryGetMediaClientForServer(ServerId(itemServerId));
     Future<void> toggleFavorite() async {
-      if (!_canUseDetail || favoriteClient == null) return;
+      if (!_canUseDetail || favoriteClient == null || _favoriteMutationInFlight) return;
+      final favorite = metadata.isFavorite != true;
+      setState(() => _favoriteMutationInFlight = true);
       try {
-        await favoriteClient.setFavorite(metadata, metadata.isFavorite != true);
-        if (_canUseDetail) await _refreshItemInPlace(metadata);
+        await favoriteClient.setFavorite(metadata, favorite);
+        if (_canUseDetail) setState(() => _fullMetadata = _metadata.copyWith(isFavorite: favorite));
       } catch (error) {
         if (context.mounted) showErrorDialog(context, t.errors.connectionFailed);
+      } finally {
+        if (mounted) setState(() => _favoriteMutationInFlight = false);
       }
     }
 
-    final favoriteAction = isTv && !widget.isOffline && favoriteClient?.capabilities.userFavorites == true
+    var favoriteAction = isTv && !widget.isOffline && favoriteClient?.capabilities.userFavorites == true
         ? FocusableAction(
             debugLabel: 'detail_favorite',
             onPressed: toggleFavorite,
             builder: (context, state) => iconActionButton(
               state,
               icon: AppIcon(Symbols.favorite_rounded, fill: metadata.isFavorite == true ? 1 : 0),
-              label: t.rateSheet.favorite,
+              tooltip: metadata.isFavorite == true ? t.rateSheet.removeFavorite : t.rateSheet.addFavorite,
               onPressed: toggleFavorite,
             ),
           )
@@ -570,6 +574,27 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
         : watchlistStates.contains(false)
         ? false
         : null;
+    final plexFavorite = _watchlistCandidates.where((candidate) => candidate.source.id == CatalogSourceId.plex).firstOrNull;
+    if (isTv && !widget.isOffline && metadata.backend == MediaBackend.plex && plexFavorite != null) {
+      final selected = plexFavorite.source.isOnWatchlist(metadata.kind, plexFavorite.ids);
+      void togglePlexFavorite() {
+        if (selected == null) {
+          unawaited(plexFavorite.source.ensureWatchlistLoaded());
+        } else {
+          unawaited(_toggleWatchlistOn(metadata, plexFavorite));
+        }
+      }
+      favoriteAction = FocusableAction(
+        debugLabel: 'detail_favorite',
+        onPressed: togglePlexFavorite,
+        builder: (context, state) => iconActionButton(
+          state,
+          icon: AppIcon(Symbols.favorite_rounded, fill: selected == true ? 1 : 0),
+          tooltip: selected == true ? t.rateSheet.removeFavorite : t.rateSheet.addFavorite,
+          onPressed: togglePlexFavorite,
+        ),
+      );
+    }
     final watchlistAction = _watchlistCandidates.isEmpty
         ? null
         : FocusableAction(
@@ -591,6 +616,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
           );
 
     void showMoreActions() => _contextMenuKey.currentState?.showContextMenu(context);
+    var directFavoriteVisible = false;
 
     final moreActionsAction = widget.isOffline
         ? null
@@ -604,6 +630,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
               onPlayTrailer: onPlayTrailer,
               onSearchSubtitles: onSearchSubtitles,
               showFocus: state.showFocus,
+              hideFavoriteAction: directFavoriteVisible,
             ),
           );
 
@@ -858,8 +885,6 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
             ? labeledWidth(t.titlePage.more)
             : isTv && identical(actions[i], shuffleAction)
             ? labeledWidth(t.common.shuffle)
-            : isTv && identical(actions[i], favoriteAction)
-            ? labeledWidth(t.rateSheet.favorite)
             : isTv && identical(actions[i], playAllAction)
             ? labeledWidth(t.showSchedule.watchBeginning)
             : identical(actions[i], tracksAction)
@@ -951,19 +976,19 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
                   ?playAllAction,
                   ?shuffleAction,
                   ?trailerAction,
-                  ?favoriteAction,
                   watchedAction,
+                  ?favoriteAction,
                   ?watchlistAction,
                   ?moreActionsAction,
                 ];
           for (final optional in [
             watchlistAction,
             shuffleAction,
-            favoriteAction,
             playAllAction,
             trailerAction,
             qualityAction,
             versionAction,
+            favoriteAction,
           ]) {
             if (estimatedRowWidth(actions) > maxWidth && optional != null) actions.remove(optional);
           }
@@ -972,6 +997,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
               ? allActions
               : compactActionsFor(maxWidth);
         }
+        directFavoriteVisible = isTv && favoriteAction != null && actions.contains(favoriteAction);
         final status = tracksStatusFor(actions, maxWidth);
         if (status == null) return actionBar(actions);
         return SizedBox(
@@ -1117,6 +1143,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
     VoidCallback? onPlayTrailer,
     VoidCallback? onSearchSubtitles,
     bool showFocus = false,
+    bool hideFavoriteAction = false,
   }) {
     return MediaContextMenu(
       key: _contextMenuKey,
@@ -1124,13 +1151,14 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
       item: metadata,
       onRefresh: (source) => unawaited(_refreshItemInPlace(source)),
       onPlayTrailer: PlatformDetector.isMobile(context) ? null : onPlayTrailer,
-      hiddenActionValues: PlatformDetector.isMobile(context)
-          ? {
+      hiddenActionValues: {
+              if (hideFavoriteAction) 'toggle_favorite',
+              if (PlatformDetector.isMobile(context)) ...{
               if (!widget.isOffline) 'download',
               if (_playbackTargetItem(metadata)?.hasActiveProgress == true) 'play_from_beginning',
               if (metadata.isMovie || metadata.isEpisode) 'play_version',
-            }
-          : const {},
+              },
+            },
       extraEntries: [
         if (metadata.isShow)
           MediaMenuExtraEntry(

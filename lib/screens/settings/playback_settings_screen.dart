@@ -352,6 +352,13 @@ class PlaybackSettingsScreen extends StatelessWidget {
         ),
       if (view != PlaybackSettingsView.engine)
         SettingSwitchTile(
+          pref: SettingsService.showEarlyNextEpisode,
+          icon: Symbols.subscriptions_rounded,
+          title: t.settings.showEarlyNextEpisode,
+          subtitle: t.settings.showEarlyNextEpisodeDescription,
+        ),
+      if (view != PlaybackSettingsView.engine)
+        SettingSwitchTile(
           pref: SettingsService.shuffleStartsFromBeginning,
           icon: Symbols.shuffle_rounded,
           title: t.settings.shuffleStartsFromBeginning,

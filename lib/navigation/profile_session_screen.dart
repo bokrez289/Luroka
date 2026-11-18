@@ -236,11 +236,12 @@ class _ProfileSessionScreenState extends State<ProfileSessionScreen> {
               ChangeNotifierProvider(
                 create: (context) {
                   final activeProfile = context.read<ActiveProfileProvider>();
+                  final multiServer = context.read<MultiServerProvider>();
                   return LibrariesProvider(
                     storageService: context.read<StorageService>(),
-                    multiServer: context.read<MultiServerProvider>(),
+                    multiServer: multiServer,
                     isProfileBinding: () => activeProfile.isBinding,
-                  );
+                  )..initialize(multiServer.aggregationService);
                 },
               ),
               ChangeNotifierProvider(

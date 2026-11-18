@@ -20,7 +20,7 @@ import 'fitted_metadata_line.dart';
 import 'settings_builder.dart';
 import 'media_rating_badge.dart';
 import 'optimized_media_image.dart' show ClearLogoImage, blurArtwork;
-import 'rasterized_gradient.dart';
+import 'backdrop_scrim.dart';
 
 class TvSpotlightBackground extends StatelessWidget {
   final MediaItem? item;
@@ -95,7 +95,7 @@ class TvSpotlightBackground extends StatelessWidget {
               child: cornerBackdrop ? _buildCornerBackdrop(backdropSize, backdrop) : blurArtwork(backdrop),
             ),
             _buildHorizontalScrim(bgColor, light: light),
-            RasterizedGradient(
+            BackdropScrim(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -182,7 +182,7 @@ class TvSpotlightBackground extends StatelessWidget {
   }
 
   Widget _buildHorizontalScrim(Color bgColor, {required bool light}) {
-    return RasterizedGradient(
+    return BackdropScrim(
       gradient: LinearGradient(
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,

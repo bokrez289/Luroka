@@ -3415,6 +3415,10 @@ class _Translations$videoSettings$hu extends Translations$videoSettings$en {
 	@override String get zoom => 'Nagyítás';
 	@override String get sleepTimer => 'Elalvási időzítő';
 	@override String get audioSync => 'Hang szinkronizálása';
+	@override String get resyncPlayback => 'Lejátszás újraszinkronizálása';
+	@override String get resyncPlaybackDescription => 'Hang és kép frissítése az aktuális pozíciónál';
+	@override String get resyncPlaybackDone => 'Újraszinkronizálás kérve';
+	@override String get resyncPlaybackFailed => 'A lejátszás újraszinkronizálása sikertelen';
 	@override String get subtitleSync => 'Felirat szinkronizálása';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => 'A HDR itt nem érhető el – ez az asztali kompozitor vagy videókimenet nem képes továbbítani.';
@@ -7712,6 +7716,10 @@ extension on TranslationsHu {
 			'videoSettings.zoom' => 'Nagyítás',
 			'videoSettings.sleepTimer' => 'Elalvási időzítő',
 			'videoSettings.audioSync' => 'Hang szinkronizálása',
+			'videoSettings.resyncPlayback' => 'Lejátszás újraszinkronizálása',
+			'videoSettings.resyncPlaybackDescription' => 'Hang és kép frissítése az aktuális pozíciónál',
+			'videoSettings.resyncPlaybackDone' => 'Újraszinkronizálás kérve',
+			'videoSettings.resyncPlaybackFailed' => 'A lejátszás újraszinkronizálása sikertelen',
 			'videoSettings.subtitleSync' => 'Felirat szinkronizálása',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'A HDR itt nem érhető el – ez az asztali kompozitor vagy videókimenet nem képes továbbítani.',
@@ -7928,12 +7936,12 @@ extension on TranslationsHu {
 			'seerr.requestFailed' => ({required Object error}) => 'Az igénylés nem sikerült: ${error}',
 			'seerr.requestsLoadFailed' => 'Nem sikerült betölteni az igénylési opciókat',
 			'seerr.nothingToRequest' => 'Minden elem már elérhető vagy igényelve van.',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Elérhető',
 			'seerr.statusPartiallyAvailable' => 'Részben elérhető',
 			'seerr.statusRequested' => 'Igényelve',
 			'seerr.statusProcessing' => 'Feldolgozás alatt',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Tiltólistán',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Nem sikerült elérni ezt: ${url}: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'Nem található Seerr-példány ezen a címen: ${url} (HTTP ${status})',

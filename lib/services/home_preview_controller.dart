@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../media/media_item.dart';
 import '../media/media_kind.dart';
 import '../media/media_server_client.dart';
+import '../media/media_rating.dart';
 import '../utils/app_logger.dart';
 import '../utils/media_server_http_client.dart';
 import 'kids_profile_service.dart';
@@ -33,6 +34,8 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
     this.settleDelay = const Duration(milliseconds: 220),
     this.requestTimeout = const Duration(seconds: 8),
     this.includeRatings = false,
+    this.includeShowMetadata = false,
+    this.lookupImdb,
   }) : super(null);
 
   final MediaServerClient? Function(MediaItem) resolveClient;
@@ -43,6 +46,11 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
   /// Studio catalogs can carry a synopsis/runtime but omit year and attributed
   /// scores. Enrich only the settled selection, retaining the bounded cache.
   final bool includeRatings;
+  /// Home shelves need descriptive fields even when the row already has a
+  /// synopsis. For episodes, the series can supply missing show-level fields.
+  final bool includeShowMetadata;
+  final Future<MediaRatingSource?> Function(MediaItem item, MediaServerClient client, bool Function() isCurrent)?
+      lookupImdb;
   final Map<(MediaServerClient, String), MediaItem> _cache = {};
   Timer? _timer;
   MediaItem? _source;
@@ -131,8 +139,11 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
     final hasEpisodeIdentity =
         visible.kind != MediaKind.episode ||
         (visible.parentIndex != null && visible.index != null && visible.grandparentTitle?.trim().isNotEmpty == true);
-    final hasRatings = !includeRatings || (visible.year != null && visible.ratings?.isNotEmpty == true);
-    if (hasSummary && hasRuntime && hasEpisodeIdentity && hasRatings) return;
+    final hasRatings = !(includeRatings || includeShowMetadata) ||
+        (visible.year != null && visible.ratings?.isNotEmpty == true &&
+            (!includeShowMetadata || visible.genres?.isNotEmpty == true));
+    final hasImdb = visible.ratings?.any((rating) => rating.source == 'imdb') == true;
+    if (hasSummary && hasRuntime && hasEpisodeIdentity && hasRatings && (lookupImdb == null || hasImdb)) return;
     final client = _clientFor(source);
     if (client == null || _cache.containsKey((client, source.globalKey))) return;
     _fetching = true;
@@ -140,15 +151,16 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
     try {
       // Legacy clients retain the single-flight gate until their request really
       // completes: a UI timeout alone cannot cancel an HTTP request.
-      final fresh = client is PreviewMetadataClient
-          ? await (client as PreviewMetadataClient).fetchPreviewItem(source.id, abort: abort).timeout(
+      Future<MediaItem?> fetch(String id) => client is PreviewMetadataClient
+          ? (client as PreviewMetadataClient).fetchPreviewItem(id, abort: abort).timeout(
               requestTimeout,
               onTimeout: () {
                 abort.abort();
                 throw TimeoutException('Home preview timed out', requestTimeout);
               },
             )
-          : await client.fetchItem(source.id);
+          : client.fetchItem(id);
+      final fresh = await fetch(source.id);
       if (!_disposed &&
           generation == _generation &&
           KidsProfileService.instance.isActiveKids &&
@@ -166,10 +178,54 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
           !identical(client, _clientFor(source))) {
         return;
       }
-      _cache[(client, source.globalKey)] = fresh;
+      var enriched = fresh;
+      final seriesId = fresh.grandparentId ?? source.grandparentId;
+      if (includeShowMetadata && source.kind == MediaKind.episode && seriesId != null && seriesId.isNotEmpty &&
+          (fresh.genres?.isNotEmpty != true || fresh.ratings?.isNotEmpty != true)) {
+        try {
+          final series = await fetch(seriesId);
+          if (_disposed || !_active || generation != _generation || abort.isAborted ||
+              !identical(client, _clientFor(source))) {
+            return;
+          }
+          if (series != null && series.id == seriesId && series.kind == MediaKind.show &&
+              series.backend == source.backend && (series.serverId == null || series.serverId == source.serverId) &&
+              KidsProfileService.instance.allows(series)) {
+            enriched = fresh.copyWith(
+              genres: fresh.genres?.isNotEmpty == true ? fresh.genres : series.genres,
+              directors: fresh.directors?.isNotEmpty == true ? fresh.directors : series.directors,
+              ratings: fresh.ratings?.isNotEmpty == true ? fresh.ratings : series.ratings,
+              rating: fresh.rating ?? series.rating,
+              year: fresh.year ?? series.year,
+            );
+          }
+        } catch (error) {
+          if (!abort.isAborted) appLogger.d('Home series preview metadata unavailable', error: error);
+        }
+      }
+      if (lookupImdb != null && enriched.ratings?.any((rating) => rating.source == 'imdb') != true) {
+        final lookupItem = source.kind == MediaKind.episode && seriesId != null && seriesId.isNotEmpty
+            ? MediaItem(id: seriesId, kind: MediaKind.show, backend: source.backend, serverId: source.serverId,
+                title: enriched.grandparentTitle ?? source.grandparentTitle)
+            : source;
+        if (lookupItem.kind == MediaKind.movie || lookupItem.kind == MediaKind.show) {
+          bool current() => !_disposed && _active && generation == _generation && !abort.isAborted &&
+              (canFetch?.call() ?? true) && identical(client, _clientFor(source));
+          try {
+            final rating = await lookupImdb!(lookupItem, client, current);
+            if (!current()) return;
+            if (rating != null && rating.source == 'imdb') {
+              enriched = enriched.copyWith(ratings: [rating, ...?enriched.ratings]);
+            }
+          } catch (error) {
+            if (!abort.isAborted) appLogger.d('Home IMDb lookup unavailable', error: error);
+          }
+        }
+      }
+      _cache[(client, source.globalKey)] = enriched;
       if (_cache.length > 32) _cache.remove(_cache.keys.first);
       final preview = value!;
-      final described = _describe(source, fresh);
+      final described = _describe(source, enriched);
       value = HomePreview(
         item: described,
         artwork: described,
@@ -191,6 +247,7 @@ class HomePreviewController extends ValueNotifier<HomePreview?> {
     title: current.title?.trim().isNotEmpty == true ? current.title : fresh.title,
     summary: current.summary?.trim().isNotEmpty == true ? current.summary : fresh.summary,
     genres: current.genres?.isNotEmpty == true ? current.genres : fresh.genres,
+    directors: current.directors?.isNotEmpty == true ? current.directors : fresh.directors,
     year: current.year ?? fresh.year,
     contentRating: current.contentRating ?? fresh.contentRating,
     rating: current.rating ?? fresh.rating,

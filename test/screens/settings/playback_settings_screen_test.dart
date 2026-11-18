@@ -19,6 +19,20 @@ void main() {
     LocaleSettings.setLocaleSync(AppLocale.en);
   });
 
+  testWidgets('early next episode prompt defaults on and can be disabled', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1000, 1400);
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(MaterialApp(theme: monoTheme(MonoPalette.dark), home: const PlaybackSettingsScreen()));
+    await tester.pumpAndSettle();
+    final title = find.text(t.settings.showEarlyNextEpisode);
+    await tester.scrollUntilVisible(title, 500, scrollable: find.byType(Scrollable).first);
+    expect(SettingsService.instance.read(SettingsService.showEarlyNextEpisode), isTrue);
+    await tester.tap(title);
+    await tester.pumpAndSettle();
+    expect(SettingsService.instance.read(SettingsService.showEarlyNextEpisode), isFalse);
+  });
+
   testWidgets('shows and changes the persisted music quality', (tester) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(1000, 1400);

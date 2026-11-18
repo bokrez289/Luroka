@@ -16,6 +16,7 @@ import '../providers/trackers_provider.dart';
 import '../screens/settings/tracker_service_info.dart';
 import '../services/trackers/tracker.dart';
 import '../services/trackers/tracker_constants.dart';
+import '../services/trackers/trakt/trakt_constants.dart';
 import '../services/trackers/tracker_id_resolver.dart';
 import '../utils/app_logger.dart';
 import '../utils/error_dialog.dart';
@@ -25,18 +26,22 @@ import 'bottom_sheet_page_scaffold.dart';
 import 'catalog_source_logo.dart';
 import 'clickable_cursor.dart';
 
+/// A server client is required to resolve tracker IDs for the item.
+bool canRateMediaItem(MediaServerClient? client, TrackersProvider? trackers) => client != null &&
+    (client.capabilities.numericUserRating || (trackers != null &&
+      ((TraktConstants.enabled && trackers.isTraktConnected) || trackers.isMalConnected ||
+       trackers.isAnilistConnected || trackers.isSimklConnected || trackers.isMdblistConnected)));
+
 class RatingBottomSheet extends StatefulWidget {
   final MediaItem item;
   final MediaServerClient? serverClient;
   final ValueChanged<double>? onServerRatingChanged;
-  final ValueChanged<bool>? onServerFavoriteChanged;
 
   const RatingBottomSheet({
     super.key,
     required this.item,
     required this.serverClient,
     this.onServerRatingChanged,
-    this.onServerFavoriteChanged,
   });
 
   @override
@@ -48,7 +53,6 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
 
   late double _serverStars;
   late double _serverRating;
-  late bool _serverFavorite;
   late final FocusNode _serverFocusNode;
 
   final Map<TrackerService, int> _trackerScores = {};
@@ -69,7 +73,6 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
     final rawServerRating = widget.item.userRating;
     _serverRating = rawServerRating != null && rawServerRating > 0 ? rawServerRating : 0.0;
     _serverStars = _serverRating > 0 ? _serverRating / 2.0 : 0.0;
-    _serverFavorite = widget.item.isFavorite == true;
   }
 
   @override
@@ -94,7 +97,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
         _queueTrackerScoreLoad(trackerSources);
 
         final serverCaps = widget.serverClient?.capabilities;
-        final showServerRow = serverCaps != null && (serverCaps.numericUserRating || serverCaps.userFavorites);
+        final showServerRow = serverCaps?.numericUserRating == true;
         final focusNodes = <FocusNode>[
           if (showServerRow) _serverFocusNode,
           for (final source in trackerSources) _trackerFocusNode(source.service),
@@ -157,9 +160,8 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
     final subtitle =
         '${_backendLabel(client.backend)} - ${client.serverName ?? widget.item.serverName ?? t.common.unknown}';
 
-    if (client.capabilities.numericUserRating) {
-      final value = (_serverStars * 2).round().clamp(0, 10).toInt();
-      return _RatingRow(
+    final value = (_serverStars * 2).round().clamp(0, 10).toInt();
+    return _RatingRow(
         focusNode: focusNode,
         autofocus: autofocus,
         leading: BackendBadge(backend: client.backend, size: 22),
@@ -179,28 +181,6 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
           onChanged: _setServerStarUnits,
           onSubmitValue: (units) => unawaited(_submitServerStars(stars: units / 2.0)),
         ),
-      );
-    }
-
-    return _RatingRow(
-      focusNode: focusNode,
-      autofocus: autofocus,
-      leading: BackendBadge(backend: client.backend, size: 22),
-      title: t.rateSheet.server,
-      subtitle: subtitle,
-      loading: loading,
-      status: status,
-      enabled: !loading,
-      onNavigateUp: onNavigateUp,
-      onNavigateDown: onNavigateDown,
-      onDecrease: () => _setServerFavorite(false),
-      onIncrease: () => _setServerFavorite(true),
-      onSubmit: () => unawaited(_submitServerFavorite(value: !_serverFavorite)),
-      control: _FavoriteControl(
-        value: _serverFavorite,
-        enabled: !loading,
-        onToggle: (next) => unawaited(_submitServerFavorite(value: next)),
-      ),
     );
   }
 
@@ -352,15 +332,6 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
     _scheduleAutoSave(_serverKey, _submitServerStars);
   }
 
-  void _setServerFavorite(bool value) {
-    if (_serverFavorite == value) return;
-    setState(() {
-      _serverFavorite = value;
-      _statuses.remove(_serverKey);
-    });
-    _scheduleAutoSave(_serverKey, _submitServerFavorite);
-  }
-
   void _setTrackerScore(_TrackerRatingSource source, int score) {
     final clamped = score.clamp(0, 10).toInt();
     if ((_trackerScores[source.service] ?? 0) == clamped) return;
@@ -395,16 +366,6 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
       _serverRating = 0;
       _serverStars = 0;
       widget.onServerRatingChanged?.call(0);
-    });
-  }
-
-  Future<void> _submitServerFavorite({bool? value}) async {
-    _cancelAutoSave(_serverKey);
-    final selected = value ?? _serverFavorite;
-    await _run(_serverKey, () async {
-      await widget.serverClient!.setFavorite(widget.item, selected);
-      _serverFavorite = selected;
-      widget.onServerFavoriteChanged?.call(selected);
     });
   }
 
@@ -511,15 +472,10 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
     if (client == null) return;
 
     try {
-      if (client.capabilities.numericUserRating) {
-        final rating = _serverStars <= 0 ? -1.0 : _serverStars * 2.0;
-        await client.rate(widget.item, rating);
-        widget.onServerRatingChanged?.call(rating < 0 ? 0 : rating);
-        return;
-      }
-
-      await client.setFavorite(widget.item, _serverFavorite);
-      widget.onServerFavoriteChanged?.call(_serverFavorite);
+      if (!client.capabilities.numericUserRating) return;
+      final rating = _serverStars <= 0 ? -1.0 : _serverStars * 2.0;
+      await client.rate(widget.item, rating);
+      widget.onServerRatingChanged?.call(rating < 0 ? 0 : rating);
     } catch (e) {
       appLogger.w('Failed to update rating after sheet close', error: e);
     }
@@ -779,53 +735,5 @@ class _StarRatingControlState extends State<_StarRatingControl> {
     final value = ((dx.clamp(0.0, safeWidth) / safeWidth) * 10).round().clamp(0, 10).toInt();
     _pointerValue = value;
     widget.onChanged(value);
-  }
-}
-
-class _FavoriteControl extends StatelessWidget {
-  final bool value;
-  final bool enabled;
-  final ValueChanged<bool> onToggle;
-
-  const _FavoriteControl({required this.value, required this.enabled, required this.onToggle});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    return ClickableCursor(
-      enabled: enabled,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: enabled ? () => onToggle(!value) : null,
-        child: Container(
-          height: 32,
-          decoration: BoxDecoration(
-            color: scheme.surfaceContainerHighest.withValues(alpha: 0.54),
-            borderRadius: const BorderRadius.all(Radius.circular(100)),
-          ),
-          child: Row(
-            mainAxisAlignment: .center,
-            children: [
-              AppIcon(
-                Symbols.favorite_rounded,
-                fill: value ? 1 : 0,
-                color: value ? Colors.redAccent : (enabled ? scheme.onSurfaceVariant : theme.disabledColor),
-                size: 18,
-              ),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  value ? t.rateSheet.favorited : t.rateSheet.favorite,
-                  maxLines: 1,
-                  overflow: .ellipsis,
-                  style: theme.textTheme.labelMedium?.copyWith(fontWeight: .w700),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

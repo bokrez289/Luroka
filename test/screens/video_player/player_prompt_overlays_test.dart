@@ -31,6 +31,39 @@ ValueNotifier<int> _countdown([int value = -1]) {
 }
 
 void main() {
+  for (final size in [const Size(320, 568), const Size(568, 320), const Size(960, 540)]) {
+    testWidgets('up next fits the viewport at $size', (tester) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      TvDetectionService.debugSetAppleTVOverride(size.width == 960);
+      addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+      final chrome = PlayerChromeController(initiallyVisible: false);
+      final cancel = FocusNode();
+      final confirm = FocusNode();
+      addTearDown(chrome.dispose);
+      addTearDown(cancel.dispose);
+      addTearDown(confirm.dispose);
+      await tester.pumpWidget(_wrapPrompt(VideoPlayerPlayNextOverlay(
+        visible: true,
+        nextEpisode: _episode(),
+        autoPlayCountdown: _countdown(5),
+        cancelFocusNode: cancel,
+        confirmFocusNode: confirm,
+        chromeController: chrome,
+        onCancel: () {},
+        onPlayNext: () {},
+      )));
+      final card = tester.getRect(find.byKey(const ValueKey('up-next-card')));
+      expect(card.left, greaterThanOrEqualTo(0));
+      expect(card.top, greaterThanOrEqualTo(0));
+      expect(card.right, lessThanOrEqualTo(size.width));
+      expect(card.bottom, lessThanOrEqualTo(size.height));
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+  }
+
   testWidgets('TV Up next fits 960x540, updates countdown and exposes Keep watching', (tester) async {
     tester.view.physicalSize = const Size(960, 540);
     tester.view.devicePixelRatio = 1;
@@ -134,7 +167,7 @@ void main() {
 
     final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(mouse.removePointer);
-    await mouse.addPointer(location: tester.getCenter(find.text('Cancel')));
+    await mouse.addPointer(location: tester.getCenter(find.text(t.lurokaPlayerDesign.keepWatching)));
     await tester.pump();
 
     expect(chromeController.controlsVisible, isTrue);
@@ -278,17 +311,17 @@ void main() {
       ),
     );
 
-    expect(find.text('5'), findsOneWidget);
+    expect(find.text(t.lurokaPlayerDesign.playingIn(seconds: 5)), findsOneWidget);
     final buildsAfterMount = parentBuilds;
 
     countdown.value = 4;
     await tester.pump();
-    expect(find.text('4'), findsOneWidget);
-    expect(find.text('5'), findsNothing);
+    expect(find.text(t.lurokaPlayerDesign.playingIn(seconds: 4)), findsOneWidget);
+    expect(find.text(t.lurokaPlayerDesign.playingIn(seconds: 5)), findsNothing);
 
     countdown.value = 3;
     await tester.pump();
-    expect(find.text('3'), findsOneWidget);
+    expect(find.text(t.lurokaPlayerDesign.playingIn(seconds: 3)), findsOneWidget);
 
     expect(parentBuilds, buildsAfterMount, reason: 'the countdown must not rebuild anything above the overlay');
   });
@@ -320,12 +353,12 @@ void main() {
         ),
       ),
     );
-    expect(find.text('2'), findsOneWidget);
+    expect(find.text(t.lurokaPlayerDesign.playingIn(seconds: 2)), findsOneWidget);
 
     countdown.value = -1;
     await tester.pump();
     expect(find.text('-1'), findsNothing);
-    expect(find.text('2'), findsNothing);
+    expect(find.text(t.lurokaPlayerDesign.playingIn(seconds: 2)), findsNothing);
   });
 
   // The play-next card paints the next episode's video-frame still behind the
@@ -371,7 +404,7 @@ void main() {
       expect(find.byType(ImageFiltered), findsNothing);
       // The text card content is unchanged on top of the backdrop.
       expect(find.text('S1 E2 · Episode 2'), findsOneWidget);
-      expect(find.text('Cancel'), findsOneWidget);
+      expect(find.text(t.lurokaPlayerDesign.keepWatching), findsOneWidget);
     });
 
     testWidgets('keeps the text-only card when the episode has no thumb', (tester) async {

@@ -128,6 +128,8 @@ class TranslationsHr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$downloads$hr downloads = _Translations$downloads$hr._(_root);
 	@override late final _Translations$shaders$hr shaders = _Translations$shaders$hr._(_root);
 	@override late final _Translations$companionRemote$hr companionRemote = _Translations$companionRemote$hr._(_root);
+	@override late final _Translations$showDetailLayout$hr showDetailLayout = _Translations$showDetailLayout$hr._(_root);
+	@override late final _Translations$iconStyles$hr iconStyles = _Translations$iconStyles$hr._(_root);
 	@override late final _Translations$videoSettings$hr videoSettings = _Translations$videoSettings$hr._(_root);
 	@override late final _Translations$performanceOverlay$hr performanceOverlay = _Translations$performanceOverlay$hr._(_root);
 	@override late final _Translations$externalPlayer$hr externalPlayer = _Translations$externalPlayer$hr._(_root);
@@ -3415,6 +3417,39 @@ class _Translations$companionRemote$hr extends Translations$companionRemote$en {
 	@override String get closedBeforeAuth => 'Veza je prekinuta prije autentifikacije';
 }
 
+// Path: showDetailLayout
+class _Translations$showDetailLayout$hr extends Translations$showDetailLayout$en {
+	_Translations$showDetailLayout$hr._(TranslationsHr root) : this._root = root, super.internal(root);
+
+	final TranslationsHr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Izgled detalja serije';
+	@override String get description => 'Odaberite prikaz serija i epizoda na televizoru.';
+	@override String get cinematic => 'Filmski';
+	@override String get compact => 'Kompaktni popis epizoda';
+	@override String get seasons => 'Odaberite sezonu';
+	@override String get episodes => 'Epizode';
+	@override String get details => 'Detalji';
+	@override String get cast => 'Glumci';
+	@override String get related => 'Slični naslovi';
+}
+
+// Path: iconStyles
+class _Translations$iconStyles$hr extends Translations$iconStyles$en {
+	_Translations$iconStyles$hr._(TranslationsHr root) : this._root = root, super.internal(root);
+
+	final TranslationsHr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Stil ikona';
+	@override String get description => 'Odaberite izgled kontrola aplikacije za ovaj profil.';
+	@override String get current => 'Luroka podebljano';
+	@override String get outline => 'Material obrub';
+	@override String get lucide => 'Lucide';
+	@override String get lucideDescription => 'Linijske ikone uz Material zamjene za nedostupne simbole.';
+}
+
 // Path: videoSettings
 class _Translations$videoSettings$hr extends Translations$videoSettings$en {
 	_Translations$videoSettings$hr._(TranslationsHr root) : this._root = root, super.internal(root);
@@ -3428,6 +3463,10 @@ class _Translations$videoSettings$hr extends Translations$videoSettings$en {
 	@override String get zoom => 'Zumiranje';
 	@override String get sleepTimer => 'Mjerač vremena za isključivanje';
 	@override String get audioSync => 'Sinkronizacija zvuka';
+	@override String get resyncPlayback => 'Ponovno sinkroniziraj reprodukciju';
+	@override String get resyncPlaybackDescription => 'Osvježi zvuk i sliku na trenutnom položaju';
+	@override String get resyncPlaybackDone => 'Zatražena je ponovna sinkronizacija';
+	@override String get resyncPlaybackFailed => 'Nije moguće ponovno sinkronizirati reprodukciju';
 	@override String get subtitleSync => 'Sinkronizacija titlova';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => 'HDR nije dostupan — kompozitor radne površine ili videoizlaz ne podržava HDR.';
@@ -7721,12 +7760,31 @@ extension on TranslationsHr {
 			'companionRemote.errors.connectionLostAfterAttempts' => ({required Object attempts}) => 'Veza je izgubljena nakon ${attempts} pokušaja',
 			'companionRemote.errors.connectionLost' => 'Veza izgubljena',
 			'companionRemote.closedBeforeAuth' => 'Veza je prekinuta prije autentifikacije',
+			'showDetailLayout.title' => 'Izgled detalja serije',
+			'showDetailLayout.description' => 'Odaberite prikaz serija i epizoda na televizoru.',
+			'showDetailLayout.cinematic' => 'Filmski',
+			'showDetailLayout.compact' => 'Kompaktni popis epizoda',
+			'showDetailLayout.seasons' => 'Odaberite sezonu',
+			'showDetailLayout.episodes' => 'Epizode',
+			'showDetailLayout.details' => 'Detalji',
+			'showDetailLayout.cast' => 'Glumci',
+			'showDetailLayout.related' => 'Slični naslovi',
+			'iconStyles.title' => 'Stil ikona',
+			'iconStyles.description' => 'Odaberite izgled kontrola aplikacije za ovaj profil.',
+			'iconStyles.current' => 'Luroka podebljano',
+			'iconStyles.outline' => 'Material obrub',
+			'iconStyles.lucide' => 'Lucide',
+			'iconStyles.lucideDescription' => 'Linijske ikone uz Material zamjene za nedostupne simbole.',
 			'videoSettings.playbackSpeed' => 'Brzina reprodukcije',
 			'videoSettings.normalSpeed' => 'Uobičajena',
 			'videoSettings.sleepTimerActive' => ({required Object duration}) => 'Aktivno (${duration})',
 			'videoSettings.zoom' => 'Zumiranje',
 			'videoSettings.sleepTimer' => 'Mjerač vremena za isključivanje',
 			'videoSettings.audioSync' => 'Sinkronizacija zvuka',
+			'videoSettings.resyncPlayback' => 'Ponovno sinkroniziraj reprodukciju',
+			'videoSettings.resyncPlaybackDescription' => 'Osvježi zvuk i sliku na trenutnom položaju',
+			'videoSettings.resyncPlaybackDone' => 'Zatražena je ponovna sinkronizacija',
+			'videoSettings.resyncPlaybackFailed' => 'Nije moguće ponovno sinkronizirati reprodukciju',
 			'videoSettings.subtitleSync' => 'Sinkronizacija titlova',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'HDR nije dostupan — kompozitor radne površine ili videoizlaz ne podržava HDR.',
@@ -7928,6 +7986,8 @@ extension on TranslationsHr {
 			'seerr.disconnectConfirmBody' => 'Luroka će zaboraviti ovu Seerr instancu. Ponovno se povežite bilo kada.',
 			'seerr.request' => 'zahtjev',
 			'seerr.request4k' => 'Zahtjev u 4K',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.seasons' => 'Godišnja doba',
 			'seerr.allSeasons' => 'Sva godišnja doba',
 			'seerr.advancedOptions' => 'Napredno',
@@ -7947,8 +8007,6 @@ extension on TranslationsHr {
 			'seerr.statusPartiallyAvailable' => 'Djelomično dostupno',
 			'seerr.statusRequested' => 'Zatraženo',
 			'seerr.statusProcessing' => 'Obrada',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Na popisu blokiranih',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Nije moguće doći do ${url}: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'Nema Seerr instance na ${url} (HTTP ${status})',

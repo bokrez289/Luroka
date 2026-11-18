@@ -4,6 +4,7 @@ import 'package:luroka/services/base_shared_preferences_service.dart';
 import 'package:luroka/services/profile_settings_store.dart';
 import 'package:luroka/services/settings_service.dart';
 import 'package:luroka/models/player_setting_scope.dart';
+import 'package:luroka/media/show_detail_layout.dart';
 import 'package:luroka/models/external_player_models.dart';
 import 'package:luroka/utils/platform_detector.dart';
 
@@ -11,6 +12,17 @@ import '../test_helpers/prefs.dart';
 
 void main() {
   setUp(resetSharedPreferencesForTest);
+
+  test('show detail layout is scoped to each profile', () async {
+    final settings = await SettingsService.getInstance();
+    await settings.prepareProfileSettings(['one', 'two']);
+    settings.selectProfile('one');
+    await settings.write(SettingsService.showDetailLayout, ShowDetailLayout.compact);
+    settings.selectProfile('two');
+    expect(settings.read(SettingsService.showDetailLayout), ShowDetailLayout.cinematic);
+    settings.selectProfile('one');
+    expect(settings.read(SettingsService.showDetailLayout), ShowDetailLayout.compact);
+  });
 
   test('existing profiles keep migrated settings and new profiles start at defaults', () async {
     final settings = await SettingsService.getInstance();

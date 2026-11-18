@@ -11,6 +11,10 @@ import '../../focus/focusable_slider.dart';
 import '../../services/device_performance.dart';
 import '../../utils/platform_detector.dart';
 import '../../widgets/app_icon.dart';
+import '../../widgets/backdrop_scrim.dart';
+import '../../widgets/icon_style_picker.dart';
+import '../../media/show_detail_layout.dart';
+import '../../utils/error_dialog.dart';
 import '../../widgets/overlay_sheet.dart';
 import '../../widgets/setting_tile.dart';
 import '../../widgets/appearance_workspace.dart';
@@ -58,6 +62,50 @@ class AppearanceSettingsScreen extends StatelessWidget {
         title: t.settings.display,
         children: [
           _themeSelector(),
+          _backdropBrightnessSlider(),
+          if (PlatformDetector.isTV())
+            SettingSelectionTile<ShowDetailLayout>(
+              pref: SettingsService.showDetailLayout,
+              icon: Symbols.view_list_rounded,
+              title: t.showDetailLayout.title,
+              subtitleBuilder: (value) => value == ShowDetailLayout.cinematic
+                  ? t.showDetailLayout.cinematic : t.showDetailLayout.compact,
+              options: [
+                DialogOption(value: ShowDetailLayout.cinematic, title: t.showDetailLayout.cinematic),
+                DialogOption(value: ShowDetailLayout.compact, title: t.showDetailLayout.compact),
+              ],
+            ),
+          SettingValueBuilder(
+            pref: SettingsService.iconStyle,
+            builder: (context, style, _) => SettingNavigationTile(
+              icon: Symbols.palette_rounded,
+              title: t.iconStyles.title,
+              subtitle: iconStyleLabel(style),
+              settingId: SettingsService.iconStyle.key,
+              onTap: () => showDialog<void>(
+                context: context,
+                builder: (dialogContext) => AlertDialog(
+                  content: SingleChildScrollView(
+                    child: SettingValueBuilder(
+                      pref: SettingsService.iconStyle,
+                      builder: (context, value, _) => IconStylePicker(
+                        value: value,
+                        autofocus: true,
+                        onChanged: (next) async {
+                          try {
+                            await SettingsService.instance.write(SettingsService.iconStyle, next);
+                          } catch (_) {
+                            if (dialogContext.mounted) await showErrorDialog(dialogContext, t.household.saveFailed);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(t.common.close))],
+                ),
+              ),
+            ),
+          ),
           if (PlatformDetector.isTV())
             SettingSegmentedTile<int>(
               pref: SettingsService.tvScreenMargin,
@@ -425,6 +473,44 @@ class AppearanceSettingsScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _backdropBrightnessSlider() => WorkspaceSettingRow(
+    settingId: SettingsService.backdropBrightness.key,
+    title: t.settings.backdropBrightness,
+    description: t.settings.backdropBrightnessDescription,
+    child: SettingValueBuilder<int>(
+      pref: SettingsService.backdropBrightness,
+      builder: (context, value, _) {
+        final brightness = value.clamp(BackdropScrim.minBrightness, BackdropScrim.maxBrightness);
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                const AppIcon(Symbols.brightness_6_rounded),
+                const SizedBox(width: 16),
+                Expanded(child: Text(t.settings.backdropBrightness, style: settingsOptionTitleStyle(context))),
+                Text('$brightness%'),
+              ]),
+              Text(t.settings.backdropBrightnessDescription, style: Theme.of(context).textTheme.bodySmall),
+              Semantics(
+                label: t.settings.backdropBrightness,
+                child: FocusableSlider(
+                  key: const ValueKey('backdrop-brightness-slider'),
+                  min: BackdropScrim.minBrightness.toDouble(),
+                  max: BackdropScrim.maxBrightness.toDouble(),
+                  divisions: 10,
+                  value: brightness.toDouble(),
+                  onChanged: (next) => SettingsService.instance.write(SettingsService.backdropBrightness, next.round()),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    ),
+  );
 
   Widget _displayScaleSelector() {
     return SettingValueBuilder<double>(

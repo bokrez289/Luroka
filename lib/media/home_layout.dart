@@ -9,8 +9,10 @@ const homeContinueWatchingId = 'continue_watching';
 const homeNextUpId = 'home.nextup';
 const homePinnedCollectionsId = 'custom_pinned_collections';
 const homeStudiosId = 'custom_studios';
+const homeUpcomingEpisodesId = 'home.upcoming_episodes';
 
 enum HomeSpotlightSource { forYou, trending, continueWatching }
+enum UpcomingEpisodesSource { favorites, previouslyWatched, both }
 
 /// Includes library identity: split hubs from two libraries may share an identifier.
 String homeRowKey(MediaHub hub) => jsonEncode([hub.serverId, hub.libraryId, hub.identifier ?? hub.id]);
@@ -43,6 +45,9 @@ List<MediaHub> buildHomeRows({
   bool hasMoreNextUp = false,
   String nextUpTitle = 'Next Up',
   bool includeEmpty = false,
+  List<MediaItem> upcomingEpisodes = const [],
+  String upcomingTitle = 'Upcoming episodes',
+  bool includeUpcomingPlaceholder = false,
 }) {
   final resume = splitContinueWatching ? onDeck.where((item) => !isHomeNextUp(item)).toList() : onDeck;
   final nextUp = splitContinueWatching ? onDeck.where(isHomeNextUp).toList() : const <MediaItem>[];
@@ -69,6 +74,8 @@ List<MediaHub> buildHomeRows({
       MediaHub(id: homePinnedCollectionsId, title: pinnedTitle, type: 'collection', items: pins, size: pins.length),
     if (includeEmpty || studios.isNotEmpty)
       MediaHub(id: homeStudiosId, title: studiosTitle, type: 'studio', items: studios, size: studios.length),
+    if (upcomingEpisodes.isNotEmpty || includeUpcomingPlaceholder)
+      MediaHub(id: homeUpcomingEpisodesId, title: upcomingTitle, type: 'episode', items: upcomingEpisodes),
     ...hubs.where((hub) => includeEmpty || hub.items.isNotEmpty),
   ];
 }
@@ -82,14 +89,18 @@ class HomeLayout {
     Iterable<MediaItem> pins = const [],
     this.splitContinueWatching = false,
     this.spotlightSource = HomeSpotlightSource.trending,
+    this.upcomingEpisodesEnabled = false,
+    this.upcomingEpisodesSource = UpcomingEpisodesSource.favorites,
     Iterable<String> studioOrder = const [],
     Iterable<String> hiddenStudios = const [],
+    Iterable<String> hiddenProgress = const [],
   }) : order = List.unmodifiable(order.toSet()),
        hidden = Set.unmodifiable(hidden),
        shown = Set.unmodifiable(shown),
        pins = List.unmodifiable(pins),
        studioOrder = List.unmodifiable(studioOrder.toSet()),
-       hiddenStudios = Set.unmodifiable(hiddenStudios);
+       hiddenStudios = Set.unmodifiable(hiddenStudios),
+       hiddenProgress = Set.unmodifiable(hiddenProgress);
 
   final List<String> order;
   final Set<String> hidden;
@@ -97,8 +108,11 @@ class HomeLayout {
   final List<MediaItem> pins;
   final bool splitContinueWatching;
   final HomeSpotlightSource spotlightSource;
+  final bool upcomingEpisodesEnabled;
+  final UpcomingEpisodesSource upcomingEpisodesSource;
   final List<String> studioOrder;
   final Set<String> hiddenStudios;
+  final Set<String> hiddenProgress;
 
   HomeLayout copyWith({
     Iterable<String>? order,
@@ -107,8 +121,11 @@ class HomeLayout {
     Iterable<MediaItem>? pins,
     bool? splitContinueWatching,
     HomeSpotlightSource? spotlightSource,
+    bool? upcomingEpisodesEnabled,
+    UpcomingEpisodesSource? upcomingEpisodesSource,
     Iterable<String>? studioOrder,
     Iterable<String>? hiddenStudios,
+    Iterable<String>? hiddenProgress,
   }) => HomeLayout(
     order: order ?? this.order,
     hidden: hidden ?? this.hidden,
@@ -116,12 +133,18 @@ class HomeLayout {
     pins: pins ?? this.pins,
     splitContinueWatching: splitContinueWatching ?? this.splitContinueWatching,
     spotlightSource: spotlightSource ?? this.spotlightSource,
+    upcomingEpisodesEnabled: upcomingEpisodesEnabled ?? this.upcomingEpisodesEnabled,
+    upcomingEpisodesSource: upcomingEpisodesSource ?? this.upcomingEpisodesSource,
     studioOrder: studioOrder ?? this.studioOrder,
     hiddenStudios: hiddenStudios ?? this.hiddenStudios,
+    hiddenProgress: hiddenProgress ?? this.hiddenProgress,
   );
 
   bool isHidden(MediaHub hub) =>
       hidden.contains(homeRowKey(hub)) || (isSeasonalHomeRow(hub) && !shown.contains(homeRowKey(hub)));
+
+  bool isProgressHidden(MediaItem item) => hiddenProgress.contains(item.globalKey) ||
+      (item.seriesGlobalKey != null && hiddenProgress.contains(item.seriesGlobalKey));
 
   List<T> arrangeStudios<T>(Iterable<T> studios, String Function(T) keyOf) {
     final positions = {for (final (index, key) in studioOrder.indexed) key: index};
@@ -154,8 +177,11 @@ class HomeLayout {
     'shown': shown.toList(),
     'splitContinueWatching': splitContinueWatching,
     'spotlightSource': spotlightSource.name,
+    'upcomingEpisodesEnabled': upcomingEpisodesEnabled,
+    'upcomingEpisodesSource': upcomingEpisodesSource.name,
     'studioOrder': studioOrder,
     'hiddenStudios': hiddenStudios.toList(),
+    'hiddenProgress': hiddenProgress.toList(),
     // Only display/navigation metadata; never retain raw server responses.
     'pins': [for (final pin in pins) _pinSnapshot(pin).toJson()],
   };
@@ -190,8 +216,15 @@ class HomeLayout {
       spotlightSource:
           HomeSpotlightSource.values.where((value) => value.name == json['spotlightSource']).firstOrNull ??
           HomeSpotlightSource.trending,
+      upcomingEpisodesEnabled: json['upcomingEpisodesEnabled'] == true,
+      // Retire the old unbounded-looking choice without disabling the row for
+      // people who already selected it.
+      upcomingEpisodesSource: json['upcomingEpisodesSource'] == 'allShows' ? UpcomingEpisodesSource.both : UpcomingEpisodesSource.values
+              .where((value) => value.name == json['upcomingEpisodesSource']).firstOrNull ??
+          UpcomingEpisodesSource.favorites,
       studioOrder: strings(json['studioOrder']),
       hiddenStudios: strings(json['hiddenStudios']),
+      hiddenProgress: strings(json['hiddenProgress']),
     );
   }
 

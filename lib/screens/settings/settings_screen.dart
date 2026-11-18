@@ -331,6 +331,7 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
         search('audio', t.settings.audioChannelLimit, settings.SettingsService.audioChannelLimit.key),
         search('audio', t.settings.maxVolume, settings.SettingsService.maxVolume.key),
         search('playback', t.settings.autoPlayNextEpisode, settings.SettingsService.autoPlayNextEpisode.key),
+        search('playback', t.settings.showEarlyNextEpisode, settings.SettingsService.showEarlyNextEpisode.key),
         search('playback', t.settings.playNextCountdown, settings.SettingsService.playNextCountdown.key),
         search('playback', t.settings.skipIntroMode, settings.SettingsService.skipIntroMode.key),
         search('playback', t.settings.skipCreditsMode, settings.SettingsService.skipCreditsMode.key),
@@ -563,6 +564,7 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
           keywords: 'logs diagnostics backup',
         ),
         search('appearance', t.settings.theme, settings.SettingsService.themeMode.key, 'theme colors'),
+        search('appearance', t.settings.backdropBrightness, settings.SettingsService.backdropBrightness.key, 'fan art dim background'),
         if (PlatformDetector.isTV())
           search('appearance', t.tvLayout.screenMargins, settings.SettingsService.tvScreenMargin.key),
         search('appearance', t.settings.visualEffects, settings.SettingsService.visualEffects.key, 'animations motion'),
@@ -649,6 +651,7 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
         ),
         search('home', t.settings.episodeAction, settings.SettingsService.episodeAction.key, 'play details'),
         search('playback', t.settings.autoPlayNextEpisode, settings.SettingsService.autoPlayNextEpisode.key),
+        search('playback', t.settings.showEarlyNextEpisode, settings.SettingsService.showEarlyNextEpisode.key),
         search('playback', t.settings.skipIntroMode, settings.SettingsService.skipIntroMode.key),
         search('playback', t.settings.skipCreditsMode, settings.SettingsService.skipCreditsMode.key),
         search(

@@ -13,6 +13,7 @@ import 'package:luroka/database/app_database.dart';
 import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/media/ids.dart';
 import 'package:luroka/media/media_backend.dart';
+import 'package:luroka/media/media_kind.dart';
 import 'package:luroka/media/media_server_client.dart';
 import 'package:luroka/media/play_queue.dart';
 import 'package:luroka/media/server_capabilities.dart';
@@ -673,6 +674,7 @@ void main() {
     WidgetTester tester, {
     WatchTogetherProvider? watchTogether,
     _ReloadClient? client,
+    bool episode = false,
   }) async {
     client ??= _ReloadClient();
     final multi = testMultiServer(clients: [client]);
@@ -690,7 +692,8 @@ void main() {
       accountPreferences.dispose();
     });
     final key = GlobalKey<VideoPlayerScreenState>();
-    final item = testMediaItem(id: 'movie-prior', serverId: 'srv-1', backend: MediaBackend.jellyfin);
+    final item = testMediaItem(id: 'movie-prior', serverId: 'srv-1', backend: MediaBackend.jellyfin,
+      kind: episode ? MediaKind.episode : MediaKind.movie);
     await tester.pumpWidget(
       MultiProvider(
         providers: [
@@ -714,6 +717,50 @@ void main() {
   }
 
   group('TV background suspend', () {
+    testWidgets('early next prompt respects credits, dismissal, pause and setting', (tester) async {
+      await withMockPlayerChannels(
+        methodChannelName: 'com.plezy/mpv_player',
+        eventChannelName: 'com.plezy/mpv_player/events',
+        testBody: () async {
+          final screen = await pumpReloadScreen(tester, episode: true);
+          final state = screen.key.currentState!;
+          await state.debugMarkPlaybackStartedForTesting();
+          final next = testMediaItem(id: 'next', title: 'Next', serverId: 'srv-1',
+            backend: MediaBackend.jellyfin, kind: MediaKind.episode);
+          state.debugCommitAdjacentEpisodesForTesting(AdjacentEpisodes(next: next,
+            nextStatus: QueueNavigationStatus.found, previousStatus: QueueNavigationStatus.boundary));
+          const duration = Duration(minutes: 40);
+          state.debugUpdateEarlyNextForTesting(const Duration(minutes: 38), duration, creditsStartMs: 2340000);
+          expect(state.debugPlayNextPromptVisibleForTesting, isFalse);
+          state.debugUpdateEarlyNextForTesting(const Duration(minutes: 39), duration, creditsStartMs: 2340000);
+          expect(state.debugPlayNextPromptVisibleForTesting, isTrue);
+          expect(state.debugAutoPlayCountdownForTesting, 5);
+          screen.player.emitPlaying(false);
+          await tester.pump(const Duration(seconds: 2));
+          expect(state.debugAutoPlayCountdownForTesting, 5);
+          screen.player.emitPlaying(true);
+          await tester.pump(const Duration(seconds: 1));
+          expect(state.debugAutoPlayCountdownForTesting, 4);
+          state.debugDismissNextForTesting();
+          state.debugUpdateEarlyNextForTesting(const Duration(minutes: 39, seconds: 5), duration, creditsStartMs: 2340000);
+          expect(state.debugPlayNextPromptVisibleForTesting, isFalse);
+          state.debugUpdateEarlyNextForTesting(const Duration(minutes: 38), duration, creditsStartMs: 2340000);
+          await SettingsService.instance.write(SettingsService.showEarlyNextEpisode, false);
+          state.debugUpdateEarlyNextForTesting(const Duration(minutes: 39), duration, creditsStartMs: 2340000);
+          expect(state.debugPlayNextPromptVisibleForTesting, isFalse);
+          await SettingsService.instance.write(SettingsService.showEarlyNextEpisode, true);
+          await SettingsService.instance.write(SettingsService.autoPlayNextEpisode, false);
+          state.debugUpdateEarlyNextForTesting(const Duration(minutes: 39, seconds: 29), duration);
+          expect(state.debugPlayNextPromptVisibleForTesting, isFalse);
+          state.debugUpdateEarlyNextForTesting(const Duration(minutes: 39, seconds: 30), duration);
+          expect(state.debugPlayNextPromptVisibleForTesting, isTrue);
+          expect(state.debugAutoPlayCountdownForTesting, -1);
+          await tester.pump(const Duration(seconds: 2));
+          expect(state.debugPlayNextPromptVisibleForTesting, isTrue);
+          expect(state.debugAutoPlayCountdownForTesting, -1);
+        },
+      );
+    });
     testWidgets('remote OK toggles playback when focus has fallen back to the screen', (tester) async {
       await initializeDateFormatting('en');
       TvDetectionService.debugSetAppleTVOverride(true);

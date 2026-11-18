@@ -14,7 +14,13 @@ import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/media/library_query.dart';
 import 'package:luroka/media/library_change_event.dart';
 import 'package:luroka/media/media_backend.dart';
+import 'package:luroka/media/show_detail_layout.dart';
+import 'package:luroka/widgets/media_context_menu.dart';
 import 'package:luroka/media/media_hub.dart';
+import 'package:luroka/media/media_role.dart';
+import 'package:luroka/widgets/cast_member_strip.dart';
+import 'package:luroka/widgets/hub_section.dart';
+import 'package:luroka/widgets/watched_indicator.dart';
 import 'package:luroka/media/media_item.dart';
 import 'package:luroka/media/show_theme_music.dart';
 import 'package:luroka/mpv/mpv.dart' as mpv;
@@ -368,6 +374,41 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('compact show displays spoiler-safe informational upcoming episodes', (tester) async {
+    await SettingsService.getInstance();
+    await SettingsService.instance.write(SettingsService.showDetailLayout, ShowDetailLayout.compact);
+    await SettingsService.instance.write(SettingsService.hideSpoilers, true);
+    tester.view.physicalSize = const Size(1280, 720);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final show = testMediaItem(id: 'schedule-compact', kind: MediaKind.show, title: 'Show', serverId: 'server_1');
+    final season = testMediaItem(id: 'season', kind: MediaKind.season, parentId: show.id, index: 1, serverId: show.serverId);
+    final episode = testMediaItem(id: 'episode', kind: MediaKind.episode, parentId: season.id,
+      grandparentId: show.id, parentIndex: 1, index: 1, serverId: show.serverId);
+    final client = _ScheduledShowClient(show: show, childrenByParent: {show.id: [season], season.id: [episode]});
+    final source = _ScheduleSource();
+    final sources = _ScheduleSources(source);
+    addTearDown(source.dispose);
+    addTearDown(sources.dispose);
+    await tester.pumpWidget(MultiProvider(providers: [
+      ChangeNotifierProvider<MultiServerProvider>.value(value: testMultiServer(clients: [client]).provider),
+      ChangeNotifierProvider<CatalogSourcesProvider>.value(value: sources),
+    ], child: MaterialApp(theme: monoTheme(MonoPalette.dark),
+      home: withProfileNavigationScope(child: MediaDetailScreen(metadata: show)))));
+    await tester.pumpAndSettle();
+    final section = find.byKey(const ValueKey('compact_show_upcoming'));
+    await tester.ensureVisible(section);
+    expect(section, findsOneWidget);
+    final row = find.byKey(const ValueKey('compact_upcoming_1_3'));
+    expect(row, findsOneWidget);
+    expect(find.descendant(of: section, matching: find.text('Future')), findsNothing);
+    await tester.tap(row);
+    await tester.pumpAndSettle();
+    expect(find.text(t.showSchedule.notYetAired), findsWidgets);
+    expect(find.byType(AlertDialog), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   for (final count in [1, 2]) {
     testWidgets('TV exposes version chooser for $count inline versions only when there is a choice', (tester) async {
       await SettingsService.getInstance();
@@ -563,6 +604,118 @@ void main() {
     expect(players, hasLength(2));
   });
 
+  testWidgets('compact TV show switches seasons through the picker', (tester) async {
+    await SettingsService.getInstance();
+    await SettingsService.instance.write(SettingsService.showDetailLayout, ShowDetailLayout.compact);
+    tester.view.physicalSize = const Size(1280, 720);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final show = testMediaItem(id: 'show', backend: MediaBackend.jellyfin, kind: MediaKind.show,
+      title: 'Show', serverId: 'server_1', summary: 'A full description').copyWith(
+        roles: [const MediaRole(id: 'actor', tag: 'An Actor', role: 'A Character', thumbPath: '/actor')]);
+    MediaItem season(int index) => testMediaItem(id: 'season_$index', backend: show.backend,
+      kind: MediaKind.season, title: 'Season $index', parentId: show.id, index: index, serverId: show.serverId);
+    final first = season(1);
+    final second = season(2);
+    MediaItem episode(MediaItem season, String id) => testMediaItem(
+      id: id, backend: show.backend, kind: MediaKind.episode, title: id,
+      serverId: show.serverId, parentId: season.id, parentIndex: season.index, index: 1,
+    );
+    final client = _FakeMediaServerClient(show: show, childrenByParent: {
+      show.id: [first, second], first.id: [episode(first, 'First episode')],
+      second.id: [episode(second, 'Second episode')],
+    }, relatedHubs: [MediaHub(id: 'related', title: 'Related', type: 'movie',
+      items: [testMediaItem(id: 'other', title: 'Another show', kind: MediaKind.show,
+        backend: show.backend, serverId: show.serverId)])]);
+    await tester.pumpWidget(TranslationProvider(child: ChangeNotifierProvider<MultiServerProvider>.value(
+      value: testMultiServer(clients: [client]).provider,
+      child: MaterialApp(theme: monoTheme(MonoPalette.dark),
+        home: withProfileNavigationScope(child: MediaDetailScreen(metadata: show))),
+    )));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('compact_show_title')), findsOneWidget);
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'play_button');
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'compact_show_episodes_tab');
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'compact_show_season');
+    await tester.ensureVisible(find.byKey(const ValueKey('compact_show_season_picker')));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('compact_episode_First episode')), 100,
+        scrollable: find.descendant(of: find.byKey(const ValueKey('compact_show_scroll')), matching: find.byType(Scrollable)));
+    expect(find.text('First episode'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('compact_show_season_picker')));
+    await tester.pumpAndSettle();
+    expect(find.text(t.showDetailLayout.seasons), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(find.text('Second episode'), findsOneWidget);
+    expect(find.text('First episode'), findsNothing);
+    await tester.ensureVisible(find.byKey(const ValueKey('compact_show_tab_2')));
+    await tester.tap(find.byKey(const ValueKey('compact_show_tab_2')));
+    await tester.pumpAndSettle();
+    final cast = tester.widget<CastMemberStrip>(find.byType(CastMemberStrip));
+    expect(cast.circularPortraits, isTrue);
+    expect(cast.members.single.imagePath, '/actor');
+    await tester.tap(find.byKey(const ValueKey('compact_show_tab_3')));
+    await tester.pumpAndSettle();
+    expect(find.byType(HubSection), findsWidgets);
+    await tester.tap(find.byKey(const ValueKey('compact_show_tab_1')));
+    await tester.pumpAndSettle();
+    expect(find.text('A full description'), findsWidgets);
+    expect(find.text('Unknown'), findsNothing);
+    expect(find.text('Second episode'), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('compact_show_tab_0')));
+    await tester.pumpAndSettle();
+    expect(find.text('Second episode'), findsOneWidget);
+    await SettingsService.instance.write(SettingsService.hideSpoilers, true);
+    await tester.tap(find.byKey(const ValueKey('compact_show_tab_2')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('compact_show_tab_0')));
+    await tester.pumpAndSettle();
+    expect(find.text('Second episode'), findsNothing);
+    expect(find.text(t.dashboard.spoilerHidden), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('compact episodes show watched state and mark the actual next episode', (tester) async {
+    await SettingsService.getInstance();
+    await SettingsService.instance.write(SettingsService.showDetailLayout, ShowDetailLayout.compact);
+    tester.view.physicalSize = const Size(1280, 720);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final show = testMediaItem(id: 'show', backend: MediaBackend.jellyfin, kind: MediaKind.show,
+      title: 'Show', serverId: 'server_1');
+    final season = testMediaItem(id: 'season', backend: show.backend, kind: MediaKind.season,
+      title: 'Season 1', index: 1, parentId: show.id, serverId: show.serverId);
+    MediaItem episode(String id, int index, int views) => testMediaItem(id: id, backend: show.backend,
+      kind: MediaKind.episode, title: id, serverId: show.serverId, parentId: season.id,
+      grandparentId: show.id, parentIndex: 1, index: index, viewCount: views);
+    final seen = episode('seen', 1, 1);
+    final next = episode('next', 2, 0);
+    final client = _FakeMediaServerClient(show: show, childrenByParent: {
+      show.id: [season], season.id: [seen, next],
+    })..onDeckEpisode = next;
+    await tester.pumpWidget(TranslationProvider(child: ChangeNotifierProvider<MultiServerProvider>.value(
+      value: testMultiServer(clients: [client]).provider,
+      child: MaterialApp(theme: monoTheme(MonoPalette.dark),
+        home: withProfileNavigationScope(child: MediaDetailScreen(metadata: show))),
+    )));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('compact_episode_seen')), 100,
+      scrollable: find.descendant(of: find.byKey(const ValueKey('compact_show_scroll')), matching: find.byType(Scrollable)));
+    final indicator = tester.widget<WatchedIndicator>(find.descendant(
+      of: find.byKey(const ValueKey('compact_episode_seen')), matching: find.byType(WatchedIndicator)));
+    expect(indicator.item.isWatched, isTrue);
+    expect(find.byKey(const ValueKey('compact_next_up_seen')), findsNothing);
+    expect(find.byKey(const ValueKey('compact_next_up_next')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   for (final size in [const Size(960, 540), const Size(1280, 720), const Size(1920, 1080), const Size(3840, 2160)]) {
     for (final kind in [MediaKind.movie, MediaKind.show, MediaKind.episode]) {
       final showPage = kind == MediaKind.show;
@@ -654,6 +807,18 @@ void main() {
         expect(bar.right, lessThanOrEqualTo(size.width));
         expect(bar.bottom, lessThan(size.height));
         expect(bar.top, greaterThan(0));
+        if (kind == MediaKind.movie || kind == MediaKind.show) {
+          final actions = tester.widget<FocusableActionBar>(find.byType(FocusableActionBar)).actions;
+          final favorite = actions.indexWhere((action) => action.debugLabel == 'detail_favorite');
+          final watched = actions.indexWhere((action) => action.debugLabel == 'detail_watched');
+          expect(favorite, watched + 1);
+          final menu = tester.widgetList<MediaContextMenu>(find.byType(MediaContextMenu))
+              .firstWhere((menu) => menu.compactDetailMenu);
+          expect(menu.hiddenActionValues, contains('toggle_favorite'));
+          actions[favorite].onPressed!();
+          await tester.pumpAndSettle();
+          expect(client.favoriteWrites, [true]);
+        }
         expect(find.byKey(const ValueKey('detail_playback_panel')), findsOneWidget);
         if (!showPage) expect(find.byKey(const ValueKey('detail_finish_time')), findsOneWidget);
         expect(FocusManager.instance.primaryFocus?.debugLabel, 'play_button');
@@ -825,6 +990,7 @@ void main() {
         MediaRatingSource(source: 'rottenTomatoesCritic', value: 8.0),
         MediaRatingSource(source: 'rottenTomatoesAudience', value: 6.9),
         MediaRatingSource(source: 'imdb', value: 7.4),
+        MediaRatingSource(source: 'audience', value: 5.1),
       ],
     );
 
@@ -943,6 +1109,7 @@ void main() {
     expect(find.text('62%'), findsOneWidget);
     expect(find.text('87%'), findsOneWidget);
     expect(find.text('7.4'), findsOneWidget);
+    expect(find.text('5.1'), findsNothing);
     expect(find.byType(SvgPicture), findsNWidgets(3));
     expect(find.textContaining('★ 6.2', findRichText: true), findsNothing);
     // The redundant type label no longer opens the line.
@@ -4366,6 +4533,7 @@ class _FakeMediaServerClient implements MediaServerClient {
   int extrasReads = 0;
   int sourceReads = 0;
   final List<MediaItem> extras;
+  final List<MediaHub> relatedHubs;
   final childrenPageCalls = <({String parentId, int? start, int? size})>[];
   final childrenCalls = <String>[];
   final thumbnailPaths = <String?>[];
@@ -4394,6 +4562,7 @@ class _FakeMediaServerClient implements MediaServerClient {
     this.pendingPlayableDescendants,
     this.mediaSourcesById = const {},
     this.extras = const [],
+    this.relatedHubs = const [],
     Map<String, Map<String, dynamic>>? rawItems,
   }) : rawItems = rawItems ?? {},
        childrenPageFuturesByStart = childrenPageFuturesByStart ?? {};
@@ -4506,7 +4675,7 @@ class _FakeMediaServerClient implements MediaServerClient {
   }
 
   @override
-  Future<List<MediaHub>> fetchRelatedHubs(String id, {int count = 10}) async => const [];
+  Future<List<MediaHub>> fetchRelatedHubs(String id, {int count = 10}) async => relatedHubs;
 
   @override
   Future<List<MediaItem>> fetchExtras(String id) async {

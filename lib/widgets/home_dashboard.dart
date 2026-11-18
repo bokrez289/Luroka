@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show setEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
 
 import '../focus/focusable_button.dart';
 import '../focus/locked_hub_controller.dart';
@@ -18,6 +19,10 @@ import 'movie_copy_picker.dart';
 import '../media/media_item.dart';
 import '../media/media_item_types.dart';
 import '../media/media_kind.dart';
+import '../media/media_rating.dart';
+import '../models/catalog/catalog_item.dart';
+import '../providers/catalog_sources_provider.dart';
+import '../services/catalog/cinemeta_catalog_source.dart';
 import '../media/media_server_client.dart';
 import '../screens/libraries/state_messages.dart';
 import '../services/device_performance.dart';
@@ -34,7 +39,7 @@ import 'app_icon.dart';
 import 'cycling_media_backdrop.dart';
 import 'hub_section.dart';
 import 'optimized_media_image.dart';
-import 'rasterized_gradient.dart';
+import 'backdrop_scrim.dart';
 import 'studio_card.dart';
 import 'mobile_studios_shelf.dart';
 import 'media_rating_badge.dart';
@@ -44,6 +49,18 @@ import '../theme/kids_style.dart';
 import 'kids/kids_movie_shelf.dart';
 import 'kids/kids_sky.dart';
 import 'kids/kids_feature.dart';
+
+List<MediaRatingSource> _homePreviewRatings(MediaItem item) {
+  final ratings = mediaRatingsFor(item);
+  final imdb = ratings.where((rating) => rating.source == 'imdb').firstOrNull;
+  final fallback = ratings.where((rating) => rating.source.isEmpty || rating.source == 'audience').firstOrNull;
+  return [
+    ?(imdb ?? fallback),
+    ...ratings.where((rating) => const {
+      'rottenTomatoes', 'rottenTomatoesCritic', 'rottenTomatoesAudience',
+    }.contains(rating.source)),
+  ];
+}
 
 /// Artwork-led Home. On TV the billboard scrolls away to give lazy shelves
 /// the full viewport; handheld layouts retain their compact preview.
@@ -248,10 +265,14 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
     _preview = HomePreviewController(
       resolveClient: (item) => widget.resolveClient(item),
       canFetch: () => mounted && _previewActive && (ModalRoute.of(context)?.isCurrent ?? false),
+      includeShowMetadata: true,
+      lookupImdb: _lookupHomeImdb,
     );
     _browsePreview = HomePreviewController(
       resolveClient: (item) => widget.resolveClient(item),
       canFetch: () => mounted && _previewActive && _browsing && (ModalRoute.of(context)?.isCurrent ?? false),
+      includeShowMetadata: true,
+      lookupImdb: _lookupHomeImdb,
     );
     _browsing = PlatformDetector.isTV() && !widget.showFeature;
     setPreviewActive(widget.active);
@@ -259,6 +280,25 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
     _syncPreview();
     if (_browsing) _selectFirstBrowseItem();
     _scheduleRotation();
+  }
+
+  Future<MediaRatingSource?> _lookupHomeImdb(
+    MediaItem item, MediaServerClient client, bool Function() isCurrent,
+  ) async {
+    if (!mounted || !isCurrent() || KidsProfileService.instance.isActiveKids) return null;
+    final source = context.read<CatalogSourcesProvider?>()?.connectedSources
+        .whereType<CinemetaCatalogSource>().firstOrNull;
+    if (source == null) return null;
+    try {
+      final ids = await client.fetchExternalIds(item.id).timeout(const Duration(seconds: 4));
+      if (!mounted || !isCurrent() || ids.imdb == null) return null;
+      final ratings = await source.fetchCommunityRatings(item.kind, CatalogItemIds.fromExternal(ids))
+          .timeout(const Duration(seconds: 8));
+      if (!mounted || !isCurrent()) return null;
+      return ratings.where((rating) => rating.source == 'imdb').firstOrNull;
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
@@ -630,6 +670,18 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
       setState(() => _browsing = false);
       _scheduleRotation(afterInteraction: true);
       _browsePreview.setActive(false);
+      // The billboard is inserted on the next frame. Reset after that layout,
+      // since resetting against the old shelf-only slivers can leave Flutter
+      // preserving the shelf's old scroll anchor above the new billboard.
+      final generation = _focusGeneration;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _browsing || generation != _focusGeneration ||
+            (_preview.value == null && !widget.featureLoading)) {
+          return;
+        }
+        if (_scroll.hasClients) _scroll.jumpTo(0);
+        _play.requestFocus();
+      });
     }
     if (widget.showFeature && (_preview.value != null || widget.featureLoading)) {
       if ((PlatformDetector.isTV() || PlatformDetector.isMobile(context) || widget.kidsStyle != null) &&
@@ -906,7 +958,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                                       onItemLongPress: row.id == homeStudiosId ? (_) {} : null,
                                       showServerName: widget.showServerName,
                                       onRefresh: widget.onRefresh,
-                                      isInContinueWatching: row.isContinueWatchingHub,
+                                      isInContinueWatching: row.isContinueWatchingHub || row.id == homeNextUpId,
                                       usesContinueWatchingAction: row.usesContinueWatchingAction,
                                       onRemoveFromContinueWatching: widget.onRemoveFromContinueWatching,
                                       loadMoreItems: _loadMore(row),
@@ -1102,7 +1154,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                         onItemLongPress: row.id == homeStudiosId ? (_) {} : null,
                         showServerName: widget.showServerName,
                         onRefresh: widget.onRefresh,
-                        isInContinueWatching: row.isContinueWatchingHub,
+                        isInContinueWatching: row.isContinueWatchingHub || row.id == homeNextUpId,
                         usesContinueWatchingAction: row.usesContinueWatchingAction,
                         onRemoveFromContinueWatching: widget.onRemoveFromContinueWatching,
                         loadMoreItems: _loadMore(row),
@@ -1373,7 +1425,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                         showHeaderIcon: !style.isOlder,
                         inset: true,
                         streamingHome: mobile,
-                        isInContinueWatching: continuing,
+                        isInContinueWatching: continuing || row.id == homeNextUpId,
                         usesContinueWatchingAction: row.usesContinueWatchingAction,
                         onItemTap: row.id == homeNextUpId
                             ? null
@@ -1424,7 +1476,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
             HomeHeroSize.large => 0.84,
           };
           final heroHeight = math.max(280.0, viewport.maxHeight * heroFraction);
-          final descriptionHeight = math.min(280 * scale, viewport.maxHeight * 0.34);
+          final descriptionHeight = math.min(320 * scale, viewport.maxHeight * 0.38);
           final shelfHeight = viewport.maxHeight - (_browsing ? descriptionHeight : 0);
           return Column(
             children: [
@@ -1483,12 +1535,12 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                                   Positioned(
                                     left: inset,
                                     right: inset,
-                                    top: 64 * scale,
-                                    bottom: 48 * scale,
+                                    top: (widget.showToolbar ? 64 : 20) * scale,
+                                    bottom: 32 * scale,
                                     child: _previewDetails(
                                       context,
                                       preview,
-                                      heroHeight - 112 * scale,
+                                      heroHeight - (widget.showToolbar ? 96 : 52) * scale,
                                       viewport.maxWidth - inset * 2,
                                       hideSpoilers,
                                     ),
@@ -1549,7 +1601,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                           final continuing = row.isContinueWatchingHub || row.id == homeContinueWatchingId;
                           return Padding(
                             key: ValueKey(_rowIds[index]),
-                            padding: EdgeInsets.only(top: 8 * scale, bottom: 26 * scale),
+                            padding: EdgeInsets.only(top: (_browsing ? 2 : 8) * scale, bottom: 26 * scale),
                             child: HubSection(
                               key: _hubKeys[_rowIds[index]],
                               hub: row,
@@ -1602,7 +1654,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                               onItemLongPress: studio ? (_) {} : null,
                               showServerName: widget.showServerName,
                               onRefresh: widget.onRefresh,
-                              isInContinueWatching: continuing,
+                              isInContinueWatching: continuing || row.id == homeNextUpId,
                               usesContinueWatchingAction: row.usesContinueWatchingAction,
                               onRemoveFromContinueWatching: widget.onRemoveFromContinueWatching,
                               loadMoreItems: _loadMore(row),
@@ -1656,12 +1708,23 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
         final title = item.isEpisode
             ? item.grandparentTitle ?? (hidden ? t.dashboard.episodeFallback : item.displayTitle)
             : item.displayTitle;
+        final duration = item.durationMs;
+        final offset = item.viewOffsetMs ?? 0;
+        final remainingMs = duration != null && duration > 0 && offset >= 0 && offset < duration
+            ? duration - offset
+            : null;
+        final finishTime = preview.usesContinueWatchingAction && remainingMs != null
+            ? t.videoControls.endsAt(time: MaterialLocalizations.of(context).formatTimeOfDay(
+                TimeOfDay.fromDateTime(DateTime.now().add(Duration(milliseconds: remainingMs))),
+                alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+              ))
+            : null;
         final metadata = [
           if (item.isEpisode) t.dashboard.episodeLabel(season: item.parentIndex ?? '–', episode: item.index ?? '–'),
           if (item.year != null) '${item.year}',
           if (item.contentRating?.isNotEmpty == true) formatContentRating(item.contentRating!),
           if ((item.durationMs ?? 0) > 0 && item.kind != MediaKind.show) formatDurationTextual(item.durationMs!),
-          if (item.genres?.isNotEmpty == true) item.genres!.take(2).join(' / '),
+          ?finishTime,
         ].join('  ·  ');
         return Stack(
           fit: StackFit.expand,
@@ -1686,7 +1749,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
             Positioned(
               left: inset,
               top: 12 * scale,
-              bottom: 16 * scale,
+              bottom: 10 * scale,
               width: width * 0.65,
               child: Align(
                 alignment: Alignment.centerLeft,
@@ -1704,7 +1767,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.labelMedium?.copyWith(
-                            fontSize: 11 * scale,
+                            fontSize: 12 * scale,
                             letterSpacing: 1.3,
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -1721,37 +1784,85 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                             letterSpacing: -0.6,
                           ),
                         ),
-                        if (metadata.isNotEmpty) ...[
-                          SizedBox(height: 6 * scale),
+                        if (item.isEpisode && !hidden && item.title?.trim().isNotEmpty == true &&
+                            item.title!.trim() != title.trim()) ...[
+                          SizedBox(height: 4 * scale),
                           Text(
-                            metadata,
-                            key: const ValueKey('home_browse_metadata'),
+                            item.title!,
+                            key: const ValueKey('home_browse_episode_title'),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontSize: 13 * scale,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
+                            style: theme.textTheme.titleSmall?.copyWith(fontSize: 16 * scale, fontWeight: FontWeight.w600),
                           ),
                         ],
-                        if (mediaRatingsFor(item).isNotEmpty) ...[
-                          SizedBox(height: 8 * scale),
-                          InlineRatingBadges(
-                            ratings: mediaRatingsFor(item),
-                            textStyle: theme.textTheme.bodyMedium?.copyWith(fontSize: 13 * scale),
+                        if (metadata.isNotEmpty || _homePreviewRatings(item).isNotEmpty) ...[
+                          SizedBox(height: 6 * scale),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 12 * scale,
+                            runSpacing: 4 * scale,
+                            children: [
+                              if (metadata.isNotEmpty)
+                                Text(
+                                  metadata,
+                                  key: const ValueKey('home_browse_metadata'),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontSize: 16 * scale,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              if (_homePreviewRatings(item).isNotEmpty)
+                                InlineRatingBadges(
+                                  key: const ValueKey('home_browse_ratings'),
+                                  ratings: _homePreviewRatings(item),
+                                  textStyle: theme.textTheme.bodyMedium?.copyWith(fontSize: 16 * scale),
+                                ),
+                            ],
+                          ),
+                        ],
+                        if (item.genres?.isNotEmpty == true || item.directors?.isNotEmpty == true) ...[
+                          SizedBox(height: 7 * scale),
+                          Wrap(
+                            spacing: 6 * scale,
+                            runSpacing: 4 * scale,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              for (final genre in (item.genres ?? const <String>[]).where((g) => g.trim().isNotEmpty).take(2))
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 8 * scale, vertical: 3 * scale),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: theme.colorScheme.outline.withValues(alpha: .6)),
+                                    borderRadius: BorderRadius.circular(6 * scale),
+                                  ),
+                                  child: Text(genre, style: theme.textTheme.labelSmall?.copyWith(fontSize: 13 * scale)),
+                                ),
+                              if (item.directors?.any((name) => name.trim().isNotEmpty) == true)
+                                Text(
+                                  '${t.discover.director}: ${item.directors!.where((name) => name.trim().isNotEmpty).take(2).join(', ')}',
+                                  key: const ValueKey('home_browse_director'),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.labelSmall?.copyWith(fontSize: 13 * scale),
+                                ),
+                            ],
                           ),
                         ],
                         SizedBox(height: 10 * scale),
-                        Text(
-                          hidden
-                              ? t.dashboard.spoilerHidden
-                              : item.summary?.trim().isNotEmpty == true
-                              ? item.summary!
-                              : t.dashboard.synopsisUnavailable,
-                          key: const ValueKey('home_browse_summary'),
-                          maxLines: 4,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16 * scale, height: 1.4),
+                        SizedBox(
+                          width: width * 0.52,
+                          child: Text(
+                            hidden
+                                ? t.dashboard.spoilerHidden
+                                : item.summary?.trim().isNotEmpty == true
+                                ? item.summary!
+                                : t.dashboard.synopsisUnavailable,
+                            key: const ValueKey('home_browse_summary'),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16 * scale, height: 1.4),
+                          ),
                         ),
                       ],
                     ),
@@ -1913,6 +2024,12 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
     final remaining = item.durationMs != null && item.hasActiveProgress
         ? math.max(1, ((item.durationMs! - item.viewOffsetMs! + 59999) ~/ 60000))
         : null;
+    final finishTime = preview.usesContinueWatchingAction && remaining != null
+        ? t.videoControls.endsAt(time: MaterialLocalizations.of(context).formatTimeOfDay(
+            TimeOfDay.fromDateTime(DateTime.now().add(Duration(minutes: remaining))),
+            alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+          ))
+        : null;
     void activate() {
       if (item.raw?['customStudio'] != null) {
         widget.onStudioTap?.call(item);
@@ -1933,12 +2050,12 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
         : t.common.play;
     final smallActions = infoWidth < 420;
     return Align(
-      alignment: Alignment.bottomLeft,
+      alignment: tv ? Alignment.topLeft : Alignment.bottomLeft,
       child: SizedBox(
         width: infoWidth,
         child: FittedBox(
           fit: BoxFit.scaleDown,
-          alignment: Alignment.bottomLeft,
+          alignment: tv ? Alignment.topLeft : Alignment.bottomLeft,
           child: SizedBox(
             width: infoWidth,
             child: Column(
@@ -1955,7 +2072,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: colors.onSurface.withValues(alpha: 0.7),
-                      fontSize: tv ? 12 * uiScale : 11,
+                      fontSize: tv ? 13 * uiScale : 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.6,
                     ),
@@ -2019,13 +2136,17 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: colors.onSurface,
-                      fontSize: tv ? 17 * uiScale : 15,
+                      fontSize: tv ? 19 * uiScale : 15,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
                 const SizedBox(height: 8),
-                Text(
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 10 * uiScale,
+                  runSpacing: 4,
+                  children: [Text(
                   [
                     if (minimal && episode != null) episode,
                     metadata,
@@ -2033,20 +2154,36 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                       remaining < 60
                           ? t.dashboard.timeLeft(minutes: remaining)
                           : t.dashboard.timeLeftHours(hours: remaining ~/ 60, minutes: remaining % 60),
+                    ?finishTime,
                   ].where((value) => value.isNotEmpty).join('  ·  '),
                   key: const ValueKey('home_preview_metadata'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: colors.onSurface.withValues(alpha: 0.78), fontSize: tv ? 14 * uiScale : 12),
+                  style: TextStyle(color: colors.onSurface.withValues(alpha: 0.78), fontSize: tv ? 18 * uiScale : 12),
+                ),
+                  if (tv && _homePreviewRatings(item).isNotEmpty)
+                    InlineRatingBadges(ratings: _homePreviewRatings(item),
+                      textStyle: TextStyle(fontSize: 18 * uiScale, color: colors.onSurface)),
+                  ],
                 ),
                 if (!minimal) ...[
                   const SizedBox(height: 10),
-                  if (mediaRatingsFor(item).isNotEmpty) ...[
-                    InlineRatingBadges(
-                      ratings: mediaRatingsFor(item),
-                      textStyle: TextStyle(fontSize: tv ? 14 * uiScale : 12, color: colors.onSurface),
-                    ),
+                  if (!tv && mediaRatingsFor(item).isNotEmpty) ...[
+                      InlineRatingBadges(
+                        ratings: mediaRatingsFor(item),
+                        textStyle: TextStyle(fontSize: 12, color: colors.onSurface),
+                      ),
                     const SizedBox(height: 10),
+                  ],
+                  if (item.directors?.any((name) => name.trim().isNotEmpty) == true) ...[
+                    Text(
+                      '${t.discover.director}: ${item.directors!.where((name) => name.trim().isNotEmpty).take(2).join(', ')}',
+                      key: const ValueKey('home_preview_director'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: colors.onSurface.withValues(alpha: 0.78), fontSize: tv ? 16 * uiScale : 12),
+                    ),
+                    const SizedBox(height: 8),
                   ],
                   Text(
                     hidden
@@ -2063,7 +2200,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: colors.onSurface.withValues(alpha: 0.85),
-                      fontSize: tv ? 18 * uiScale : 14,
+                      fontSize: tv ? 20 * uiScale : 14,
                       height: 1.35,
                     ),
                   ),
@@ -2204,7 +2341,7 @@ class _CinematicBackdrop extends StatelessWidget {
               ? Duration.zero
               : DevicePerformance.reducedDuration(const Duration(milliseconds: 240)),
         ),
-        RasterizedGradient(
+        BackdropScrim(
           gradient: LinearGradient(
             colors: [
               base,
@@ -2215,7 +2352,7 @@ class _CinematicBackdrop extends StatelessWidget {
             stops: const [0, 0.25, 0.65, 1],
           ),
         ),
-        RasterizedGradient(
+        BackdropScrim(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,

@@ -3415,6 +3415,10 @@ class _Translations$videoSettings$da extends Translations$videoSettings$en {
 	@override String get zoom => 'Zoom';
 	@override String get sleepTimer => 'Sove-timer';
 	@override String get audioSync => 'Lydsynkronisering';
+	@override String get resyncPlayback => 'Synkroniser afspilning igen';
+	@override String get resyncPlaybackDescription => 'Genopfrisk lyd og video ved den aktuelle position';
+	@override String get resyncPlaybackDone => 'Gensynkronisering anmodet';
+	@override String get resyncPlaybackFailed => 'Kunne ikke gensynkronisere afspilningen';
 	@override String get subtitleSync => 'Undertekstsynkronisering';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => 'HDR er ikke tilgængelig her – denne skrivebordskompositor eller videoudgang kan ikke håndtere det.';
@@ -7712,6 +7716,10 @@ extension on TranslationsDa {
 			'videoSettings.zoom' => 'Zoom',
 			'videoSettings.sleepTimer' => 'Sove-timer',
 			'videoSettings.audioSync' => 'Lydsynkronisering',
+			'videoSettings.resyncPlayback' => 'Synkroniser afspilning igen',
+			'videoSettings.resyncPlaybackDescription' => 'Genopfrisk lyd og video ved den aktuelle position',
+			'videoSettings.resyncPlaybackDone' => 'Gensynkronisering anmodet',
+			'videoSettings.resyncPlaybackFailed' => 'Kunne ikke gensynkronisere afspilningen',
 			'videoSettings.subtitleSync' => 'Undertekstsynkronisering',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'HDR er ikke tilgængelig her – denne skrivebordskompositor eller videoudgang kan ikke håndtere det.',
@@ -7928,12 +7936,12 @@ extension on TranslationsDa {
 			'seerr.requestFailed' => ({required Object error}) => 'Anmodning mislykkedes: ${error}',
 			'seerr.requestsLoadFailed' => 'Kunne ikke indlæse anmodningsmuligheder',
 			'seerr.nothingToRequest' => 'Alt er allerede tilgængeligt eller anmodet.',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Tilgængelig',
 			'seerr.statusPartiallyAvailable' => 'Delvist tilgængelig',
 			'seerr.statusRequested' => 'Anmodet',
 			'seerr.statusProcessing' => 'Behandler',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'På blokeringslisten',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Kunne ikke nå ${url}: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'Ingen Seerr-instans på ${url} (HTTP ${status})',

@@ -35,6 +35,9 @@ class EpisodeSessionState {
   bool isLoadingPrevious = false;
 
   bool showPlayNextDialog = false;
+  bool earlyPrompt = false;
+  bool earlyPromptDismissed = false;
+  int? creditsStartMs;
 
   Timer? autoPlayTimer;
   final ValueNotifier<int> autoPlayCountdown = ValueNotifier<int>(5);

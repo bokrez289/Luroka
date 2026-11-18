@@ -3416,6 +3416,10 @@ class _Translations$videoSettings$zh_Hant extends Translations$videoSettings$zh 
 	@override String get zoom => '縮放';
 	@override String get sleepTimer => '睡眠計時器';
 	@override String get audioSync => '音訊同步調整';
+	@override String get resyncPlayback => '重新同步播放';
+	@override String get resyncPlaybackDescription => '在目前位置重新整理音訊和視訊';
+	@override String get resyncPlaybackDone => '已要求重新同步';
+	@override String get resyncPlaybackFailed => '無法重新同步播放';
 	@override String get subtitleSync => '字幕同步調整';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => '此處無法使用 HDR——這個桌面合成器或視訊輸出無法傳遞 HDR。';
@@ -7713,6 +7717,10 @@ extension on TranslationsZhHant {
 			'videoSettings.zoom' => '縮放',
 			'videoSettings.sleepTimer' => '睡眠計時器',
 			'videoSettings.audioSync' => '音訊同步調整',
+			'videoSettings.resyncPlayback' => '重新同步播放',
+			'videoSettings.resyncPlaybackDescription' => '在目前位置重新整理音訊和視訊',
+			'videoSettings.resyncPlaybackDone' => '已要求重新同步',
+			'videoSettings.resyncPlaybackFailed' => '無法重新同步播放',
 			'videoSettings.subtitleSync' => '字幕同步調整',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => '此處無法使用 HDR——這個桌面合成器或視訊輸出無法傳遞 HDR。',
@@ -7929,12 +7937,12 @@ extension on TranslationsZhHant {
 			'seerr.requestFailed' => ({required Object error}) => '請求失敗：${error}',
 			'seerr.requestsLoadFailed' => '無法載入請求選項',
 			'seerr.nothingToRequest' => '所有內容皆已可用或已提出請求。',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusAvailable' => '可用',
 			'seerr.statusPartiallyAvailable' => '部分可用',
 			'seerr.statusRequested' => '已請求',
 			'seerr.statusProcessing' => '處理中',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => '已加入封鎖清單',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => '無法連線至 ${url}：${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => '在 ${url} 找不到 Seerr 執行個體（HTTP ${status}）',

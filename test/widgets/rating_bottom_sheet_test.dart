@@ -42,6 +42,13 @@ void main() {
   });
   tearDown(_resetTrackerBindings);
 
+  testWidgets('Jellyfin does not present a favorite control in the rating sheet', (tester) async {
+    await _pumpRatingSheet(tester, viewport: const Size(1280, 800),
+      serverClient: _StubServerClient(ServerCapabilities.jellyfin));
+    expect(find.text(t.rateSheet.server), findsNothing);
+    expect(find.text(t.rateSheet.favorite), findsNothing);
+  });
+
   testWidgets('an unratable tracker keeps its row so the sheet cannot resize under the user', (tester) async {
     // The score load resolves asynchronously and finds every tracker unratable
     // for this item. Removing those rows would shorten the sheet hundreds of ms
@@ -57,7 +64,7 @@ void main() {
     );
 
     // Post-frame resolve has already run and reported every tracker unavailable.
-    expect(find.text(t.rateSheet.notAvailable), findsNWidgets(4));
+    expect(find.text(t.rateSheet.notAvailable, skipOffstage: false), findsNWidgets(2));
     expect(_listContentExtent(tester), _tallListExtent, reason: 'no row may be dropped');
 
     final heightAfterResolve = tester.getSize(_sheetFinder).height;
@@ -81,7 +88,7 @@ void main() {
       item: testMediaItem(id: 'movie-1', kind: MediaKind.movie, serverId: 'server-1', serverName: 'Living Room'),
     );
 
-    expect(find.text(t.errors.failedToRate), findsNWidgets(4));
+    expect(find.text(t.errors.failedToRate, skipOffstage: false), findsNWidgets(2));
     expect(
       find.descendant(of: _sheetFinder, matching: find.byType(CircularProgressIndicator)),
       findsNothing,
@@ -94,8 +101,8 @@ void main() {
 /// `ConstrainedBox`, so its height *is* the clamped sheet height.
 final Finder _sheetFinder = find.byType(RatingBottomSheet);
 
-/// Five 54px rows (48px min-height row + 6px gap) plus the list's 4/12 padding.
-const double _tallListExtent = 5 * 54 + 16;
+/// The server and two available connected trackers, plus list padding.
+const double _tallListExtent = 3 * 54 + 16;
 
 double _listContentExtent(WidgetTester tester) {
   final position = tester

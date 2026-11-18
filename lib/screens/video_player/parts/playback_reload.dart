@@ -583,6 +583,11 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
         _unfocusPlayNextPrompt();
         _episode.showPlayNextDialog = false;
         _episode.autoPlayTimer?.cancel();
+        _episode.earlyPrompt = false;
+        if (isItemChange) {
+          _episode.earlyPromptDismissed = false;
+          _episode.creditsStartMs = null;
+        }
         _firstFrame.resetUiForOpen();
 
         // Hold the Watch Together room off the player while it reloads: the
