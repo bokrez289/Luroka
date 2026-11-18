@@ -100,6 +100,24 @@ void main() {
     expect(SettingsService.instance.read(SettingsService.showHeroSection), isFalse);
   });
 
+  testWidgets('upcoming row defaults off and saves the chosen source', (tester) async {
+    final provider = await mount(tester);
+    final setting = find.byKey(const ValueKey('home-upcoming-episodes'));
+    await tester.ensureVisible(setting);
+    await tester.tap(setting);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(t.homeLayout.upcomingWatched).last);
+    await tester.pumpAndSettle();
+    expect(provider.layout.upcomingEpisodesEnabled, isTrue);
+    expect(provider.layout.upcomingEpisodesSource, UpcomingEpisodesSource.previouslyWatched);
+    await tester.ensureVisible(setting);
+    await tester.tap(setting);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(t.homeLayout.upcomingOff).last);
+    await tester.pumpAndSettle();
+    expect(provider.layout.upcomingEpisodesEnabled, isFalse);
+  });
+
   testWidgets('studio preferences hide Netflix for only this profile and allow reordering', (tester) async {
     final provider = await mount(tester);
     await tester.ensureVisible(find.text(t.homeLayout.manageStudios));

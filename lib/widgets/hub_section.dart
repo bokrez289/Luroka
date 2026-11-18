@@ -460,6 +460,10 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
   }
 
   Future<void> _navigateToItem(MediaItem item) async {
+    if (item.raw?['upcomingShow'] case final MediaItem show) {
+      await navigateToMediaItemDetails(context, show, onRefresh: widget.onRefresh);
+      return;
+    }
     await navigateToMediaItem(
       context,
       item,

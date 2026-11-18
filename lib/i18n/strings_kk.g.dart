@@ -3415,6 +3415,10 @@ class _Translations$videoSettings$kk extends Translations$videoSettings$en {
 	@override String get zoom => 'Масштаб';
 	@override String get sleepTimer => 'Ұйқы таймері';
 	@override String get audioSync => 'Аудио синхрондау';
+	@override String get resyncPlayback => 'Ойнатуды қайта синхрондау';
+	@override String get resyncPlaybackDescription => 'Ағымдағы орында дыбыс пен бейнені жаңарту';
+	@override String get resyncPlaybackDone => 'Қайта синхрондау сұралды';
+	@override String get resyncPlaybackFailed => 'Ойнатуды синхрондау мүмкін болмады';
 	@override String get subtitleSync => 'Субтитр синхрондау';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => 'HDR мұнда қолжетімді емес — бұл жұмыс үстелі композиторы немесе бейне шығысы оны өткізе алмайды.';
@@ -7712,6 +7716,10 @@ extension on TranslationsKk {
 			'videoSettings.zoom' => 'Масштаб',
 			'videoSettings.sleepTimer' => 'Ұйқы таймері',
 			'videoSettings.audioSync' => 'Аудио синхрондау',
+			'videoSettings.resyncPlayback' => 'Ойнатуды қайта синхрондау',
+			'videoSettings.resyncPlaybackDescription' => 'Ағымдағы орында дыбыс пен бейнені жаңарту',
+			'videoSettings.resyncPlaybackDone' => 'Қайта синхрондау сұралды',
+			'videoSettings.resyncPlaybackFailed' => 'Ойнатуды синхрондау мүмкін болмады',
 			'videoSettings.subtitleSync' => 'Субтитр синхрондау',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'HDR мұнда қолжетімді емес — бұл жұмыс үстелі композиторы немесе бейне шығысы оны өткізе алмайды.',
@@ -7928,12 +7936,12 @@ extension on TranslationsKk {
 			'seerr.requestFailed' => ({required Object error}) => 'Сұрау қатесі: ${error}',
 			'seerr.requestsLoadFailed' => 'Параметрлерді жүктеу мүмкін болмады',
 			'seerr.nothingToRequest' => 'Барлығы бұрыннан бар немесе сұралған.',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Қолжетімді',
 			'seerr.statusPartiallyAvailable' => 'Жартылай қолжетімді',
 			'seerr.statusRequested' => 'Сұралды',
 			'seerr.statusProcessing' => 'Өңделуде',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Бұғаттау тізімінде',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => '${url} мекенжайына қосылу мүмкін болмады: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => '${url} мекенжайында Seerr данасы жоқ (HTTP ${status})',

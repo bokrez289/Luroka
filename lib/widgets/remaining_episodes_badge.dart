@@ -10,8 +10,7 @@ import '../services/kids_profile_service.dart';
 import '../utils/media_server_http_client.dart';
 import '../utils/provider_extensions.dart';
 import 'settings_builder.dart';
-import 'app_icon.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import 'unwatched_count_badge.dart';
 
 /// Optional, delayed enrichment. It never delays the Home request or painting,
 /// and a single queue prevents visible cards flooding a slower media server.
@@ -100,7 +99,7 @@ class _RemainingEpisodesBadgeState extends State<RemainingEpisodesBadge> {
   @override
   Widget build(BuildContext context) => SettingValueBuilder<bool>(
     pref: SettingsService.showRemainingEpisodes,
-    builder: (context, enabled, _) => !enabled || _count == null
+    builder: (context, enabled, _) => !enabled || _count == null || _count! <= 0
         ? const SizedBox.shrink()
         : Semantics(
             label: _count == 1 ? t.referenceDetails.oneEpisodeLeft : t.referenceDetails.episodesLeft(count: _count!),
@@ -108,29 +107,7 @@ class _RemainingEpisodesBadgeState extends State<RemainingEpisodesBadge> {
               message: _count == 1
                   ? t.referenceDetails.oneEpisodeLeft
                   : t.referenceDetails.episodesLeft(count: _count!),
-              child: ExcludeSemantics(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: .82),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Colors.white.withValues(alpha: .18)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const AppIcon(Symbols.format_list_numbered_rounded, size: 14, color: Colors.white),
-                        const SizedBox(width: 4),
-                        Text(
-                          '$_count',
-                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              child: ExcludeSemantics(child: UnwatchedCountBadge(count: _count!)),
             ),
           ),
   );

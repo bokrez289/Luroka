@@ -3415,6 +3415,10 @@ class _Translations$videoSettings$az extends Translations$videoSettings$en {
 	@override String get zoom => 'Miqyas';
 	@override String get sleepTimer => 'Yuxu taymeri';
 	@override String get audioSync => 'Səs sinxronizasiyası';
+	@override String get resyncPlayback => 'Oxutmanı yenidən sinxronlaşdır';
+	@override String get resyncPlaybackDescription => 'Cari mövqedə səs və videonu yenilə';
+	@override String get resyncPlaybackDone => 'Sinxronizasiya istəndi';
+	@override String get resyncPlaybackFailed => 'Oxutmanı sinxronlaşdırmaq olmadı';
 	@override String get subtitleSync => 'Altyazı sinxronizasiyası';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => 'HDR burada əlçatan deyil — bu masaüstü kompozitoru və ya video çıxışı onu ötürə bilmir.';
@@ -7712,6 +7716,10 @@ extension on TranslationsAz {
 			'videoSettings.zoom' => 'Miqyas',
 			'videoSettings.sleepTimer' => 'Yuxu taymeri',
 			'videoSettings.audioSync' => 'Səs sinxronizasiyası',
+			'videoSettings.resyncPlayback' => 'Oxutmanı yenidən sinxronlaşdır',
+			'videoSettings.resyncPlaybackDescription' => 'Cari mövqedə səs və videonu yenilə',
+			'videoSettings.resyncPlaybackDone' => 'Sinxronizasiya istəndi',
+			'videoSettings.resyncPlaybackFailed' => 'Oxutmanı sinxronlaşdırmaq olmadı',
 			'videoSettings.subtitleSync' => 'Altyazı sinxronizasiyası',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'HDR burada əlçatan deyil — bu masaüstü kompozitoru və ya video çıxışı onu ötürə bilmir.',
@@ -7928,12 +7936,12 @@ extension on TranslationsAz {
 			'seerr.requestFailed' => ({required Object error}) => 'Sorğu uğursuz oldu: ${error}',
 			'seerr.requestsLoadFailed' => 'Seçimlər yüklənə bilmədi',
 			'seerr.nothingToRequest' => 'Hər şey artıq var və ya sorğu göndərilib.',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Əlçatandır',
 			'seerr.statusPartiallyAvailable' => 'Hissəvi əlçatandır',
 			'seerr.statusRequested' => 'Sorğu göndərildi',
 			'seerr.statusProcessing' => 'Emal edilir',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Bloklanmış',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => '${url} ünvanına çatmaq olmadı: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => '${url} ünvanında Seerr instansiyası yoxdur (HTTP ${status})',

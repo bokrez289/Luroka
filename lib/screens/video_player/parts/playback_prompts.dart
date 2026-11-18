@@ -1,6 +1,55 @@
 part of '../../video_player_screen.dart';
 
 extension _VideoPlayerPlaybackPromptMethods on VideoPlayerScreenState {
+  void _updateEarlyNextPrompt(Duration position, Duration duration, SettingsService settings) {
+    if (!mounted || _shuttingDown || widget.isLive || !_currentMetadata.isEpisode ||
+        duration.inMilliseconds <= 0 || !_firstFrame.uiReady.value) {
+      return;
+    }
+    final end = duration.inMilliseconds;
+    final credits = _episode.creditsStartMs;
+    final threshold = credits != null && credits > 0 && credits < end ? credits : (end - 30000).clamp(0, end);
+    final pos = position.inMilliseconds;
+    if (pos < threshold - 5000) {
+      if (_episode.earlyPrompt) {
+        _episode.autoPlayTimer?.cancel();
+        _unfocusPlayNextPrompt();
+        _setPlayerState(() {
+          _episode.earlyPrompt = false;
+          _episode.showPlayNextDialog = false;
+        });
+      }
+      _episode.earlyPromptDismissed = false;
+      return;
+    }
+    if (pos < threshold || pos >= end || !settings.read(SettingsService.showEarlyNextEpisode) ||
+        _episode.earlyPromptDismissed || _episode.showPlayNextDialog || _episode.isLoadingNext ||
+        _episode.completionLatch.triggered ||
+        _episode.next == null || !_episode.next!.isEpisode || !_canNavigateMediaItems() ||
+        _showStillWatchingPrompt || SleepTimerService().isEndOfVideoMode ||
+        _watchTogetherRoom() != null || PipService().isPipActive.value ||
+        (_progressTracker?.stoppedByServer ?? false) || !(player?.state.playing ?? false)) {
+      return;
+    }
+    final autoplay = settings.read(SettingsService.autoPlayNextEpisode);
+    final seconds = settings.read(SettingsService.playNextCountdown);
+    _setPlayerState(() {
+      _episode.earlyPrompt = true;
+      _episode.showPlayNextDialog = true;
+      // A zero preference still shows the early card and advances at EOF.
+      _episode.autoPlayCountdown.value = autoplay ? (seconds == 0 ? -1 : seconds) : -1;
+    });
+    if (PlatformDetector.isTV() && !_chromeController.controlsVisible &&
+        InputModeTracker.isKeyboardMode(context, listen: false)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _episode.earlyPrompt && _episode.showPlayNextDialog) {
+          _playNextConfirmFocusNode.requestFocus();
+        }
+      });
+    }
+    if (autoplay && seconds > 0) _startAutoPlayTimer();
+  }
+
   void _onVideoCompleted(bool completed, {bool skipAutoPlayCountdown = false}) async {
     if (!completed) return;
     // Live TV streams are continuous — ignore transient EOF events while an
@@ -57,6 +106,19 @@ extension _VideoPlayerPlaybackPromptMethods on VideoPlayerScreenState {
       _logVideoCompleted('sleepTimer');
       _episode.completionLatch.latch();
       sleepTimerService.notifyVideoCompleted();
+      return;
+    }
+    if (_episode.earlyPromptDismissed) {
+      if (!_episode.completionLatch.triggered) _episode.completionLatch.latch();
+      return;
+    }
+    if (_episode.earlyPrompt && _episode.showPlayNextDialog) {
+      if (!_episode.completionLatch.triggered) _episode.completionLatch.latch();
+      if (SettingsService.instance.read(SettingsService.autoPlayNextEpisode) &&
+          SettingsService.instance.read(SettingsService.playNextCountdown) == 0 &&
+          !(_progressTracker?.stoppedByServer ?? false)) {
+        unawaited(_playNext());
+      }
       return;
     }
     if (!_canNavigateMediaItems()) {
@@ -175,6 +237,17 @@ extension _VideoPlayerPlaybackPromptMethods on VideoPlayerScreenState {
       // answer the prompt, and advancing would start the next episode behind
       // the viewer's back; the countdown holds until they return.
       if (_playNextPromptBackgrounded()) return;
+      if (_episode.earlyPrompt && (!SettingsService.instance.read(SettingsService.autoPlayNextEpisode) ||
+          SleepTimerService().isEndOfVideoMode || (_progressTracker?.stoppedByServer ?? false))) {
+        timer.cancel();
+        _episode.autoPlayCountdown.value = -1;
+        return;
+      }
+      if (_episode.earlyPrompt &&
+          ((player?.state.buffering ?? false) ||
+              (!(player?.state.playing ?? false) && !(player?.state.completed ?? false)))) {
+        return;
+      }
       final nextCountdown = _episode.autoPlayCountdown.value - 1;
       _episode.autoPlayCountdown.value = nextCountdown;
       if (nextCountdown <= 0) {
@@ -305,6 +378,8 @@ extension _VideoPlayerPlaybackPromptMethods on VideoPlayerScreenState {
   void _cancelAutoPlay() {
     if (_shuttingDown) return;
     _episode.autoPlayTimer?.cancel();
+    if (_episode.earlyPrompt) _episode.earlyPromptDismissed = true;
+    _episode.earlyPrompt = false;
     _unfocusPlayNextPrompt();
     _progressTracker?.resumeAfterStoppedReport();
     // Keep the latch set while playback is still parked at EOF, so duplicate

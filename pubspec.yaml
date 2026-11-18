@@ -1,7 +1,7 @@
 name: luroka
 description: "Luroka, a cinematic media client for Plex, Jellyfin, and Emby"
 publish_to: "none"
-version: 1.1.2+2051
+version: 1.1.4+2068
 
 environment:
   # Dart floor stays 3.12: freezed 3.x emits `final` constructor parameters,
@@ -58,6 +58,7 @@ dependencies:
     path: packages/saf_util
   saf_stream: ^3.1.0
   material_symbols_icons: ^4.2951.0
+  lucide_icons_flutter: ^4.0.3
   web_socket_channel: ^3.0.1
   flutter_svg: ^2.2.3
   # Fork 54a34a0 fixes upstream #649's missing desktop temp parent; 7ee4588

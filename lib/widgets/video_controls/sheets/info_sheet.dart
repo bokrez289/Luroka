@@ -137,6 +137,7 @@ class _MediaInfoSheetState extends State<MediaInfoSheet> {
       builder: (context, hideSpoilers, _) {
         final synopsisMasked = hideSpoilers && item.shouldHideSpoiler;
         final roles = item.roles?.isNotEmpty == true ? item.roles! : _loadedRoles ?? const <MediaRole>[];
+        final tv = PlatformDetector.isTV();
         return BaseVideoControlSheet(
           title: t.videoControls.infoButton,
           icon: Symbols.info_rounded,
@@ -148,13 +149,8 @@ class _MediaInfoSheetState extends State<MediaInfoSheet> {
               child: SingleChildScrollView(
                 key: const ValueKey('player_info_scroll'),
                 controller: _scroll,
-                padding: EdgeInsets.fromLTRB(
-                  PlatformDetector.isTV() ? 28 : 20,
-                  22,
-                  PlatformDetector.isTV() ? 28 : 20,
-                  28,
-                ),
-                child: Column(
+                 padding: EdgeInsets.fromLTRB(tv ? 28 : 20, 22, tv ? 28 : 20, 28),
+                 child: tv ? _buildTvContent(context, synopsisMasked, roles) : Column(
                   crossAxisAlignment: .start,
                   children: [
                     LayoutBuilder(
@@ -237,6 +233,95 @@ class _MediaInfoSheetState extends State<MediaInfoSheet> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildTvContent(BuildContext context, bool synopsisMasked, List<MediaRole> roles) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final synopsis = item.summary?.trim();
+    final showOverview = synopsisMasked || synopsis?.isNotEmpty == true;
+    final contextLine = item.isEpisode || item.isSeason ? formatQueueItemSubtitle(item) : '';
+    final poster = item.posterThumb();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color.alphaBlend(colors.primary.withValues(alpha: .12), colors.surfaceContainerHigh), colors.surfaceContainerLow],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: colors.outlineVariant.withValues(alpha: .55)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: LayoutBuilder(builder: (context, constraints) {
+              final headline = Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (poster != null && constraints.maxWidth >= 440) ...[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: OptimizedMediaImage.poster(
+                        client: context.tryGetMediaClientForServer(serverIdOrNull(item.serverId)),
+                        imagePath: poster,
+                        width: 92,
+                        height: 138,
+                      ),
+                    ),
+                    const SizedBox(width: 18),
+                  ],
+                  Expanded(child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (contextLine.isNotEmpty) ...[
+                        Text(contextLine, key: const ValueKey('player_info_context'),
+                          style: theme.textTheme.labelLarge?.copyWith(color: colors.primary),
+                          maxLines: 2, overflow: TextOverflow.ellipsis),
+                        const SizedBox(height: 6),
+                      ],
+                      Text(item.displayTitle, key: const ValueKey('player_info_title'),
+                        style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800, height: 1.12)),
+                      _buildMetaLine(context),
+                      if (!synopsisMasked && item.tagline?.trim().isNotEmpty == true) ...[
+                        const SizedBox(height: 8),
+                        Text(item.tagline!, style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colors.onSurfaceVariant, fontStyle: FontStyle.italic)),
+                      ],
+                      _buildGenresAndDirector(context),
+                    ],
+                  )),
+                ],
+              );
+              if (!showOverview) return headline;
+              final overview = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(t.discover.overview, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 8),
+                  Text(synopsisMasked ? t.dashboard.spoilerHidden : synopsis!,
+                    key: ValueKey(synopsisMasked ? 'player_info_synopsis_masked' : 'player_info_synopsis'),
+                    style: theme.textTheme.bodyLarge?.copyWith(color: colors.onSurfaceVariant, height: 1.45)),
+                ],
+              );
+              return constraints.maxWidth >= 600
+                  ? Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Expanded(flex: 5, child: headline),
+                      Container(width: 1, height: 72, margin: const EdgeInsets.symmetric(horizontal: 20), color: colors.outlineVariant),
+                      Expanded(flex: 4, child: overview),
+                    ])
+                  : Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                      headline, const SizedBox(height: 12), const Divider(), const SizedBox(height: 8), overview,
+                    ]);
+            }),
+          ),
+        ),
+        if (roles.isNotEmpty) _buildCast(context, roles, tv: true),
+      ],
     );
   }
 
@@ -344,7 +429,7 @@ class _MediaInfoSheetState extends State<MediaInfoSheet> {
     );
   }
 
-  Widget _buildCast(BuildContext context, List<MediaRole> roles) {
+  Widget _buildCast(BuildContext context, List<MediaRole> roles, {bool tv = false}) {
     final client = context.tryGetMediaClientForServer(serverIdOrNull(item.serverId));
     return Column(
       crossAxisAlignment: .start,
@@ -352,7 +437,7 @@ class _MediaInfoSheetState extends State<MediaInfoSheet> {
         const SizedBox(height: 24),
         Text(
           t.discover.cast,
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: .w700),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: tv ? 20 : 16, fontWeight: .w700),
         ),
         const SizedBox(height: 10),
         LayoutBuilder(
@@ -361,7 +446,7 @@ class _MediaInfoSheetState extends State<MediaInfoSheet> {
             debugLabel: 'player_info_cast',
             imageClient: client,
             circularPortraits: true,
-            cardWidth: (constraints.maxWidth / 4).clamp(64.0, 112.0),
+            cardWidth: tv ? (constraints.maxWidth / 6).clamp(80.0, 112.0) : (constraints.maxWidth / 4).clamp(64.0, 112.0),
             members: [for (final role in roles) (name: role.tag, secondary: role.role, imagePath: role.thumbPath)],
             canOpenMember: (index) => roles[index].id?.isNotEmpty == true && item.serverId?.isNotEmpty == true,
             onMemberTap: (index) => _openCastMember(roles[index]),

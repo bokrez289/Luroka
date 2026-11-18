@@ -96,6 +96,23 @@ void main() {
       .map((card) => card.item as MediaItem)
       .toList();
 
+  testWidgets('anime filter appears only while favorites contain anime', (tester) async {
+    final data = ValueNotifier<List<MediaItem>>([items.first]);
+    addTearDown(data.dispose);
+    await mount(tester, data: data);
+    expect(find.text(t.animeFavorites.filter), findsNothing);
+    data.value = [items.first, MediaItem.plex(id: 'anime', kind: MediaKind.show, title: 'Anime show', labels: ['Anime'])];
+    await tester.pumpAndSettle();
+    expect(find.text(t.animeFavorites.filter), findsOneWidget);
+    await tester.tap(find.text(t.animeFavorites.filter));
+    await tester.pumpAndSettle();
+    expect(cards(tester).single.title, 'Anime show');
+    data.value = [items.first];
+    await tester.pumpAndSettle();
+    expect(find.text(t.animeFavorites.filter), findsNothing);
+    expect(cards(tester).single.id, items.first.id);
+  });
+
   testWidgets('TV Up from first poster reaches filters then top navigation', (tester) async {
     var navigation = 0;
     final key = await mount(tester, onNavigation: () => navigation++);
@@ -258,7 +275,9 @@ void main() {
   }
 
   testWidgets('TV remote reaches and selects the anime filter', (tester) async {
-    final key = await mount(tester);
+    final data = ValueNotifier<List<MediaItem>>([items.first.copyWith(labels: ['Anime'])]);
+    addTearDown(data.dispose);
+    final key = await mount(tester, data: data);
     key.currentState!.focusContent();
     await tester.pumpAndSettle();
     for (var i = 0; i < 3; i++) {
@@ -268,11 +287,10 @@ void main() {
     expect(FocusManager.instance.primaryFocus?.debugLabel, 'favorites_filter_3');
     await tester.sendKeyEvent(LogicalKeyboardKey.select);
     await tester.pumpAndSettle();
-    expect(find.text(t.animeFavorites.empty), findsOneWidget);
-    expect(find.text(t.animeFavorites.manage), findsOneWidget);
+    expect(cards(tester).single.labels, contains('Anime'));
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
     await tester.pumpAndSettle();
-    expect(FocusManager.instance.primaryFocus?.debugLabel, 'favorites_anime_empty_settings');
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'favorites_item_0');
     expect(tester.takeException(), isNull);
   });
 
@@ -285,7 +303,7 @@ void main() {
     final key = await mount(tester, data: data, libraries: [library]);
     key.currentState!.focusContent();
     await tester.pumpAndSettle();
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 5; i++) {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await tester.pumpAndSettle();
     }
@@ -342,7 +360,9 @@ void main() {
   }
 
   testWidgets('phone Favorites keeps every filter visible above its separate sort row', (tester) async {
-    await mount(tester, size: const Size(360, 780));
+    final data = ValueNotifier<List<MediaItem>>([items.first.copyWith(labels: ['Anime']), ...items.skip(1)]);
+    addTearDown(data.dispose);
+    await mount(tester, size: const Size(360, 780), data: data);
     for (var index = 0; index < 4; index++) {
       expect(find.byKey(ValueKey('favorites_filter_$index')).hitTestable(), findsOneWidget);
     }

@@ -129,6 +129,8 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$downloads$en downloads = Translations$downloads$en.internal(_root);
 	late final Translations$shaders$en shaders = Translations$shaders$en.internal(_root);
 	late final Translations$companionRemote$en companionRemote = Translations$companionRemote$en.internal(_root);
+	late final Translations$showDetailLayout$en showDetailLayout = Translations$showDetailLayout$en.internal(_root);
+	late final Translations$iconStyles$en iconStyles = Translations$iconStyles$en.internal(_root);
 	late final Translations$videoSettings$en videoSettings = Translations$videoSettings$en.internal(_root);
 	late final Translations$performanceOverlay$en performanceOverlay = Translations$performanceOverlay$en.internal(_root);
 	late final Translations$externalPlayer$en externalPlayer = Translations$externalPlayer$en.internal(_root);
@@ -2574,6 +2576,12 @@ class Translations$settings$en {
 	/// en: 'Show spotlight artwork in the top-right corner instead of filling the screen'
 	String get tvCornerSpotlightBackdropDescription => 'Show spotlight artwork in the top-right corner instead of filling the screen';
 
+	/// en: 'Backdrop brightness'
+	String get backdropBrightness => 'Backdrop brightness';
+
+	/// en: 'Adjust the shading over Home and title artwork. 100% is the default.'
+	String get backdropBrightnessDescription => 'Adjust the shading over Home and title artwork. 100% is the default.';
+
 	/// en: 'View Mode'
 	String get viewMode => 'View Mode';
 
@@ -2963,6 +2971,12 @@ class Translations$settings$en {
 
 	/// en: 'Start the next episode automatically when one ends'
 	String get autoPlayNextEpisodeDescription => 'Start the next episode automatically when one ends';
+
+	/// en: 'Show Up next before an episode ends'
+	String get showEarlyNextEpisode => 'Show Up next before an episode ends';
+
+	/// en: 'Show the next episode during credits or in the final 30 seconds.'
+	String get showEarlyNextEpisodeDescription => 'Show the next episode during credits or in the final 30 seconds.';
 
 	/// en: 'Shuffle Starts at Beginning'
 	String get shuffleStartsFromBeginning => 'Shuffle Starts at Beginning';
@@ -4129,6 +4143,30 @@ class Translations$homeLayout$en {
 
 	// Translations
 
+	/// en: 'Upcoming episodes'
+	String get upcomingEpisodes => 'Upcoming episodes';
+
+	/// en: 'Off'
+	String get upcomingOff => 'Off';
+
+	/// en: 'Favorites'
+	String get upcomingFavorites => 'Favorites';
+
+	/// en: 'Previously watched'
+	String get upcomingWatched => 'Previously watched';
+
+	/// en: 'All shows'
+	String get upcomingAll => 'All shows';
+
+	/// en: 'Favorites and previously watched'
+	String get upcomingBoth => 'Favorites and previously watched';
+
+	/// en: 'Upcoming air dates are checked in the background only while this row is enabled. Results are limited and may not be available on your server yet.'
+	String get upcomingHint => 'Upcoming air dates are checked in the background only while this row is enabled. Results are limited and may not be available on your server yet.';
+
+	/// en: 'Air date: ${date}'
+	String airDate({required Object date}) => 'Air date: ${date}';
+
 	/// en: 'Choose and order studios'
 	String get manageStudios => 'Choose and order studios';
 
@@ -4932,6 +4970,9 @@ class Translations$mediaMenu$en {
 	/// en: 'Remove from Continue Watching'
 	String get removeFromContinueWatching => 'Remove from Continue Watching';
 
+	/// en: 'Remove from Next Up'
+	String get removeFromNextUp => 'Remove from Next Up';
+
 	/// en: 'View details'
 	String get viewDetails => 'View details';
 
@@ -5051,6 +5092,12 @@ class Translations$rateSheet$en {
 
 	/// en: 'Favorited'
 	String get favorited => 'Favorited';
+
+	/// en: 'Add to favorites'
+	String get addFavorite => 'Add to favorites';
+
+	/// en: 'Remove from favorites'
+	String get removeFavorite => 'Remove from favorites';
 
 	/// en: 'Saved'
 	String get saved => 'Saved';
@@ -5641,6 +5688,12 @@ class Translations$messages$en {
 
 	/// en: 'Log ID'
 	String get logId => 'Log ID';
+
+	/// en: 'Support reference'
+	String get logSupportReference => 'Support reference';
+
+	/// en: 'Copy full log ID'
+	String get copyFullLogId => 'Copy full log ID';
 
 	/// en: 'Subtitles are burned into this stream. Change them from the subtitle menu.'
 	String get burnedSubtitlesUseMenu => 'Subtitles are burned into this stream. Change them from the subtitle menu.';
@@ -8264,6 +8317,69 @@ class Translations$companionRemote$en {
 	String get closedBeforeAuth => 'The connection closed before authentication';
 }
 
+// Path: showDetailLayout
+class Translations$showDetailLayout$en {
+	Translations$showDetailLayout$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Show details layout'
+	String get title => 'Show details layout';
+
+	/// en: 'Choose how TV shows and episodes are presented on television.'
+	String get description => 'Choose how TV shows and episodes are presented on television.';
+
+	/// en: 'Cinematic'
+	String get cinematic => 'Cinematic';
+
+	/// en: 'Compact episode list'
+	String get compact => 'Compact episode list';
+
+	/// en: 'Choose a season'
+	String get seasons => 'Choose a season';
+
+	/// en: 'Episodes'
+	String get episodes => 'Episodes';
+
+	/// en: 'Details'
+	String get details => 'Details';
+
+	/// en: 'Cast'
+	String get cast => 'Cast';
+
+	/// en: 'More like this'
+	String get related => 'More like this';
+}
+
+// Path: iconStyles
+class Translations$iconStyles$en {
+	Translations$iconStyles$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Icon style'
+	String get title => 'Icon style';
+
+	/// en: 'Choose how app controls look. Changes apply to this profile.'
+	String get description => 'Choose how app controls look. Changes apply to this profile.';
+
+	/// en: 'Luroka Bold'
+	String get current => 'Luroka Bold';
+
+	/// en: 'Material Outline'
+	String get outline => 'Material Outline';
+
+	/// en: 'Lucide'
+	String get lucide => 'Lucide';
+
+	/// en: 'Clean line icons with Material fallbacks for unavailable symbols.'
+	String get lucideDescription => 'Clean line icons with Material fallbacks for unavailable symbols.';
+}
+
 // Path: videoSettings
 class Translations$videoSettings$en {
 	Translations$videoSettings$en.internal(this._root);
@@ -8289,6 +8405,18 @@ class Translations$videoSettings$en {
 
 	/// en: 'Audio Sync'
 	String get audioSync => 'Audio Sync';
+
+	/// en: 'Resync playback'
+	String get resyncPlayback => 'Resync playback';
+
+	/// en: 'Refresh audio and video at the current position'
+	String get resyncPlaybackDescription => 'Refresh audio and video at the current position';
+
+	/// en: 'Resync requested'
+	String get resyncPlaybackDone => 'Resync requested';
+
+	/// en: 'Could not resync playback'
+	String get resyncPlaybackFailed => 'Could not resync playback';
 
 	/// en: 'Subtitle Sync'
 	String get subtitleSync => 'Subtitle Sync';
@@ -12209,6 +12337,8 @@ extension on Translations {
 			'settings.gridSpacingSpacious' => 'Spacious',
 			'settings.tvCornerSpotlightBackdrop' => 'Corner Spotlight Backdrop',
 			'settings.tvCornerSpotlightBackdropDescription' => 'Show spotlight artwork in the top-right corner instead of filling the screen',
+			'settings.backdropBrightness' => 'Backdrop brightness',
+			'settings.backdropBrightnessDescription' => 'Adjust the shading over Home and title artwork. 100% is the default.',
 			'settings.viewMode' => 'View Mode',
 			'settings.gridView' => 'Grid',
 			'settings.listView' => 'List',
@@ -12339,6 +12469,8 @@ extension on Translations {
 			'settings.autoPlayAndSkip' => 'Auto-Play & Skip',
 			'settings.autoPlayNextEpisode' => 'Auto-Play Next Episode',
 			'settings.autoPlayNextEpisodeDescription' => 'Start the next episode automatically when one ends',
+			'settings.showEarlyNextEpisode' => 'Show Up next before an episode ends',
+			'settings.showEarlyNextEpisodeDescription' => 'Show the next episode during credits or in the final 30 seconds.',
 			'settings.shuffleStartsFromBeginning' => 'Shuffle Starts at Beginning',
 			'settings.shuffleStartsFromBeginningDescription' => 'Start each episode at the beginning when shuffling instead of resuming',
 			'settings.playNextCountdown' => 'Play Next Countdown',
@@ -12475,12 +12607,12 @@ extension on Translations {
 			'settings.liveTvDefaultFavorites' => 'Default to Favorite Channels',
 			'settings.liveTvDefaultFavoritesDescription' => 'Show only favorite channels when opening Live TV',
 			'settings.general' => 'General',
+			_ => null,
+		} ?? switch (path) {
 			'settings.generalDescription' => 'Language, startup, and window behavior',
 			'settings.languageAndRegion' => 'Language & Region',
 			'settings.startup' => 'Startup',
 			'settings.display' => 'Display',
-			_ => null,
-		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Library & Cards',
 			'settings.homeScreen' => 'Home Screen',
 			'settings.navigation' => 'Navigation',
@@ -12696,6 +12828,14 @@ extension on Translations {
 			'customPerformance.frameBudget' => 'Per-frame budget',
 			'customPerformance.processMemory' => 'App process memory at sample end',
 			'customPerformance.noFrames' => 'No rendered frames were captured. Start another sample and browse the app.',
+			'homeLayout.upcomingEpisodes' => 'Upcoming episodes',
+			'homeLayout.upcomingOff' => 'Off',
+			'homeLayout.upcomingFavorites' => 'Favorites',
+			'homeLayout.upcomingWatched' => 'Previously watched',
+			'homeLayout.upcomingAll' => 'All shows',
+			'homeLayout.upcomingBoth' => 'Favorites and previously watched',
+			'homeLayout.upcomingHint' => 'Upcoming air dates are checked in the background only while this row is enabled. Results are limited and may not be available on your server yet.',
+			'homeLayout.airDate' => ({required Object date}) => 'Air date: ${date}',
 			'homeLayout.manageStudios' => 'Choose and order studios',
 			'homeLayout.manageStudiosDescription' => 'Choose which studios appear for this profile, and arrange their order.',
 			'homeLayout.studioUnavailable' => 'Only studios found in your selected libraries appear on Home.',
@@ -12969,6 +13109,7 @@ extension on Translations {
 			'mediaMenu.markAsUnwatched' => 'Mark as Unwatched',
 			'mediaMenu.clearProgress' => 'Clear progress',
 			'mediaMenu.removeFromContinueWatching' => 'Remove from Continue Watching',
+			'mediaMenu.removeFromNextUp' => 'Remove from Next Up',
 			'mediaMenu.viewDetails' => 'View details',
 			'mediaMenu.goToSeries' => 'Go to series',
 			'mediaMenu.shufflePlay' => 'Shuffle Play',
@@ -12980,6 +13121,8 @@ extension on Translations {
 			'mediaMenu.deleteMovieFromServer' => 'Delete movie from server',
 			'mediaMenu.deleteEpisodeTitle' => 'Delete this episode?',
 			'mediaMenu.deleteSeasonTitle' => 'Delete this season?',
+			_ => null,
+		} ?? switch (path) {
 			'mediaMenu.deleteShowTitle' => 'Delete this show?',
 			'mediaMenu.deleteMovieTitle' => 'Delete this movie?',
 			'mediaMenu.deleteEpisodeConfirm' => 'Delete episode',
@@ -12993,8 +13136,6 @@ extension on Translations {
 			'mediaMenu.deleteMultiPartWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'This item is stored as ${n} file, which will be deleted.', other: 'This item is stored across ${n} files, and all of them will be deleted.', ), 
 			'mediaMenu.deleteSharedFileHeading' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} other episode is stored in the same file and will be deleted too:', other: '${n} other episodes are stored in the same file and will be deleted too:', ), 
 			'mediaMenu.deleteScopeUnverifiedProbeFailed' => 'Luroka could not check which files this will remove, so it may delete more than the item named above. Cancel and try again, or delete anyway.',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteScopeUnverifiedNoFileInfo' => 'Your server did not provide file details for this item, so Luroka cannot check which files this will remove. It may delete more than the item named above.',
 			'mediaMenu.mediaDeletedSuccessfully' => 'Media item deleted successfully',
 			'mediaMenu.mediaFailedToDelete' => 'Failed to delete media item',
@@ -13005,6 +13146,8 @@ extension on Translations {
 			'rateSheet.server' => 'Server',
 			'rateSheet.favorite' => 'Favorite',
 			'rateSheet.favorited' => 'Favorited',
+			'rateSheet.addFavorite' => 'Add to favorites',
+			'rateSheet.removeFavorite' => 'Remove from favorites',
 			'rateSheet.saved' => 'Saved',
 			'rateSheet.notAvailable' => 'No match found',
 			'rateSheet.noConnectedServices' => 'Connect a service in Settings to rate there.',
@@ -13193,6 +13336,8 @@ extension on Translations {
 			'messages.logsUploaded' => 'Logs uploaded',
 			'messages.logsUploadFailed' => 'Failed to upload logs',
 			'messages.logId' => 'Log ID',
+			'messages.logSupportReference' => 'Support reference',
+			'messages.copyFullLogId' => 'Copy full log ID',
 			'messages.burnedSubtitlesUseMenu' => 'Subtitles are burned into this stream. Change them from the subtitle menu.',
 			'messages.noVideoUrl' => 'No video URL available',
 			'messages.playbackNoMediaSources' => 'The server returned no playable media sources',
@@ -13490,6 +13635,8 @@ extension on Translations {
 			'libraries.selectLibrary' => 'Select library',
 			'libraries.filtersWithCount' => ({required Object count}) => 'Filters (${count})',
 			'libraries.noRecommendations' => 'No recommendations available',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.noCollections' => 'No collections in this library',
 			'libraries.noFoldersFound' => 'No folders found',
 			'libraries.folders' => 'folders',
@@ -13507,8 +13654,6 @@ extension on Translations {
 			'libraries.groupings.albums' => 'Albums',
 			'libraries.groupings.tracks' => 'Tracks',
 			'libraries.groupings.folders' => 'Folders',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.filterCategories.genre' => 'Genre',
 			'libraries.filterCategories.year' => 'Year',
 			'libraries.filterCategories.contentRating' => 'Content Rating',
@@ -14004,6 +14149,8 @@ extension on Translations {
 			'watchTogether.inviteMessage' => ({required Object code}) => 'Join my Watch Together room in Luroka: luroka://watch?code=${code} — or open Watch Together and enter ${code}.',
 			'watchTogether.openSessionControls' => 'Open Watch Together session controls',
 			'watchTogether.reconnecting' => 'Reconnecting...',
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.reconnectingDescription' => 'The connection dropped. You rejoin the room automatically.',
 			'watchTogether.connected' => 'Connected',
 			'watchTogether.disconnected' => 'Disconnected',
@@ -14021,8 +14168,6 @@ extension on Translations {
 			'watchTogether.yourCopy' => 'Your copy',
 			'watchTogether.sharingYourCopy' => 'You\'re sharing your copy',
 			'watchTogether.playingOtherLength' => ({required Object difference}) => 'Playing your copy, ${difference}',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.mismatchTitle' => 'Your Copy Is a Different Length',
 			'watchTogether.mismatchDescription' => ({required Object difference}) => 'Your closest copy is ${difference} than the room\'s video. It may be another cut or version.',
 			'watchTogether.playAnyway' => 'Play Anyway',
@@ -14337,12 +14482,31 @@ extension on Translations {
 			'companionRemote.errors.connectionLostAfterAttempts' => ({required Object attempts}) => 'Connection lost after ${attempts} attempts',
 			'companionRemote.errors.connectionLost' => 'Connection lost',
 			'companionRemote.closedBeforeAuth' => 'The connection closed before authentication',
+			'showDetailLayout.title' => 'Show details layout',
+			'showDetailLayout.description' => 'Choose how TV shows and episodes are presented on television.',
+			'showDetailLayout.cinematic' => 'Cinematic',
+			'showDetailLayout.compact' => 'Compact episode list',
+			'showDetailLayout.seasons' => 'Choose a season',
+			'showDetailLayout.episodes' => 'Episodes',
+			'showDetailLayout.details' => 'Details',
+			'showDetailLayout.cast' => 'Cast',
+			'showDetailLayout.related' => 'More like this',
+			'iconStyles.title' => 'Icon style',
+			'iconStyles.description' => 'Choose how app controls look. Changes apply to this profile.',
+			'iconStyles.current' => 'Luroka Bold',
+			'iconStyles.outline' => 'Material Outline',
+			'iconStyles.lucide' => 'Lucide',
+			'iconStyles.lucideDescription' => 'Clean line icons with Material fallbacks for unavailable symbols.',
 			'videoSettings.playbackSpeed' => 'Playback Speed',
 			'videoSettings.normalSpeed' => 'Normal',
 			'videoSettings.sleepTimerActive' => ({required Object duration}) => 'Active (${duration})',
 			'videoSettings.zoom' => 'Zoom',
 			'videoSettings.sleepTimer' => 'Sleep Timer',
 			'videoSettings.audioSync' => 'Audio Sync',
+			'videoSettings.resyncPlayback' => 'Resync playback',
+			'videoSettings.resyncPlaybackDescription' => 'Refresh audio and video at the current position',
+			'videoSettings.resyncPlaybackDone' => 'Resync requested',
+			'videoSettings.resyncPlaybackFailed' => 'Could not resync playback',
 			'videoSettings.subtitleSync' => 'Subtitle Sync',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'HDR isn\'t available here — this desktop compositor or video output can\'t carry it.',
@@ -14499,6 +14663,8 @@ extension on Translations {
 			'metadataEdit.addTag' => 'Add tag',
 			'metadataEdit.genre' => 'Genre',
 			'metadataEdit.director' => 'Director',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.writer' => 'Writer',
 			'metadataEdit.producer' => 'Producer',
 			'metadataEdit.country' => 'Country',
@@ -14535,8 +14701,6 @@ extension on Translations {
 			'seerr.serverUrlHelper' => 'The address of your Seerr instance',
 			'seerr.checkServer' => 'Continue',
 			'seerr.signInWithJellyfin' => 'Sign in with Jellyfin',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.signInWithEmby' => 'Sign in with Emby',
 			'seerr.signInWithLocal' => 'Use a local account',
 			'seerr.email' => 'Email',

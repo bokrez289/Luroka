@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/media/home_layout.dart';
+import 'package:luroka/media/home_progress.dart';
+import 'package:luroka/media/ids.dart';
+import 'package:luroka/utils/watch_state_notifier.dart';
 import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_hub.dart';
 import 'package:luroka/media/media_item.dart';
@@ -40,6 +43,41 @@ void main() {
     expect(restored.studioOrder, ['bbc', 'netflix']);
   });
   setUp(resetSharedPreferencesForTest);
+
+  test('hidden progress is profile scoped, survives reload and returns after playback', () async {
+    final storage = await StorageService.getInstance();
+    final first = HomeLayoutProvider(storage: storage, profileId: 'hide-a');
+    final second = HomeLayoutProvider(storage: storage, profileId: 'hide-b');
+    addTearDown(first.dispose);
+    addTearDown(second.dispose);
+    final episode = withHomeProgressRole(MediaItem.jellyfin(id: 'ep',
+      kind: MediaKind.episode, serverId: 'server', grandparentId: 'show'), HomeProgressRole.nextUp);
+    await first.hideProgressItem(episode);
+    expect(storage.getHomeLayout('hide-a').isProgressHidden(episode), isTrue);
+    expect(second.layout.isProgressHidden(episode), isFalse);
+    WatchStateNotifier().notify(WatchStateEvent(itemId: 'ep', serverId: ServerId('server'),
+      changeType: WatchStateChangeType.progressUpdate, parentChain: ['show'], viewOffset: 1000));
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    expect(first.layout.isProgressHidden(episode), isFalse);
+  });
+
+  test('upcoming preferences default off and remain scoped to the profile', () async {
+    final storage = await StorageService.getInstance();
+    final first = HomeLayoutProvider(storage: storage, profileId: 'upcoming-a');
+    final second = HomeLayoutProvider(storage: storage, profileId: 'upcoming-b');
+    addTearDown(first.dispose);
+    addTearDown(second.dispose);
+    expect(first.layout.upcomingEpisodesEnabled, isFalse);
+    expect(first.layout.upcomingEpisodesSource, UpcomingEpisodesSource.favorites);
+    await first.setUpcomingEpisodes(enabled: true, source: UpcomingEpisodesSource.previouslyWatched);
+    expect(storage.getHomeLayout('upcoming-a').upcomingEpisodesEnabled, isTrue);
+    expect(storage.getHomeLayout('upcoming-a').upcomingEpisodesSource, UpcomingEpisodesSource.previouslyWatched);
+    expect(second.layout.upcomingEpisodesEnabled, isFalse);
+    expect(HomeLayout.fromJson({'upcomingEpisodesSource': 'unknown'}).upcomingEpisodesSource,
+        UpcomingEpisodesSource.favorites);
+    expect(HomeLayout.fromJson({'upcomingEpisodesSource': 'allShows'}).upcomingEpisodesSource,
+        UpcomingEpisodesSource.both);
+  });
 
   test('default order is stable; custom order hides exact server/library rows and appends new ones', () {
     final a = row('latest', library: 'a');

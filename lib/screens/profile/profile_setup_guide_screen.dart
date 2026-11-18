@@ -8,19 +8,28 @@ import '../../focus/focusable_button.dart';
 import '../../focus/key_event_utils.dart';
 import '../../i18n/strings.g.dart';
 import '../../media/home_layout.dart';
+import '../../media/ids.dart';
+import '../../media/library_query.dart';
+import '../../media/media_item.dart';
+import '../../media/media_kind.dart';
+import '../../media/show_detail_layout.dart';
 import '../../profiles/active_profile_provider.dart';
 import '../../providers/home_layout_provider.dart';
+import '../../providers/hidden_libraries_provider.dart';
+import '../../providers/libraries_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../services/profile_appearance_service.dart';
 import '../../services/settings_service.dart' as settings;
 import '../../theme/mono_theme.dart';
 import '../../utils/error_dialog.dart';
+import '../../utils/platform_detector.dart';
 import '../../widgets/focusable_list_tile.dart';
 import '../../widgets/live_home_preview.dart';
 import '../../widgets/device_preview_frame.dart';
 import '../../widgets/expanded_settings_preview.dart';
 import '../../widgets/settings_preview_thumbnail.dart';
 import '../../widgets/palette_swatch.dart';
+import '../media_detail_screen.dart';
 import '../settings/settings_utils.dart';
 import '../settings/studio_preferences_screen.dart';
 
@@ -45,6 +54,7 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
   late final HomeSpotlightSource _initialSpotlight;
   late final bool _initialSplit;
   late final bool _initialEpisodeThumbnails;
+  late final ShowDetailLayout _initialShowLayout;
   late HomeLayout _studioDraft;
   bool _studiosEdited = false;
   late settings.ThemeMode _theme;
@@ -54,6 +64,10 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
   late HomeSpotlightSource _spotlight;
   late bool _split;
   late bool _episodeThumbnails;
+  late ShowDetailLayout _showLayout;
+  bool _previewShowLayout = false;
+  MediaItem? _previewShow;
+  bool _loadingPreviewShow = false;
   bool _initialized = false;
   bool _moreThemes = false;
   bool _busy = false;
@@ -71,7 +85,10 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
   void _showPage(int page) {
     if (_formScroll.hasClients) _formScroll.jumpTo(0);
     FocusManager.instance.primaryFocus?.unfocus();
-    setState(() => _page = page);
+    setState(() {
+      _page = page;
+      _previewShowLayout = false;
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _pageStart.requestFocus();
@@ -107,6 +124,7 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
       widget.profileId,
       settings.SettingsService.homeEpisodeThumbnails,
     );
+    _showLayout = _initialShowLayout = _settings.readForProfile(widget.profileId, settings.SettingsService.showDetailLayout);
     _studioDraft = _home.layout;
     final discover = context.read<DiscoverProvider?>();
     final servers = context.read<MultiServerProvider?>();
@@ -147,6 +165,7 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
           playThemeMusic: _themeMusic != _initialThemeMusic ? _themeMusic : null,
           showSpotlight: _showSpotlight != _initialShowSpotlight ? _showSpotlight : null,
           showEpisodeThumbnails: _episodeThumbnails != _initialEpisodeThumbnails ? _episodeThumbnails : null,
+          showLayout: _showLayout != _initialShowLayout ? _showLayout : null,
         );
         if (!_isCurrent) return;
       }
@@ -165,6 +184,62 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
       _showPage(0);
     } else {
       _finish(useDefaults: true);
+    }
+  }
+
+  void _selectShowLayout(ShowDetailLayout layout) {
+    setState(() {
+      _showLayout = layout;
+      _previewShowLayout = true;
+    });
+    if (_previewShow == null && !_loadingPreviewShow) unawaited(_loadPreviewShow());
+  }
+
+  Future<void> _loadPreviewShow() async {
+    setState(() => _loadingPreviewShow = true);
+    final servers = context.read<MultiServerProvider?>();
+    final libraries = context.read<LibrariesProvider?>();
+    final hidden = context.read<HiddenLibrariesProvider?>();
+    try {
+      if (_active.isBinding) await _active.awaitBindingSettle();
+      await hidden?.ensureInitialized();
+      if (!_isCurrent || servers == null || libraries == null) return;
+      if (libraries.libraries.isEmpty) await libraries.syncToOnlineServers(servers.onlineServerIds.toSet());
+      if (!_isCurrent) return;
+      final eligible = libraries.libraries.where((library) =>
+          library.kind == MediaKind.show &&
+          library.serverId != null &&
+          servers.onlineServerIds.contains(library.serverId) &&
+          !(hidden?.hiddenLibraryKeys.contains(library.globalKey) ?? false));
+      for (final library in eligible.take(6)) {
+        if (!_isCurrent) return;
+        final client = servers.getClientForServer(ServerId(library.serverId!));
+        if (client == null) continue;
+        try {
+          final page = await client.fetchLibraryPagedContent(library.id, libraryKind: library.kind,
+              query: const LibraryQuery(kind: MediaKind.show, limit: 1)).timeout(const Duration(seconds: 5));
+          if (!_isCurrent) return;
+          if (!identical(servers.getClientForServer(ServerId(library.serverId!)), client) ||
+              !servers.onlineServerIds.contains(library.serverId)) {
+            continue;
+          }
+          final item = page.items.where((item) => item.kind == MediaKind.show &&
+              (item.serverId == null || item.serverId == library.serverId) &&
+              (item.libraryId == null || item.libraryId == library.id)).firstOrNull;
+          if (item == null) continue;
+          final show = item.copyWith(serverId: library.serverId, serverName: library.serverName,
+              libraryId: library.id, libraryTitle: library.title);
+          if (hidden?.allowsItem(show) == false) continue;
+          setState(() => _previewShow = show);
+          break;
+        } catch (_) {
+          // Try another accessible library.
+        }
+      }
+    } catch (_) {
+      // The layout can still be selected when a preview cannot be loaded.
+    } finally {
+      if (mounted) setState(() => _loadingPreviewShow = false);
     }
   }
 
@@ -401,6 +476,27 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
           onPressed: () => setState(() => _moreThemes = !_moreThemes),
         ),
         const SizedBox(height: 16),
+        if (PlatformDetector.isTV()) ...[
+          Text(t.showDetailLayout.title, style: Theme.of(context).textTheme.titleMedium),
+          Text(t.showDetailLayout.description),
+          const SizedBox(height: 8),
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final layout in ShowDetailLayout.values)
+              FocusableButton(
+                onPressed: _busy ? null : () => _selectShowLayout(layout),
+                child: OutlinedButton(
+                  key: ValueKey('profile-guide-show-layout-${layout.name}'),
+                  onPressed: _busy ? null : () => _selectShowLayout(layout),
+                  style: OutlinedButton.styleFrom(side: BorderSide(
+                    color: _showLayout == layout ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outlineVariant,
+                    width: _showLayout == layout ? 2 : 1,
+                  )),
+                  child: Text(layout == ShowDetailLayout.cinematic ? t.showDetailLayout.cinematic : t.showDetailLayout.compact),
+                ),
+              ),
+          ]),
+          const SizedBox(height: 16),
+        ],
         FocusableSwitchListTile(
           key: const ValueKey('profile-guide-posters'),
           title: Text(t.posterDetails.title),
@@ -547,7 +643,7 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
               Theme(
                 data: monoTheme(palette).copyWith(platform: Theme.of(context).platform),
                 child: DevicePreviewFrame(
-                  child: LiveHomePreview(
+                  child: _previewShowLayout ? _showPreview() : LiveHomePreview(
                     layout: _studioDraft.copyWith(spotlightSource: _spotlight, splitContinueWatching: _split),
                     showSpotlight: _showSpotlight,
                     posterDetails: _posterDetails,
@@ -556,6 +652,33 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
                 ),
               ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _showPreview() {
+    final show = _previewShow;
+    if (show == null) {
+      return SizedBox(
+        key: const ValueKey('profile-guide-show-preview-empty'),
+        height: 540,
+        child: Center(child: _loadingPreviewShow ? const CircularProgressIndicator() : Text(t.messages.noItemsAvailable)),
+      );
+    }
+    return AspectRatio(
+      key: const ValueKey('profile-guide-show-preview'),
+      aspectRatio: 16 / 9,
+      child: FittedBox(
+        child: SizedBox(
+          width: 1280,
+          height: 720,
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(size: const Size(1280, 720), padding: EdgeInsets.zero),
+            child: ExcludeFocus(child: IgnorePointer(child: MediaDetailScreen(
+              key: ValueKey('profile-guide-show-${show.globalKey}'), metadata: show, previewShowLayout: _showLayout,
+            ))),
+          ),
         ),
       ),
     );

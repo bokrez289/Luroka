@@ -647,6 +647,7 @@ class PlexVideoControls extends StatefulWidget {
   /// to EOF and can't be seeked past). Parent should route this into its normal
   /// completion flow so the auto-play-next setting is honored.
   final void Function({required bool skipAutoPlayCountdown})? onReachedEnd;
+  final ValueChanged<List<MediaMarker>>? onMarkersLoaded;
 
   /// Whether the user can control playback (false in host-only mode for non-host).
   final bool canControl;
@@ -771,6 +772,7 @@ class PlexVideoControls extends StatefulWidget {
     this.onSeekCompleted,
     this.onBack,
     this.onReachedEnd,
+    this.onMarkersLoaded,
     this.canControl = true,
     required this.canNavigateMediaItems,
     this.hasFirstFrame,
@@ -1087,6 +1089,13 @@ class _PlexVideoControlsState extends State<PlexVideoControls>
   @override
   void didUpdateWidget(PlexVideoControls oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.playNextFocusNode == null && widget.playNextFocusNode != null) {
+      // A next-episode prompt replaces the credits skip affordance. Its own
+      // countdown must not race an already-running automatic credits skip.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && widget.playNextFocusNode != null) _cancelAutoSkipTimer();
+      });
+    }
     if (oldWidget.player != widget.player) {
       ++_subtitleVisibilityWriteGeneration;
       // Otherwise the accumulator keeps listening to the retired player and

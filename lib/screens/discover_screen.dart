@@ -20,6 +20,12 @@ import '../media/media_kind.dart';
 import '../media/media_backend.dart';
 import '../media/home_layout.dart';
 import '../media/home_progress.dart';
+import '../media/library_query.dart';
+import '../media/media_filter.dart';
+import '../services/catalog/cinemeta_catalog_source.dart';
+import '../services/catalog/catalog_source.dart';
+import '../services/catalog/catalog_library_matcher.dart';
+import '../services/upcoming_episodes_loader.dart';
 import '../models/catalog/catalog_item.dart' show CatalogSourceId;
 import '../utils/media_image_helper.dart';
 import '../widgets/system_clock.dart';
@@ -90,11 +96,22 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   WatchStateStore? _watchState;
   int? _lastTasteWatchRevision;
   Timer? _personalSpotlightTimer;
+  Timer? _upcomingTimer;
+  CinemetaCatalogSource? _upcomingSource;
+  UpcomingEpisodesLoader? _upcomingLoader;
+  List<MediaItem> _upcoming = const [];
+  int _upcomingGeneration = 0;
+  DateTime? _upcomingLoadedAt;
+  bool _upcomingInFlight = false;
+  Future<void>? _waitingForHomeBeforeUpcoming;
+  UpcomingEpisodesSource? _lastUpcomingChoice;
+  Object? _upcomingScope;
   Future<void>? _waitingForHomeBeforePersonalSpotlight;
   bool _appForeground = true;
   Object? _filteredFavoritesKey;
   List<MediaItem> _filteredFavorites = const [];
   late final HomeLayoutProvider? _homeLayout;
+  late final ActiveProfileProvider? _activeProfile;
   late final StudiosProvider? _studios;
   late final HiddenLibrariesProvider? _hiddenLibraries;
   late final MultiServerProvider _multiServer;
@@ -103,7 +120,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   List<MediaItem> get _onDeck {
     final layout = _homeLayout?.layout ?? _defaultHomeLayout;
-    final items = _discover.onDeck;
+    final items = layout.hiddenProgress.isEmpty ? _discover.onDeck
+        : _discover.onDeck.where((item) => !layout.isProgressHidden(item)).toList();
     final hideContinue = layout.hidden.contains(homeContinueWatchingKey);
     if (!layout.splitContinueWatching) return hideContinue ? const [] : items;
     final hideNext = layout.hidden.contains(homeNextUpKey);
@@ -171,6 +189,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       _studios?.hasMore,
       _studios?.failed,
       t.studios.title,
+      _upcoming,
     );
     if (_rowsCache != null && key == _rowsCacheKey) return _rowsCache!;
     _rowsCacheKey = key;
@@ -182,7 +201,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final arranged = layout.arrange(
       buildHomeRows(
         hubs: _hubs,
-        onDeck: _discover.onDeck,
+        onDeck: _discover.onDeck.where((item) => !layout.isProgressHidden(item)).toList(),
         pins: pins,
         continueWatchingTitle: t.discover.continueWatching,
         pinnedTitle: t.homeLayout.pinnedCollections,
@@ -202,6 +221,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
             ),
         ],
         studiosTitle: t.studios.title,
+        upcomingEpisodes: layout.upcomingEpisodesEnabled ? _upcoming : const [],
+        upcomingTitle: t.homeLayout.upcomingEpisodes,
       ),
     );
     if (KidsProfileService.instance.isActiveKids) {
@@ -296,6 +317,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _homeLayout = context.read<HomeLayoutProvider?>();
+    _activeProfile = context.read<ActiveProfileProvider?>();
+    _activeProfile?.addListener(_onHomeLayoutChanged);
     _studios = context.read<StudiosProvider?>();
     _studios?.addListener(_onHomeLayoutChanged);
     _hiddenLibraries = context.read<HiddenLibrariesProvider?>();
@@ -310,7 +333,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     _favoriteSnapshot = context.read<HomeFavoritesSnapshot?>();
     _homeTaste = context.read<HomeTasteProvider?>();
     _catalogSources = context.read<CatalogSourcesProvider?>();
-    _catalogSources?.addListener(_schedulePersonalSpotlight);
+    _catalogSources?.addListener(_onCatalogSourcesChanged);
     _watchState = context.read<WatchStateStore?>();
     _lastTasteWatchRevision = _watchState?.observationWatermark;
     _watchState?.addListener(_onFavoriteWatchStateChanged);
@@ -319,6 +342,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     _trending?.updateLibraryItems(_hubs.expand((hub) => hub.items));
     _trending?.ensureFresh();
     unawaited(_discover.load());
+    _scheduleUpcoming();
   }
 
   Future<void>? _waitingForHomeBeforeStudios;
@@ -486,9 +510,16 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     _onHomeLayoutChanged();
   }
 
+  void _onCatalogSourcesChanged() {
+    if (!mounted) return;
+    _schedulePersonalSpotlight();
+    _scheduleUpcoming();
+  }
+
   void _onHomeLayoutChanged() {
     if (!mounted) return;
     _discover.setSplitHomeProgress(_homeLayout?.layout.splitContinueWatching ?? false);
+    _scheduleUpcoming();
     if (_homeLayout?.layout.spotlightSource == HomeSpotlightSource.forYou &&
         _lastTasteWatchRevision != _watchState?.observationWatermark) {
       _lastTasteWatchRevision = _watchState?.observationWatermark;
@@ -498,6 +529,205 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     _startStudiosWhenHomeReady();
     _schedulePersonalSpotlight();
     _applyPendingTvBrowseRailFocus();
+  }
+
+  void _scheduleUpcoming() {
+    final layout = _homeLayout?.layout;
+    final active = _activeProfile;
+    final upcomingHidden = layout?.isHidden(const MediaHub(
+      id: homeUpcomingEpisodesId, title: '', type: 'episode', items: [],
+    )) ?? true;
+    if (!mounted || layout?.upcomingEpisodesEnabled != true || KidsProfileService.instance.isActiveKids ||
+        upcomingHidden || !_isTabVisible || !_appForeground || _homeLayout?.profileId == null ||
+        active?.activeId != _homeLayout?.profileId || active?.isBinding == true) {
+      _upcomingTimer?.cancel();
+      _upcomingTimer = null;
+      _upcomingGeneration++;
+      _upcomingLoader?.cancel();
+      _upcomingLoadedAt = null;
+      if (_upcoming.isNotEmpty) _upcoming = const [];
+      return;
+    }
+    final scope = (
+      _homeLayout?.profileId,
+      active?.identityMutationGeneration,
+      Object.hashAllUnordered(_multiServer.onlineServerIds),
+      Object.hashAllUnordered(_hiddenLibraries?.hiddenLibraryKeys ?? const <String>{}),
+      Object.hashAllUnordered(_hiddenLibraries?.selectedSourceLibraries ?? const <String>{}),
+      _hiddenLibraries?.hasSourceSelection,
+      layout?.upcomingEpisodesSource != UpcomingEpisodesSource.previouslyWatched
+          ? _catalogSources?.connectedSources.where((source) => source.id == CatalogSourceId.plex).firstOrNull
+          : null,
+    );
+    if (_upcomingScope != scope) {
+      _upcomingScope = scope;
+      _upcomingGeneration++;
+      _upcomingLoader?.cancel();
+      _upcomingLoader = null;
+      _upcomingLoadedAt = null;
+      _upcoming = const [];
+    }
+    if (_lastUpcomingChoice != layout!.upcomingEpisodesSource) {
+      _lastUpcomingChoice = layout.upcomingEpisodesSource;
+      _upcomingLoadedAt = null;
+      _upcomingGeneration++;
+      _upcomingLoader?.cancel();
+      _upcoming = const [];
+    }
+    final homeLoad = _discover.activeLoad;
+    if (homeLoad != null) {
+      if (!identical(_waitingForHomeBeforeUpcoming, homeLoad)) {
+        _waitingForHomeBeforeUpcoming = homeLoad;
+        void resume() {
+          if (identical(_waitingForHomeBeforeUpcoming, homeLoad)) _waitingForHomeBeforeUpcoming = null;
+          if (mounted) _scheduleUpcoming();
+        }
+        unawaited(homeLoad.then((_) => resume(), onError: (Object error, StackTrace stack) => resume()));
+      }
+      return;
+    }
+    if (_upcomingInFlight || _upcomingTimer != null || _discover.isLoading || _areHubsLoading ||
+        (_upcomingLoadedAt != null &&
+        DateTime.now().difference(_upcomingLoadedAt!) < const Duration(minutes: 30))) {
+      return;
+    }
+    _upcomingTimer = Timer(const Duration(seconds: 2), () {
+      _upcomingTimer = null;
+      _upcomingInFlight = true;
+      unawaited(_loadUpcoming().whenComplete(() {
+        _upcomingInFlight = false;
+        if (mounted && _upcomingLoadedAt == null) _scheduleUpcoming();
+      }));
+    });
+  }
+
+  Future<void> _loadUpcoming() async {
+    final layout = _homeLayout?.layout;
+    if (!mounted || layout?.upcomingEpisodesEnabled != true || !_isTabVisible || !_appForeground ||
+        KidsProfileService.instance.isActiveKids) {
+      return;
+    }
+    final active = _activeProfile;
+    final librariesProvider = context.read<LibrariesProvider>();
+    final matcher = context.read<CatalogLibraryMatcher?>();
+    final identityGeneration = active?.identityMutationGeneration;
+    final owner = _homeLayout?.profileId;
+    final choice = layout!.upcomingEpisodesSource;
+    final generation = ++_upcomingGeneration;
+    bool current() => mounted && generation == _upcomingGeneration && _isTabVisible && _appForeground &&
+        !KidsProfileService.instance.isActiveKids && _homeLayout?.profileId == owner &&
+        _homeLayout?.layout.upcomingEpisodesEnabled == true && _homeLayout?.layout.upcomingEpisodesSource == choice &&
+        !(_homeLayout?.layout.isHidden(const MediaHub(id: homeUpcomingEpisodesId, title: '', type: 'episode', items: [])) ?? true) &&
+        active?.activeId == owner && active?.identityMutationGeneration == identityGeneration && active?.isBinding != true;
+    final favoriteBatches = <List<MediaItem>>[];
+    final watchedBatches = <List<MediaItem>>[];
+    final includeFavorites = choice != UpcomingEpisodesSource.previouslyWatched;
+    final includeWatched = choice != UpcomingEpisodesSource.favorites;
+    final hidden = _hiddenLibraries;
+    if (hidden != null) await hidden.ensureInitialized();
+    if (!current()) return;
+    if (includeWatched) {
+      bool allowed(MediaItem item) => _multiServer.onlineServerIds.contains(item.serverId) &&
+          (hidden?.allowsItem(item) ?? true);
+      watchedBatches.add(upcomingShowCandidates(
+        source: UpcomingEpisodesSource.previouslyWatched,
+        favorites: const [],
+        watched: [
+          ..._discover.onDeck.where(allowed),
+          // A caught-up series may disappear from Continue Watching and some
+          // servers omit rolled-up watch history on the series itself.
+          for (final hub in _discover.hubs)
+            for (final item in hub.items.where(allowed))
+              if (item.kind == MediaKind.episode && upcomingHasWatchHistory(_watchState?.apply(item) ?? item)) item,
+        ],
+      ));
+    }
+    final libraries = librariesProvider.libraries.where((library) =>
+        library.kind == MediaKind.show && library.serverId != null &&
+        !(hidden?.hiddenLibraryKeys.contains(library.globalKey) ?? false) &&
+        (!(hidden?.hasSourceSelection ?? false) || hidden!.selectedSourceLibraries!.contains(library.globalKey)) &&
+        _multiServer.onlineServerIds.contains(library.serverId)).take(12).toList();
+    for (final library in libraries) {
+      if (!current()) return;
+      final client = _multiServer.getClientForServer(ServerId(library.serverId!));
+      if (client == null) continue;
+      for (final favorites in [if (includeFavorites && client.capabilities.userFavorites) true, if (includeWatched) false]) {
+      if (!current()) return;
+      try {
+        final page = await client.fetchLibraryPagedContent(library.id, libraryKind: library.kind,
+          query: LibraryQuery(kind: MediaKind.show, limit: 90,
+            sort: !favorites ? const LibrarySort(field: 'lastViewedAt') : null,
+            filters: favorites
+                ? const [LibraryFilter(field: MediaFilterField.favorite, values: ['1'])] : const [],
+          )).timeout(const Duration(seconds: 4));
+        if (!current()) return;
+        final fromLibrary = <MediaItem>[];
+        for (final item in page.items) {
+          if (item.kind != MediaKind.show || (item.serverId != null && item.serverId != library.serverId) ||
+              (item.libraryId != null && item.libraryId != library.id)) {
+            continue;
+          }
+          if (!favorites && !upcomingHasWatchHistory(_watchState?.apply(item) ?? item)) {
+            continue;
+          }
+          fromLibrary.add(item.copyWith(serverId: library.serverId, serverName: library.serverName,
+            libraryId: library.id, libraryTitle: library.title));
+        }
+        (favorites ? favoriteBatches : watchedBatches).add(fromLibrary);
+      } catch (_) {
+        // A failed library does not block the others.
+      }
+      }
+    }
+    // Plex exposes its Favorites surface through the account Watchlist rather
+    // than a per-server favorite flag. Match only a bounded first page back to
+    // the active profile's visible library copies before requesting schedules.
+    if (includeFavorites && current()) {
+      final plex = _catalogSources?.connectedSources.where((s) => s.id == CatalogSourceId.plex).firstOrNull;
+      if (plex != null && matcher != null) {
+        try {
+          final watchlist = await plex.fetchRow(CatalogRowId.watchlist, page: 1, limit: 20)
+              .timeout(const Duration(seconds: 8));
+          for (final entry in watchlist.items.where((item) => item.kind == MediaKind.show).take(10)) {
+            if (!current()) break;
+            final matches = await matcher.match(entry).timeout(const Duration(seconds: 8));
+            if (!current()) return;
+            favoriteBatches.add(matches.items.where((item) => item.kind == MediaKind.show &&
+                _multiServer.onlineServerIds.contains(item.serverId) && (hidden?.allowsItem(item) ?? true)).toList());
+          }
+        } catch (_) {
+          // Keep the successfully resolved server favorites.
+        }
+      }
+    }
+    if (!current()) return;
+    final shows = interleaveUpcomingLibraries([
+      if (includeFavorites) interleaveUpcomingLibraries(favoriteBatches),
+      if (includeWatched) interleaveUpcomingLibraries(watchedBatches),
+    ]);
+    final source = _upcomingSource ??= CinemetaCatalogSource();
+    final loader = _upcomingLoader ??= UpcomingEpisodesLoader(fetchSchedule: (show) async {
+      if (!mounted || _homeLayout?.layout.upcomingEpisodesEnabled != true || show.serverId == null) return null;
+      final client = _multiServer.getClientForServer(ServerId(show.serverId!));
+      if (client == null) return null;
+      final token = _upcomingGeneration;
+      var activeRequest = true;
+      try {
+        return await fetchUpcomingShowSchedule(show: show, client: client, source: source,
+          isCurrent: () => activeRequest && mounted && token == _upcomingGeneration &&
+              _homeLayout?.layout.upcomingEpisodesEnabled == true &&
+              identical(client, _multiServer.getClientForServer(ServerId(show.serverId!))))
+            .timeout(UpcomingEpisodesLoader.timeout - const Duration(milliseconds: 100));
+      } finally {
+        activeRequest = false;
+      }
+    });
+    final results = await loader.load(enabled: true, shows: shows, onProgress: (items) {
+      if (current()) setState(() => _upcoming = items);
+    });
+    if (!current()) return;
+    _upcomingLoadedAt = DateTime.now();
+    setState(() => _upcoming = results);
   }
 
   void _openHomeLayout() => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HomeLayoutScreen()));
@@ -542,6 +772,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   void _onDiscoverChanged() {
     if (!mounted) return;
+    _scheduleUpcoming();
     _trending?.updateLibraryItems(_hubs.expand((hub) => hub.items));
     final generation = _discover.loadGeneration;
     final isNewLoad = generation != _seenLoadGeneration;
@@ -571,13 +802,18 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   @override
   void dispose() {
+    _upcomingGeneration++;
+    _upcomingTimer?.cancel();
+    _upcomingLoader?.cancel();
+    _upcomingSource?.dispose();
     _personalSpotlightTimer?.cancel();
     _favoriteSnapshot?.cancelBackground();
     _homeTaste?.cancelPending();
-    _catalogSources?.removeListener(_schedulePersonalSpotlight);
+    _catalogSources?.removeListener(_onCatalogSourcesChanged);
     _watchState?.removeListener(_onFavoriteWatchStateChanged);
     _studios?.removeListener(_onHomeLayoutChanged);
     _homeLayout?.removeListener(_onHomeLayoutChanged);
+    _activeProfile?.removeListener(_onHomeLayoutChanged);
     _hiddenLibraries?.removeListener(_onHomeLayoutChanged);
     _multiServer.removeOnlineServersListener(_onHomeServersChanged);
     _discover.removeListener(_onDiscoverChanged);
@@ -590,12 +826,14 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _appForeground = state == AppLifecycleState.resumed;
     if (!_appForeground) {
+      _scheduleUpcoming();
       _personalSpotlightTimer?.cancel();
       _personalSpotlightTimer = null;
       _favoriteSnapshot?.cancelBackground();
       _homeTaste?.cancelPending();
     }
     if (state == AppLifecycleState.resumed) {
+      _scheduleUpcoming();
       // Stale hubs refetch on every resume — cheap timestamp check, and a
       // desktop window-focus gain after hours away should refresh too.
       final startedFullPass = _discover.refreshIfStale();
@@ -611,6 +849,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   @override
   void onTabHidden() {
     _isTabVisible = false;
+    _scheduleUpcoming();
     _personalSpotlightTimer?.cancel();
     _personalSpotlightTimer = null;
     _favoriteSnapshot?.cancelBackground();
@@ -622,6 +861,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   @override
   void onTabShown() {
     _isTabVisible = true;
+    _scheduleUpcoming();
     _dashboardKey.currentState?.setPreviewActive(true);
     if (PlatformDetector.isMobile(context)) _dashboardKey.currentState?.resetMobileShelves();
     if (PlatformDetector.isTV()) _dashboardKey.currentState?.resetTvShelves();
@@ -1053,6 +1293,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           focusMemory: _hubFocusMemory,
           resolveClient: _getMediaClientForItem,
           onPlay: (item) async {
+            if (item.raw?['upcomingShow'] case final MediaItem show) {
+              await navigateToMediaItemDetails(context, show, onRefresh: _discover.updateItem);
+              return;
+            }
             if (item.kind == MediaKind.show) {
               await _playFeaturedShow(item);
               if (mounted) {
@@ -1068,7 +1312,9 @@ class _DiscoverScreenState extends State<DiscoverScreen>
               _schedulePersonalSpotlight();
             }
           },
-          onDetails: (item) => item.kind == MediaKind.collection || item.kind.isMusic
+          onDetails: (item) => item.raw?['upcomingShow'] is MediaItem
+              ? navigateToMediaItemDetails(context, item.raw!['upcomingShow'] as MediaItem, onRefresh: _discover.updateItem)
+              : item.kind == MediaKind.collection || item.kind.isMusic
               ? navigateToMediaItem(context, item, onRefresh: _discover.updateItem)
               : navigateToMediaItemDetails(context, item, onRefresh: _discover.updateItem),
           onResume: (item) async {
@@ -1085,12 +1331,14 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           loadMoreItems: (hub) => hub.id == homeContinueWatchingId
               ? () async {
                   final items = await _discover.loadAllContinueWatching();
+                  final visible = items.where((item) => !(_homeLayout?.layout.isProgressHidden(item) ?? false));
                   return (_homeLayout?.layout.splitContinueWatching ?? false)
-                      ? items.where((item) => !isHomeNextUp(item)).toList()
-                      : items;
+                      ? visible.where((item) => !isHomeNextUp(item)).toList()
+                      : visible.toList();
                 }
               : hub.id == homeNextUpId
-              ? () async => (await _discover.loadAllContinueWatching()).where(isHomeNextUp).toList()
+              ? () async => (await _discover.loadAllContinueWatching()).where((item) => isHomeNextUp(item) &&
+                  !(_homeLayout?.layout.isProgressHidden(item) ?? false)).toList()
               : hub.id == homePinnedCollectionsId
               ? () async => hub.items
               : null,

@@ -128,6 +128,8 @@ class TranslationsFr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$downloads$fr downloads = _Translations$downloads$fr._(_root);
 	@override late final _Translations$shaders$fr shaders = _Translations$shaders$fr._(_root);
 	@override late final _Translations$companionRemote$fr companionRemote = _Translations$companionRemote$fr._(_root);
+	@override late final _Translations$showDetailLayout$fr showDetailLayout = _Translations$showDetailLayout$fr._(_root);
+	@override late final _Translations$iconStyles$fr iconStyles = _Translations$iconStyles$fr._(_root);
 	@override late final _Translations$videoSettings$fr videoSettings = _Translations$videoSettings$fr._(_root);
 	@override late final _Translations$performanceOverlay$fr performanceOverlay = _Translations$performanceOverlay$fr._(_root);
 	@override late final _Translations$externalPlayer$fr externalPlayer = _Translations$externalPlayer$fr._(_root);
@@ -3402,6 +3404,39 @@ class _Translations$companionRemote$fr extends Translations$companionRemote$en {
 	@override String get closedBeforeAuth => 'La connexion a été fermée avant l’authentification';
 }
 
+// Path: showDetailLayout
+class _Translations$showDetailLayout$fr extends Translations$showDetailLayout$en {
+	_Translations$showDetailLayout$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Présentation des séries';
+	@override String get description => 'Choisissez la présentation des séries et épisodes sur la télévision.';
+	@override String get cinematic => 'Cinématique';
+	@override String get compact => 'Liste compacte des épisodes';
+	@override String get seasons => 'Choisir une saison';
+	@override String get episodes => 'Épisodes';
+	@override String get details => 'Détails';
+	@override String get cast => 'Distribution';
+	@override String get related => 'Titres similaires';
+}
+
+// Path: iconStyles
+class _Translations$iconStyles$fr extends Translations$iconStyles$en {
+	_Translations$iconStyles$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Style des icônes';
+	@override String get description => 'Choisissez l’apparence des commandes pour ce profil.';
+	@override String get current => 'Luroka gras';
+	@override String get outline => 'Material contour';
+	@override String get lucide => 'Lucide';
+	@override String get lucideDescription => 'Icônes linéaires avec remplacement Material si nécessaire.';
+}
+
 // Path: videoSettings
 class _Translations$videoSettings$fr extends Translations$videoSettings$en {
 	_Translations$videoSettings$fr._(TranslationsFr root) : this._root = root, super.internal(root);
@@ -3415,6 +3450,10 @@ class _Translations$videoSettings$fr extends Translations$videoSettings$en {
 	@override String get zoom => 'Zoom';
 	@override String get sleepTimer => 'Minuterie de mise en veille';
 	@override String get audioSync => 'Synchronisation audio';
+	@override String get resyncPlayback => 'Resynchroniser la lecture';
+	@override String get resyncPlaybackDescription => 'Actualiser l\'audio et la vidéo à la position actuelle';
+	@override String get resyncPlaybackDone => 'Resynchronisation demandée';
+	@override String get resyncPlaybackFailed => 'Impossible de resynchroniser la lecture';
 	@override String get subtitleSync => 'Synchronisation des sous-titres';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => 'Le HDR n’est pas disponible ici : ce compositeur de bureau ou cette sortie vidéo ne permet pas de le transmettre.';
@@ -7706,12 +7745,31 @@ extension on TranslationsFr {
 			'companionRemote.errors.connectionLostAfterAttempts' => ({required Object attempts}) => 'Connexion perdue après ${attempts} tentatives',
 			'companionRemote.errors.connectionLost' => 'Connexion perdue',
 			'companionRemote.closedBeforeAuth' => 'La connexion a été fermée avant l’authentification',
+			'showDetailLayout.title' => 'Présentation des séries',
+			'showDetailLayout.description' => 'Choisissez la présentation des séries et épisodes sur la télévision.',
+			'showDetailLayout.cinematic' => 'Cinématique',
+			'showDetailLayout.compact' => 'Liste compacte des épisodes',
+			'showDetailLayout.seasons' => 'Choisir une saison',
+			'showDetailLayout.episodes' => 'Épisodes',
+			'showDetailLayout.details' => 'Détails',
+			'showDetailLayout.cast' => 'Distribution',
+			'showDetailLayout.related' => 'Titres similaires',
+			'iconStyles.title' => 'Style des icônes',
+			'iconStyles.description' => 'Choisissez l’apparence des commandes pour ce profil.',
+			'iconStyles.current' => 'Luroka gras',
+			'iconStyles.outline' => 'Material contour',
+			'iconStyles.lucide' => 'Lucide',
+			'iconStyles.lucideDescription' => 'Icônes linéaires avec remplacement Material si nécessaire.',
 			'videoSettings.playbackSpeed' => 'Vitesse de lecture',
 			'videoSettings.normalSpeed' => 'Normale',
 			'videoSettings.sleepTimerActive' => ({required Object duration}) => 'Actif (${duration})',
 			'videoSettings.zoom' => 'Zoom',
 			'videoSettings.sleepTimer' => 'Minuterie de mise en veille',
 			'videoSettings.audioSync' => 'Synchronisation audio',
+			'videoSettings.resyncPlayback' => 'Resynchroniser la lecture',
+			'videoSettings.resyncPlaybackDescription' => 'Actualiser l\'audio et la vidéo à la position actuelle',
+			'videoSettings.resyncPlaybackDone' => 'Resynchronisation demandée',
+			'videoSettings.resyncPlaybackFailed' => 'Impossible de resynchroniser la lecture',
 			'videoSettings.subtitleSync' => 'Synchronisation des sous-titres',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'Le HDR n’est pas disponible ici : ce compositeur de bureau ou cette sortie vidéo ne permet pas de le transmettre.',
@@ -7913,6 +7971,8 @@ extension on TranslationsFr {
 			'seerr.disconnectConfirmBody' => 'Luroka oubliera cette instance Seerr. Vous pourrez vous reconnecter à tout moment.',
 			'seerr.request' => 'Demander',
 			'seerr.request4k' => 'Demander en 4K',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.seasons' => 'Saisons',
 			'seerr.allSeasons' => 'Toutes les saisons',
 			'seerr.advancedOptions' => 'Avancé',
@@ -7932,8 +7992,6 @@ extension on TranslationsFr {
 			'seerr.statusPartiallyAvailable' => 'Partiellement disponible',
 			'seerr.statusRequested' => 'Demandé',
 			'seerr.statusProcessing' => 'En cours de traitement',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Sur la liste de blocage',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Impossible de joindre ${url} : ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'Aucune instance Seerr à l’adresse ${url} (HTTP ${status})',

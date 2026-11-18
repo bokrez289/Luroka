@@ -183,6 +183,17 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
     final hadGridFocus = gridItemFocusNodes.values.any((node) => node.hasFocus);
     final followed = _visible.isEmpty ? null : _visible[_selected.clamp(0, _visible.length - 1)].globalKey;
     final libraryTitles = {for (final library in widget.libraries) library.globalKey: library.title};
+    if (_animeOnly && !widget.items.any((item) =>
+        _animeRules.includesTitle(_copiesFor(item), libraryTitles: libraryTitles))) {
+      _animeOnly = false;
+      _kind = null;
+    }
+    if (_filters[3].hasFocus && !widget.items.any((item) =>
+        _animeRules.includesTitle(_copiesFor(item), libraryTitles: libraryTitles))) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _active && (ModalRoute.of(context)?.isCurrent ?? false)) _filters[0].requestFocus();
+      });
+    }
     _visible = widget.items.where((item) {
       if (_animeOnly) return _animeRules.includesTitle(_copiesFor(item), libraryTitles: libraryTitles);
       return _kind == null || item.kind == _kind;
@@ -385,12 +396,16 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
   Widget _buildControls(BuildContext context, double width) {
     final narrow = !PlatformDetector.isTV() && width < 600;
     final colors = Theme.of(context).colorScheme;
+    final libraryTitles = {for (final library in widget.libraries) library.globalKey: library.title};
+    final hasAnime = widget.items.any((item) =>
+        _animeRules.includesTitle(_copiesFor(item), libraryTitles: libraryTitles));
+    final lastFilterIndex = hasAnime ? 3 : 2;
     final chips = <Widget>[
       for (final (index, (kind, label, anime)) in [
         (null, t.studios.all, false),
         (MediaKind.movie, t.studios.movies, false),
         (MediaKind.show, t.studios.shows, false),
-        (null, t.animeFavorites.filter, true),
+        if (hasAnime) (null, t.animeFavorites.filter, true),
       ].indexed)
         FocusableTabChip(
           key: ValueKey('favorites_filter_$index'),
@@ -400,7 +415,7 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
           focusNode: _filters[index],
           onSelect: () => _filter(kind, anime: anime),
           onNavigateLeft: index == 0 ? widget.onNavigation : _filters[index - 1].requestFocus,
-          onNavigateRight: index == _filters.length - 1 ? _sortFocus.requestFocus : _filters[index + 1].requestFocus,
+          onNavigateRight: index == lastFilterIndex ? _sortFocus.requestFocus : _filters[index + 1].requestFocus,
           onNavigateUp: PlatformDetector.isTV() ? widget.onNavigation : _focusOverview,
           onNavigateDown: narrow ? _sortFocus.requestFocus : () => _focusIndex(0),
         ),
@@ -413,7 +428,7 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
           focusNode: _sortFocus,
           autoScroll: false,
           onPressed: () => unawaited(_chooseSort()),
-          onNavigateLeft: _filters.last.requestFocus,
+          onNavigateLeft: _filters[lastFilterIndex].requestFocus,
           onNavigateRight: _viewFocus.requestFocus,
           onNavigateUp: PlatformDetector.isTV()
               ? widget.onNavigation

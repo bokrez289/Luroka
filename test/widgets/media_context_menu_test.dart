@@ -20,6 +20,7 @@ import 'package:luroka/media/library_query.dart';
 import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_file_info.dart';
 import 'package:luroka/media/media_item.dart';
+import 'package:luroka/media/home_progress.dart';
 import 'package:luroka/media/media_kind.dart';
 import 'package:luroka/media/media_part.dart';
 import 'package:luroka/media/media_playlist.dart';
@@ -69,6 +70,64 @@ import '../test_helpers/profile_stack.dart';
 import '../test_helpers/stub_music_playback_service.dart';
 
 void main() {
+  testWidgets('Jellyfin Continue Watching removal keeps movie progress', (tester) async {
+    resetSharedPreferencesForTest();
+    await SettingsService.getInstance();
+    final layout = HomeLayoutProvider(storage: await StorageService.getInstance(), profileId: 'p');
+    addTearDown(layout.dispose);
+    final item = testMediaItem(id: 'movie', backend: MediaBackend.jellyfin, kind: MediaKind.movie,
+      serverId: 'srv-1', viewOffsetMs: 10000);
+    final writes = <String>[];
+    final key = await _pumpJellyfinItemMenu(tester, isAdministrator: false, item: item, homeLayout: layout,
+      inContinueWatching: true, handler: (request) async { if (request.method != 'GET') writes.add(request.method); return jsonResponse({}); });
+    await _openMenu(tester, key);
+    await tester.tap(find.text(t.mediaMenu.removeFromContinueWatching));
+    await tester.pumpAndSettle();
+    expect(layout.layout.isProgressHidden(item), isTrue);
+    expect(writes, isEmpty);
+  });
+  testWidgets('Jellyfin Next Up removal hides the series without changing server watch state', (tester) async {
+    resetSharedPreferencesForTest();
+    await SettingsService.getInstance();
+    final layout = HomeLayoutProvider(storage: await StorageService.getInstance(), profileId: 'p');
+    addTearDown(layout.dispose);
+    final item = withHomeProgressRole(testMediaItem(id: 'episode', backend: MediaBackend.jellyfin,
+      kind: MediaKind.episode, serverId: 'srv-1', grandparentId: 'show'), HomeProgressRole.nextUp);
+    final writes = <String>[];
+    final key = await _pumpJellyfinItemMenu(tester, isAdministrator: false, item: item, homeLayout: layout,
+      inContinueWatching: true, handler: (request) async { if (request.method != 'GET') writes.add(request.method); return jsonResponse({}); });
+    await _openMenu(tester, key);
+    await tester.tap(find.text(t.mediaMenu.removeFromNextUp));
+    await tester.pumpAndSettle();
+    expect(layout.layout.isProgressHidden(item), isTrue);
+    expect(layout.layout.isProgressHidden(item.copyWith(id: 'next-episode')), isTrue);
+    expect(writes, isEmpty);
+  });
+  testWidgets('Plex presents Rate without a server favorite action', (tester) async {
+    final key = await _pumpPlexMovieMenu(tester, const []);
+    key.currentState!.showContextMenu(tester.element(find.text('picker target')));
+    await tester.pumpAndSettle();
+    expect(find.text(t.mediaMenu.rate), findsOneWidget);
+    expect(find.text(t.rateSheet.addFavorite), findsNothing);
+  });
+  testWidgets('Jellyfin favorite is a direct toggle, separate from ratings', (tester) async {
+    final writes = <String>[];
+    final key = await _pumpJellyfinMovieMenu(tester, isAdministrator: false, handler: (request) async {
+      if (request.url.path.contains('FavoriteItems')) writes.add(request.method);
+      return http.Response('', 204);
+    });
+    await _openMenu(tester, key);
+    expect(find.text(t.rateSheet.addFavorite), findsOneWidget);
+    expect(find.text(t.mediaMenu.rate), findsNothing);
+    await tester.tap(find.text(t.rateSheet.addFavorite));
+    await tester.pumpAndSettle();
+    expect(writes, ['POST']);
+    await _openMenu(tester, key);
+    expect(find.text(t.rateSheet.removeFavorite), findsOneWidget);
+    await tester.tap(find.text(t.rateSheet.removeFavorite));
+    await tester.pumpAndSettle();
+    expect(writes, ['POST', 'DELETE']);
+  });
   testWidgets('detail More groups playback tools and keeps advanced choices out of the first page', (tester) async {
     final key = await _pumpPlexMovieMenu(tester, const [], compactDetailMenu: true);
     key.currentState!.showContextMenu(tester.element(find.text('picker target')));
@@ -895,7 +954,7 @@ void main() {
 
       expect(postedBody, isNotNull);
       expect((jsonDecode(postedBody!) as Map<String, dynamic>)['Tags'], ['kids']);
-      expect(find.text(t.metadataEdit.metadataUpdated), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
     testWidgets('hides Quick Tag for a non-admin', (tester) async {
@@ -1167,7 +1226,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
-      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.byType(AlertDialog), findsOneWidget);
       expect(find.text('target'), findsOneWidget);
     });
 
@@ -1316,7 +1375,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(requests, isEmpty, reason: 'the registered srv-1 must not be asked about another server item');
-      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.byType(AlertDialog), findsOneWidget);
     });
 
     testWidgets('playlist picker filters playlists by title', (tester) async {
@@ -1613,7 +1672,7 @@ void main() {
 
       expect(source.mutations.map((m) => m.add), [true]);
       expect(source.mutations.single.ids.imdb, 'tt1');
-      expect(find.text(t.explore.addedToWatchlist), findsOneWidget);
+      expect(find.byType(AlertDialog), findsNothing);
       // Opening also kicked the membership snapshot load for the next open.
       expect(source.ensureLoadedCalls, greaterThan(0));
     });
@@ -1636,7 +1695,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(source.mutations.map((m) => m.add), [false]);
-      expect(find.text(t.explore.removedFromWatchlist), findsOneWidget);
+      expect(find.byType(AlertDialog), findsNothing);
     });
 
     testWidgets('hides the entry when the item resolved in no capable source', (tester) async {
@@ -1698,7 +1757,7 @@ void main() {
 
       expect(simkl.mutations.map((m) => m.add), [false]);
       expect(trakt.mutations, isEmpty);
-      expect(find.text(t.explore.removedFromWatchlist), findsOneWidget);
+      expect(find.byType(AlertDialog), findsNothing);
     });
   });
 }
@@ -1919,6 +1978,7 @@ Future<GlobalKey<MediaContextMenuState>> _pumpJellyfinItemMenu(
   required MediaItem item,
   bool serverOnline = true,
   bool compactDetailMenu = false,
+  bool inContinueWatching = false,
   HomeLayoutProvider? homeLayout,
   List<Uri>? requests,
 
@@ -1957,6 +2017,7 @@ Future<GlobalKey<MediaContextMenuState>> _pumpJellyfinItemMenu(
       child: MediaContextMenu(
         key: menuKey,
         item: item,
+        isInContinueWatching: inContinueWatching,
         compactDetailMenu: compactDetailMenu,
         child: const SizedBox(width: 120, height: 80, child: Text('delete target')),
       ),

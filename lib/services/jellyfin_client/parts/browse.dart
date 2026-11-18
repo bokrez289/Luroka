@@ -854,7 +854,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   Future<MediaItem?> fetchPreviewItem(String id, {required AbortController abort}) async {
     final response = await _http.get(
       '/Users/${_segment(connection.userId)}/Items/${_segment(id)}',
-      queryParameters: {'Fields': 'Overview,Genres,ProductionYear,OfficialRating,PremiereDate,RecursiveItemCount'},
+      queryParameters: {'Fields': 'Overview,Genres,People,ProductionYear,OfficialRating,PremiereDate,RecursiveItemCount'},
       abort: abort,
       timeout: const Duration(seconds: 8),
     );

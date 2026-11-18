@@ -3151,6 +3151,25 @@
     },
     "closedBeforeAuth": "La connexion a été fermée avant l’authentification"
   },
+  "showDetailLayout": {
+    "title": "Présentation des séries",
+    "description": "Choisissez la présentation des séries et épisodes sur la télévision.",
+    "cinematic": "Cinématique",
+    "compact": "Liste compacte des épisodes",
+    "seasons": "Choisir une saison",
+    "episodes": "Épisodes",
+    "details": "Détails",
+    "cast": "Distribution",
+    "related": "Titres similaires"
+  },
+  "iconStyles": {
+    "title": "Style des icônes",
+    "description": "Choisissez l’apparence des commandes pour ce profil.",
+    "current": "Luroka gras",
+    "outline": "Material contour",
+    "lucide": "Lucide",
+    "lucideDescription": "Icônes linéaires avec remplacement Material si nécessaire."
+  },
   "videoSettings": {
     "playbackSpeed": "Vitesse de lecture",
     "normalSpeed": "Normale",
@@ -3158,6 +3177,10 @@
     "zoom": "Zoom",
     "sleepTimer": "Minuterie de mise en veille",
     "audioSync": "Synchronisation audio",
+    "resyncPlayback": "Resynchroniser la lecture",
+    "resyncPlaybackDescription": "Actualiser l'audio et la vidéo à la position actuelle",
+    "resyncPlaybackDone": "Resynchronisation demandée",
+    "resyncPlaybackFailed": "Impossible de resynchroniser la lecture",
     "subtitleSync": "Synchronisation des sous-titres",
     "hdr": "HDR",
     "hdrUnsupported": "Le HDR n’est pas disponible ici : ce compositeur de bureau ou cette sortie vidéo ne permet pas de le transmettre.",

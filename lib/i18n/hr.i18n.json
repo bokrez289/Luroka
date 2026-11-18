@@ -3166,6 +3166,25 @@
     },
     "closedBeforeAuth": "Veza je prekinuta prije autentifikacije"
   },
+  "showDetailLayout": {
+    "title": "Izgled detalja serije",
+    "description": "Odaberite prikaz serija i epizoda na televizoru.",
+    "cinematic": "Filmski",
+    "compact": "Kompaktni popis epizoda",
+    "seasons": "Odaberite sezonu",
+    "episodes": "Epizode",
+    "details": "Detalji",
+    "cast": "Glumci",
+    "related": "Slični naslovi"
+  },
+  "iconStyles": {
+    "title": "Stil ikona",
+    "description": "Odaberite izgled kontrola aplikacije za ovaj profil.",
+    "current": "Luroka podebljano",
+    "outline": "Material obrub",
+    "lucide": "Lucide",
+    "lucideDescription": "Linijske ikone uz Material zamjene za nedostupne simbole."
+  },
   "videoSettings": {
     "playbackSpeed": "Brzina reprodukcije",
     "normalSpeed": "Uobičajena",
@@ -3173,6 +3192,10 @@
     "zoom": "Zumiranje",
     "sleepTimer": "Mjerač vremena za isključivanje",
     "audioSync": "Sinkronizacija zvuka",
+    "resyncPlayback": "Ponovno sinkroniziraj reprodukciju",
+    "resyncPlaybackDescription": "Osvježi zvuk i sliku na trenutnom položaju",
+    "resyncPlaybackDone": "Zatražena je ponovna sinkronizacija",
+    "resyncPlaybackFailed": "Nije moguće ponovno sinkronizirati reprodukciju",
     "subtitleSync": "Sinkronizacija titlova",
     "hdr": "HDR",
     "hdrUnsupported": "HDR nije dostupan — kompozitor radne površine ili videoizlaz ne podržava HDR.",

@@ -3441,6 +3441,10 @@ class _Translations$videoSettings$pl extends Translations$videoSettings$en {
 	@override String get zoom => 'Powiększenie';
 	@override String get sleepTimer => 'Wyłącznik czasowy';
 	@override String get audioSync => 'Synchronizacja audio';
+	@override String get resyncPlayback => 'Ponownie zsynchronizuj odtwarzanie';
+	@override String get resyncPlaybackDescription => 'Odśwież dźwięk i obraz w bieżącej pozycji';
+	@override String get resyncPlaybackDone => 'Zażądano ponownej synchronizacji';
+	@override String get resyncPlaybackFailed => 'Nie udało się zsynchronizować odtwarzania';
 	@override String get subtitleSync => 'Synchronizacja napisów';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => 'HDR nie jest tutaj dostępny — ten kompozytor pulpitu lub wyjście wideo nie może go przesyłać.';
@@ -7742,6 +7746,10 @@ extension on TranslationsPl {
 			'videoSettings.zoom' => 'Powiększenie',
 			'videoSettings.sleepTimer' => 'Wyłącznik czasowy',
 			'videoSettings.audioSync' => 'Synchronizacja audio',
+			'videoSettings.resyncPlayback' => 'Ponownie zsynchronizuj odtwarzanie',
+			'videoSettings.resyncPlaybackDescription' => 'Odśwież dźwięk i obraz w bieżącej pozycji',
+			'videoSettings.resyncPlaybackDone' => 'Zażądano ponownej synchronizacji',
+			'videoSettings.resyncPlaybackFailed' => 'Nie udało się zsynchronizować odtwarzania',
 			'videoSettings.subtitleSync' => 'Synchronizacja napisów',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'HDR nie jest tutaj dostępny — ten kompozytor pulpitu lub wyjście wideo nie może go przesyłać.',
@@ -7958,12 +7966,12 @@ extension on TranslationsPl {
 			'seerr.requestFailed' => ({required Object error}) => 'Zamówienie nie powiodło się: ${error}',
 			'seerr.requestsLoadFailed' => 'Nie udało się wczytać opcji zamówienia',
 			'seerr.nothingToRequest' => 'Wszystko jest już dostępne lub zamówione.',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Dostępne',
 			'seerr.statusPartiallyAvailable' => 'Częściowo dostępne',
 			'seerr.statusRequested' => 'Zamówione',
 			'seerr.statusProcessing' => 'Przetwarzanie',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Na liście blokowanych',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => 'Nie udało się połączyć z ${url}: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => 'Pod adresem ${url} nie ma instancji Seerr (HTTP ${status})',

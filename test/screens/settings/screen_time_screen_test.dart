@@ -23,6 +23,8 @@ import 'package:luroka/focus/input_mode_tracker.dart';
 import 'package:luroka/focus/focusable_wrapper.dart';
 import 'package:luroka/media/ids.dart';
 import 'package:luroka/media/media_backend.dart';
+import 'package:luroka/media/media_item.dart';
+import 'package:luroka/media/media_kind.dart';
 import 'package:luroka/media/media_server_client.dart';
 import 'package:luroka/providers/multi_server_provider.dart';
 import 'package:luroka/widgets/optimized_media_image.dart';
@@ -544,6 +546,34 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('most-watched episodes use their show poster rather than a stretched episode still', (tester) async {
+    initTargets();
+    TvDetectionService.debugSetAppleTVOverride(true);
+    addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+    tester.view.physicalSize = const Size(960, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final client = _ArtworkClient();
+    final servers = testMultiServer(clients: [client]);
+    final now = DateTime.now();
+    await seedDaily(dayKey(now), 60000);
+    await db.addScreenTimeSessions([sessionRow(
+      localDate: dayKey(now), start: now.subtract(const Duration(minutes: 1)), end: now,
+      kind: ScreenTimeMediaKind.episode, itemKey: 'ep', itemTitle: 'Episode', showTitle: 'Series',
+      thumbPath: '/episode-still',
+    )]);
+    await tester.pumpWidget(MultiProvider(providers: [
+      Provider<ScreenTimeService>.value(value: service),
+      ChangeNotifierProvider<MultiServerProvider>.value(value: servers.provider),
+    ], child: MaterialApp(theme: monoTheme(MonoPalette.dark), home: const ScreenTimeScreen())));
+    await pumpUntil(tester, () => find.byKey(const ValueKey('activity_top_title_0')).evaluate().isNotEmpty);
+    await tester.pump();
+    final poster = tester.widget<OptimizedMediaImage>(find.descendant(
+      of: find.byKey(const ValueKey('activity_top_title_0')), matching: find.byType(OptimizedMediaImage)));
+    expect(poster.imagePath, '/show-poster');
+    expect(poster.width, 160);
+  });
+
   for (final viewport in [const Size(320, 700), const Size(768, 1024), const Size(960, 540)]) {
     testWidgets('dashboard fits $viewport with enlarged text', (tester) async {
       initTargets();
@@ -716,6 +746,9 @@ class _ArtworkClient implements MediaServerClient {
   ServerId get serverId => ServerId('srv');
   @override
   MediaBackend get backend => MediaBackend.plex;
+  @override
+  Future<MediaItem?> fetchItem(String id) async => MediaItem.plex(
+    id: id, kind: MediaKind.episode, serverId: 'srv', grandparentThumbPath: '/show-poster');
   @override
   String thumbnailUrl(String? path, {int? width, int? height, bool cover = true}) => '';
   @override

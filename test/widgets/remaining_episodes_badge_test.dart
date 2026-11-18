@@ -11,10 +11,9 @@ import 'package:luroka/services/settings_service.dart';
 import 'package:luroka/utils/media_server_http_client.dart';
 import 'package:luroka/widgets/remaining_episodes_badge.dart';
 import 'package:luroka/widgets/media_card.dart';
-import 'package:luroka/widgets/app_icon.dart';
+import 'package:luroka/widgets/unwatched_count_badge.dart';
 import 'package:luroka/utils/platform_detector.dart';
 import 'package:luroka/theme/mono_theme.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import '../test_helpers/multi_server_fixtures.dart';
 import '../test_helpers/prefs.dart';
 
@@ -115,13 +114,11 @@ void main() {
       expect(client.calls, 1);
       final remaining = find.byType(RemainingEpisodesBadge);
       final copies = find.byKey(const ValueKey('media-copy-count'));
-      expect(find.descendant(of: remaining, matching: find.byWidgetPredicate(
-        (widget) => widget is AppIcon && widget.icon == Symbols.format_list_numbered_rounded,
-      )), findsOneWidget);
+      expect(find.descendant(of: remaining, matching: find.byType(UnwatchedCountBadge)), findsOneWidget);
       expect(find.descendant(of: remaining, matching: find.text('2')), findsOneWidget);
       expect(find.descendant(of: copies, matching: find.byIcon(Icons.file_copy_rounded)), findsOneWidget);
       expect(find.descendant(of: copies, matching: find.text('3')), findsOneWidget);
-      expect(tester.getRect(remaining).right, lessThanOrEqualTo(tester.getRect(copies).left));
+      expect(tester.getRect(remaining).left, greaterThanOrEqualTo(tester.getRect(copies).right));
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
     });

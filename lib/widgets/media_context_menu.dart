@@ -10,6 +10,7 @@ import '../providers/watch_state_store.dart';
 import '../providers/home_layout_provider.dart';
 import '../media/media_backend.dart';
 import '../media/media_item.dart';
+import '../media/home_progress.dart';
 import '../media/media_item_labels.dart';
 import '../media/media_item_types.dart';
 import '../media/media_kind.dart';
@@ -35,6 +36,7 @@ import '../providers/download_provider.dart';
 import '../providers/multi_server_provider.dart';
 import '../providers/offline_mode_provider.dart';
 import '../providers/catalog_sources_provider.dart';
+import '../providers/trackers_provider.dart';
 import '../profiles/active_profile_provider.dart';
 import '../profiles/profile.dart';
 import '../utils/provider_extensions.dart';
@@ -282,6 +284,8 @@ class MediaContextMenuState extends State<MediaContextMenu> {
 
   bool _openedFromKeyboard = false;
   bool _isContextMenuOpen = false;
+  String? _favoriteOverrideKey;
+  bool? _favoriteOverride;
 
   bool get isContextMenuOpen => _isContextMenuOpen;
 
@@ -300,7 +304,15 @@ class MediaContextMenuState extends State<MediaContextMenu> {
   /// Returns `null` for playlists.
   MediaItem? get _mediaItem {
     final item = widget.item;
-    return item is MediaItem ? context.readFreshWatchState(item) : null;
+    if (item is! MediaItem) return null;
+    final fresh = context.readFreshWatchState(item);
+    if (_favoriteOverrideKey != fresh.globalKey || _favoriteOverride == null) return fresh;
+    if (fresh.isFavorite == _favoriteOverride) {
+      _favoriteOverride = null;
+      _favoriteOverrideKey = null;
+      return fresh;
+    }
+    return fresh.copyWith(isFavorite: _favoriteOverride);
   }
 
   /// The widget's [item] cast as a [MediaPlaylist]. Returns `null` for media items.
@@ -560,8 +572,9 @@ class MediaContextMenuState extends State<MediaContextMenu> {
         .toList();
     Future<String?> showGroup(String title, List<AppMenuEntry<String>> Function() buildEntries) {
       if (!PlatformDetector.isMobile(context)) {
-        final entries = ValueNotifier<List<AppMenuEntry<String>>>(buildEntries());
-        void updateEntries() => entries.value = buildEntries();
+        List<AppMenuEntry<String>> titledEntries() => [AppMenuHeader(label: title), ...buildEntries()];
+        final entries = ValueNotifier<List<AppMenuEntry<String>>>(titledEntries());
+        void updateEntries() => entries.value = titledEntries();
         actions.addListener(updateEntries);
         return showAdaptiveAppMenu<String>(
           context,
@@ -629,7 +642,6 @@ class MediaContextMenuState extends State<MediaContextMenu> {
       final choice = await showGroup(
         t.detailComposition.moreActions,
         () => [
-          if (!PlatformDetector.isMobile(context)) AppMenuHeader(label: _itemMenuTitle()),
           ..._menuEntries(everyday()),
           if (playback().isNotEmpty)
             AppMenuItem(value: '_playback', icon: Symbols.tune_rounded, label: t.detailComposition.playbackOptions),
@@ -802,6 +814,8 @@ class MediaContextMenuState extends State<MediaContextMenu> {
     final isPartiallyWatched = mediaItem.isPartiallyWatched;
     final hasActiveProgress = isMovieOrEpisode && mediaItem.hasActiveProgress;
     final isVideoKind = mediaItem.isVideoContent;
+    final trackers = context.read<TrackersProvider?>();
+    final canRate = !widget.isOffline && canRateMediaItem(menu.mediaClient, trackers);
     final isUnmatched = _isUnmatched(mediaItem);
 
     // Go to Series (for episodes and seasons) — hide if already on that series' detail screen
@@ -830,15 +844,22 @@ class MediaContextMenuState extends State<MediaContextMenu> {
               ? t.mediaMenu.clearProgress
               : t.mediaMenu.markAsUnwatched,
         ),
-      if (widget.isInContinueWatching && menu.canRemoveFromContinueWatching)
+      if (widget.isInContinueWatching && (menu.canRemoveFromContinueWatching ||
+          (!widget.isOffline && menu.itemServerOnline && context.read<HomeLayoutProvider?>()?.profileId != null)))
         _MenuAction(
           value: 'remove_from_continue_watching',
           icon: Symbols.close_rounded,
-          label: t.mediaMenu.removeFromContinueWatching,
+          label: isHomeNextUp(mediaItem) ? t.mediaMenu.removeFromNextUp : t.mediaMenu.removeFromContinueWatching,
         ),
       if (widget.isInContinueWatching && isVideoKind)
         _MenuAction(value: 'details', icon: Symbols.info_rounded, label: t.mediaMenu.viewDetails),
-      if (isVideoKind) _MenuAction(value: 'rate', icon: Symbols.star_rounded, label: t.mediaMenu.rate),
+      if (isVideoKind && !widget.isOffline && menu.mediaClient?.capabilities.userFavorites == true)
+        _MenuAction(
+          value: 'toggle_favorite',
+          icon: mediaItem.isFavorite == true ? Symbols.heart_minus_rounded : Symbols.favorite_rounded,
+          label: mediaItem.isFavorite == true ? t.rateSheet.removeFavorite : t.rateSheet.addFavorite,
+        ),
+      if (isVideoKind && canRate) _MenuAction(value: 'rate', icon: Symbols.star_rounded, label: t.mediaMenu.rate),
       // Edit Metadata — admin-only and backend-capability gated.
       if (menu.canEditMetadata)
         _MenuAction(value: 'edit_metadata', icon: Symbols.edit_rounded, label: t.metadataEdit.editMetadata),
@@ -1101,6 +1122,20 @@ class MediaContextMenuState extends State<MediaContextMenu> {
       case 'rate':
         if (context.mounted) await _handleRate(context, mediaItem);
         break;
+      case 'toggle_favorite':
+        final client = menu.mediaClient;
+        if (client == null || !client.capabilities.userFavorites) return;
+        try {
+          final value = mediaItem.isFavorite != true;
+          await client.setFavorite(mediaItem, value);
+          if (!mounted) return;
+          _favoriteOverrideKey = mediaItem.globalKey;
+          _favoriteOverride = value;
+          _notifyRefresh(mediaItem);
+        } catch (error) {
+          if (context.mounted) await showErrorDialog(context, t.errors.connectionFailed);
+        }
+        break;
       case 'edit_metadata':
         outcome.didNavigate = true;
         if (context.mounted) await _pushAndRefresh(context, mediaItem, MetadataEditScreen(metadata: mediaItem));
@@ -1214,6 +1249,13 @@ class MediaContextMenuState extends State<MediaContextMenu> {
   /// mark unwatched next episodes as watched.
   Future<void> _handleRemoveFromContinueWatching(BuildContext context, MediaItem item) async {
     try {
+      final client = _getMediaClientForItem();
+      if (!client.capabilities.continueWatchingRemoval) {
+        final home = context.read<HomeLayoutProvider?>();
+        if (home?.profileId == null) return;
+        await home!.hideProgressItem(item);
+        return;
+      }
       await WatchActions.removeFromContinueWatching(context, item);
       if (context.mounted) {
         if (widget.onRemoveFromContinueWatching != null) {
@@ -1303,6 +1345,7 @@ class MediaContextMenuState extends State<MediaContextMenu> {
     }
     if (!context.mounted) return;
     if (candidates.isEmpty) {
+      unawaited(showErrorDialog(context, t.explore.watchlistNoMatch));
       return;
     }
 
@@ -1464,6 +1507,7 @@ class MediaContextMenuState extends State<MediaContextMenu> {
     final profileId = context.read<ActiveProfileProvider>().activeId;
     final serverId = item.serverId;
     final loadingDialog = ScopedLoadingDialogController();
+    final savingDialog = ScopedLoadingDialogController();
 
     try {
       final adapter = metadataEditAdapterFor(client);
@@ -1518,13 +1562,13 @@ class MediaContextMenuState extends State<MediaContextMenu> {
       // sequential PUTs and MediaBrowser re-posts the whole DTO, so the card
       // must not be interactive (and re-launchable) mid-save.
       if (context.mounted) {
-        loadingDialog.show(
+        savingDialog.show(
           context,
           builder: (_) => const PopScope(canPop: false, child: Center(child: CircularProgressIndicator())),
         );
       }
       final saved = await adapter.save(draft);
-      await loadingDialog.dismiss();
+      await savingDialog.dismiss();
 
       if (saved) {
         if (profileId != null && profileId.isNotEmpty && serverId != null) {
@@ -1550,6 +1594,7 @@ class MediaContextMenuState extends State<MediaContextMenu> {
       }
     } finally {
       await loadingDialog.dismiss();
+      await savingDialog.dismiss();
     }
   }
 
@@ -1827,7 +1872,6 @@ class MediaContextMenuState extends State<MediaContextMenu> {
         item: item,
         serverClient: client,
         onServerRatingChanged: (_) => _notifyRefresh(item),
-        onServerFavoriteChanged: (_) => _notifyRefresh(item),
       ),
     );
   }

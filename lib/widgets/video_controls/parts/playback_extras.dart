@@ -41,6 +41,7 @@ extension _PlexVideoControlsPlaybackExtrasMethods on _PlexVideoControlsState {
       _chaptersLoaded = true;
       _markersLoaded = true;
     });
+    widget.onMarkersLoaded?.call(extras.markers);
     _syncCurrentMarkerForCurrentPosition();
   }
 }

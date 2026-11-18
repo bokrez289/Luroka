@@ -5,6 +5,17 @@ import 'package:luroka/connection/connection_registry.dart';
 import 'package:luroka/database/app_database.dart';
 import 'package:luroka/models/plex/plex_home_user.dart';
 import 'package:luroka/media/home_layout.dart';
+import 'package:luroka/media/icon_style.dart';
+import 'package:luroka/media/ids.dart';
+import 'package:luroka/media/library_query.dart';
+import 'package:luroka/media/media_backend.dart';
+import 'package:luroka/media/media_item.dart';
+import 'package:luroka/media/media_kind.dart';
+import 'package:luroka/media/media_library.dart';
+import 'package:luroka/media/media_server_client.dart';
+import 'package:luroka/media/server_capabilities.dart';
+import 'package:luroka/screens/media_detail_screen.dart';
+import 'package:luroka/utils/media_server_http_client.dart';
 import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/navigation/profile_navigation_scope.dart';
 import 'package:luroka/navigation/profile_session_screen.dart';
@@ -125,6 +136,7 @@ void main() {
 
     await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-theme-dark')));
     await tester.tap(find.byKey(const ValueKey('profile-guide-theme-dark')));
+    expect(find.byKey(const ValueKey('icon-style-lucide')), findsNothing);
     await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-posters')));
     await tester.tap(find.byKey(const ValueKey('profile-guide-posters')));
     await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-music')));
@@ -166,6 +178,8 @@ void main() {
     expect(ProfileAppearanceService.instance.personalizationPendingFor('second'), isFalse);
     final settings = SettingsService.instance;
     expect(settings.readForProfile('second', SettingsService.themeMode), app_settings.ThemeMode.dark);
+    expect(settings.readForProfile('second', SettingsService.iconStyle), AppIconStyle.current);
+    expect(settings.readForProfile('first', SettingsService.iconStyle), AppIconStyle.current);
     expect(settings.readForProfile('second', SettingsService.posterDetails), isTrue);
     expect(settings.readForProfile('second', SettingsService.showThemeMusic), isFalse);
     expect(settings.readForProfile('second', SettingsService.showHeroSection), isFalse);
@@ -178,6 +192,66 @@ void main() {
     expect(graph.storage.getHomeLayout('second').hiddenStudios, contains('netflix'));
     expect(graph.storage.getHomeLayout('first').hiddenStudios, isEmpty);
   });
+
+  for (final withServer in [false, true]) {
+  testWidgets('TV guide saves the layout and previews ${withServer ? 'a real show' : 'an empty library'}', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+    final graph = (await tester.runAsync(() async {
+      final graph = await _SessionGraph.create();
+      final profile = Profile.local(id: 'guide-tv', displayName: 'TV', createdAt: DateTime(2026));
+      final first = Profile.local(id: 'guide-first', displayName: 'First', createdAt: DateTime(2026));
+      await graph.profileRegistry.upsert(profile);
+      await graph.profileRegistry.upsert(first);
+      await graph.storage.setActiveProfileId(first.id);
+      await graph.activeProfile.initialize();
+      await SettingsService.instance.prepareProfileSettings([profile.id, first.id]);
+      await ProfileAppearanceService.instance.markPersonalizationPending(profile.id);
+      return graph;
+    }))!;
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+      await tester.runAsync(graph.dispose);
+    });
+    await graph.pump(tester,
+      httpClientFactory: () => FakeHttpClient(200, const <int>[]),
+      profileShellBuilder: (_) => const Scaffold(body: Text('TV home')));
+    await tester.pumpAndSettle();
+    final profile = graph.activeProfile.profiles.singleWhere((p) => p.id == 'guide-tv');
+    expect(await tester.runAsync(() => graph.activeProfile.activate(profile)), isTrue);
+    await tester.pumpAndSettle();
+    final client = _GuidePreviewClient();
+    if (withServer) graph.serverManager.debugRegisterClientForTesting(client, online: true);
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-show-layout-compact')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-show-layout-compact')));
+    await tester.pumpAndSettle();
+    final details = find.byType(MediaDetailScreen);
+    if (withServer) {
+      expect(tester.widget<MediaDetailScreen>(details).metadata.id, 'preview-show');
+      expect(find.byKey(const ValueKey('compact_show_scroll')), findsOneWidget);
+    } else {
+      expect(find.byKey(const ValueKey('profile-guide-show-preview-empty')), findsOneWidget);
+    }
+    await tester.tap(find.byKey(const ValueKey('profile-guide-show-layout-cinematic')));
+    await tester.pumpAndSettle();
+    if (withServer) {
+      expect(tester.widget<MediaDetailScreen>(details).metadata.id, 'preview-show');
+      expect(find.byKey(const ValueKey('compact_show_scroll')), findsNothing);
+      expect(client.libraryReads, 1);
+    }
+    await tester.tap(find.byKey(const ValueKey('profile-guide-show-layout-compact')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-next')));
+    await tester.tap(find.byKey(const ValueKey('profile-guide-next')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('profile-guide-next')));
+    final finish = tester.widget<FilledButton>(find.byKey(const ValueKey('profile-guide-next')));
+    await tester.runAsync(() async => await (finish.onPressed as dynamic)());
+    await tester.pumpAndSettle();
+    expect(SettingsService.instance.readForProfile('guide-tv', SettingsService.showDetailLayout).name, 'compact');
+  });
+  }
 
   testWidgets('an interrupted guide returns on next activation and skipping keeps defaults', (tester) async {
     final graph = (await tester.runAsync(() async {
@@ -727,6 +801,36 @@ void _expectCloseCount(Iterable<FakeHttpClient> clients, int expected) {
   for (final client in clients) {
     expect(client.closeCount, expected);
   }
+}
+
+class _GuidePreviewClient extends Fake implements MediaServerClient {
+  final show = MediaItem.plex(id: 'preview-show', kind: MediaKind.show, title: 'Library Preview Show');
+  int libraryReads = 0;
+  @override
+  ServerId get serverId => ServerId('guide-server');
+  @override
+  String get serverName => 'Guide server';
+  @override
+  MediaBackend get backend => MediaBackend.plex;
+  @override
+  ServerCapabilities get capabilities => ServerCapabilities.plex;
+  @override
+  Future<List<MediaLibrary>> fetchLibraries() async => const [
+    MediaLibrary(id: 'shows', backend: MediaBackend.plex, title: 'Shows', kind: MediaKind.show, serverId: 'guide-server'),
+  ];
+  @override
+  Future<LibraryPage<MediaItem>> fetchLibraryPagedContent(String libraryId,
+      {required LibraryQuery query, MediaKind? libraryKind, AbortController? abort}) async {
+    libraryReads++;
+    return LibraryPage(items: [show], totalCount: 1);
+  }
+  @override
+  Future<({MediaItem? item, MediaItem? onDeckEpisode})> fetchItemWithOnDeck(String id,
+      {void Function(MediaItem item)? onItemReady, bool? isShow}) async => (item: show, onDeckEpisode: null);
+  @override
+  Future<List<MediaItem>> fetchChildren(String parentId) async => const [];
+  @override
+  void close() {}
 }
 
 class _SessionGraph {

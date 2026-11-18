@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:luroka/widgets/media_context_menu.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -15,8 +16,11 @@ import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_hub.dart';
 import 'package:luroka/media/media_item.dart';
 import 'package:luroka/media/media_kind.dart';
+import 'package:luroka/media/media_rating.dart';
+import 'package:luroka/media/show_episode_state.dart';
 import 'package:luroka/services/device_performance.dart';
 import 'package:luroka/services/settings_service.dart';
+import 'package:luroka/services/upcoming_episodes_loader.dart';
 import 'package:luroka/theme/mono_theme.dart';
 import 'package:luroka/utils/platform_detector.dart';
 import 'package:luroka/widgets/home_dashboard.dart';
@@ -25,6 +29,7 @@ import 'package:luroka/widgets/optimized_media_image.dart';
 import 'package:luroka/widgets/cycling_media_backdrop.dart';
 import 'package:luroka/widgets/hub_section.dart';
 import 'package:luroka/widgets/media_card.dart';
+import 'package:luroka/widgets/media_rating_badge.dart';
 import 'package:luroka/widgets/studio_card.dart';
 import 'package:luroka/widgets/tv_screen_insets.dart';
 
@@ -163,6 +168,36 @@ void main() {
     );
     await tester.pumpAndSettle();
     return key;
+  }
+
+  for (final tv in [false, true]) {
+    testWidgets('${tv ? 'TV' : 'phone'} Next Up cards expose progress removal', (tester) async {
+      await mount(tester, tv: tv, size: tv ? const Size(1280, 720) : const Size(400, 800),
+        showFeature: false, onDeck: [], rows: [
+          MediaHub(id: homeNextUpId, title: 'Next Up', type: 'episode', items: [episode]),
+        ]);
+      final menus = tester.widgetList<MediaContextMenu>(find.byType(MediaContextMenu));
+      expect(menus.where((menu) => menu.item == episode && menu.isInContinueWatching), isNotEmpty);
+    });
+    testWidgets('upcoming artwork shows the air date on ${tv ? 'TV' : 'phone'}', (tester) async {
+      final semantics = tester.ensureSemantics();
+      final show = testMediaItem(id: 'show', backend: MediaBackend.plex, kind: MediaKind.show, title: 'A show')
+          .copyWith(serverId: 'server');
+      final tomorrow = DateTime.now().add(const Duration(days: 1));
+      final loader = UpcomingEpisodesLoader(fetchSchedule: (_) async => (imdb: 'tt123', schedule: ShowSchedule(episodes: [
+        ScheduledEpisode(season: 2, number: 3, title: 'A new episode', released: tomorrow),
+      ])));
+      final upcoming = await loader.load(enabled: true, shows: [show]);
+      await mount(tester, tv: tv, size: tv ? const Size(1280, 720) : const Size(400, 800),
+          showFeature: false, onDeck: [], rows: [
+            MediaHub(id: homeUpcomingEpisodesId, title: 'Upcoming episodes', type: 'episode', items: upcoming),
+          ]);
+      expect(find.text('A show'), findsWidgets);
+      expect(find.textContaining('Tomorrow'), findsWidgets);
+      expect(tester.getSemantics(find.byType(MediaCard).first).getSemanticsData().label, contains('Tomorrow'));
+      expect(tester.takeException(), isNull);
+      semantics.dispose();
+    });
   }
 
   String text(WidgetTester tester, String key) =>
@@ -321,7 +356,7 @@ void main() {
     expect(text(tester, 'home_preview_title'), a.title);
     expect(text(tester, 'home_preview_summary'), a.summary);
     expect(text(tester, 'home_preview_metadata'), contains('2026'));
-    expect(find.text('8.4', findRichText: true), findsWidgets);
+    expect(find.text('8.4'), findsOneWidget);
     expect(find.text(t.dashboard.jumpBackIn), findsNothing);
     expect(tester.widgetList<HubSection>(find.byType(HubSection)).every((hub) => !hub.showHeaderIcon), isTrue);
     expect(
@@ -476,6 +511,40 @@ void main() {
       tester.getBottomLeft(find.byKey(const ValueKey('home_browse_summary'))).dy,
       lessThanOrEqualTo(tester.getTopLeft(find.byType(CustomScrollView)).dy),
     );
+  });
+
+  testWidgets('TV browse preview uses about 38 percent of the available Home height', (tester) async {
+    await mount(tester, showFeature: false, size: const Size(1280, 720));
+    final preview = tester.getSize(find.byKey(const ValueKey('home_browse_description'))).height;
+    final home = tester.getSize(find.byType(HomeDashboard)).height;
+    expect(preview / home, closeTo(.38, .01));
+  });
+
+  testWidgets('TV browse preview shows episode details without revealing spoilers', (tester) async {
+    final enriched = episode.copyWith(
+      title: 'The hidden chapter', genres: ['Drama', 'Mystery'], directors: ['A Director'],
+      durationMs: 3600000, viewOffsetMs: 600000,
+      ratings: const [
+        MediaRatingSource(source: 'imdb', value: 8.4),
+        MediaRatingSource(source: 'audience', value: 10),
+        MediaRatingSource(source: 'rottenTomatoesCritic', value: 9),
+      ],
+    );
+    final key = await mount(tester, rows: [
+      MediaHub(id: homeContinueWatchingId, title: t.discover.continueWatching, type: 'episode', items: [enriched]),
+    ]);
+    key.currentState!.requestContentFocus();
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(find.text('The hidden chapter'), findsWidgets);
+    expect(find.text('Drama'), findsWidgets);
+    expect(find.textContaining('A Director'), findsOneWidget);
+    final ratings = tester.widget<InlineRatingBadges>(find.byKey(const ValueKey('home_browse_ratings')));
+    expect(ratings.ratings.map((rating) => rating.source), ['imdb', 'rottenTomatoesCritic']);
+    expect(find.text('8.4'), findsOneWidget);
+    expect(text(tester, 'home_browse_metadata'), contains('Ends at'));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('Resume targets the billboard episode rather than its series', (tester) async {
@@ -806,6 +875,26 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     expect(played?.globalKey, b.globalKey);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('rapid upward navigation restores Spotlight at the top', (tester) async {
+    final rows = [for (var i = 0; i < 8; i++) shelf('Rapid $i', [movie('$i', 'Movie $i')])];
+    final key = await mount(tester, rows: rows);
+    key.currentState!.requestContentFocus();
+    await tester.pumpAndSettle();
+    for (var i = 0; i < 6; i++) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+    }
+    for (var i = 0; i < 7; i++) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pump(const Duration(milliseconds: 30));
+    }
+    await tester.pumpAndSettle();
+    final billboard = find.byKey(const ValueKey('home_feature_billboard'));
+    expect(billboard, findsOneWidget);
+    expect(tester.getTopLeft(billboard).dy, tester.getTopLeft(find.byType(CustomScrollView)).dy);
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'dashboard_play');
   });
 
   testWidgets('late Favorites data does not replace the focused personal Spotlight', (tester) async {

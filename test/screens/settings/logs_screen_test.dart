@@ -165,7 +165,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    expect(find.text(capability, findRichText: true), findsOneWidget);
+    expect(find.text('abcdefghij', findRichText: true), findsOneWidget);
+    expect(find.text(capability, findRichText: true), findsNothing);
     expect(utf8.encode(uploadedBody!).length, lessThanOrEqualTo(maxLogUploadBytes));
     expect(uploadedRequest!.method, 'POST');
     expect(uploadedRequest!.url, Uri.parse('https://ice.luroka.app/logs'));
@@ -176,7 +177,7 @@ void main() {
     expect(uploadedBody, contains('widget upload seed'));
 
     final dialog = find.byType(AlertDialog);
-    final copyButton = find.descendant(of: dialog, matching: find.byType(IconButton));
+    final copyButton = find.descendant(of: dialog, matching: find.byTooltip(t.messages.copyFullLogId));
     expect(copyButton, findsOneWidget);
     await tester.tap(copyButton);
     await tester.pump();

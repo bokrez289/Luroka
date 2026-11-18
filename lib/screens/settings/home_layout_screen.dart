@@ -117,6 +117,29 @@ class _HomeLayoutScreenState extends State<HomeLayoutScreen> {
     }
   }
 
+  Future<void> _editUpcoming() async {
+    final provider = context.read<HomeLayoutProvider>();
+    final layout = provider.layout;
+    final selected = await showAdaptiveAppMenu<String>(context,
+      title: t.homeLayout.upcomingEpisodes,
+      position: Offset(MediaQuery.sizeOf(context).width / 2, MediaQuery.sizeOf(context).height / 3),
+      focusFirstItem: true,
+      entries: [
+        AppMenuItem(value: 'off', label: t.homeLayout.upcomingOff, selected: !layout.upcomingEpisodesEnabled),
+        for (final source in UpcomingEpisodesSource.values)
+          AppMenuItem(value: source.name, selected: layout.upcomingEpisodesEnabled && layout.upcomingEpisodesSource == source,
+            label: switch (source) {
+              UpcomingEpisodesSource.favorites => t.homeLayout.upcomingFavorites,
+              UpcomingEpisodesSource.previouslyWatched => t.homeLayout.upcomingWatched,
+              UpcomingEpisodesSource.both => t.homeLayout.upcomingBoth,
+            }),
+      ]);
+    if (!mounted || selected == null) return;
+    await _save(() => selected == 'off' ? provider.setUpcomingEpisodes(enabled: false)
+        : provider.setUpcomingEpisodes(enabled: true,
+          source: UpcomingEpisodesSource.values.firstWhere((value) => value.name == selected)));
+  }
+
   String _spotlightSourceLabel(HomeSpotlightSource source) => switch (source) {
     HomeSpotlightSource.forYou => t.homeLayout.spotlightForYou,
     HomeSpotlightSource.trending => t.homeLayout.spotlightTrending,
@@ -167,6 +190,8 @@ class _HomeLayoutScreenState extends State<HomeLayoutScreen> {
       splitContinueWatching: provider.layout.splitContinueWatching,
       nextUpTitle: t.discover.nextUp,
       includeEmpty: true,
+      includeUpcomingPlaceholder: provider.layout.upcomingEpisodesEnabled,
+      upcomingTitle: t.homeLayout.upcomingEpisodes,
     );
     final rows = provider.layout.arrange(available, includeHidden: true);
     // Duplicate server rows share presentation preferences; edit each identity once.
@@ -193,6 +218,23 @@ class _HomeLayoutScreenState extends State<HomeLayoutScreen> {
                 : const MobileSettingsPreviewFrame(categoryId: 'home')
           : null,
       children: [
+        if (!KidsProfileService.instance.isActiveKids)
+          SettingNavigationTile(
+            key: const ValueKey('home-upcoming-episodes'),
+            icon: Symbols.event_upcoming_rounded,
+            title: t.homeLayout.upcomingEpisodes,
+            subtitle: provider.layout.upcomingEpisodesEnabled
+                ? switch (provider.layout.upcomingEpisodesSource) {
+                    UpcomingEpisodesSource.favorites => t.homeLayout.upcomingFavorites,
+                    UpcomingEpisodesSource.previouslyWatched => t.homeLayout.upcomingWatched,
+                    UpcomingEpisodesSource.both => t.homeLayout.upcomingBoth,
+                  }
+                : t.homeLayout.upcomingOff,
+            onTap: _saving ? () {} : _editUpcoming,
+          ),
+        if (!KidsProfileService.instance.isActiveKids)
+          Padding(padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+            child: Text(t.homeLayout.upcomingHint, style: Theme.of(context).textTheme.bodySmall)),
         SettingNavigationTile(
           icon: Symbols.movie_rounded,
           title: t.homeLayout.manageStudios,

@@ -687,7 +687,7 @@ extension _TitlePagePresentation on _MediaDetailScreenState {
                   fallbackColor: bg,
                 ),
               ),
-              RasterizedGradient(
+              BackdropScrim(
                 gradient: LinearGradient(
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
@@ -695,7 +695,7 @@ extension _TitlePagePresentation on _MediaDetailScreenState {
                   stops: const [0, 0.28, 0.58, 1],
                 ),
               ),
-              RasterizedGradient(
+              BackdropScrim(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,

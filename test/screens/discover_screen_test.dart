@@ -50,6 +50,7 @@ import 'package:luroka/theme/mono_theme.dart';
 import 'package:luroka/utils/platform_detector.dart';
 import 'package:luroka/utils/media_server_http_client.dart';
 import 'package:luroka/utils/watch_state_notifier.dart';
+import 'package:luroka/utils/external_ids.dart';
 import 'package:luroka/watch_together/watch_together.dart';
 import 'package:luroka/widgets/side_navigation_rail.dart';
 import 'package:luroka/widgets/tv_browse_rail.dart';
@@ -358,6 +359,36 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('Saved outside Home'), findsNothing);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Upcoming both sources do no discovery while disabled or hidden and cancel a late library result', (tester) async {
+    final client = _UpcomingHomeClient();
+    final layout = (await _pumpDiscoverShell(tester, isTv: true, customize: true, fakeClient: client,
+      profiles: [Profile.local(id: 'custom-profile', displayName: 'Viewer', createdAt: DateTime(2026))],
+      activeProfileId: 'custom-profile'))!;
+    final context = tester.element(find.byType(DiscoverScreen));
+    await context.read<LibrariesProvider>().updateLibraryOrder(const [
+      MediaLibrary(id: 'shows', title: 'Shows', kind: MediaKind.show,
+        backend: MediaBackend.jellyfin, serverId: 'server_1'),
+    ]);
+    await tester.pump(const Duration(seconds: 4));
+    expect(client.libraryCalls, 0);
+    final key = homeRowKey(const MediaHub(id: homeUpcomingEpisodesId, title: '', type: 'episode', items: []));
+    await layout.setHidden(key, true);
+    await layout.setUpcomingEpisodes(enabled: true, source: UpcomingEpisodesSource.both);
+    await tester.pump(const Duration(seconds: 4));
+    expect(client.libraryCalls, 0);
+    await layout.setHidden(key, false);
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 3));
+    expect(client.libraryCalls, 1);
+    await layout.setHidden(key, true);
+    client.page.complete(LibraryPage(items: [testMediaItem(id: 'series', kind: MediaKind.show,
+      backend: MediaBackend.jellyfin, title: 'Series', serverId: 'server_1', libraryId: 'shows')], totalCount: 1));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 4));
+    expect(client.idCalls, 0, reason: 'a hidden row cannot start schedule discovery after the library responds');
+    expect(find.text(t.homeLayout.upcomingEpisodes), findsNothing);
   });
 
   testWidgets('Home reads local profile activity after loading without replacing the focused title', (tester) async {
@@ -1225,6 +1256,30 @@ class _FavoriteHomeClient extends _FakeMediaServerClient {
       ],
       totalCount: 1,
     );
+  }
+}
+
+class _UpcomingHomeClient extends _FakeMediaServerClient {
+  _UpcomingHomeClient() : super(hubs: const []);
+  int libraryCalls = 0;
+  int idCalls = 0;
+  final page = Completer<LibraryPage<MediaItem>>();
+  @override
+  MediaBackend get backend => MediaBackend.jellyfin;
+  @override
+  ServerCapabilities get capabilities => ServerCapabilities.jellyfin;
+  @override
+  Future<List<MediaLibrary>> fetchLibraries() async => const [];
+  @override
+  Future<LibraryPage<MediaItem>> fetchLibraryPagedContent(String libraryId,
+      {required LibraryQuery query, MediaKind? libraryKind, AbortController? abort}) {
+    libraryCalls++;
+    return page.future;
+  }
+  @override
+  Future<ExternalIds> fetchExternalIds(String itemId) async {
+    idCalls++;
+    return const ExternalIds();
   }
 }
 

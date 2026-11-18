@@ -299,6 +299,7 @@ extension _VideoPlayerPlaybackServiceMethods on VideoPlayerScreenState {
           promptVisible: _episode.showPlayNextDialog,
           countdownActive: _episode.autoPlayTimer?.isActive == true,
         );
+        _updateEarlyNextPrompt(position, duration, settingsService);
       }),
     );
   }
@@ -656,6 +657,7 @@ extension _VideoPlayerPlaybackServiceMethods on VideoPlayerScreenState {
         TrackerCoordinator.instance.updateDuration(currentPlayer.state.duration);
       }),
     );
+
 
     _mediaControlSubscriptions.add(
       currentPlayer.streams.seekable.listen((_) {

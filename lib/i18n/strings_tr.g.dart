@@ -3415,6 +3415,10 @@ class _Translations$videoSettings$tr extends Translations$videoSettings$en {
 	@override String get zoom => 'Yakınlaştırma';
 	@override String get sleepTimer => 'Uyku Zamanlayıcısı';
 	@override String get audioSync => 'Ses Senkronizasyonu';
+	@override String get resyncPlayback => 'Oynatmayı yeniden eşitle';
+	@override String get resyncPlaybackDescription => 'Geçerli konumda ses ve görüntüyü yenile';
+	@override String get resyncPlaybackDone => 'Yeniden eşitleme istendi';
+	@override String get resyncPlaybackFailed => 'Oynatma yeniden eşitlenemedi';
 	@override String get subtitleSync => 'Altyazı Senkronizasyonu';
 	@override String get hdr => 'HDR';
 	@override String get hdrUnsupported => 'HDR burada kullanılamıyor — bu masaüstü birleştiricisi veya video çıkışı HDR\'yi taşıyamıyor.';
@@ -7712,6 +7716,10 @@ extension on TranslationsTr {
 			'videoSettings.zoom' => 'Yakınlaştırma',
 			'videoSettings.sleepTimer' => 'Uyku Zamanlayıcısı',
 			'videoSettings.audioSync' => 'Ses Senkronizasyonu',
+			'videoSettings.resyncPlayback' => 'Oynatmayı yeniden eşitle',
+			'videoSettings.resyncPlaybackDescription' => 'Geçerli konumda ses ve görüntüyü yenile',
+			'videoSettings.resyncPlaybackDone' => 'Yeniden eşitleme istendi',
+			'videoSettings.resyncPlaybackFailed' => 'Oynatma yeniden eşitlenemedi',
 			'videoSettings.subtitleSync' => 'Altyazı Senkronizasyonu',
 			'videoSettings.hdr' => 'HDR',
 			'videoSettings.hdrUnsupported' => 'HDR burada kullanılamıyor — bu masaüstü birleştiricisi veya video çıkışı HDR\'yi taşıyamıyor.',
@@ -7928,12 +7936,12 @@ extension on TranslationsTr {
 			'seerr.requestFailed' => ({required Object error}) => 'İstek başarısız oldu: ${error}',
 			'seerr.requestsLoadFailed' => 'İstek seçenekleri yüklenemedi',
 			'seerr.nothingToRequest' => 'Her şey zaten mevcut veya istendi.',
+			_ => null,
+		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Mevcut',
 			'seerr.statusPartiallyAvailable' => 'Kısmen mevcut',
 			'seerr.statusRequested' => 'İstendi',
 			'seerr.statusProcessing' => 'İşleniyor',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusBlocklisted' => 'Engelleme listesinde',
 			'seerr.couldNotReach' => ({required Object url, required Object error}) => '${url} adresine ulaşılamadı: ${error}',
 			'seerr.noInstanceAtUrl' => ({required Object url, required Object status}) => '${url} adresinde Seerr örneği bulunamadı (HTTP ${status})',

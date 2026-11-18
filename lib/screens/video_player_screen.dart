@@ -1285,6 +1285,15 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
   bool get debugPlayNextPromptVisibleForTesting => _episode.showPlayNextDialog;
 
   @visibleForTesting
+  void debugUpdateEarlyNextForTesting(Duration position, Duration duration, {int? creditsStartMs}) {
+    _episode.creditsStartMs = creditsStartMs;
+    _updateEarlyNextPrompt(position, duration, SettingsService.instance);
+  }
+
+  @visibleForTesting
+  void debugDismissNextForTesting() => _cancelAutoPlay();
+
+  @visibleForTesting
   int get debugAutoPlayCountdownForTesting => _episode.autoPlayCountdown.value;
 
   @visibleForTesting

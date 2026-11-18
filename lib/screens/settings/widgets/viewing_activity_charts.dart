@@ -20,6 +20,7 @@ import '../../../theme/mono_tokens.dart';
 import '../../../utils/formatters.dart';
 import '../../../utils/media_image_helper.dart';
 import '../../../utils/platform_detector.dart';
+import '../../../utils/media_server_http_client.dart';
 import '../../../widgets/app_icon.dart';
 import '../../../widgets/optimized_media_image.dart';
 
@@ -598,7 +599,7 @@ class StatsTopTitlesRail extends StatelessWidget {
   const StatsTopTitlesRail({super.key, required this.entries, this.artworkFor, this.onOpenFor});
 
   final List<ScreenTimeTopTitle> entries;
-  final ({MediaServerClient? client, String? path})? Function(ScreenTimeTopTitle entry)? artworkFor;
+  final ({MediaServerClient? client, String? path, String? episodeId})? Function(ScreenTimeTopTitle entry)? artworkFor;
   final VoidCallback? Function(ScreenTimeTopTitle entry)? onOpenFor;
 
   @override
@@ -619,11 +620,12 @@ class StatsTopTitlesRail extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              OptimizedMediaImage(
+              _ActivityPoster(
                 client: artwork?.client,
                 imagePath: artwork?.path,
-                fit: BoxFit.cover,
-                imageType: ImageType.poster,
+                episodeId: artwork?.episodeId,
+                width: cardWidth,
+                height: posterHeight,
                 fallbackIcon: statsKindIcon(entry.kind),
               ),
               Positioned(
@@ -693,6 +695,78 @@ class StatsTopTitlesRail extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Old activity records contain an episode still. Resolve its series poster
+/// for the portrait rail; keep the saved still as a fallback for offline data.
+class _ActivityPoster extends StatefulWidget {
+  const _ActivityPoster({required this.client, required this.imagePath, required this.episodeId,
+    required this.width, required this.height, required this.fallbackIcon});
+  final MediaServerClient? client;
+  final String? imagePath;
+  final String? episodeId;
+  final double width;
+  final double height;
+  final IconData fallbackIcon;
+  @override
+  State<_ActivityPoster> createState() => _ActivityPosterState();
+}
+
+class _ActivityPosterState extends State<_ActivityPoster> {
+  AbortController? _abort;
+  String? _poster;
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(_ActivityPoster oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.client != widget.client || oldWidget.episodeId != widget.episodeId) {
+      _abort?.abort();
+      _poster = null;
+      _load();
+    }
+  }
+
+  Future<void> _load() async {
+    final client = widget.client;
+    final id = widget.episodeId;
+    if (client == null || id == null) return;
+    final abort = _abort = AbortController();
+    try {
+      final item = client is PreviewMetadataClient
+          ? await (client as PreviewMetadataClient).fetchPreviewItem(id, abort: abort)
+          : await client.fetchItem(id).timeout(const Duration(seconds: 8));
+      if (!mounted || abort.isAborted || item?.id != id || item?.backend != client.backend ||
+          (item?.serverId != null && item?.serverId != client.serverId)) {
+        return;
+      }
+      final poster = item?.grandparentThumbPath;
+      if (poster != null && poster.isNotEmpty) setState(() => _poster = poster);
+    } catch (_) {
+      // The saved artwork remains usable when the server is unavailable.
+    }
+  }
+
+  @override
+  void dispose() {
+    _abort?.abort();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => OptimizedMediaImage(
+    client: widget.client,
+    imagePath: _poster ?? widget.imagePath,
+    width: widget.width,
+    height: widget.height,
+    fit: BoxFit.cover,
+    imageType: ImageType.poster,
+    fallbackIcon: widget.fallbackIcon,
+  );
 }
 
 /// Contribution-grid view of daily watch time (weeks as columns, weekdays as
