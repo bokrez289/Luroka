@@ -3256,7 +3256,7 @@ void main() {
               MediaRatingSource(source: '', value: 6.4),
             ],
           );
-      final client = _FakeMediaServerClient(show: movie, childrenByParent: const {});
+      final client = _FakeMediaServerClient(show: movie, childrenByParent: const {}, numericRatings: true);
 
       await pumpPhoneDetail(
         tester,
@@ -3339,7 +3339,7 @@ void main() {
         serverId: 'server_1',
         serverName: 'Server',
       );
-      final client = _FakeMediaServerClient(show: movie, childrenByParent: const {});
+      final client = _FakeMediaServerClient(show: movie, childrenByParent: const {}, numericRatings: true);
 
       await pumpPhoneDetail(
         tester,
@@ -4512,6 +4512,7 @@ class _ScheduledShowClient extends _FakeMediaServerClient {
 }
 
 class _FakeMediaServerClient implements MediaServerClient {
+  final bool numericRatings;
   final favoriteWrites = <bool>[];
 
   @override
@@ -4554,6 +4555,7 @@ class _FakeMediaServerClient implements MediaServerClient {
 
   _FakeMediaServerClient({
     required this.show,
+    this.numericRatings = false,
     required this.childrenByParent,
     this.childrenPageFutures = const {},
     Map<String, Future<List<MediaItem>>>? childrenPageFuturesByStart,
@@ -4577,7 +4579,7 @@ class _FakeMediaServerClient implements MediaServerClient {
   MediaBackend get backend => MediaBackend.jellyfin;
 
   @override
-  ServerCapabilities get capabilities => ServerCapabilities.jellyfin;
+  ServerCapabilities get capabilities => numericRatings ? ServerCapabilities.plex : ServerCapabilities.jellyfin;
 
   @override
   Future<({MediaItem? item, MediaItem? onDeckEpisode})> fetchItemWithOnDeck(

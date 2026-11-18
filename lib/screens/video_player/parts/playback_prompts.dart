@@ -3,7 +3,9 @@ part of '../../video_player_screen.dart';
 extension _VideoPlayerPlaybackPromptMethods on VideoPlayerScreenState {
   void _updateEarlyNextPrompt(Duration position, Duration duration, SettingsService settings) {
     if (!mounted || _shuttingDown || widget.isLive || !_currentMetadata.isEpisode ||
-        duration.inMilliseconds <= 0 || !_firstFrame.uiReady.value) return;
+        duration.inMilliseconds <= 0 || !_firstFrame.uiReady.value) {
+      return;
+    }
     final end = duration.inMilliseconds;
     final credits = _episode.creditsStartMs;
     final threshold = credits != null && credits > 0 && credits < end ? credits : (end - 30000).clamp(0, end);
@@ -26,7 +28,9 @@ extension _VideoPlayerPlaybackPromptMethods on VideoPlayerScreenState {
         _episode.next == null || !_episode.next!.isEpisode || !_canNavigateMediaItems() ||
         _showStillWatchingPrompt || SleepTimerService().isEndOfVideoMode ||
         _watchTogetherRoom() != null || PipService().isPipActive.value ||
-        (_progressTracker?.stoppedByServer ?? false) || !(player?.state.playing ?? false)) return;
+        (_progressTracker?.stoppedByServer ?? false) || !(player?.state.playing ?? false)) {
+      return;
+    }
     final autoplay = settings.read(SettingsService.autoPlayNextEpisode);
     final seconds = settings.read(SettingsService.playNextCountdown);
     _setPlayerState(() {
@@ -241,7 +245,9 @@ extension _VideoPlayerPlaybackPromptMethods on VideoPlayerScreenState {
       }
       if (_episode.earlyPrompt &&
           ((player?.state.buffering ?? false) ||
-              (!(player?.state.playing ?? false) && !(player?.state.completed ?? false)))) return;
+              (!(player?.state.playing ?? false) && !(player?.state.completed ?? false)))) {
+        return;
+      }
       final nextCountdown = _episode.autoPlayCountdown.value - 1;
       _episode.autoPlayCountdown.value = nextCountdown;
       if (nextCountdown <= 0) {

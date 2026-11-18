@@ -524,14 +524,14 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
     Future<void> toggleFavorite() async {
       if (!_canUseDetail || favoriteClient == null || _favoriteMutationInFlight) return;
       final favorite = metadata.isFavorite != true;
-      setState(() => _favoriteMutationInFlight = true);
+      setStateIfMounted(() => _favoriteMutationInFlight = true);
       try {
         await favoriteClient.setFavorite(metadata, favorite);
-        if (_canUseDetail) setState(() => _fullMetadata = _metadata.copyWith(isFavorite: favorite));
+        if (_canUseDetail) setStateIfMounted(() => _fullMetadata = _metadata.copyWith(isFavorite: favorite));
       } catch (error) {
         if (context.mounted) showErrorDialog(context, t.errors.connectionFailed);
       } finally {
-        if (mounted) setState(() => _favoriteMutationInFlight = false);
+        if (mounted) setStateIfMounted(() => _favoriteMutationInFlight = false);
       }
     }
 
