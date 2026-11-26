@@ -7,6 +7,9 @@ import 'package:luroka/connection/connection_registry.dart';
 import 'package:luroka/database/app_database.dart';
 import 'package:luroka/models/plex/plex_home_user.dart';
 import 'package:luroka/profiles/profile.dart';
+import 'package:luroka/profiles/profile_registry.dart';
+import 'package:luroka/profiles/profile_connection.dart';
+import 'package:luroka/profiles/profile_connection_registry.dart';
 import 'package:luroka/services/base_shared_preferences_service.dart';
 import 'package:luroka/services/credential_vault.dart';
 import 'package:luroka/services/luroka_backup_crypto.dart';
@@ -14,6 +17,91 @@ import 'package:luroka/services/luroka_backup_snapshot.dart';
 import '../test_helpers/prefs.dart';
 
 void main() {
+  test('local profile restores its linked Plex account and only its Home identity', () async {
+    resetSharedPreferencesForTest();
+    CredentialVault.resetKeyForTesting();
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+    await ProfileRegistry(db).upsert(Profile.local(id: 'local', displayName: 'Luka', createdAt: DateTime(2026)));
+    await ProfileRegistry(db).upsert(Profile.local(id: 'other', displayName: 'Other', createdAt: DateTime(2026)));
+    await ConnectionRegistry(db).upsert(
+      PlexAccountConnection(
+        id: 'plex',
+        accountToken: 'plex-owner-token',
+        clientIdentifier: 'device',
+        accountLabel: 'Plex',
+        createdAt: DateTime(2026),
+      ),
+    );
+    await ProfileConnectionRegistry(db).upsert(
+      const ProfileConnection(
+        profileId: 'local',
+        connectionId: 'plex',
+        userIdentifier: 'home-user',
+        userToken: 'home-token',
+      ),
+    );
+    final prefs = await BaseSharedPreferencesService.sharedCache();
+    await prefs.setString(
+      'plex_home_users_plex',
+      jsonEncode([
+        {'id': 1, 'uuid': 'home-user', 'title': 'My Home', 'protected': true, 'restricted': true},
+        {'id': 2, 'uuid': 'another-user', 'title': 'Other Home', 'protected': false},
+      ]),
+    );
+    final encrypted = await LurokaBackupSnapshot.exportSelected(
+      db,
+      'test password',
+      selectedProfileIds: {'local'},
+      includeCredentials: true,
+    );
+    final payload = await LurokaBackupCrypto.decrypt(encrypted, 'test password');
+    LurokaBackupSnapshot.validateSelectedPayload(payload, expectedProfileIds: {'local'}, includeCredentials: true);
+    expect(jsonEncode(payload), contains('plex-owner-token'));
+    expect(jsonEncode(payload), isNot(contains('another-user')));
+    final home = jsonDecode((payload['preferences'] as Map)['plex_home_users_plex'] as String) as List;
+    expect(home.single['uuid'], 'home-user');
+    expect(home.single['protected'], isTrue);
+    expect(home.single['restricted'], isTrue);
+    final preferences = payload['preferences'] as Map;
+    final scopedCache = preferences['plex_home_users_plex'];
+    preferences['plex_home_users_plex'] = jsonEncode([
+      ...home,
+      {'id': 2, 'uuid': 'another-user', 'title': 'Other Home'},
+    ]);
+    expect(
+      () => LurokaBackupSnapshot.validateSelectedPayload(
+        payload,
+        expectedProfileIds: {'local'},
+        includeCredentials: true,
+      ),
+      throwsFormatException,
+    );
+    preferences['plex_home_users_plex'] = scopedCache;
+    final withoutCredentials = await LurokaBackupSnapshot.exportSelected(
+      db,
+      'test password',
+      selectedProfileIds: {'local'},
+      includeCredentials: false,
+    );
+    final withoutSecrets = await LurokaBackupCrypto.decrypt(withoutCredentials, 'test password');
+    expect(withoutSecrets['connections'], isEmpty);
+    expect(withoutSecrets['profileConnections'], isEmpty);
+    expect((withoutSecrets['preferences'] as Map).containsKey('plex_home_users_plex'), isFalse);
+
+    resetSharedPreferencesForTest();
+    CredentialVault.resetKeyForTesting();
+    final restored = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(restored.close);
+    await LurokaBackupSnapshot.restore(restored, encrypted, 'test password');
+    final account = await ConnectionRegistry(restored).get('plex') as PlexAccountConnection;
+    expect(account.accountToken, 'plex-owner-token');
+    final binding = (await ProfileConnectionRegistry(restored).listForProfile('local')).single;
+    expect(binding.userIdentifier, 'home-user');
+    expect(binding.userToken, 'home-token');
+    expect((await BaseSharedPreferencesService.sharedCache()).getString('plex_home_users_plex'), contains('home-user'));
+    expect((await restored.select(restored.profiles).get()).map((p) => p.id), ['local']);
+  });
   test('selected Plex Home identity restores using only its scoped cache entry', () async {
     resetSharedPreferencesForTest();
     CredentialVault.resetKeyForTesting();

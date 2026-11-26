@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import '../../focus/focusable_button.dart';
 import '../../focus/focusable_wrapper.dart';
 import '../../i18n/strings.g.dart';
@@ -10,10 +13,14 @@ import '../../media/media_server_client.dart';
 import '../../services/kids_profile_service.dart';
 import '../../services/settings_service.dart' hide ThemeMode;
 import '../../utils/platform_detector.dart';
-import '../../utils/app_identity.dart';
+import '../../utils/media_image_helper.dart';
+import '../../utils/error_dialog.dart';
+import '../../theme/kids_style.dart';
+import '../app_menu.dart';
+import 'kids_avatar.dart';
+import 'kids_shelf_spotlight.dart';
 import '../../media/media_item_types.dart';
 import '../optimized_media_image.dart';
-import '../movie_copy_picker.dart';
 
 /// Illustrated landing with independent, horizontally browsable rows. Artwork
 /// is bundled; media and progress always belong to the active child's library.
@@ -31,6 +38,7 @@ class KidsMovieShelf extends StatefulWidget {
     required this.onResume,
     required this.onSidebar,
     required this.onToolbar,
+    this.onBrowse,
     this.loading = false,
     this.error,
     this.onRetry,
@@ -43,6 +51,7 @@ class KidsMovieShelf extends StatefulWidget {
   final MediaServerClient? Function(MediaItem) resolveClient;
   final ValueChanged<MediaItem> onPlay, onDetails, onResume;
   final VoidCallback onSidebar, onToolbar;
+  final ValueChanged<MediaKind>? onBrowse;
   final bool loading;
   final String? error;
   final VoidCallback? onRetry;
@@ -52,14 +61,73 @@ class KidsMovieShelf extends StatefulWidget {
 
 class KidsMovieShelfState extends State<KidsMovieShelf> {
   static const _ink = Color(0xff071529);
-  static const _yellow = Color(0xffffdc55);
-  final _filters = List.generate(3, (i) => FocusNode(debugLabel: 'kids-shelf-filter-$i'));
+  Color get _yellow => _quiet ? const Color(0xff89ecd3) : const Color(0xffffdc55);
+  bool get _quiet {
+    final kids = KidsProfileService.instance;
+    return kids.activeId != null && kids.quietSceneryFor(kids.activeId!);
+  }
+
+  final _filters = List.generate(2, (i) => FocusNode(debugLabel: 'kids-shelf-filter-$i'));
   final _cards = <String, FocusNode>{};
   final _rowAnchors = <String, GlobalKey>{};
   final _remembered = <String, String>{};
   final _scroll = ScrollController();
-  int _filter = 0;
+  int _shortcut = 0;
   String? _lastCard;
+  String? _spotlightCard;
+  Timer? _settle;
+  final _stage = GlobalKey();
+  int _previewRequest = 0;
+
+  bool _hideSpoiler(MediaItem item) =>
+      item.isEpisode &&
+      item.shouldHideSpoiler &&
+      (SettingsService.instanceOrNull?.read(SettingsService.hideSpoilers) ?? false);
+
+  void _cardFocus(String id, MediaItem item, bool focused) {
+    if (focused) {
+      _lastCard = id;
+      if (!PlatformDetector.isTV()) return;
+      _settle?.cancel();
+      final request = ++_previewRequest;
+      _settle = Timer(const Duration(milliseconds: 220), () async {
+        if (!mounted || _cards[id]?.hasPrimaryFocus != true || !KidsProfileService.instance.allows(item)) return;
+        final size = _stage.currentContext?.size;
+        final path = KidsShelfSpotlight.backdrop(item, _hideSpoiler(item));
+        if (size != null && path != null) {
+          final image = OptimizedMediaImage(
+            client: widget.resolveClient(item),
+            imagePath: path,
+            imageType: ImageType.featureArt,
+          );
+          final (_, provider) = image.resolveNetworkImage(
+            context,
+            size.width * KidsShelfSpotlight.artFraction,
+            size.height,
+          );
+          if (provider != null) {
+            // Keep the current scene while artwork decodes. A stalled server
+            // mustn't keep the new title and its fallback off-screen indefinitely.
+            await precacheImage(
+              provider,
+              context,
+              onError: (_, _) {},
+            ).timeout(const Duration(milliseconds: 900), onTimeout: () {});
+          }
+        }
+        if (mounted && request == _previewRequest && _cards[id]?.hasPrimaryFocus == true) {
+          setState(() => _spotlightCard = id);
+        }
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _cards[_lastCard]?.hasFocus == true) return;
+        _settle?.cancel();
+        if (_spotlightCard != null) setState(() => _spotlightCard = null);
+      });
+    }
+  }
+
   final Map<String, List<MediaItem>> _copies = {};
 
   @override
@@ -71,6 +139,9 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
   void _policyChanged() {
     if (mounted) {
       _lastCard = null;
+      _previewRequest++;
+      _settle?.cancel();
+      _spotlightCard = null;
       setState(() {});
     }
   }
@@ -81,7 +152,7 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
     if (previous?.context != null && previous!.canRequestFocus) {
       previous.requestFocus();
     } else {
-      _filters[_filter].requestFocus();
+      _filters[_shortcut].requestFocus();
     }
   }
 
@@ -91,19 +162,29 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
     for (final node in [..._filters, ..._cards.values]) {
       node.dispose();
     }
+    _settle?.cancel();
     _scroll.dispose();
     super.dispose();
   }
 
   void _focusRow(_KidsRow row) {
-    final key = _remembered[row.id] ?? '${row.id}:${row.items.first.globalKey}';
+    final remembered = _remembered[row.id];
+    final key = row.items.any((item) => '${row.id}:${item.globalKey}' == remembered)
+        ? remembered!
+        : '${row.id}:${row.items.first.globalKey}';
     final anchor = _rowAnchors[row.id]?.currentContext;
-    if (anchor != null) Scrollable.ensureVisible(anchor, alignment: .15);
+    if (anchor != null) Scrollable.ensureVisible(anchor, alignment: 0);
+    final target = _cards[key];
+    if (target?.context != null) {
+      target!.requestFocus();
+      return;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final node = _cards[key];
       if (node?.context != null) node!.requestFocus();
     });
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
 
   List<_KidsRow> _rows() {
@@ -123,11 +204,7 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
     final count = (SettingsService.instanceOrNull?.read(SettingsService.homeShelfItemCount) ?? 16).clamp(16, 48);
     final resume = kids
         .filter(widget.onDeck, continueWatching: true)
-        .where(
-          (item) =>
-              resumeSeen.add(item.globalKey) &&
-              (_filter == 0 || (_filter == 1 ? item.kind == MediaKind.movie : item.kind != MediaKind.movie)),
-        )
+        .where((item) => resumeSeen.add(item.globalKey))
         .take(count)
         .toList();
     final movies = titles.where((item) => item.kind == MediaKind.movie).take(count).toList();
@@ -135,8 +212,8 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
     return [
       if (resume.isNotEmpty)
         _KidsRow('resume', t.kidsHome.keepWatching, Icons.play_circle_fill_rounded, resume, resume: true),
-      if (_filter != 2 && movies.isNotEmpty) _KidsRow('movies', t.kidsShelf.movieShelf, Icons.movie_rounded, movies),
-      if (_filter != 1 && shows.isNotEmpty) _KidsRow('shows', t.kidsShelf.showShelf, Icons.tv_rounded, shows),
+      if (movies.isNotEmpty) _KidsRow('movies', t.kidsShelf.movieShelf, Icons.movie_rounded, movies),
+      if (shows.isNotEmpty) _KidsRow('shows', t.kidsShelf.showShelf, Icons.tv_rounded, shows),
     ];
   }
 
@@ -147,98 +224,169 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
     final width = MediaQuery.sizeOf(context).width;
     final inset = tv ? (width * .045).clamp(24.0, 70.0) : 18.0;
     final scale = MediaQuery.textScalerOf(context).scale(14) / 14;
+    final shelf = CustomScrollView(
+      key: const ValueKey('kids-movie-shelf'),
+      controller: _scroll,
+      scrollCacheExtent: ScrollCacheExtent.pixels(tv ? 720 : 240),
+      slivers: [
+        if (!tv)
+          SliverToBoxAdapter(
+            child: _header(context, tv: false, inset: inset, rows: rows),
+          ),
+        if (widget.loading && rows.isEmpty)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: LinearProgressIndicator(color: _yellow),
+            ),
+          ),
+        if (rows.isEmpty && !widget.loading)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  Icon(
+                    widget.error == null ? Icons.local_movies_outlined : Icons.cloud_off_outlined,
+                    size: 48,
+                    color: _yellow,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    widget.error ?? t.kids.emptyHint,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                  if (widget.error != null && widget.onRetry != null)
+                    TextButton(onPressed: widget.onRetry, child: Text(t.common.retry)),
+                ],
+              ),
+            ),
+          ),
+        for (var r = 0; r < rows.length; r++)
+          SliverToBoxAdapter(
+            child: Column(
+              key: _rowAnchors.putIfAbsent(rows[r].id, GlobalKey.new),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(inset, r == 0 ? 0 : 8, inset, 12),
+                  child: Row(
+                    children: [
+                      Icon(rows[r].icon, color: _yellow, size: tv ? 26 : 22),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          rows[r].title,
+                          style: TextStyle(color: Colors.white, fontSize: tv ? 20 : 18, fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                LayoutBuilder(
+                  builder: (context, bounds) {
+                    final cardWidth = tv
+                        ? ((bounds.maxWidth - inset * 2 - 48) / (rows[r].resume ? 4 : 5)).clamp(165.0, 310.0)
+                        : (bounds.maxWidth * (rows[r].resume ? .56 : .42)).clamp(130.0, 220.0);
+                    final cardHeight = cardWidth / (tv || rows[r].resume ? 16 / 9 : 1.25) + 48 * scale;
+                    return SizedBox(
+                      height: cardHeight + 20,
+                      child: ListView.separated(
+                        key: PageStorageKey('kids-row-${rows[r].id}'),
+                        padding: EdgeInsets.fromLTRB(inset, 4, inset, 16),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: rows[r].items.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 14),
+                        itemBuilder: (context, index) => _tile(
+                          context,
+                          rows[r],
+                          rows[r].items[index],
+                          cardWidth,
+                          onUp: r == 0 ? _filters[_shortcut].requestFocus : () => _focusRow(rows[r - 1]),
+                          onDown: r + 1 < rows.length ? () => _focusRow(rows[r + 1]) : null,
+                          first: index == 0,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        if (tv && rows.isNotEmpty)
+          SliverLayoutBuilder(
+            builder: (context, constraints) {
+              final last = rows.last;
+              final cardWidth = ((constraints.crossAxisExtent - inset * 2 - 48) / (last.resume ? 4 : 5)).clamp(
+                165.0,
+                310.0,
+              );
+              final cardHeight = cardWidth / (16 / 9) + 48 * scale + 20;
+              // Allow the final row to reach the top even when it is shorter
+              // than the viewport; otherwise the preceding row stays clipped.
+              final space = (constraints.viewportMainAxisExtent - cardHeight).clamp(24.0, double.infinity);
+              return SliverToBoxAdapter(child: SizedBox(height: space));
+            },
+          )
+        else
+          SliverToBoxAdapter(child: SizedBox(height: 24 + MediaQuery.paddingOf(context).bottom)),
+      ],
+    );
+    // The welcome and the spotlight occupy exactly the same stage. Only the
+    // rails scroll, so changing focus never moves the selected poster.
+    MediaItem? selected;
+    bool resume = false;
+    if (tv && _spotlightCard != null) {
+      for (final row in rows) {
+        final match = row.items.where((i) => '${row.id}:${i.globalKey}' == _spotlightCard).firstOrNull;
+        if (match != null) {
+          selected = match;
+          resume = row.resume;
+          break;
+        }
+      }
+    }
     return Material(
       color: _ink,
       child: SafeArea(
         bottom: false,
-        child: CustomScrollView(
-          key: const ValueKey('kids-movie-shelf'),
-          controller: _scroll,
-          slivers: [
-            SliverToBoxAdapter(
-              child: _header(context, tv: tv, inset: inset, rows: rows),
-            ),
-            if (widget.loading && rows.isEmpty)
-              const SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: LinearProgressIndicator(color: _yellow),
-                ),
-              ),
-            if (rows.isEmpty && !widget.loading)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
+        child: !tv
+            ? shelf
+            : Column(
+                children: [
+                  Stack(
+                    key: _stage,
                     children: [
-                      Text(
-                        widget.error ?? t.kids.emptyHint,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white70),
+                      IgnorePointer(
+                        ignoring: selected != null,
+                        child: ExcludeSemantics(
+                          excluding: selected != null,
+                          child: Opacity(
+                            opacity: selected == null ? 1 : 0,
+                            child: _header(context, tv: true, inset: inset, rows: rows),
+                          ),
+                        ),
                       ),
-                      if (widget.onRetry != null) TextButton(onPressed: widget.onRetry, child: Text(t.common.retry)),
+                      if (selected != null)
+                        Positioned.fill(
+                          child: IgnorePointer(
+                            child: KidsShelfSpotlight(
+                              key: ValueKey('spotlight:${selected.globalKey}'),
+                              item: selected,
+                              client: widget.resolveClient(selected),
+                              quiet: _quiet,
+                              inset: inset,
+                              resume: resume,
+                              spoiler: _hideSpoiler(selected),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
-                ),
+                  Expanded(child: shelf),
+                ],
               ),
-            for (var r = 0; r < rows.length; r++)
-              SliverToBoxAdapter(
-                child: Column(
-                  key: _rowAnchors.putIfAbsent(rows[r].id, GlobalKey.new),
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(inset, r == 0 ? 0 : 8, inset, 12),
-                      child: Row(
-                        children: [
-                          Icon(rows[r].icon, color: _yellow, size: tv ? 26 : 22),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              rows[r].title,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: tv ? 23 : 20,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    LayoutBuilder(
-                      builder: (context, bounds) {
-                        final cardWidth = tv
-                            ? ((bounds.maxWidth - inset * 2 - 48) / (rows[r].resume ? 4 : 5)).clamp(165.0, 310.0)
-                            : (bounds.maxWidth * (rows[r].resume ? .73 : .54)).clamp(150.0, 265.0);
-                        final cardHeight = cardWidth / (rows[r].resume ? 16 / 9 : 1.25) + 48 * scale;
-                        return SizedBox(
-                          height: cardHeight + 20,
-                          child: ListView.separated(
-                            key: PageStorageKey('kids-row-${rows[r].id}-$_filter'),
-                            padding: EdgeInsets.fromLTRB(inset, 4, inset, 16),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: rows[r].items.length,
-                            separatorBuilder: (_, _) => const SizedBox(width: 14),
-                            itemBuilder: (context, index) => _tile(
-                              context,
-                              rows[r],
-                              rows[r].items[index],
-                              cardWidth,
-                              onUp: r == 0 ? _filters[_filter].requestFocus : () => _focusRow(rows[r - 1]),
-                              onDown: r + 1 < rows.length ? () => _focusRow(rows[r + 1]) : null,
-                              first: index == 0,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            SliverToBoxAdapter(child: SizedBox(height: 24 + MediaQuery.paddingOf(context).bottom)),
-          ],
-        ),
       ),
     );
   }
@@ -246,7 +394,7 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
   Widget _header(BuildContext context, {required bool tv, required double inset, required List<_KidsRow> rows}) {
     final scale = MediaQuery.textScalerOf(context).scale(14) / 14;
     final height =
-        (tv ? (MediaQuery.sizeOf(context).height * .44).clamp(225.0, 360.0) : 290.0) + (scale - 1).clamp(0, 3) * 105;
+        (tv ? (MediaQuery.sizeOf(context).height * .36).clamp(185.0, 300.0) : 152.0) + (scale - 1).clamp(0, 3) * 45;
     return ConstrainedBox(
       key: const ValueKey('kids-illustrated-header'),
       constraints: BoxConstraints(minHeight: height),
@@ -256,9 +404,25 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
             top: 0,
             right: 0,
             bottom: 0,
-            left: tv ? MediaQuery.sizeOf(context).width * .20 : 0,
+            left: tv ? MediaQuery.sizeOf(context).width * .44 : 0,
             child: ExcludeSemantics(
-              child: const RepaintBoundary(child: CustomPaint(painter: _KidsLandscapePainter())),
+              child: RepaintBoundary(
+                child: _quiet
+                    ? const CustomPaint(painter: _KidsLandscapePainter())
+                    : ShaderMask(
+                        blendMode: BlendMode.dstIn,
+                        shaderCallback: (bounds) => const LinearGradient(
+                          colors: [Colors.transparent, Colors.white],
+                          stops: [0, .30],
+                        ).createShader(bounds),
+                        child: Image.asset(
+                          'assets/branding/kids-world-${tv ? 'tv' : 'phone'}.webp',
+                          fit: BoxFit.cover,
+                          alignment: tv ? const Alignment(1, -.65) : Alignment.centerRight,
+                          errorBuilder: (_, _, _) => const CustomPaint(painter: _KidsLandscapePainter()),
+                        ),
+                      ),
+              ),
             ),
           ),
           Positioned.fill(
@@ -270,7 +434,7 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                     _ink.withValues(alpha: tv ? .8 : .5),
                     Colors.transparent,
                   ],
-                  stops: const [0, .35, .75],
+                  stops: const [0, .30, .78],
                 ),
               ),
             ),
@@ -282,92 +446,83 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [_ink.withValues(alpha: .05), _ink.withValues(alpha: .05), _ink],
-                  stops: const [0, .6, 1],
+                  stops: const [0, .72, 1],
                 ),
               ),
             ),
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(inset, tv ? 18 : 12, inset, 24),
+            padding: EdgeInsets.fromLTRB(inset, tv ? 12 : 10, inset, 14),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    const Spacer(),
+                    KidsAvatar(
+                      avatar: KidsProfileService.instance.avatarFor(KidsProfileService.instance.activeId ?? ''),
+                      size: tv ? 46 : 38,
+                      older: _quiet,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        widget.name.trim().isEmpty ? t.kids.title : t.kids.welcome(name: widget.name),
+                        style: TextStyle(color: Colors.white, fontSize: tv ? 28 : 21, fontWeight: FontWeight.w800),
+                      ),
+                    ),
                     if (widget.showToolbar) SizedBox(width: 52, height: 44, child: widget.toolbar),
                   ],
                 ),
-                SizedBox(height: tv ? 18 : 24),
-                Text(
-                  AppIdentity.name,
-                  style: TextStyle(color: Colors.white, fontSize: tv ? 38 : 30, fontWeight: FontWeight.w900, height: 1),
-                ),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      const TextSpan(
-                        text: 'K',
-                        style: TextStyle(color: Color(0xffd9a2ff)),
-                      ),
-                      const TextSpan(
-                        text: 'i',
-                        style: TextStyle(color: Color(0xffffa173)),
-                      ),
-                      const TextSpan(
-                        text: 'd',
-                        style: TextStyle(color: _yellow),
-                      ),
-                      const TextSpan(
-                        text: 's',
-                        style: TextStyle(color: Color(0xff69e6cf)),
-                      ),
-                    ],
-                  ),
-                  style: TextStyle(fontSize: tv ? 56 : 46, fontWeight: FontWeight.w900, height: 1.1),
-                ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 6),
                 Text(
                   t.kidsShelf.pickSomething,
                   style: TextStyle(color: Colors.white, fontSize: tv ? 16 : 14, fontWeight: FontWeight.w500),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 12),
                 ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 620),
+                  constraints: BoxConstraints(maxWidth: tv ? 360 : 300),
                   child: Row(
                     children: [
-                      for (var i = 0; i < 3; i++) ...[
+                      for (var i = 0; i < 2; i++) ...[
                         if (i > 0) const SizedBox(width: 10),
                         Expanded(
                           child: FocusableButton(
                             focusNode: _filters[i],
-                            borderRadius: 100,
+                            borderRadius: 14,
                             focusColor: Colors.white,
                             onNavigateLeft: i == 0 ? widget.onSidebar : _filters[i - 1].requestFocus,
-                            onNavigateRight: i < 2 ? _filters[i + 1].requestFocus : null,
+                            onNavigateRight: i < 1 ? _filters[i + 1].requestFocus : null,
                             onNavigateUp: widget.onToolbar,
                             onNavigateDown: rows.isEmpty ? null : () => _focusRow(rows.first),
-                            onPressed: () => setState(() {
-                              _filter = i;
-                              _lastCard = null;
-                            }),
+                            onPressed: () => _browse(i),
                             child: OutlinedButton(
                               key: ValueKey('kids-shelf-filter-$i'),
                               style: OutlinedButton.styleFrom(
-                                backgroundColor: _filter == i ? _yellow : _ink.withValues(alpha: .7),
-                                foregroundColor: _filter == i ? _ink : Colors.white,
-                                side: BorderSide(color: _filter == i ? _yellow : Colors.white54),
-                                padding: EdgeInsets.symmetric(horizontal: 6, vertical: tv ? 13 : 11),
+                                backgroundColor: _ink.withValues(alpha: .8),
+                                foregroundColor: Colors.white,
+                                side: BorderSide(color: _yellow.withValues(alpha: .65)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                minimumSize: const Size(0, 48),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                               ),
-                              onPressed: () => setState(() {
-                                _filter = i;
-                                _lastCard = null;
-                              }),
-                              child: Text(
-                                [t.kidsShelf.all, t.kids.movies, t.kids.shows][i],
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: tv ? 15 : 12, fontWeight: FontWeight.w800),
+                              onPressed: () => _browse(i),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(i == 0 ? Icons.movie_rounded : Icons.tv_rounded, size: 19, color: _yellow),
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(
+                                      [t.kids.movies, t.kids.shows][i],
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(fontSize: tv ? 14 : 12, fontWeight: FontWeight.w700),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -382,6 +537,11 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
         ],
       ),
     );
+  }
+
+  void _browse(int index) {
+    _shortcut = index;
+    widget.onBrowse?.call(index == 0 ? MediaKind.movie : MediaKind.show);
   }
 
   Widget _tile(
@@ -399,16 +559,49 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
         (SettingsService.instanceOrNull?.read(SettingsService.hideSpoilers) ?? false) &&
         item.shouldHideSpoiler;
     final image = spoiler ? item.grandparentThumbPath : item.artPath ?? item.grandparentArtPath ?? item.thumbPath;
-    final copyCount = (_copies[item.globalKey] ?? [item]).where(KidsProfileService.instance.allows).length;
     Future<void> activate() async {
       if (!KidsProfileService.instance.allows(item)) return;
       final choices = (_copies[item.globalKey] ?? [item]).where(KidsProfileService.instance.allows).toList();
-      final selected = row.resume ? item : await chooseMovieCopy(context, choices);
+      final selected = row.resume ? item : choices.firstOrNull;
       if (!mounted || selected == null || !KidsProfileService.instance.allows(selected)) return;
-      if (row.resume) {
+      if (row.resume && PlatformDetector.isTV()) {
         widget.onResume(selected);
       } else {
         widget.onDetails(selected);
+      }
+    }
+
+    Future<void> remove() async {
+      final kids = KidsProfileService.instance;
+      final owner = kids.activeId;
+      if (owner == null || !row.resume || !kids.allows(item)) return;
+      final box = _card(id).context?.findRenderObject();
+      final confirm = await showAdaptiveAppMenu<bool>(
+        context,
+        title: item.grandparentTitle ?? item.displayTitle,
+        position: box is RenderBox && box.hasSize
+            ? box.localToGlobal(Offset.zero)
+            : MediaQuery.sizeOf(context).center(Offset.zero),
+        focusFirstItem: true,
+        entries: [
+          AppMenuItem(value: true, icon: Icons.remove_circle_outline, label: t.mediaMenu.removeFromContinueWatching),
+        ],
+      );
+      if (confirm != true || !mounted || kids.activeId != owner) return;
+      try {
+        await kids.dismissFromKidsShelf(item, owner);
+        if (!mounted || kids.activeId != owner) return;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || kids.activeId != owner) return;
+          final next = _rows().firstOrNull;
+          if (next != null) {
+            _focusRow(next);
+          } else {
+            _filters[_shortcut].requestFocus();
+          }
+        });
+      } catch (_) {
+        if (context.mounted) await showErrorDialog(context, t.kids.saveFailed);
       }
     }
 
@@ -419,19 +612,23 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
         focusNode: _card(id),
         borderRadius: 16,
         focusColor: _yellow,
-        disableScale: true,
+        disableScale: KidsStyle.reduceMotion(context),
+        focusScale: 1.025,
+        autoScroll: false,
+        descendantsAreFocusable: false,
+        enableLongPress: row.resume,
+        onLongPress: row.resume ? remove : null,
         onSelect: activate,
         onFocusChange: (focused) {
-          if (focused) {
-            _lastCard = id;
-            _remembered[row.id] = id;
-          }
+          _cardFocus(id, item, focused);
+          if (focused) _remembered[row.id] = id;
         },
         onNavigateUp: onUp,
         onNavigateDown: onDown,
         onNavigateLeft: first ? widget.onSidebar : null,
         child: InkWell(
           onTap: activate,
+          onLongPress: row.resume ? remove : null,
           borderRadius: BorderRadius.circular(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -447,42 +644,10 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                         child: OptimizedMediaImage(
                           client: widget.resolveClient(item),
                           imagePath: image,
+                          imageType: ImageType.art,
                           fit: BoxFit.cover,
                         ),
                       ),
-                      if (copyCount > 1)
-                        Positioned(
-                          top: 6,
-                          left: 6,
-                          child: Semantics(
-                            label: t.personSpotlight.copies(n: copyCount),
-                            child: DecoratedBox(
-                              key: const ValueKey('kids-copy-count'),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: .76),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.file_copy_rounded, size: 12, color: Colors.white),
-                                    const SizedBox(width: 3),
-                                    Text(
-                                      '$copyCount',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
                       if (row.resume && item.hasActiveProgress)
                         Positioned(
                           left: 12,
@@ -499,22 +664,34 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                           ),
                         ),
                       if (row.resume)
-                        const Positioned(
+                        Positioned(
                           top: 10,
                           right: 10,
-                          child: Icon(Icons.play_circle_fill_rounded, color: Colors.white, size: 28),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(12)),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              child: Text(
+                                t.common.resume,
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
                         ),
                     ],
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(3, 8, 3, 0),
-                child: Text(
-                  item.grandparentTitle ?? item.displayTitle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700, height: 1.2),
+              SizedBox(
+                height: 48 * MediaQuery.textScalerOf(context).scale(14) / 14,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(3, 8, 3, 0),
+                  child: Text(
+                    item.grandparentTitle ?? item.displayTitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700, height: 1.2),
+                  ),
                 ),
               ),
             ],

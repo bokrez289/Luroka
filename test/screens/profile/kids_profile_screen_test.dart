@@ -31,6 +31,15 @@ import 'package:luroka/utils/platform_detector.dart';
 import '../../test_helpers/backend_client_fixtures.dart';
 import '../../test_helpers/prefs.dart';
 
+Future<void> openSection(WidgetTester tester, String id) async {
+  final row = find.byKey(PageStorageKey('kids-section-$id'));
+  final heading = find.descendant(of: row, matching: find.byType(ListTile)).first;
+  await tester.ensureVisible(heading);
+  await tester.pumpAndSettle();
+  await tester.tap(heading);
+  await tester.pumpAndSettle();
+}
+
 void main() {
   final kids = KidsProfileService.instance;
   setUp(() {
@@ -39,6 +48,52 @@ void main() {
     LocaleSettings.setLocaleSync(AppLocale.en);
   });
   tearDown(kids.resetForTesting);
+
+  testWidgets('Back can keep a draft or discard it without creating a profile', (tester) async {
+    await kids.initialize();
+    await tester.pumpWidget(
+      InputModeTracker(
+        child: MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () =>
+                    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const KidsProfileScreen())),
+                child: const Text('Open'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Emma');
+    await tester.pumpAndSettle();
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(t.common.cancel));
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(find.byType(TextField)).controller!.text, 'Emma');
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(t.kids.discardAction));
+    await tester.pumpAndSettle();
+    expect(find.text('Open'), findsOneWidget);
+    expect(kids.hasKids, isFalse);
+  });
+
+  testWidgets('first child offers a recommended Parent PIN choice', (tester) async {
+    await kids.initialize();
+    await tester.pumpWidget(TranslationProvider(child: const MaterialApp(home: KidsProfileScreen())));
+    await tester.pumpAndSettle();
+    final choice = find.byKey(const ValueKey('kids-use-parent-pin'));
+    expect(tester.widget<SwitchListTile>(choice).value, isTrue);
+    await tester.tap(choice);
+    await tester.pumpAndSettle();
+    expect(tester.widget<SwitchListTile>(choice).value, isFalse);
+    expect(find.text(t.kids.pinChoiceHint), findsOneWidget);
+  });
 
   for (final tv in [false, true]) {
     testWidgets('${tv ? 'TV' : 'phone'} time-limit labels do not overlap at larger text sizes', (tester) async {
@@ -58,6 +113,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      await openSection(tester, 'time');
       final daily = find.byKey(const ValueKey('kids-daily-watch-limit'));
       await tester.scrollUntilVisible(daily, 250, scrollable: find.byType(Scrollable).first);
       await tester.ensureVisible(daily);
@@ -182,8 +238,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'Emma');
     await tester.pump();
+    await openSection(tester, 'advanced');
+    await tester.ensureVisible(find.byKey(const ValueKey('kids-choose-different-connection')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('kids-choose-different-connection')));
-    await tester.scrollUntilVisible(find.text(t.common.save), 300, scrollable: find.byType(Scrollable).first);
     await tester.tap(find.text(t.common.save));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).last, '1234');
@@ -197,6 +255,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(connectionSwitch);
     await tester.pumpAndSettle();
+    await openSection(tester, 'watch');
     for (final key in ['kids-allow-unrated', 'kids-animation-only', 'kids-all-libraries']) {
       final control = find.byKey(ValueKey(key));
       await tester.scrollUntilVisible(control, 200, scrollable: find.byType(Scrollable).first);
@@ -205,6 +264,14 @@ void main() {
       await tester.tap(control);
       await tester.pumpAndSettle();
     }
+    final libraryControl = find.byKey(const ValueKey('kids-library-srv-1:kids-library'));
+    await tester.scrollUntilVisible(libraryControl, 200, scrollable: find.byType(Scrollable).first);
+    await tester.ensureVisible(libraryControl);
+    await tester.pumpAndSettle();
+    await tester.tap(libraryControl);
+    await tester.pumpAndSettle();
+    await openSection(tester, 'watch');
+    await openSection(tester, 'time');
     final dailyLimit = find.byKey(const ValueKey('kids-daily-watch-limit'));
     await tester.scrollUntilVisible(dailyLimit, -200, scrollable: find.byType(Scrollable).first);
     await tester.ensureVisible(dailyLimit);
@@ -218,6 +285,7 @@ void main() {
     await tester.pumpAndSettle();
     final bedtime = find.byKey(const ValueKey('kids-bedtime-enabled'));
     await tester.ensureVisible(bedtime);
+    await tester.pumpAndSettle();
     await tester.tap(bedtime);
     await tester.pumpAndSettle();
     final start = find.byKey(const ValueKey('kids-bedtime-start'));
@@ -228,11 +296,6 @@ void main() {
       tester.getTopLeft(find.text(t.kids.bedtimeEnd)).dy,
       greaterThanOrEqualTo(tester.getBottomLeft(start).dy + 4),
     );
-    final libraryControl = find.byKey(const ValueKey('kids-library-srv-1:kids-library'));
-    await tester.scrollUntilVisible(libraryControl, 200, scrollable: find.byType(Scrollable).first);
-    await tester.tap(libraryControl);
-    await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.text(t.common.save), 300, scrollable: find.byType(Scrollable).first);
     await tester.tap(find.text(t.common.save));
     await tester.pumpAndSettle();
     expect(find.text(t.kids.parentPin), findsOneWidget);
@@ -270,10 +333,25 @@ void main() {
     expect(await active.activate(child), isTrue);
     expect(await active.activate(parent), isTrue);
     await settings.write(SettingsService.kidsAllowExitWithoutParentPin, false);
+    await kids.disableParentPin();
+    expect(await active.activate(child), isTrue);
+    expect(await active.activate(parent), isTrue);
+    await kids.setParentPin('1234');
+    expect(await active.activate(child), isTrue);
+    expect(await active.activate(parent), isFalse);
+    expect(await active.activate(parent, parentPin: '1234'), isTrue);
 
     await kids.restoreViewingExclusions(child.id, ['srv-1:watched-series']);
     editing = child;
     await tester.tap(find.text('Create child'));
+    await tester.pumpAndSettle();
+    await openSection(tester, 'more');
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('kids-delete-profile')),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.byKey(const ValueKey('kids-delete-profile')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('kids-delete-profile')));
     await tester.pumpAndSettle();
@@ -312,7 +390,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(t.kids.restoreReview), findsOneWidget);
     expect(tester.widget<TextField>(find.byType(TextField)).controller!.text, 'Emma');
-    await tester.scrollUntilVisible(find.text(t.common.save), 300, scrollable: find.byType(Scrollable).first);
     await tester.tap(find.text(t.common.save));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).last, '1234');

@@ -206,6 +206,7 @@ String mediaCardSemanticLabel(Object item) {
     baseLabel = '$baseLabel, ${t.accessibility.mediaCardUnwatched}';
   }
 
+  if (item.raw?['lurokaAvailable'] == true) baseLabel = '$baseLabel, ${t.lurokaDiscovery.available}';
   final copies = item.raw?['lurokaCopyCount'];
   if (copies is int && copies > 1) return '$baseLabel, ${t.personSpotlight.copies(n: copies)}';
   final versions = item.mediaVersions?.length ?? 0;
@@ -582,9 +583,6 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
     final catalogItem = _catalogItem;
     final now = catalogItem?.nextEpisode == null ? null : DateTime.now();
     final badgeLabels = _buildCatalogBadgeLabels(catalogItem, now);
-    if (item is MediaItem && item.raw?['lurokaAvailable'] == true) {
-      badgeLabels.insert(0, t.lurokaDiscovery.available);
-    }
     final Widget card;
     if (widget.fullBleedImage || widget.cinemaArtwork) {
       card = LayoutBuilder(
@@ -840,13 +838,14 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
           ),
         ),
       if (!tvContinue && item is MediaItem && _showsWatchedIndicator(item)) WatchedIndicator(item: item),
-      if ((!tvContinue && badgeLabels.isNotEmpty) ||
+      if ((!tvContinue && (badgeLabels.isNotEmpty || (item is MediaItem && item.raw?['lurokaAvailable'] == true))) ||
           _cardCopyCount(item) != null ||
           (widget.usesContinueWatchingAction &&
               item is MediaItem &&
               item.isEpisode &&
               SettingsService.instance.read(SettingsService.showRemainingEpisodes)))
         _CatalogBadges(
+          owned: !tvContinue && item is MediaItem && item.raw?['lurokaAvailable'] == true,
           copyCount: _cardCopyCount(item),
           remainingItem: widget.usesContinueWatchingAction && item is MediaItem && item.isEpisode ? item : null,
           labels: tvContinue ? const [] : badgeLabels,
@@ -1790,7 +1789,8 @@ class _CatalogBadges extends StatelessWidget {
   final int? copyCount;
   final MediaItem? remainingItem;
 
-  const _CatalogBadges({required this.labels, this.copyCount, this.remainingItem});
+  final bool owned;
+  const _CatalogBadges({required this.labels, this.copyCount, this.remainingItem, this.owned = false});
 
   @override
   Widget build(BuildContext context) {
@@ -1802,6 +1802,11 @@ class _CatalogBadges extends StatelessWidget {
       child: Column(
         crossAxisAlignment: .start,
         children: [
+          if (owned)
+            const DecoratedBox(
+              decoration: BoxDecoration(color: Colors.black87, shape: BoxShape.circle),
+              child: Padding(padding: EdgeInsets.all(3), child: Icon(Icons.check_rounded, size: 15, color: Colors.white)),
+            ),
           if (remainingItem != null || (copyCount ?? 0) > 1) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -49,6 +49,9 @@ class MediaBrowserPaths {
   /// [MediaBrowserDialect.resumeReturnsOnlyStartedItems].
   String get resumeItems => dialect.requiresUserScopedItemRoutes ? '$_user/Items/Resume' : '/UserItems/Resume';
 
+  /// Server-wide Home shelf used by newer Emby Web clients.
+  String get embyHomeResumeItems => '$_user/Sections/resume/Items';
+
   /// Played flag write route (`POST` to mark, `DELETE` to unmark).
   String playedItem(String itemId) =>
       dialect.requiresUserScopedItemRoutes ? '$_user/PlayedItems/${_id(itemId)}' : '/UserPlayedItems/${_id(itemId)}';

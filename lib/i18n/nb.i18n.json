@@ -300,6 +300,7 @@
     "notificationProgress": "{progress} · {networkSpeed} · {timeRemaining} gjenstår"
   },
   "kidsShelf": {
+    "quietScenery": "Rolig nattlandskap",
     "movieShelf": "Filmtid",
     "showShelf": "Finn ditt neste show",
     "aurora": "Aurora - dyp blågrønn og lime",
@@ -604,7 +605,9 @@
     "availabilityUnknown": "Noen biblioteker kunne ikke sjekkes. Prøv å oppdatere.",
     "noAvailable": "Ingen samsvarende titler funnet i bibliotekene som er sjekket.",
     "sourceInfo": "Ukentlige trender og utvalgte prisvinnere · TMDb",
-    "configure": "Oppdagingsinnstillinger"
+    "configure": "Oppdagingsinnstillinger",
+    "filterOwned": "I mine biblioteker",
+    "statusRetry": "Kunne ikke sjekke Seerr · Prøv igjen"
   },
   "app": {
     "title": "Luroka"
@@ -1139,7 +1142,11 @@
     "playerScopeLibrary": "Per bibliotek",
     "playerScopeTitle": "Per serie eller film",
     "exportDialogTitle": "Eksporter Luroka-innstillinger",
-    "velvetHourTheme": "Velvet Hour"
+    "velvetHourTheme": "Velvet Hour",
+    "backdropBrightness": "Lysstyrke for bakgrunn",
+    "backdropBrightnessDescription": "Juster skyggeleggingen over bilder på hjem- og tittelsider. Standard er 100 %.",
+    "showEarlyNextEpisode": "Vis neste episode før den nåværende er ferdig",
+    "showEarlyNextEpisodeDescription": "Vis neste episode under rulleteksten eller i de siste 30 sekundene."
   },
   "themeEditor": {
     "builtIn": "Innebygd",
@@ -1311,6 +1318,9 @@
     "episodesLeft": "${count} episoder igjen"
   },
   "lurokaThemes": {
+    "patina": "Patina · dyp blågrønn og kobber",
+    "afterimage": "Etterbilde · indigo og neonrosa",
+    "letterpress": "Boktrykk · papir og vinrødt blekk",
     "title": "Luroka kinopaletter",
     "coral": "Korall · midnattsblå og solnedgang",
     "ocean": "Hav · dyp blå og is",
@@ -1394,7 +1404,15 @@
     "reset": "Gjenopprett standardrader",
     "resetDescription": "Vil du gjenopprette den opprinnelige rekkefølgen og vise alle radene for denne profilen? De festede samlingene dine beholdes.",
     "saveFailed": "Kunne ikke lagre hjemmeoppsettet. Vennligst prøv igjen.",
-    "emptyHint": "Rader kan være skjult. Åpne Tilpass Hjem for å vise dem igjen."
+    "emptyHint": "Rader kan være skjult. Åpne Tilpass Hjem for å vise dem igjen.",
+    "upcomingEpisodes": "Kommende episoder",
+    "upcomingFavorites": "Favoritter",
+    "upcomingWatched": "Tidligere sett",
+    "upcomingBoth": "Favoritter og tidligere sett",
+    "upcomingAll": "Alle serier",
+    "upcomingOff": "Av",
+    "airDate": "Sendes: ${date}",
+    "upcomingHint": "Kommende sendetider sjekkes bare i bakgrunnen når denne raden er aktivert. Resultatene er begrenset og er kanskje ikke tilgjengelige på serveren ennå."
   },
   "screenTime": {
     "title": "Skjermtid",
@@ -1449,7 +1467,35 @@
     "sessionNoTitle": "Uidentifisert avspilling",
     "emptyTitle": "Ingenting her ennå",
     "emptyBody": "Se på noe, og statistikken din vil bygge seg opp her.",
-    "noDataInPeriod": "Ingen avspilling tatt opp i denne perioden."
+    "noDataInPeriod": "Ingen avspilling tatt opp i denne perioden.",
+    "patternsTab": "Mønstre",
+    "moviesFilter": "Filmer",
+    "episodesFilter": "Episoder",
+    "datesFilter": "Datoer",
+    "titlesPlayed": "${count} titler spilt av · episoder telles separat",
+    "previousPeriod": "Forrige periode",
+    "lifetimeSummary": "Totalt: ${total} · Daglig gjennomsnitt: ${average}",
+    "dailyAverage": "Daglig gjennomsnitt",
+    "allKinds": "Alle",
+    "titlesPlayedLabel": "Titler spilt av",
+    "ledgerScope": "Aktiviteten kommer fra denne profilens lokale avspillingslogg i Luroka. Serverens seerhistorikk og avspilling i andre apper er ikke inkludert.",
+    "chartScale": "Skala: 0 – ${duration}",
+    "gettingStarted": "Aktiviteten har så vidt begynt. Seermønstre vises etter noen aktive dager.",
+    "history": "Historikk",
+    "insufficientHistory": "Ikke nok historikk",
+    "monthlyRecap": "Månedsoversikt",
+    "noMatches": "Ingen visninger samsvarer med disse filtrene.",
+    "activeDays": "Aktive dager",
+    "measurementHint": "Tiden viser registrert avspilling, ikke fullførte titler.",
+    "historyError": "Kunne ikke laste historikken. Prøv igjen.",
+    "watchedPeriod": "Sett i denne perioden",
+    "monthWatched": "${duration} sett denne måneden",
+    "drillDown": "Se aktivitet for disse datoene",
+    "searchHistory": "Søk i seerhistorikken",
+    "clearDates": "Fjern datoer",
+    "playedHint": "Episoder telles separat. Avspillingstid angir ikke om en tittel er fullført.",
+    "allHistory": "Se hele historikken",
+    "overview": "Oversikt"
   },
   "search": {
     "hint": "Søk i filmer, serier, musikk...",
@@ -1655,7 +1701,8 @@
     "mediaFailedToDelete": "Kunne ikke slette medieelement",
     "rate": "Vurder",
     "playFromBeginning": "Spill fra begynnelsen",
-    "playVersion": "Spill av versjon..."
+    "playVersion": "Spill av versjon...",
+    "removeFromNextUp": "Fjern fra Neste"
   },
   "rateSheet": {
     "title": "Vurder",
@@ -1664,7 +1711,9 @@
     "favorited": "Lagt til i favoritter",
     "saved": "Lagret",
     "notAvailable": "Ingen treff",
-    "noConnectedServices": "Koble til en tjeneste i Innstillinger for å vurdere her."
+    "noConnectedServices": "Koble til en tjeneste i Innstillinger for å vurdere her.",
+    "addFavorite": "Legg til i favoritter",
+    "removeFavorite": "Fjern fra favoritter"
   },
   "accessibility": {
     "mediaCardMovie": "${title}, film",
@@ -1873,7 +1922,9 @@
     "streamSelectionUnavailable": "Valg av strømmer er ikke tilgjengelig for denne kilden",
     "streamSelectionFailed": "Kunne ikke bruke de valgte strømmene",
     "trackSelectionNotRemembered": "Dette sporvalget gjelder bare for gjeldende avspilling.",
-    "serverUnavailableForProfile": "Ingen server er tilgjengelig for den aktive profilen"
+    "serverUnavailableForProfile": "Ingen server er tilgjengelig for den aktive profilen",
+    "logSupportReference": "Supportreferanse",
+    "copyFullLogId": "Kopier full logg-ID"
   },
   "sourceLibraries": {
     "title": "Dine servere og biblioteker",
@@ -3596,5 +3647,39 @@
     "redirectDifferentHost": "Serveren omdirigerte til en annen vert. Angi den endelige ${product}-URL-en direkte.",
     "redirectInsecure": "Serveren omdirigerte fra HTTPS til en usikker URL",
     "redirectUnsupportedEnterFinal": "Serveren omdirigerte til en URL som ikke støttes. Angi den endelige ${product}-URL-en direkte."
+  },
+  "episodeDetails": {
+    "previous": "Forrige episode",
+    "next": "Neste episode"
+  },
+  "tvEdgeMenu": {
+    "title": "TV-navigering",
+    "top": "Topplinje",
+    "both": "Topplinje og sidemeny",
+    "hint": "Trykk til venstre fra det første elementet i en rad for å åpne sidemenyen. Trykk til høyre eller Tilbake for å gå tilbake.",
+    "tryMenu": "Prøv navigering",
+    "allLibraries": "Alle biblioteker",
+    "browse": "Bla gjennom",
+    "more": "Mer",
+    "closeHint": "Trykk til høyre eller Tilbake for å lukke"
+  },
+  "showDetailLayout": {
+    "title": "Oppsett for seriedetaljer",
+    "description": "Velg hvordan serier og episoder vises på TV.",
+    "compact": "Kompakt episodeliste",
+    "cinematic": "Filmaktig",
+    "seasons": "Velg en sesong",
+    "episodes": "Episoder",
+    "details": "Detaljer",
+    "cast": "Medvirkende",
+    "related": "Lignende titler"
+  },
+  "iconStyles": {
+    "title": "Ikonstil",
+    "description": "Velg hvordan appens kontroller ser ut. Endringene gjelder denne profilen.",
+    "current": "Luroka Bold",
+    "lucide": "Lucide",
+    "lucideDescription": "Rene linjeikoner med Material-ikoner som reserve.",
+    "outline": "Material Outline"
   }
 }

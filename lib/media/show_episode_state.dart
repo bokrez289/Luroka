@@ -19,10 +19,10 @@ class ShowEpisodeState {
           final season = (a.parentIndex ?? 1).compareTo(b.parentIndex ?? 1);
           return season != 0 ? season : (a.index ?? 0).compareTo(b.index ?? 0);
         });
-    final started = items.any((e) => e.isWatched || (e.lastViewedAt ?? 0) > 0 || e.hasActiveProgress);
-    final active = items.where((e) => e.hasActiveProgress && !e.isWatched).toList()
+    final started = items.any((e) => e.isWatched || e.hasMeaningfulProgress);
+    final active = items.where((e) => e.hasMeaningfulProgress && !e.isWatched).toList()
       ..sort((a, b) => (b.lastViewedAt ?? 0).compareTo(a.lastViewedAt ?? 0));
-    if (onDeck != null && onDeck.hasActiveProgress && !onDeck.isWatched) {
+    if (onDeck != null && onDeck.hasMeaningfulProgress && !onDeck.isWatched) {
       return ShowEpisodeState(onDeck, ShowPlayIntent.resume);
     }
     if (active.isNotEmpty) return ShowEpisodeState(active.first, ShowPlayIntent.resume);

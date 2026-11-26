@@ -306,6 +306,8 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
       onExitLeft: PlatformDetector.isTV() ? _navigateToSidebar : () => Navigator.of(context).maybePop(),
       searchEntries: [
         search('appearance', t.settings.theme),
+        if (PlatformDetector.isTV())
+          search('appearance', t.tvEdgeMenu.title, settings.SettingsService.tvEdgeMenu.key, 'left drawer side menu top bar'),
         search(
           'appearance',
           t.settingsRedesign.showLiveTv,

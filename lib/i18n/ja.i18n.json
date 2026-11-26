@@ -300,6 +300,7 @@
     "notificationProgress": "{progress} · {networkSpeed} · 残り{timeRemaining}"
   },
   "kidsShelf": {
+    "quietScenery": "静かな夜の風景",
     "movieShelf": "映画タイム",
     "showShelf": "次のシリーズを見つけよう",
     "aurora": "オーロラ — ディープティール＆ライム",
@@ -604,7 +605,9 @@
     "availabilityUnknown": "一部のライブラリを確認できませんでした。更新を試してください。",
     "noAvailable": "確認したライブラリに一致するタイトルは見つかりませんでした。",
     "sourceInfo": "週間トレンド＆選択された受賞作 · TMDb",
-    "configure": "Discover設定"
+    "configure": "Discover設定",
+    "filterOwned": "マイライブラリ内",
+    "statusRetry": "Seerrを確認できませんでした · 再試行"
   },
   "app": {
     "title": "Luroka"
@@ -1139,7 +1142,11 @@
     "playerScopeLibrary": "ライブラリごと",
     "playerScopeTitle": "作品ごと",
     "exportDialogTitle": "Lurokaの設定をエクスポート",
-    "velvetHourTheme": "ベルベットアワー"
+    "velvetHourTheme": "ベルベットアワー",
+    "backdropBrightness": "背景の明るさ",
+    "backdropBrightnessDescription": "ホームと作品ページの画像に重ねる暗さを調整します。初期値は100%です。",
+    "showEarlyNextEpisode": "エピソードが終わる前に次のエピソードを表示",
+    "showEarlyNextEpisodeDescription": "クレジット中または最後の30秒に次のエピソードを表示します。"
   },
   "themeEditor": {
     "builtIn": "内蔵",
@@ -1311,6 +1318,9 @@
     "episodesLeft": "残り${count}エピソード"
   },
   "lurokaThemes": {
+    "patina": "緑青 · 深い青緑と銅色",
+    "afterimage": "残像 · 藍色とネオンピンク",
+    "letterpress": "活版印刷 · 紙と深紅のインク",
     "title": "Lurokaシネマパレット",
     "coral": "Coral · ミッドナイトブルー＆サンセット",
     "ocean": "Ocean · ディープブルー＆アイス",
@@ -1394,7 +1404,15 @@
     "reset": "デフォルトの行を復元",
     "resetDescription": "このプロフィールのオリジナルの行順を復元してすべての行を表示しますか？ピン留めされたコレクションは保持されます。",
     "saveFailed": "ホームレイアウトを保存できませんでした。もう一度お試しください。",
-    "emptyHint": "行が非表示になっている可能性があります。ホームをカスタマイズを開いて再表示してください。"
+    "emptyHint": "行が非表示になっている可能性があります。ホームをカスタマイズを開いて再表示してください。",
+    "upcomingEpisodes": "今後のエピソード",
+    "upcomingFavorites": "お気に入り",
+    "upcomingWatched": "以前に視聴した作品",
+    "upcomingBoth": "お気に入りと以前に視聴した作品",
+    "upcomingAll": "すべての番組",
+    "upcomingOff": "オフ",
+    "airDate": "放送日: ${date}",
+    "upcomingHint": "今後の放送日は、この行が有効な場合のみバックグラウンドで確認されます。結果には制限があり、サーバーでまだ利用できない場合があります。"
   },
   "screenTime": {
     "title": "スクリーンタイム",
@@ -1449,7 +1467,35 @@
     "sessionNoTitle": "未識別の再生",
     "emptyTitle": "まだ何もありません",
     "emptyBody": "何かを見ると、ここに統計が蓄積されていきます。",
-    "noDataInPeriod": "この期間に記録された再生はありません。"
+    "noDataInPeriod": "この期間に記録された再生はありません。",
+    "patternsTab": "視聴傾向",
+    "moviesFilter": "映画",
+    "episodesFilter": "エピソード",
+    "datesFilter": "日付",
+    "titlesPlayed": "再生した作品: ${count} · エピソードは個別に計算",
+    "previousPeriod": "前の期間",
+    "lifetimeSummary": "全期間: ${total} · 1日平均: ${average}",
+    "dailyAverage": "1日平均",
+    "allKinds": "すべて",
+    "titlesPlayedLabel": "再生した作品",
+    "ledgerScope": "このプロフィールのローカルなLuroka再生記録に基づきます。サーバーの視聴履歴や他のアプリでの再生は含まれません。",
+    "chartScale": "目盛り: 0 – ${duration}",
+    "gettingStarted": "視聴記録の収集が始まったばかりです。数日間視聴すると傾向が表示されます。",
+    "history": "履歴",
+    "insufficientHistory": "履歴が不足しています",
+    "monthlyRecap": "月間まとめ",
+    "noMatches": "このフィルターに一致する視聴記録はありません。",
+    "activeDays": "視聴した日数",
+    "measurementHint": "時間は記録された再生時間であり、視聴を完了した作品を示すものではありません。",
+    "historyError": "履歴を読み込めませんでした。もう一度お試しください。",
+    "watchedPeriod": "この期間の視聴時間",
+    "monthWatched": "今月の視聴時間: ${duration}",
+    "drillDown": "この日付の視聴記録を表示",
+    "searchHistory": "視聴履歴を検索",
+    "clearDates": "日付をクリア",
+    "playedHint": "エピソードは個別に計算されます。再生時間は視聴完了を意味しません。",
+    "allHistory": "すべての履歴を表示",
+    "overview": "概要"
   },
   "search": {
     "hint": "映画、番組、音楽を検索…",
@@ -1655,7 +1701,8 @@
     "mediaFailedToDelete": "メディアアイテムの削除に失敗しました",
     "rate": "評価",
     "playFromBeginning": "最初から再生",
-    "playVersion": "バージョンを選んで再生…"
+    "playVersion": "バージョンを選んで再生…",
+    "removeFromNextUp": "次に見るから削除"
   },
   "rateSheet": {
     "title": "評価",
@@ -1664,7 +1711,9 @@
     "favorited": "お気に入りに追加済み",
     "saved": "保存済み",
     "notAvailable": "一致なし",
-    "noConnectedServices": "評価するには、設定でサービスを接続してください。"
+    "noConnectedServices": "評価するには、設定でサービスを接続してください。",
+    "addFavorite": "お気に入りに追加",
+    "removeFavorite": "お気に入りから削除"
   },
   "accessibility": {
     "mediaCardMovie": "${title}、映画",
@@ -1873,7 +1922,9 @@
     "streamSelectionUnavailable": "このソースではストリームを選択できません",
     "streamSelectionFailed": "選択したストリームを適用できませんでした",
     "trackSelectionNotRemembered": "このトラック選択は現在の再生にのみ適用されます。",
-    "serverUnavailableForProfile": "現在のプロフィールで利用可能なサーバーがありません"
+    "serverUnavailableForProfile": "現在のプロフィールで利用可能なサーバーがありません",
+    "logSupportReference": "サポート参照番号",
+    "copyFullLogId": "ログID全体をコピー"
   },
   "sourceLibraries": {
     "title": "サーバーとライブラリ",
@@ -3596,5 +3647,39 @@
     "redirectDifferentHost": "サーバーから別のホストにリダイレクトされました。最終的な${product}のURLを直接入力してください。",
     "redirectInsecure": "サーバーからHTTPSではない安全でないURLにリダイレクトされました",
     "redirectUnsupportedEnterFinal": "サーバーからサポートされていないURLにリダイレクトされました。最終的な${product}のURLを直接入力してください。"
+  },
+  "episodeDetails": {
+    "previous": "前のエピソード",
+    "next": "次のエピソード"
+  },
+  "tvEdgeMenu": {
+    "title": "テレビのナビゲーション",
+    "top": "トップバー",
+    "both": "トップバーとサイドメニュー",
+    "hint": "行の先頭で左を押すとサイドメニューが開きます。右または戻るを押すと元に戻ります。",
+    "tryMenu": "ナビゲーションを試す",
+    "allLibraries": "すべてのライブラリ",
+    "browse": "ブラウズ",
+    "more": "その他",
+    "closeHint": "右または戻るで閉じる"
+  },
+  "showDetailLayout": {
+    "title": "番組詳細のレイアウト",
+    "description": "テレビでの番組とエピソードの表示方法を選択します。",
+    "compact": "コンパクトなエピソード一覧",
+    "cinematic": "シネマティック",
+    "seasons": "シーズンを選択",
+    "episodes": "エピソード",
+    "details": "詳細",
+    "cast": "出演者",
+    "related": "類似作品"
+  },
+  "iconStyles": {
+    "title": "アイコンのスタイル",
+    "description": "アプリの操作アイコンの外観を選択します。変更はこのプロフィールに適用されます。",
+    "current": "Luroka Bold",
+    "lucide": "Lucide",
+    "lucideDescription": "シンプルな線画アイコン。使用できないアイコンはMaterialで代用します。",
+    "outline": "Material Outline"
   }
 }

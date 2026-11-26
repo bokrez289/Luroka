@@ -145,6 +145,8 @@ class TranslationsFr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$profileSetupGuide$fr profileSetupGuide = _Translations$profileSetupGuide$fr._(_root);
 	@override late final _Translations$animeFavorites$fr animeFavorites = _Translations$animeFavorites$fr._(_root);
 	@override late final _Translations$addServer$fr addServer = _Translations$addServer$fr._(_root);
+	@override late final _Translations$episodeDetails$fr episodeDetails = _Translations$episodeDetails$fr._(_root);
+	@override late final _Translations$tvEdgeMenu$fr tvEdgeMenu = _Translations$tvEdgeMenu$fr._(_root);
 }
 
 // Path: mobileLibrary
@@ -566,6 +568,7 @@ class _Translations$kidsShelf$fr extends Translations$kidsShelf$en {
 	final TranslationsFr _root; // ignore: unused_field
 
 	// Translations
+	@override String get quietScenery => 'Paysage nocturne paisible';
 	@override String get movieShelf => 'L\'heure du film';
 	@override String get showShelf => 'Trouvez votre prochain spectacle';
 	@override String get aurora => 'Aurora — bleu sarcelle profond et citron vert';
@@ -927,6 +930,8 @@ class _Translations$lurokaDiscovery$fr extends Translations$lurokaDiscovery$en {
 	@override String get noAvailable => 'Aucun titre correspondant trouvé dans les bibliothèques vérifiées.';
 	@override String get sourceInfo => 'Tendances hebdomadaires et lauréats sélectionnés · TMDb';
 	@override String get configure => 'Paramètres de découverte';
+	@override String get filterOwned => 'Dans mes bibliothèques';
+	@override String get statusRetry => 'Impossible de vérifier Seerr · Réessayer';
 }
 
 // Path: app
@@ -1474,6 +1479,10 @@ class _Translations$settings$fr extends Translations$settings$en {
 	@override String get playerScopeTitle => 'Par série ou film';
 	@override String get exportDialogTitle => 'Exporter les paramètres de Luroka';
 	@override String get velvetHourTheme => 'L\'heure du velours';
+	@override String get backdropBrightness => 'Luminosité de l’arrière-plan';
+	@override String get backdropBrightnessDescription => 'Ajustez l’ombrage sur l’écran d’accueil et l’illustration du titre. La valeur par défaut est 100 %.';
+	@override String get showEarlyNextEpisode => 'Afficher Suivant avant la fin d’un épisode';
+	@override String get showEarlyNextEpisodeDescription => 'Afficher l\'épisode suivant pendant le générique ou dans les 30 dernières secondes.';
 }
 
 // Path: themeEditor
@@ -1721,6 +1730,9 @@ class _Translations$lurokaThemes$fr extends Translations$lurokaThemes$en {
 	final TranslationsFr _root; // ignore: unused_field
 
 	// Translations
+	@override String get patina => 'Patine · bleu canard et cuivre';
+	@override String get afterimage => 'Rémanence · indigo et rose néon';
+	@override String get letterpress => 'Typographie · papier et encre bordeaux';
 	@override String get title => 'Palettes cinéma Luroka';
 	@override String get coral => 'Corail · bleu nuit et coucher de soleil';
 	@override String get ocean => 'Océan · bleu profond et glace';
@@ -1819,6 +1831,14 @@ class _Translations$homeLayout$fr extends Translations$homeLayout$en {
 	@override String get resetDescription => 'Restaurer l\'ordre d\'origine des lignes et afficher toutes les lignes de ce profil ? Vos collections épinglées seront conservées.';
 	@override String get saveFailed => 'Impossible d\'enregistrer l\'agencement de votre maison. Veuillez réessayer.';
 	@override String get emptyHint => 'Les lignes peuvent être masquées. Ouvrez Personnaliser l\'accueil pour les afficher à nouveau.';
+	@override String get upcomingEpisodes => 'Prochains épisodes';
+	@override String get upcomingOff => 'Désactivé';
+	@override String get upcomingFavorites => 'Favoris';
+	@override String get upcomingWatched => 'Déjà regardés';
+	@override String get upcomingAll => 'Toutes les émissions';
+	@override String get upcomingBoth => 'Favoris et déjà regardés';
+	@override String get upcomingHint => 'Les prochaines dates de diffusion ne sont vérifiées en arrière-plan que lorsque cette ligne est activée. Les résultats sont limités et peuvent ne pas encore être disponibles sur votre serveur.';
+	@override String airDate({required Object date}) => 'Date de diffusion : ${date}';
 }
 
 // Path: screenTime
@@ -1888,6 +1908,34 @@ class _Translations$activityStats$fr extends Translations$activityStats$en {
 	@override String get emptyTitle => 'Rien ici encore';
 	@override String get emptyBody => 'Regardez quelque chose et vos statistiques s\'accumuleront ici.';
 	@override String get noDataInPeriod => 'Aucune lecture enregistrée pendant cette période.';
+	@override String get overview => 'Aperçu';
+	@override String get history => 'Historique';
+	@override String get patternsTab => 'Modèles';
+	@override String get gettingStarted => 'L\'activité ne fait que commencer. Les tendances de visionnage apparaîtront après quelques jours d\'activité.';
+	@override String get monthlyRecap => 'Récapitulatif mensuel';
+	@override String get measurementHint => 'La durée reflète la lecture enregistrée, et non les titres visionnés en entier.';
+	@override String get ledgerScope => 'L’activité provient du registre de lecture Luroka local de ce profil. L’historique de visionnage sur le serveur et la lecture dans d’autres applications ne sont pas inclus.';
+	@override String get watchedPeriod => 'Regardé au cours de cette période';
+	@override String get activeDays => 'Jours d\'activité';
+	@override String get dailyAverage => 'Moyenne quotidienne';
+	@override String get previousPeriod => 'Période précédente';
+	@override String get insufficientHistory => 'Historique insuffisant';
+	@override String get drillDown => 'Afficher l\'activité pour ces dates';
+	@override String get searchHistory => 'Rechercher dans l\'historique de visionnage';
+	@override String get allKinds => 'Tout';
+	@override String get moviesFilter => 'Films';
+	@override String get episodesFilter => 'Épisodes';
+	@override String get datesFilter => 'Dates';
+	@override String get clearDates => 'Effacer les dates';
+	@override String get noMatches => 'Aucun visionnage ne correspond à ces filtres.';
+	@override String get allHistory => 'Afficher tout l\'historique';
+	@override String get historyError => 'Impossible de charger l\'historique. Veuillez réessayer.';
+	@override String titlesPlayed({required Object count}) => '${count} titres lus · épisodes comptés séparément';
+	@override String monthWatched({required Object duration}) => '${duration} regardé(s) ce mois-ci';
+	@override String lifetimeSummary({required Object total, required Object average}) => 'Depuis le début : ${total} · Moyenne quotidienne : ${average}';
+	@override String chartScale({required Object duration}) => 'Échelle : 0 – ${duration}';
+	@override String get titlesPlayedLabel => 'Titres lus';
+	@override String get playedHint => 'Les épisodes sont comptés séparément. La durée de lecture n\'indique pas l\'achèvement.';
 }
 
 // Path: search
@@ -2096,6 +2144,7 @@ class _Translations$mediaMenu$fr extends Translations$mediaMenu$en {
 	@override String get rate => 'Noter';
 	@override String get playFromBeginning => 'Lire depuis le début';
 	@override String get playVersion => 'Lire la version...';
+	@override String get removeFromNextUp => 'Supprimer de À suivre';
 }
 
 // Path: rateSheet
@@ -2112,6 +2161,8 @@ class _Translations$rateSheet$fr extends Translations$rateSheet$en {
 	@override String get saved => 'Enregistré';
 	@override String get notAvailable => 'Aucune correspondance trouvée';
 	@override String get noConnectedServices => 'Connectez un service dans les paramètres pour pouvoir y attribuer une note.';
+	@override String get addFavorite => 'Ajouter aux favoris';
+	@override String get removeFavorite => 'Supprimer des favoris';
 }
 
 // Path: accessibility
@@ -2346,6 +2397,8 @@ class _Translations$messages$fr extends Translations$messages$en {
 	@override String get streamSelectionFailed => 'Impossible d’appliquer les flux sélectionnés';
 	@override String get trackSelectionNotRemembered => 'Ce choix de piste ne s’applique qu’à la lecture en cours.';
 	@override String get serverUnavailableForProfile => 'Aucun serveur n’est disponible pour le profil actif';
+	@override String get logSupportReference => 'Référence d\'assistance';
+	@override String get copyFullLogId => 'Copier l\'ID complet du journal';
 }
 
 // Path: sourceLibraries
@@ -3952,6 +4005,35 @@ class _Translations$addServer$fr extends Translations$addServer$en {
 	@override String redirectUnsupportedEnterFinal({required Object product}) => 'Le serveur a redirigé vers une URL non prise en charge. Saisissez directement l’URL finale du serveur ${product}.';
 }
 
+// Path: episodeDetails
+class _Translations$episodeDetails$fr extends Translations$episodeDetails$en {
+	_Translations$episodeDetails$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get previous => 'Épisode précédent';
+	@override String get next => 'Épisode suivant';
+}
+
+// Path: tvEdgeMenu
+class _Translations$tvEdgeMenu$fr extends Translations$tvEdgeMenu$en {
+	_Translations$tvEdgeMenu$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Navigation TV';
+	@override String get top => 'Barre supérieure';
+	@override String get both => 'Barre supérieure + menu latéral';
+	@override String get hint => 'Appuyez sur Gauche à partir du premier élément d\'une ligne pour ouvrir le menu latéral. Appuyez sur Droite ou Retour pour revenir en arrière.';
+	@override String get browse => 'Parcourir';
+	@override String get more => 'Plus';
+	@override String get closeHint => 'Droite ou Retour pour fermer';
+	@override String get tryMenu => 'Essayer la navigation';
+	@override String get allLibraries => 'Toutes les bibliothèques';
+}
+
 // Path: appIcon.names
 class _Translations$appIcon$names$fr extends Translations$appIcon$names$en {
 	_Translations$appIcon$names$fr._(TranslationsFr root) : this._root = root, super.internal(root);
@@ -5151,6 +5233,7 @@ extension on TranslationsFr {
 			'downloadsRedesign.downloaded' => 'Téléchargé',
 			'downloadsRedesign.speed' => 'Vitesse de téléchargement',
 			'downloadsRedesign.notificationProgress' => '{progress} · {networkSpeed} · {timeRemaining} restant',
+			'kidsShelf.quietScenery' => 'Paysage nocturne paisible',
 			'kidsShelf.movieShelf' => 'L\'heure du film',
 			'kidsShelf.showShelf' => 'Trouvez votre prochain spectacle',
 			'kidsShelf.aurora' => 'Aurora — bleu sarcelle profond et citron vert',
@@ -5400,9 +5483,9 @@ extension on TranslationsFr {
 			'kids.historyReset' => 'Réinitialisation des exclusions de visionnage pour les enfants',
 			'kids.blocked' => 'Ce titre n\'est pas disponible dans ce profil d\'enfant.',
 			'kids.switchProfile' => 'Changer de profil',
-			'kids.manageFromAdult' => 'Passez à un profil adulte pour gérer les paramètres.',
 			_ => null,
 		} ?? switch (path) {
+			'kids.manageFromAdult' => 'Passez à un profil adulte pour gérer les paramètres.',
 			'kids.noConnections' => 'Connectez un serveur à votre profil adulte avant d\'ajouter un profil enfant.',
 			'kids.created' => 'Profil enfant créé',
 			'kids.updated' => 'Profil des enfants mis à jour',
@@ -5442,6 +5525,8 @@ extension on TranslationsFr {
 			'lurokaDiscovery.noAvailable' => 'Aucun titre correspondant trouvé dans les bibliothèques vérifiées.',
 			'lurokaDiscovery.sourceInfo' => 'Tendances hebdomadaires et lauréats sélectionnés · TMDb',
 			'lurokaDiscovery.configure' => 'Paramètres de découverte',
+			'lurokaDiscovery.filterOwned' => 'Dans mes bibliothèques',
+			'lurokaDiscovery.statusRetry' => 'Impossible de vérifier Seerr · Réessayer',
 			'app.title' => 'Luroka',
 			'appIcon.title' => 'Icône de l\'application',
 			'appIcon.defaultIcon' => 'Par défaut',
@@ -5912,11 +5997,11 @@ extension on TranslationsFr {
 			'settings.liveTvDefaultFavoritesDescription' => 'Afficher uniquement les chaînes favorites à l\'ouverture de la TV en direct',
 			'settings.general' => 'Général',
 			'settings.generalDescription' => 'Langue, démarrage et comportement de la fenêtre',
+			_ => null,
+		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Langue et région',
 			'settings.startup' => 'Démarrage',
 			'settings.display' => 'Affichage',
-			_ => null,
-		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Bibliothèque et cartes',
 			'settings.homeScreen' => 'Écran d\'accueil',
 			'settings.navigation' => 'Navigation',
@@ -5951,6 +6036,10 @@ extension on TranslationsFr {
 			'settings.playerScopeTitle' => 'Par série ou film',
 			'settings.exportDialogTitle' => 'Exporter les paramètres de Luroka',
 			'settings.velvetHourTheme' => 'L\'heure du velours',
+			'settings.backdropBrightness' => 'Luminosité de l’arrière-plan',
+			'settings.backdropBrightnessDescription' => 'Ajustez l’ombrage sur l’écran d’accueil et l’illustration du titre. La valeur par défaut est 100 %.',
+			'settings.showEarlyNextEpisode' => 'Afficher Suivant avant la fin d’un épisode',
+			'settings.showEarlyNextEpisodeDescription' => 'Afficher l\'épisode suivant pendant le générique ou dans les 30 dernières secondes.',
 			'themeEditor.builtIn' => 'Intégré',
 			'themeEditor.presets' => 'Préréglages',
 			'themeEditor.custom' => 'Personnalisé',
@@ -6092,6 +6181,9 @@ extension on TranslationsFr {
 			'referenceDetails.continuing' => 'Continuer',
 			'referenceDetails.upNext' => 'À suivre',
 			'referenceDetails.episodesLeft' => ({required Object count}) => 'Épisodes ${count} restants',
+			'lurokaThemes.patina' => 'Patine · bleu canard et cuivre',
+			'lurokaThemes.afterimage' => 'Rémanence · indigo et rose néon',
+			'lurokaThemes.letterpress' => 'Typographie · papier et encre bordeaux',
 			'lurokaThemes.title' => 'Palettes cinéma Luroka',
 			'lurokaThemes.coral' => 'Corail · bleu nuit et coucher de soleil',
 			'lurokaThemes.ocean' => 'Océan · bleu profond et glace',
@@ -6172,6 +6264,14 @@ extension on TranslationsFr {
 			'homeLayout.resetDescription' => 'Restaurer l\'ordre d\'origine des lignes et afficher toutes les lignes de ce profil ? Vos collections épinglées seront conservées.',
 			'homeLayout.saveFailed' => 'Impossible d\'enregistrer l\'agencement de votre maison. Veuillez réessayer.',
 			'homeLayout.emptyHint' => 'Les lignes peuvent être masquées. Ouvrez Personnaliser l\'accueil pour les afficher à nouveau.',
+			'homeLayout.upcomingEpisodes' => 'Prochains épisodes',
+			'homeLayout.upcomingOff' => 'Désactivé',
+			'homeLayout.upcomingFavorites' => 'Favoris',
+			'homeLayout.upcomingWatched' => 'Déjà regardés',
+			'homeLayout.upcomingAll' => 'Toutes les émissions',
+			'homeLayout.upcomingBoth' => 'Favoris et déjà regardés',
+			'homeLayout.upcomingHint' => 'Les prochaines dates de diffusion ne sont vérifiées en arrière-plan que lorsque cette ligne est activée. Les résultats sont limités et peuvent ne pas encore être disponibles sur votre serveur.',
+			'homeLayout.airDate' => ({required Object date}) => 'Date de diffusion : ${date}',
 			'screenTime.title' => 'Temps d\'écran',
 			'screenTime.description' => 'Voir le temps passé à regarder des vidéos sur ce profil',
 			'screenTime.today' => 'Aujourd\'hui',
@@ -6220,6 +6320,34 @@ extension on TranslationsFr {
 			'activityStats.emptyTitle' => 'Rien ici encore',
 			'activityStats.emptyBody' => 'Regardez quelque chose et vos statistiques s\'accumuleront ici.',
 			'activityStats.noDataInPeriod' => 'Aucune lecture enregistrée pendant cette période.',
+			'activityStats.overview' => 'Aperçu',
+			'activityStats.history' => 'Historique',
+			'activityStats.patternsTab' => 'Modèles',
+			'activityStats.gettingStarted' => 'L\'activité ne fait que commencer. Les tendances de visionnage apparaîtront après quelques jours d\'activité.',
+			'activityStats.monthlyRecap' => 'Récapitulatif mensuel',
+			'activityStats.measurementHint' => 'La durée reflète la lecture enregistrée, et non les titres visionnés en entier.',
+			'activityStats.ledgerScope' => 'L’activité provient du registre de lecture Luroka local de ce profil. L’historique de visionnage sur le serveur et la lecture dans d’autres applications ne sont pas inclus.',
+			'activityStats.watchedPeriod' => 'Regardé au cours de cette période',
+			'activityStats.activeDays' => 'Jours d\'activité',
+			'activityStats.dailyAverage' => 'Moyenne quotidienne',
+			'activityStats.previousPeriod' => 'Période précédente',
+			'activityStats.insufficientHistory' => 'Historique insuffisant',
+			'activityStats.drillDown' => 'Afficher l\'activité pour ces dates',
+			'activityStats.searchHistory' => 'Rechercher dans l\'historique de visionnage',
+			'activityStats.allKinds' => 'Tout',
+			'activityStats.moviesFilter' => 'Films',
+			'activityStats.episodesFilter' => 'Épisodes',
+			'activityStats.datesFilter' => 'Dates',
+			'activityStats.clearDates' => 'Effacer les dates',
+			'activityStats.noMatches' => 'Aucun visionnage ne correspond à ces filtres.',
+			'activityStats.allHistory' => 'Afficher tout l\'historique',
+			'activityStats.historyError' => 'Impossible de charger l\'historique. Veuillez réessayer.',
+			'activityStats.titlesPlayed' => ({required Object count}) => '${count} titres lus · épisodes comptés séparément',
+			'activityStats.monthWatched' => ({required Object duration}) => '${duration} regardé(s) ce mois-ci',
+			'activityStats.lifetimeSummary' => ({required Object total, required Object average}) => 'Depuis le début : ${total} · Moyenne quotidienne : ${average}',
+			'activityStats.chartScale' => ({required Object duration}) => 'Échelle : 0 – ${duration}',
+			'activityStats.titlesPlayedLabel' => 'Titres lus',
+			'activityStats.playedHint' => 'Les épisodes sont comptés séparément. La durée de lecture n\'indique pas l\'achèvement.',
 			'search.hint' => 'Rechercher des films, des séries, de la musique...',
 			'search.tryDifferentTerm' => 'Essayez un autre terme de recherche',
 			'search.searchYourMedia' => 'Rechercher dans vos médias',
@@ -6383,6 +6511,8 @@ extension on TranslationsFr {
 			'mediaMenu.shuffleNotAvailableOffline' => 'La lecture aléatoire n’est pas disponible hors ligne',
 			'mediaMenu.fileInfo' => 'Informations sur le fichier',
 			'mediaMenu.deleteEpisodeFromServer' => 'Supprimer l\'épisode du serveur',
+			_ => null,
+		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Supprimer la saison du serveur',
 			'mediaMenu.deleteShowFromServer' => 'Supprimer la série du serveur',
 			'mediaMenu.deleteMovieFromServer' => 'Supprimer le film du serveur',
@@ -6407,6 +6537,7 @@ extension on TranslationsFr {
 			'mediaMenu.rate' => 'Noter',
 			'mediaMenu.playFromBeginning' => 'Lire depuis le début',
 			'mediaMenu.playVersion' => 'Lire la version...',
+			'mediaMenu.removeFromNextUp' => 'Supprimer de À suivre',
 			'rateSheet.title' => 'Noter',
 			'rateSheet.server' => 'Serveur',
 			'rateSheet.favorite' => 'Favori',
@@ -6414,6 +6545,8 @@ extension on TranslationsFr {
 			'rateSheet.saved' => 'Enregistré',
 			'rateSheet.notAvailable' => 'Aucune correspondance trouvée',
 			'rateSheet.noConnectedServices' => 'Connectez un service dans les paramètres pour pouvoir y attribuer une note.',
+			'rateSheet.addFavorite' => 'Ajouter aux favoris',
+			'rateSheet.removeFavorite' => 'Supprimer des favoris',
 			'accessibility.mediaCardMovie' => ({required Object title}) => '${title}, film',
 			'accessibility.mediaCardShow' => ({required Object title}) => '${title}, série TV',
 			'accessibility.mediaCardEpisode' => ({required Object title, required Object episodeInfo}) => '${title}, ${episodeInfo}',
@@ -6429,8 +6562,6 @@ extension on TranslationsFr {
 			'accessibility.hue' => 'Teinte',
 			'accessibility.saturation' => 'Saturation',
 			'accessibility.brightness' => 'Luminosité',
-			_ => null,
-		} ?? switch (path) {
 			'accessibility.hexColor' => 'Couleur hexadécimale',
 			'accessibility.expandText' => 'Développer le texte',
 			'accessibility.collapseText' => 'Replier le texte',
@@ -6609,6 +6740,8 @@ extension on TranslationsFr {
 			'messages.streamSelectionFailed' => 'Impossible d’appliquer les flux sélectionnés',
 			'messages.trackSelectionNotRemembered' => 'Ce choix de piste ne s’applique qu’à la lecture en cours.',
 			'messages.serverUnavailableForProfile' => 'Aucun serveur n’est disponible pour le profil actif',
+			'messages.logSupportReference' => 'Référence d\'assistance',
+			'messages.copyFullLogId' => 'Copier l\'ID complet du journal',
 			'sourceLibraries.title' => 'Vos serveurs & bibliothèques',
 			'sourceLibraries.description' => 'Choisissez les bibliothèques que Luroka utilise pour l\'accueil, la recherche, la découverte de la disponibilité et les studios. L’ordre des lignes d’accueil est personnalisé séparément.',
 			'sourceLibraries.partial' => 'Certains serveurs n\'ont pas pu être vérifiés. Vos choix enregistrés pour ces bibliothèques sont conservés. Actualisez pour réessayer.',
@@ -6892,6 +7025,8 @@ extension on TranslationsFr {
 			'libraries.filters' => 'Filtres',
 			'libraries.confirmActionMessage' => 'Êtes-vous sûr de vouloir effectuer cette action ?',
 			'libraries.showLibrary' => 'Afficher la bibliothèque',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Masquer la bibliothèque',
 			'libraries.libraryOptions' => 'Options de bibliothèque',
 			'libraries.content' => 'contenu de la bibliothèque',
@@ -6943,8 +7078,6 @@ extension on TranslationsFr {
 			'libraries.sortLabels.dateShared' => 'Date de partage',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Dernière date de diffusion',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Date d\'ajout du dernier épisode',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Date de téléchargement',
 			'libraries.sortLabels.size' => 'Taille',
 			'libraries.sortLabels.library' => 'Bibliothèque',
@@ -7406,6 +7539,8 @@ extension on TranslationsFr {
 			'watchTogether.qrShare' => 'Partager le code QR',
 			'watchTogether.qrHint' => 'Scannez avec l\'application Luroka pour rejoindre cette salle.',
 			'watchTogether.phasePlaying' => 'Jouer',
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'En pause',
 			'watchTogether.phaseWaiting' => 'En attendant tout le monde',
 			'watchTogether.inviteCopied' => 'Invitation copiée. Collez-le dans un message.',
@@ -7457,8 +7592,6 @@ extension on TranslationsFr {
 			'watchTogether.offsetPlusSecond' => '+1 s',
 			'watchTogether.participants' => 'Participants',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('fr'))(n, one: 'Participant ${n}', other: 'Participants ${n}', ), 
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'HÔTE',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (Vous)',
 			'watchTogether.playerIdle' => 'Inactif',
@@ -7920,6 +8053,8 @@ extension on TranslationsFr {
 			'metadataEdit.preferredSubtitleLanguage' => 'Langue de sous-titres préférée',
 			'metadataEdit.subtitleMode' => 'Sélection automatique des sous-titres',
 			'metadataEdit.manuallySelected' => 'Sélectionné manuellement',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.shownWithForeignAudio' => 'Avec l’audio en langue étrangère',
 			'metadataEdit.alwaysEnabled' => 'Toujours activé',
 			'metadataEdit.tags' => 'Étiquettes',
@@ -7971,8 +8106,6 @@ extension on TranslationsFr {
 			'seerr.disconnectConfirmBody' => 'Luroka oubliera cette instance Seerr. Vous pourrez vous reconnecter à tout moment.',
 			'seerr.request' => 'Demander',
 			'seerr.request4k' => 'Demander en 4K',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.seasons' => 'Saisons',
 			'seerr.allSeasons' => 'Toutes les saisons',
 			'seerr.advancedOptions' => 'Avancé',
@@ -8166,6 +8299,17 @@ extension on TranslationsFr {
 			'addServer.redirectDifferentHost' => ({required Object product}) => 'Le serveur a redirigé vers un hôte différent. Saisissez directement l’URL finale du serveur ${product}.',
 			'addServer.redirectInsecure' => 'Le serveur a redirigé de HTTPS vers une URL non sécurisée',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'Le serveur a redirigé vers une URL non prise en charge. Saisissez directement l’URL finale du serveur ${product}.',
+			'episodeDetails.previous' => 'Épisode précédent',
+			'episodeDetails.next' => 'Épisode suivant',
+			'tvEdgeMenu.title' => 'Navigation TV',
+			'tvEdgeMenu.top' => 'Barre supérieure',
+			'tvEdgeMenu.both' => 'Barre supérieure + menu latéral',
+			'tvEdgeMenu.hint' => 'Appuyez sur Gauche à partir du premier élément d\'une ligne pour ouvrir le menu latéral. Appuyez sur Droite ou Retour pour revenir en arrière.',
+			'tvEdgeMenu.browse' => 'Parcourir',
+			'tvEdgeMenu.more' => 'Plus',
+			'tvEdgeMenu.closeHint' => 'Droite ou Retour pour fermer',
+			'tvEdgeMenu.tryMenu' => 'Essayer la navigation',
+			'tvEdgeMenu.allLibraries' => 'Toutes les bibliothèques',
 			_ => null,
 		};
 	}

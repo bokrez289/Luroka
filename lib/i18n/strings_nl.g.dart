@@ -143,6 +143,10 @@ class TranslationsNl extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$profileSetupGuide$nl profileSetupGuide = _Translations$profileSetupGuide$nl._(_root);
 	@override late final _Translations$animeFavorites$nl animeFavorites = _Translations$animeFavorites$nl._(_root);
 	@override late final _Translations$addServer$nl addServer = _Translations$addServer$nl._(_root);
+	@override late final _Translations$episodeDetails$nl episodeDetails = _Translations$episodeDetails$nl._(_root);
+	@override late final _Translations$tvEdgeMenu$nl tvEdgeMenu = _Translations$tvEdgeMenu$nl._(_root);
+	@override late final _Translations$showDetailLayout$nl showDetailLayout = _Translations$showDetailLayout$nl._(_root);
+	@override late final _Translations$iconStyles$nl iconStyles = _Translations$iconStyles$nl._(_root);
 }
 
 // Path: mobileLibrary
@@ -564,6 +568,7 @@ class _Translations$kidsShelf$nl extends Translations$kidsShelf$en {
 	final TranslationsNl _root; // ignore: unused_field
 
 	// Translations
+	@override String get quietScenery => 'Rustig nachtlandschap';
 	@override String get movieShelf => 'Film tijd';
 	@override String get showShelf => 'Vind je volgende show';
 	@override String get aurora => 'Aurora – diep wintertaling en limoen';
@@ -925,6 +930,8 @@ class _Translations$lurokaDiscovery$nl extends Translations$lurokaDiscovery$en {
 	@override String get noAvailable => 'Er zijn geen overeenkomende titels gevonden in de aangevinkte bibliotheken.';
 	@override String get sourceInfo => 'Wekelijkse trends en geselecteerde prijswinnaars · TMDb';
 	@override String get configure => 'Ontdekkingsinstellingen';
+	@override String get filterOwned => 'In mijn bibliotheken';
+	@override String get statusRetry => 'Kon Seerr niet controleren · Opnieuw proberen';
 }
 
 // Path: app
@@ -1472,6 +1479,10 @@ class _Translations$settings$nl extends Translations$settings$en {
 	@override String get playerScopeTitle => 'Per serie of film';
 	@override String get exportDialogTitle => 'Luroka-instellingen exporteren';
 	@override String get velvetHourTheme => 'Fluwelen uur';
+	@override String get backdropBrightness => 'Helderheid van achtergrond';
+	@override String get backdropBrightnessDescription => 'Pas de schaduw over Startpagina en titelafbeeldingen aan. 100% is de standaardinstelling.';
+	@override String get showEarlyNextEpisode => 'Toon Volgende voordat een aflevering eindigt';
+	@override String get showEarlyNextEpisodeDescription => 'Toon de volgende aflevering tijdens de aftiteling of in de laatste 30 seconden.';
 }
 
 // Path: themeEditor
@@ -1719,6 +1730,9 @@ class _Translations$lurokaThemes$nl extends Translations$lurokaThemes$en {
 	final TranslationsNl _root; // ignore: unused_field
 
 	// Translations
+	@override String get patina => 'Patina · diep blauwgroen en koper';
+	@override String get afterimage => 'Nabeeld · indigo en neonroze';
+	@override String get letterpress => 'Boekdruk · papier en bordeauxrode inkt';
 	@override String get title => 'Luroka bioscooppaletten';
 	@override String get coral => 'Koraal · middernachtblauw en zonsondergang';
 	@override String get ocean => 'Oceaan · diepblauw en ijs';
@@ -1817,6 +1831,14 @@ class _Translations$homeLayout$nl extends Translations$homeLayout$en {
 	@override String get resetDescription => 'De oorspronkelijke rijvolgorde herstellen en alle rijen voor dit profiel weergeven? Uw vastgezette collecties blijven behouden.';
 	@override String get saveFailed => 'Kan uw woningindeling niet opslaan. Probeer het opnieuw.';
 	@override String get emptyHint => 'Rijen zijn mogelijk verborgen. Open Personaliseer Startpagina om ze opnieuw te tonen.';
+	@override String get upcomingEpisodes => 'Aankomende afleveringen';
+	@override String get upcomingOff => 'Uit';
+	@override String get upcomingFavorites => 'Favorieten';
+	@override String get upcomingWatched => 'Eerder bekeken';
+	@override String get upcomingAll => 'Alle programma\'s';
+	@override String get upcomingBoth => 'Favorieten en eerder bekeken';
+	@override String get upcomingHint => 'Aankomende uitzenddatums worden alleen op de achtergrond gecontroleerd wanneer deze rij is ingeschakeld. De resultaten zijn beperkt en zijn mogelijk nog niet beschikbaar op je server.';
+	@override String airDate({required Object date}) => 'Uitzenddatum: ${date}';
 }
 
 // Path: screenTime
@@ -1886,6 +1908,34 @@ class _Translations$activityStats$nl extends Translations$activityStats$en {
 	@override String get emptyTitle => 'Hier nog niets';
 	@override String get emptyBody => 'Kijk iets en je statistieken worden hier opgebouwd.';
 	@override String get noDataInPeriod => 'Geen weergave opgenomen in deze periode.';
+	@override String get overview => 'Overzicht';
+	@override String get history => 'Geschiedenis';
+	@override String get patternsTab => 'Patronen';
+	@override String get gettingStarted => 'De activiteit is net begonnen. Kijkpatronen worden na een paar actieve dagen weergegeven.';
+	@override String get monthlyRecap => 'Maandelijks overzicht';
+	@override String get measurementHint => 'De tijd geeft het geregistreerde afspelen weer, niet de voltooide titels.';
+	@override String get ledgerScope => 'De activiteit is afkomstig uit het lokale Luroka-afspeelregister van dit profiel. De kijkgeschiedenis van de server en het afspelen in andere apps zijn niet inbegrepen.';
+	@override String get watchedPeriod => 'Bekeken in deze periode';
+	@override String get activeDays => 'Actieve dagen';
+	@override String get dailyAverage => 'Daggemiddelde';
+	@override String get previousPeriod => 'Vorige periode';
+	@override String get insufficientHistory => 'Onvoldoende geschiedenis';
+	@override String get drillDown => 'Activiteit voor deze datums bekijken';
+	@override String get searchHistory => 'Kijkgeschiedenis doorzoeken';
+	@override String get allKinds => 'Alles';
+	@override String get moviesFilter => 'Films';
+	@override String get episodesFilter => 'Afleveringen';
+	@override String get datesFilter => 'Datums';
+	@override String get clearDates => 'Datums wissen';
+	@override String get noMatches => 'Er zijn geen weergaven die aan deze filters voldoen.';
+	@override String get allHistory => 'Bekijk alle geschiedenis';
+	@override String get historyError => 'Kon de geschiedenis niet laden. Probeer het opnieuw.';
+	@override String titlesPlayed({required Object count}) => '${count} afgespeelde titels · afleveringen afzonderlijk geteld';
+	@override String monthWatched({required Object duration}) => '${duration} deze maand bekeken';
+	@override String lifetimeSummary({required Object total, required Object average}) => 'Totaal: ${total} · Dagelijks gemiddelde: ${average}';
+	@override String chartScale({required Object duration}) => 'Schaal: 0 – ${duration}';
+	@override String get titlesPlayedLabel => 'Afgespeelde titels';
+	@override String get playedHint => 'Afleveringen tellen afzonderlijk. De afspeeltijd geeft niet aan of de aflevering is voltooid.';
 }
 
 // Path: search
@@ -2094,6 +2144,7 @@ class _Translations$mediaMenu$nl extends Translations$mediaMenu$en {
 	@override String get rate => 'Beoordelen';
 	@override String get playFromBeginning => 'Afspelen vanaf het begin';
 	@override String get playVersion => 'Versie afspelen...';
+	@override String get removeFromNextUp => 'Verwijderen uit Volgende';
 }
 
 // Path: rateSheet
@@ -2110,6 +2161,8 @@ class _Translations$rateSheet$nl extends Translations$rateSheet$en {
 	@override String get saved => 'Opgeslagen';
 	@override String get notAvailable => 'Geen overeenkomst gevonden';
 	@override String get noConnectedServices => 'Koppel een dienst in Instellingen om daar een beoordeling te geven.';
+	@override String get addFavorite => 'Aan favorieten toevoegen';
+	@override String get removeFavorite => 'Verwijderen uit favorieten';
 }
 
 // Path: accessibility
@@ -2344,6 +2397,8 @@ class _Translations$messages$nl extends Translations$messages$en {
 	@override String get streamSelectionFailed => 'Kon de geselecteerde streams niet toepassen';
 	@override String get trackSelectionNotRemembered => 'Deze trackkeuze geldt alleen voor het huidige afspelen.';
 	@override String get serverUnavailableForProfile => 'Er is geen server beschikbaar voor het actieve profiel';
+	@override String get logSupportReference => 'Supportreferentie';
+	@override String get copyFullLogId => 'Volledige log-ID kopiëren';
 }
 
 // Path: sourceLibraries
@@ -3917,6 +3972,68 @@ class _Translations$addServer$nl extends Translations$addServer$en {
 	@override String redirectUnsupportedEnterFinal({required Object product}) => 'De server heeft doorgestuurd naar een niet-ondersteunde URL. Voer de uiteindelijke ${product}-URL rechtstreeks in.';
 }
 
+// Path: episodeDetails
+class _Translations$episodeDetails$nl extends Translations$episodeDetails$en {
+	_Translations$episodeDetails$nl._(TranslationsNl root) : this._root = root, super.internal(root);
+
+	final TranslationsNl _root; // ignore: unused_field
+
+	// Translations
+	@override String get previous => 'Vorige aflevering';
+	@override String get next => 'Volgende aflevering';
+}
+
+// Path: tvEdgeMenu
+class _Translations$tvEdgeMenu$nl extends Translations$tvEdgeMenu$en {
+	_Translations$tvEdgeMenu$nl._(TranslationsNl root) : this._root = root, super.internal(root);
+
+	final TranslationsNl _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Tv-navigatie';
+	@override String get top => 'Bovenste balk';
+	@override String get both => 'Bovenste balk + zijmenu';
+	@override String get hint => 'Druk op Links vanaf het eerste item in een rij om het zijmenu te openen. Druk op Rechts of Terug om terug te keren.';
+	@override String get browse => 'Bladeren';
+	@override String get more => 'Meer';
+	@override String get closeHint => 'Rechts of Terug om te sluiten';
+	@override String get tryMenu => 'Navigatie proberen';
+	@override String get allLibraries => 'Alle bibliotheken';
+}
+
+// Path: showDetailLayout
+class _Translations$showDetailLayout$nl extends Translations$showDetailLayout$en {
+	_Translations$showDetailLayout$nl._(TranslationsNl root) : this._root = root, super.internal(root);
+
+	final TranslationsNl _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Indeling van details weergeven';
+	@override String get description => 'Kies hoe tv-programma\'s en -afleveringen op televisie worden weergegeven.';
+	@override String get cinematic => 'Cinematisch';
+	@override String get compact => 'Compacte afleveringenlijst';
+	@override String get seasons => 'Kies een seizoen';
+	@override String get episodes => 'Afleveringen';
+	@override String get details => 'Details';
+	@override String get cast => 'Cast';
+	@override String get related => 'Meer zoals dit';
+}
+
+// Path: iconStyles
+class _Translations$iconStyles$nl extends Translations$iconStyles$en {
+	_Translations$iconStyles$nl._(TranslationsNl root) : this._root = root, super.internal(root);
+
+	final TranslationsNl _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Pictogramstijl';
+	@override String get description => 'Kies hoe de bedieningselementen van de app eruitzien. Wijzigingen zijn van toepassing op dit profiel.';
+	@override String get current => 'Luroka Bold';
+	@override String get outline => 'Material Outline';
+	@override String get lucide => 'Lucide';
+	@override String get lucideDescription => 'Strakke lijnpictogrammen met Material-alternatieven voor niet-beschikbare symbolen.';
+}
+
 // Path: appIcon.names
 class _Translations$appIcon$names$nl extends Translations$appIcon$names$en {
 	_Translations$appIcon$names$nl._(TranslationsNl root) : this._root = root, super.internal(root);
@@ -5116,6 +5233,7 @@ extension on TranslationsNl {
 			'downloadsRedesign.downloaded' => 'Gedownload',
 			'downloadsRedesign.speed' => 'Downloadsnelheid',
 			'downloadsRedesign.notificationProgress' => '{progress} · {networkSpeed} · {timeRemaining} resterend',
+			'kidsShelf.quietScenery' => 'Rustig nachtlandschap',
 			'kidsShelf.movieShelf' => 'Film tijd',
 			'kidsShelf.showShelf' => 'Vind je volgende show',
 			'kidsShelf.aurora' => 'Aurora – diep wintertaling en limoen',
@@ -5365,9 +5483,9 @@ extension on TranslationsNl {
 			'kids.historyReset' => 'Kijkuitsluitingen voor kinderen gereset',
 			'kids.blocked' => 'Deze titel is niet beschikbaar in dit kinderprofiel.',
 			'kids.switchProfile' => 'Profiel wisselen',
-			'kids.manageFromAdult' => 'Schakel over naar een volwassen profiel om de instellingen te beheren.',
 			_ => null,
 		} ?? switch (path) {
+			'kids.manageFromAdult' => 'Schakel over naar een volwassen profiel om de instellingen te beheren.',
 			'kids.noConnections' => 'Verbind een server met uw volwassenprofiel voordat u een kinderprofiel toevoegt.',
 			'kids.created' => 'Kinderprofiel aangemaakt',
 			'kids.updated' => 'Kinderprofiel bijgewerkt',
@@ -5407,6 +5525,8 @@ extension on TranslationsNl {
 			'lurokaDiscovery.noAvailable' => 'Er zijn geen overeenkomende titels gevonden in de aangevinkte bibliotheken.',
 			'lurokaDiscovery.sourceInfo' => 'Wekelijkse trends en geselecteerde prijswinnaars · TMDb',
 			'lurokaDiscovery.configure' => 'Ontdekkingsinstellingen',
+			'lurokaDiscovery.filterOwned' => 'In mijn bibliotheken',
+			'lurokaDiscovery.statusRetry' => 'Kon Seerr niet controleren · Opnieuw proberen',
 			'app.title' => 'Luroka',
 			'appIcon.title' => 'App-pictogram',
 			'appIcon.defaultIcon' => 'Standaard',
@@ -5877,11 +5997,11 @@ extension on TranslationsNl {
 			'settings.liveTvDefaultFavoritesDescription' => 'Toon alleen favoriete zenders bij het openen van Live TV',
 			'settings.general' => 'Algemeen',
 			'settings.generalDescription' => 'Taal, opstart- en venstergedrag',
+			_ => null,
+		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Taal en regio',
 			'settings.startup' => 'Opstarten',
 			'settings.display' => 'Weergave',
-			_ => null,
-		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Bibliotheek en kaarten',
 			'settings.homeScreen' => 'Startscherm',
 			'settings.navigation' => 'Navigatie',
@@ -5916,6 +6036,10 @@ extension on TranslationsNl {
 			'settings.playerScopeTitle' => 'Per serie of film',
 			'settings.exportDialogTitle' => 'Luroka-instellingen exporteren',
 			'settings.velvetHourTheme' => 'Fluwelen uur',
+			'settings.backdropBrightness' => 'Helderheid van achtergrond',
+			'settings.backdropBrightnessDescription' => 'Pas de schaduw over Startpagina en titelafbeeldingen aan. 100% is de standaardinstelling.',
+			'settings.showEarlyNextEpisode' => 'Toon Volgende voordat een aflevering eindigt',
+			'settings.showEarlyNextEpisodeDescription' => 'Toon de volgende aflevering tijdens de aftiteling of in de laatste 30 seconden.',
 			'themeEditor.builtIn' => 'Ingebouwd',
 			'themeEditor.presets' => 'Voorinstellingen',
 			'themeEditor.custom' => 'Aangepast',
@@ -6057,6 +6181,9 @@ extension on TranslationsNl {
 			'referenceDetails.continuing' => 'Voortzetting',
 			'referenceDetails.upNext' => 'Volgende',
 			'referenceDetails.episodesLeft' => ({required Object count}) => '${count} afleveringen over',
+			'lurokaThemes.patina' => 'Patina · diep blauwgroen en koper',
+			'lurokaThemes.afterimage' => 'Nabeeld · indigo en neonroze',
+			'lurokaThemes.letterpress' => 'Boekdruk · papier en bordeauxrode inkt',
 			'lurokaThemes.title' => 'Luroka bioscooppaletten',
 			'lurokaThemes.coral' => 'Koraal · middernachtblauw en zonsondergang',
 			'lurokaThemes.ocean' => 'Oceaan · diepblauw en ijs',
@@ -6137,6 +6264,14 @@ extension on TranslationsNl {
 			'homeLayout.resetDescription' => 'De oorspronkelijke rijvolgorde herstellen en alle rijen voor dit profiel weergeven? Uw vastgezette collecties blijven behouden.',
 			'homeLayout.saveFailed' => 'Kan uw woningindeling niet opslaan. Probeer het opnieuw.',
 			'homeLayout.emptyHint' => 'Rijen zijn mogelijk verborgen. Open Personaliseer Startpagina om ze opnieuw te tonen.',
+			'homeLayout.upcomingEpisodes' => 'Aankomende afleveringen',
+			'homeLayout.upcomingOff' => 'Uit',
+			'homeLayout.upcomingFavorites' => 'Favorieten',
+			'homeLayout.upcomingWatched' => 'Eerder bekeken',
+			'homeLayout.upcomingAll' => 'Alle programma\'s',
+			'homeLayout.upcomingBoth' => 'Favorieten en eerder bekeken',
+			'homeLayout.upcomingHint' => 'Aankomende uitzenddatums worden alleen op de achtergrond gecontroleerd wanneer deze rij is ingeschakeld. De resultaten zijn beperkt en zijn mogelijk nog niet beschikbaar op je server.',
+			'homeLayout.airDate' => ({required Object date}) => 'Uitzenddatum: ${date}',
 			'screenTime.title' => 'Schermtijd',
 			'screenTime.description' => 'Bekijk de tijd die je hebt besteed aan het bekijken van video\'s op dit profiel',
 			'screenTime.today' => 'Vandaag',
@@ -6185,6 +6320,34 @@ extension on TranslationsNl {
 			'activityStats.emptyTitle' => 'Hier nog niets',
 			'activityStats.emptyBody' => 'Kijk iets en je statistieken worden hier opgebouwd.',
 			'activityStats.noDataInPeriod' => 'Geen weergave opgenomen in deze periode.',
+			'activityStats.overview' => 'Overzicht',
+			'activityStats.history' => 'Geschiedenis',
+			'activityStats.patternsTab' => 'Patronen',
+			'activityStats.gettingStarted' => 'De activiteit is net begonnen. Kijkpatronen worden na een paar actieve dagen weergegeven.',
+			'activityStats.monthlyRecap' => 'Maandelijks overzicht',
+			'activityStats.measurementHint' => 'De tijd geeft het geregistreerde afspelen weer, niet de voltooide titels.',
+			'activityStats.ledgerScope' => 'De activiteit is afkomstig uit het lokale Luroka-afspeelregister van dit profiel. De kijkgeschiedenis van de server en het afspelen in andere apps zijn niet inbegrepen.',
+			'activityStats.watchedPeriod' => 'Bekeken in deze periode',
+			'activityStats.activeDays' => 'Actieve dagen',
+			'activityStats.dailyAverage' => 'Daggemiddelde',
+			'activityStats.previousPeriod' => 'Vorige periode',
+			'activityStats.insufficientHistory' => 'Onvoldoende geschiedenis',
+			'activityStats.drillDown' => 'Activiteit voor deze datums bekijken',
+			'activityStats.searchHistory' => 'Kijkgeschiedenis doorzoeken',
+			'activityStats.allKinds' => 'Alles',
+			'activityStats.moviesFilter' => 'Films',
+			'activityStats.episodesFilter' => 'Afleveringen',
+			'activityStats.datesFilter' => 'Datums',
+			'activityStats.clearDates' => 'Datums wissen',
+			'activityStats.noMatches' => 'Er zijn geen weergaven die aan deze filters voldoen.',
+			'activityStats.allHistory' => 'Bekijk alle geschiedenis',
+			'activityStats.historyError' => 'Kon de geschiedenis niet laden. Probeer het opnieuw.',
+			'activityStats.titlesPlayed' => ({required Object count}) => '${count} afgespeelde titels · afleveringen afzonderlijk geteld',
+			'activityStats.monthWatched' => ({required Object duration}) => '${duration} deze maand bekeken',
+			'activityStats.lifetimeSummary' => ({required Object total, required Object average}) => 'Totaal: ${total} · Dagelijks gemiddelde: ${average}',
+			'activityStats.chartScale' => ({required Object duration}) => 'Schaal: 0 – ${duration}',
+			'activityStats.titlesPlayedLabel' => 'Afgespeelde titels',
+			'activityStats.playedHint' => 'Afleveringen tellen afzonderlijk. De afspeeltijd geeft niet aan of de aflevering is voltooid.',
 			'search.hint' => 'Zoek films, series, muziek...',
 			'search.tryDifferentTerm' => 'Probeer een andere zoekterm',
 			'search.searchYourMedia' => 'Zoek in je media',
@@ -6348,6 +6511,8 @@ extension on TranslationsNl {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Willekeurig afspelen is offline niet beschikbaar',
 			'mediaMenu.fileInfo' => 'Bestandsinformatie',
 			'mediaMenu.deleteEpisodeFromServer' => 'Aflevering verwijderen van server',
+			_ => null,
+		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Seizoen verwijderen van server',
 			'mediaMenu.deleteShowFromServer' => 'Serie verwijderen van server',
 			'mediaMenu.deleteMovieFromServer' => 'Film verwijderen van server',
@@ -6372,6 +6537,7 @@ extension on TranslationsNl {
 			'mediaMenu.rate' => 'Beoordelen',
 			'mediaMenu.playFromBeginning' => 'Afspelen vanaf het begin',
 			'mediaMenu.playVersion' => 'Versie afspelen...',
+			'mediaMenu.removeFromNextUp' => 'Verwijderen uit Volgende',
 			'rateSheet.title' => 'Beoordelen',
 			'rateSheet.server' => 'Server',
 			'rateSheet.favorite' => 'Favoriet',
@@ -6379,6 +6545,8 @@ extension on TranslationsNl {
 			'rateSheet.saved' => 'Opgeslagen',
 			'rateSheet.notAvailable' => 'Geen overeenkomst gevonden',
 			'rateSheet.noConnectedServices' => 'Koppel een dienst in Instellingen om daar een beoordeling te geven.',
+			'rateSheet.addFavorite' => 'Aan favorieten toevoegen',
+			'rateSheet.removeFavorite' => 'Verwijderen uit favorieten',
 			'accessibility.mediaCardMovie' => ({required Object title}) => '${title}, film',
 			'accessibility.mediaCardShow' => ({required Object title}) => '${title}, tv-serie',
 			'accessibility.mediaCardEpisode' => ({required Object title, required Object episodeInfo}) => '${title}, ${episodeInfo}',
@@ -6394,8 +6562,6 @@ extension on TranslationsNl {
 			'accessibility.hue' => 'Tint',
 			'accessibility.saturation' => 'Verzadiging',
 			'accessibility.brightness' => 'Helderheid',
-			_ => null,
-		} ?? switch (path) {
 			'accessibility.hexColor' => 'Hexkleur',
 			'accessibility.expandText' => 'Tekst uitvouwen',
 			'accessibility.collapseText' => 'Tekst samenvouwen',
@@ -6574,6 +6740,8 @@ extension on TranslationsNl {
 			'messages.streamSelectionFailed' => 'Kon de geselecteerde streams niet toepassen',
 			'messages.trackSelectionNotRemembered' => 'Deze trackkeuze geldt alleen voor het huidige afspelen.',
 			'messages.serverUnavailableForProfile' => 'Er is geen server beschikbaar voor het actieve profiel',
+			'messages.logSupportReference' => 'Supportreferentie',
+			'messages.copyFullLogId' => 'Volledige log-ID kopiëren',
 			'sourceLibraries.title' => 'Uw servers en bibliotheken',
 			'sourceLibraries.description' => 'Kies de bibliotheken die Luroka gebruikt voor Startpagina, zoeken, Ontdek beschikbaarheid en Studio\'s. De volgorde van de thuisrijen wordt afzonderlijk aangepast.',
 			'sourceLibraries.partial' => 'Sommige servers konden niet worden gecontroleerd. Uw opgeslagen keuzes voor die bibliotheken blijven behouden. Vernieuw om het opnieuw te proberen.',
@@ -6857,6 +7025,8 @@ extension on TranslationsNl {
 			'libraries.filters' => 'Filters',
 			'libraries.confirmActionMessage' => 'Weet je zeker dat je deze actie wilt uitvoeren?',
 			'libraries.showLibrary' => 'Bibliotheek tonen',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Bibliotheek verbergen',
 			'libraries.libraryOptions' => 'Bibliotheekopties',
 			'libraries.content' => 'bibliotheekinhoud',
@@ -6908,8 +7078,6 @@ extension on TranslationsNl {
 			'libraries.sortLabels.dateShared' => 'Gedeeld op',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Laatste afleveringsuitzending',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Datum laatst toegevoegde aflevering',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Gedownload op',
 			'libraries.sortLabels.size' => 'Grootte',
 			'libraries.sortLabels.library' => 'Bibliotheek',
@@ -7371,6 +7539,8 @@ extension on TranslationsNl {
 			'watchTogether.qrShare' => 'Deel QR-code',
 			'watchTogether.qrHint' => 'Scan met de Luroka-app om deel te nemen aan deze kamer.',
 			'watchTogether.phasePlaying' => 'Spelen',
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Gepauzeerd',
 			'watchTogether.phaseWaiting' => 'Wachten op iedereen',
 			'watchTogether.inviteCopied' => 'Uitnodiging gekopieerd. Plak het in een bericht.',
@@ -7422,8 +7592,6 @@ extension on TranslationsNl {
 			'watchTogether.offsetPlusSecond' => '+1 sec',
 			'watchTogether.participants' => 'Deelnemers',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('nl'))(n, one: '${n} deelnemer', other: '${n}-deelnemers', ), 
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'HOST',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (jij)',
 			'watchTogether.playerIdle' => 'Inactief',
@@ -7885,6 +8053,8 @@ extension on TranslationsNl {
 			'matchScreen.match' => 'Koppelen...',
 			'matchScreen.fixMatch' => 'Koppeling herstellen...',
 			'matchScreen.unmatch' => 'Ontkoppelen',
+			_ => null,
+		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Deze koppeling wissen? Plex behandelt het item als niet-gekoppeld totdat het opnieuw wordt gekoppeld.',
 			'matchScreen.unmatchSuccess' => 'Item ontkoppeld',
 			'matchScreen.unmatchFailed' => 'Kon item niet ontkoppelen',
@@ -7936,8 +8106,6 @@ extension on TranslationsNl {
 			'seerr.requestFailed' => ({required Object error}) => 'Aanvraag mislukt: ${error}',
 			'seerr.requestsLoadFailed' => 'Aanvraagopties konden niet worden geladen',
 			'seerr.nothingToRequest' => 'Alles is al beschikbaar of aangevraagd.',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Beschikbaar',
 			'seerr.statusPartiallyAvailable' => 'Gedeeltelijk beschikbaar',
 			'seerr.statusRequested' => 'Aangevraagd',
@@ -8116,6 +8284,32 @@ extension on TranslationsNl {
 			'addServer.redirectDifferentHost' => ({required Object product}) => 'De server heeft doorgestuurd naar een andere host. Voer de uiteindelijke ${product}-URL rechtstreeks in.',
 			'addServer.redirectInsecure' => 'De server heeft van HTTPS doorgestuurd naar een onbeveiligde URL',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'De server heeft doorgestuurd naar een niet-ondersteunde URL. Voer de uiteindelijke ${product}-URL rechtstreeks in.',
+			'episodeDetails.previous' => 'Vorige aflevering',
+			'episodeDetails.next' => 'Volgende aflevering',
+			'tvEdgeMenu.title' => 'Tv-navigatie',
+			'tvEdgeMenu.top' => 'Bovenste balk',
+			'tvEdgeMenu.both' => 'Bovenste balk + zijmenu',
+			'tvEdgeMenu.hint' => 'Druk op Links vanaf het eerste item in een rij om het zijmenu te openen. Druk op Rechts of Terug om terug te keren.',
+			'tvEdgeMenu.browse' => 'Bladeren',
+			'tvEdgeMenu.more' => 'Meer',
+			'tvEdgeMenu.closeHint' => 'Rechts of Terug om te sluiten',
+			'tvEdgeMenu.tryMenu' => 'Navigatie proberen',
+			'tvEdgeMenu.allLibraries' => 'Alle bibliotheken',
+			'showDetailLayout.title' => 'Indeling van details weergeven',
+			'showDetailLayout.description' => 'Kies hoe tv-programma\'s en -afleveringen op televisie worden weergegeven.',
+			'showDetailLayout.cinematic' => 'Cinematisch',
+			'showDetailLayout.compact' => 'Compacte afleveringenlijst',
+			'showDetailLayout.seasons' => 'Kies een seizoen',
+			'showDetailLayout.episodes' => 'Afleveringen',
+			'showDetailLayout.details' => 'Details',
+			'showDetailLayout.cast' => 'Cast',
+			'showDetailLayout.related' => 'Meer zoals dit',
+			'iconStyles.title' => 'Pictogramstijl',
+			'iconStyles.description' => 'Kies hoe de bedieningselementen van de app eruitzien. Wijzigingen zijn van toepassing op dit profiel.',
+			'iconStyles.current' => 'Luroka Bold',
+			'iconStyles.outline' => 'Material Outline',
+			'iconStyles.lucide' => 'Lucide',
+			'iconStyles.lucideDescription' => 'Strakke lijnpictogrammen met Material-alternatieven voor niet-beschikbare symbolen.',
 			_ => null,
 		};
 	}

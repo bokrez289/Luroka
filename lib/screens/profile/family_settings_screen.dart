@@ -117,6 +117,7 @@ class FamilySettingsScreen extends StatefulWidget {
 }
 
 class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
+  FamilyParentAccess? _familyAccess;
   String? _activityOwner;
   String? _activityScope;
   Future<ViewingActivitySummary?>? _activity;
@@ -131,6 +132,7 @@ class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
 
   @override
   void dispose() {
+    _familyAccess?.dispose();
     KidsProfileService.instance.removeListener(_policyChanged);
     super.dispose();
   }
@@ -154,15 +156,18 @@ class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
       _activityOwner = service?.profileId;
       _activityScope = scope;
       _activity = service == null || service.profileId != active?.activeId
-          ? Future.value() : loadViewingActivitySummary(service);
+          ? Future.value()
+          : loadViewingActivitySummary(service);
       _todayPerProfile = _loadTodayPerProfile(service, eligible);
     }
   }
 
   Set<String> _activityProfiles(ActiveProfileProvider? active) {
     final viewer = active?.activeId;
-    return {for (final profile in active?.profiles ?? const <Profile>[])
-      if (KidsProfileService.instance.canViewActivity(viewerId: viewer, targetId: profile.id)) profile.id};
+    return {
+      for (final profile in active?.profiles ?? const <Profile>[])
+        if (KidsProfileService.instance.canViewActivity(viewerId: viewer, targetId: profile.id)) profile.id,
+    };
   }
 
   /// Per-person "Today" chips for the family hub; single group-by over the
@@ -170,7 +175,10 @@ class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
   Future<Map<String, int>> _loadTodayPerProfile(ScreenTimeService? service, Set<String> allowed) async {
     if (service == null || !allowed.contains(service.profileId)) return const {};
     await loadViewingActivitySummary(service);
-    return service.database.getScreenTimePerProfileForDate(localDate: localDateKey(DateTime.now()), profileIds: allowed);
+    return service.database.getScreenTimePerProfileForDate(
+      localDate: localDateKey(DateTime.now()),
+      profileIds: allowed,
+    );
   }
 
   void _refreshActivity() {
@@ -178,7 +186,8 @@ class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
     final active = context.read<ActiveProfileProvider?>();
     setState(() {
       _activity = service == null || service.profileId != active?.activeId
-          ? Future.value() : loadViewingActivitySummary(service);
+          ? Future.value()
+          : loadViewingActivitySummary(service);
       _todayPerProfile = _loadTodayPerProfile(service, _activityProfiles(active));
     });
   }
@@ -188,11 +197,16 @@ class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
     final origin = FocusManager.instance.primaryFocus;
     setState(() => _managing = true);
     try {
-      if (!await ensureProfileManagementAccess(context, profile) || !mounted) return;
+      final access = _familyAccess ??= FamilyParentAccess(context.read<ActiveProfileProvider>());
+      if (!await ensureProfileManagementAccess(context, profile, familyAccess: access) || !mounted) return;
       final active = context.read<ActiveProfileProvider>();
       final current = active.profiles.where((p) => p.id == profile.id).firstOrNull;
       if (current == null || KidsProfileService.instance.isActiveKids) return;
-      await Navigator.of(context).push(MaterialPageRoute(builder: (_) => ProfileDetailScreen(profile: current)));
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ProfileDetailScreen(profile: current, familyAccess: access),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _managing = false);
@@ -235,8 +249,8 @@ class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
     if (_managing) return;
     final active = context.read<ActiveProfileProvider>();
     final owner = active.activeId;
-    bool authorized() => active.activeId == owner &&
-      KidsProfileService.instance.canViewActivity(viewerId: owner, targetId: profile.id);
+    bool authorized() =>
+        active.activeId == owner && KidsProfileService.instance.canViewActivity(viewerId: owner, targetId: profile.id);
     if (!authorized()) return;
     final origin = FocusManager.instance.primaryFocus;
     setState(() => _managing = true);
@@ -303,7 +317,8 @@ class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
                                 active: profile.id == active?.activeId,
                                 avatarUrl: active?.avatarUrlFor(profile.id),
                                 todayMs: kids.canViewActivity(viewerId: active?.activeId, targetId: profile.id)
-                                    ? todayMap[profile.id] : null,
+                                    ? todayMap[profile.id]
+                                    : null,
                                 onTap: _managing ? null : () => _manage(profile),
                               ),
                         ],
@@ -323,21 +338,22 @@ class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
                             title: t.profileStartup.autoLogin,
                             subtitle: t.profileStartup.autoLoginHint,
                           ),
-                          ValueListenableBuilder<bool>(
-                            valueListenable: SettingsService.instance.listenable(
-                              SettingsService.kidsAllowExitWithoutParentPin,
-                            ),
-                            builder: (context, value, _) => FocusableListTile(
-                              key: const ValueKey('family-kids-exit'),
-                              leading: const Icon(Icons.swap_horiz_rounded),
-                              title: Text(t.profileStartup.allowKidsExit),
-                              subtitle: Text(t.profileStartup.allowKidsExitHint),
-                              trailing: ExcludeFocus(
-                                child: Switch(value: value, onChanged: (_) => _toggleKidsExit()),
+                          if (!kids.parentPinOptedOut)
+                            ValueListenableBuilder<bool>(
+                              valueListenable: SettingsService.instance.listenable(
+                                SettingsService.kidsAllowExitWithoutParentPin,
                               ),
-                              onTap: _toggleKidsExit,
+                              builder: (context, value, _) => FocusableListTile(
+                                key: const ValueKey('family-kids-exit'),
+                                leading: const Icon(Icons.swap_horiz_rounded),
+                                title: Text(t.profileStartup.allowKidsExit),
+                                subtitle: Text(t.profileStartup.allowKidsExitHint),
+                                trailing: ExcludeFocus(
+                                  child: Switch(value: value, onChanged: (_) => _toggleKidsExit()),
+                                ),
+                                onTap: _toggleKidsExit,
+                              ),
                             ),
-                          ),
                           WorkspaceSettingRow(
                             title: t.family.safety,
                             description: t.family.safetyHint,
@@ -352,7 +368,7 @@ class _FamilySettingsScreenState extends State<FamilySettingsScreen> {
                               title: Text(t.family.safety),
                               subtitle: Text(
                                 kids.hasKids && !kids.hasParentPin
-                                    ? t.family.missingPin
+                                    ? (kids.parentPinOptedOut ? t.kids.pinDisabledWarning : t.family.missingPin)
                                     : kids.hasParentPin
                                     ? t.family.parentPinOn
                                     : t.family.safetyHint,

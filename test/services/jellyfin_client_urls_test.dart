@@ -1146,6 +1146,60 @@ void main() {
       );
     });
 
+    for (final backend in [MediaBackend.emby, MediaBackend.jellyfin]) {
+      for (final forcedBurn in [false, true]) {
+        test('$backend 4 Mbps switch negotiates embedded SRT separately (server override: $forcedBurn)', () async {
+          const source = {
+            'Id': 'src-1',
+            'Container': 'mkv',
+            'DefaultSubtitleStreamIndex': 4,
+            'MediaStreams': [
+              {'Index': 4, 'Type': 'Subtitle', 'Codec': 'subrip', 'Language': 'eng', 'IsExternal': false},
+            ],
+          };
+          final client = JellyfinClient.forTesting(
+            connection: backend == MediaBackend.emby ? testEmbyConnection() : _conn(),
+            httpClient: MockClient((request) async {
+              if (request.url.path.endsWith('/PlaybackInfo')) {
+                expect(request.url.queryParameters['MaxStreamingBitrate'], '4000000');
+                expect(request.url.queryParameters['StartTimeTicks'], '3583550000');
+                final transcoding = jsonDecode(request.body)['DeviceProfile']['TranscodingProfiles'] as List;
+                expect(transcoding.first['Container'], backend == MediaBackend.emby ? 'ts' : 'mp4');
+                final profiles = jsonDecode(request.body)['DeviceProfile']['SubtitleProfiles'] as List;
+                expect(profiles.any((p) => p['Format'] == 'srt' && p['Method'] == 'External'), isTrue);
+                return jsonResponse({
+                  'MediaSources': [
+                    {
+                      ...source,
+                      'TranscodingUrl':
+                          '/videos/item-1/master.m3u8?SubtitleMethod=${forcedBurn ? 'Encode' : 'External'}',
+                    },
+                  ],
+                });
+              }
+              return jsonResponse({
+                'Id': 'item-1',
+                'Name': 'Movie',
+                'Type': 'Movie',
+                'MediaSources': [source],
+              });
+            }),
+          );
+          addTearDown(client.close);
+          final result = await client.getPlaybackInitialization(
+            PlaybackInitializationOptions(
+              metadata: testMediaItem(id: 'item-1', backend: backend, kind: MediaKind.movie, serverId: 'srv-1'),
+              selectedMediaIndex: 0,
+              startPosition: const Duration(milliseconds: 358355),
+              qualityPreset: TranscodeQualityPreset.p720_4mbps,
+            ),
+          );
+          expect(result.isTranscoding, isTrue);
+          expect(result.subtitleSidecars.map((s) => s.sourceStreamId), forcedBurn ? [] : [4]);
+        });
+      }
+    }
+
     /// The two rules are only expressible per request, so the selection decides: an embedded
     /// stream is burned, a real external file is still delivered as a file. Both on a transcode.
     test('a selected external file keeps External and is still sidecarred on a transcode', () async {
@@ -1839,10 +1893,9 @@ void main() {
       expect(result.playMethod, 'Transcode');
       expect(result.mediaInfo!.subtitleTracks, hasLength(3));
       // The last request matched no row, so the effective selection is the server's default
-      // (`DefaultSubtitleStreamIndex: 4`) and that is the stream the server burns in. It is the
-      // one row not fetched: a sidecar for it would paint a second copy over the burned pixels.
-      // The other two stay fetchable, which is what keeps a secondary track renderable.
-      expect(result.subtitleSidecars.map((sidecar) => sidecar.sourceStreamId), [3, 5]);
+      // (`DefaultSubtitleStreamIndex: 4`), an embedded SRT. It can be extracted
+      // alongside the video just like the two alternate selections.
+      expect(result.subtitleSidecars.map((sidecar) => sidecar.sourceStreamId), [3, 4, 5]);
       expect(
         result.subtitleSidecars.map((sidecar) => sidecar.preload),
         everyElement(isFalse),
@@ -4357,7 +4410,7 @@ void main() {
           if (req.url.path == '/Shows/NextUp') {
             return jsonResponse({
               'Items': [
-                for (var i = 0; i < 60; i++)
+                for (var i = 0; i < 80; i++)
                   {'Id': 'next-$i', 'Type': 'Episode', 'Name': 'Next $i', 'SeriesId': 'show-$i'},
               ],
             });
@@ -4382,16 +4435,16 @@ void main() {
       final items = await scoped.fetchContinueWatching(count: null);
 
       final lookups = requests.where((uri) => uri.path == '/Items').toList();
-      // 60 series on the shelf, but the enrichment stays bounded — an unbounded
+      // 80 series on the shelf, but the enrichment stays bounded — an unbounded
       // fan-out here is what the #1699 fix exists to prevent.
-      expect(lookups, hasLength(24));
+      expect(lookups, hasLength(64));
       // Next Up order decides which series get dated: the newest ones.
       expect(
         lookups.map((uri) => uri.queryParameters['ParentId']).toList(),
-        unorderedEquals([for (var i = 0; i < 24; i++) 'show-$i']),
+        unorderedEquals([for (var i = 0; i < 64; i++) 'show-$i']),
       );
-      // Every row is still returned; the undated tail just sorts by addedAt.
-      expect(items, hasLength(60));
+      // Every row is returned; the undated tail retains backend rank.
+      expect(items, hasLength(80));
     });
 
     /// Next Up rows for [seriesCount] distinct series, nothing resumable.
@@ -4551,7 +4604,9 @@ void main() {
 
       // The dated series still outranks the resume item; the failed one keeps a
       // null date and falls to the bottom instead of sinking the whole shelf.
-      expect(items.map((item) => item.id), ['next-ok', 'resume-mid', 'next-broken']);
+      // Missing enrichment retains its position behind the known Next Up row,
+      // rather than treating the episode's DateCreated as viewing activity.
+      expect(items.map((item) => item.id), ['next-ok', 'next-broken', 'resume-mid']);
     });
 
     test('fetchContinueWatching does not let resume items starve Next Up under the limit', () async {
@@ -4631,7 +4686,7 @@ void main() {
       expect(items.map((item) => item.id), ['resume-movie-1']);
     });
 
-    test('fetchContinueWatching omits Limit when count is null', () async {
+    test('fetchContinueWatching uses explicit pages when count is null', () async {
       final requests = <Uri>[];
       final scoped = JellyfinClient.forTesting(
         connection: _conn(),
@@ -4662,9 +4717,9 @@ void main() {
 
       expect(items.map((item) => item.id), ['resume-movie-1', 'resume-movie-2', 'next-show-1', 'next-show-2']);
       final resume = requests.singleWhere((uri) => uri.path == '/UserItems/Resume');
-      expect(resume.queryParameters.containsKey('Limit'), isFalse);
+      expect(resume.queryParameters['Limit'], '200');
       final nextUp = requests.singleWhere((uri) => uri.path == '/Shows/NextUp');
-      expect(nextUp.queryParameters.containsKey('Limit'), isFalse);
+      expect(nextUp.queryParameters['Limit'], '200');
     });
   });
 

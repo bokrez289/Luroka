@@ -64,7 +64,11 @@ class CinemetaCatalogSource
       if (response.statusCode != 200) throw StateError('Cinemeta HTTP ${response.statusCode}');
       final body = jsonDecode(response.body) as Map<String, dynamic>;
       if (!_disposed) {
-        await PublicCatalogCache.shared.setString(prefs, key, jsonEncode({'at': DateTime.now().toIso8601String(), 'body': body}));
+        await PublicCatalogCache.shared.setString(
+          prefs,
+          key,
+          jsonEncode({'at': DateTime.now().toIso8601String(), 'body': body}),
+        );
       }
       return body;
     } catch (_) {
@@ -81,13 +85,13 @@ class CinemetaCatalogSource
     final validScore = score != null && score.isFinite && score > 0 && score <= 10 ? score : null;
     final year = RegExp(r'^\d{4}').firstMatch('${meta['year'] ?? meta['releaseInfo'] ?? ''}');
     String? artwork(dynamic value) => value is String && Uri.tryParse(value)?.scheme == 'https' ? value : null;
-    final trailers = meta['trailers'] as List? ?? const [];
-    final youtubeId = trailers
+    final trailers = _orderedTrailers(meta);
+    final youtubeIds = trailers
         .whereType<Map>()
         .map((trailer) => trailer['source'])
         .whereType<String>()
         .where((id) => RegExp(r'^[A-Za-z0-9_-]{11}$').hasMatch(id))
-        .firstOrNull;
+        .toSet();
     return CatalogItem(
       source: CatalogSourceId.cinemeta,
       kind: kind,
@@ -103,7 +107,8 @@ class CinemetaCatalogSource
       backdropUrl: artwork(meta['background']),
       logoUrl: artwork(meta['logo']),
       releaseDate: DateTime.tryParse('${meta['released'] ?? ''}'),
-      trailerUrl: youtubeId == null ? null : 'https://www.youtube.com/watch?v=$youtubeId',
+      trailerUrl: youtubeIds.isEmpty ? null : 'https://www.youtube.com/watch?v=${youtubeIds.first}',
+      alternateTrailerUrls: [for (final id in youtubeIds.skip(1)) 'https://www.youtube.com/watch?v=$id'],
       cast: [for (final name in (meta['cast'] as List? ?? const []).whereType<String>()) CatalogCastMember(name: name)],
     );
   }
@@ -159,7 +164,7 @@ class CinemetaCatalogSource
     if (meta is! Map || (meta['imdb_id'] ?? meta['id']) != imdb) return const [];
     final seen = <String>{};
     return [
-      for (final trailer in (meta['trailers'] as List? ?? const []).whereType<Map>())
+      for (final trailer in _orderedTrailers(meta))
         if (trailer['source'] case final String key when RegExp(r'^[\w-]{11}$').hasMatch(key) && seen.add(key))
           DetailVideo(
             url: 'https://www.youtube.com/watch?v=$key',
@@ -168,6 +173,24 @@ class CinemetaCatalogSource
             thumbnail: 'https://img.youtube.com/vi/$key/hqdefault.jpg',
           ),
     ].take(8).toList();
+  }
+
+  static List<Map> _orderedTrailers(Map meta) {
+    final trailers = (meta['trailers'] as List? ?? const []).whereType<Map>();
+    final groups = [<Map>[], <Map>[], <Map>[]];
+    for (final trailer in trailers) {
+      final language = '${trailer['iso_639_1'] ?? trailer['language'] ?? ''}'.toLowerCase();
+      final english =
+          const {'en', 'english'}.contains(language) ||
+          RegExp(r'\benglish\b', caseSensitive: false).hasMatch('${trailer['name'] ?? ''}');
+      groups[english
+              ? 0
+              : language.isNotEmpty && language == meta['original_language']
+              ? 1
+              : 2]
+          .add(trailer);
+    }
+    return groups.expand((group) => group).toList();
   }
 
   Future<ShowSchedule> fetchShowSchedule(String imdb) async {

@@ -31,6 +31,7 @@ import '../services/search_suggestions.dart';
 import '../services/kids_profile_service.dart';
 import '../widgets/mobile_keyboard_scope.dart';
 import '../services/home_preview_controller.dart';
+import '../widgets/library_focused_info.dart';
 import '../widgets/studio_cinematic_spotlight.dart';
 import '../widgets/studio_spotlight.dart';
 import '../widgets/tv_screen_insets.dart';
@@ -1016,6 +1017,11 @@ class _SearchScreenState extends State<SearchScreen>
               onListRefresh: refresh,
               onNavigateLeft: _navigateToSidebar,
               onNavigateUp: onNavigateUp,
+              onFocusChange: isTv
+                  ? (focused) {
+                      if (focused) _selectPreview(item);
+                    }
+                  : null,
               showServerName: showServerName && (item.raw?['lurokaCopyCount'] as int? ?? 1) == 1,
               libraryName: (item.raw?['lurokaCopyCount'] as int? ?? 1) > 1 ? null : libraries.libraryLabelFor(item),
             ),
@@ -1134,28 +1140,26 @@ class _SearchScreenState extends State<SearchScreen>
               if (PlatformDetector.isTV() &&
                   (_focusedResult != null ||
                       (!_searchSeerr && searchController.text.trim().isEmpty && _suggestions.isNotEmpty)))
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: MediaQuery.viewInsetsOf(context).bottom > 0
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _SearchPreviewHeader(
+                    expandedHeight: MediaQuery.viewInsetsOf(context).bottom > 0
                         ? 88
                         : (MediaQuery.sizeOf(context).height * 0.26).clamp(130.0, 210.0),
-                    child: ValueListenableBuilder<HomePreview?>(
-                      valueListenable: _preview,
-                      builder: (context, value, _) {
-                        if (value == null) return const SizedBox.shrink();
-                        return StudioCinematicSpotlight(
-                          collapsed: MediaQuery.viewInsetsOf(context).bottom > 0,
-                          item: value.item,
-                          artwork: value.artwork,
-                          client: context.tryGetMediaClientForServer(serverIdOrNull(value.artwork.serverId)),
-                          tint: Theme.of(context).colorScheme.primary,
-                          overviewFocus: _previewFocus,
-                          onOverview: () => unawaited(_showOverview()),
-                          onNavigateUp: _focusInputForNavigation,
-                          onNavigateDown: firstResultFocusNode.requestFocus,
-                        );
-                      },
-                    ),
+                    preview: _preview,
+                    builder: (context, value) {
+                      return StudioCinematicSpotlight(
+                        collapsed: MediaQuery.viewInsetsOf(context).bottom > 0,
+                        item: value.item,
+                        artwork: value.artwork,
+                        client: context.tryGetMediaClientForServer(serverIdOrNull(value.artwork.serverId)),
+                        tint: Theme.of(context).colorScheme.primary,
+                        overviewFocus: _previewFocus,
+                        onOverview: () => unawaited(_showOverview()),
+                        onNavigateUp: _focusInputForNavigation,
+                        onNavigateDown: firstResultFocusNode.requestFocus,
+                      );
+                    },
                   ),
                 ),
               if (isSearching && searchResults.isNotEmpty)
@@ -1224,6 +1228,41 @@ class _SearchScreenState extends State<SearchScreen>
       ),
     );
   }
+}
+
+class _SearchPreviewHeader extends SliverPersistentHeaderDelegate {
+  const _SearchPreviewHeader({required this.expandedHeight, required this.preview, required this.builder});
+
+  final double expandedHeight;
+  final HomePreviewController preview;
+  final Widget Function(BuildContext, HomePreview) builder;
+
+  @override
+  double get minExtent => 58;
+
+  @override
+  double get maxExtent => expandedHeight;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) => SizedBox.expand(
+    child: ColoredBox(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: ValueListenableBuilder<HomePreview?>(
+        valueListenable: preview,
+        builder: (context, value, _) {
+          if (value == null) return const SizedBox.shrink();
+          if (shrinkOffset > 0) {
+            return FocusedMediaInfo(key: const ValueKey('search-focused-result-info'), item: value.item);
+          }
+          return builder(context, value);
+        },
+      ),
+    ),
+  );
+
+  @override
+  bool shouldRebuild(covariant _SearchPreviewHeader oldDelegate) =>
+      expandedHeight != oldDelegate.expandedHeight || preview != oldDelegate.preview || builder != oldDelegate.builder;
 }
 
 final class _SearchUnavailableException implements Exception {

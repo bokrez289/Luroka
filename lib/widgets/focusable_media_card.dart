@@ -81,6 +81,7 @@ class FocusableMediaCard extends StatefulWidget {
   /// Called when the user presses LEFT and there's no focusable item to the left.
   /// Used to navigate from the first column to the sidebar.
   final VoidCallback? onNavigateLeft;
+  final FocusOnKeyEventCallback? onKeyEvent;
 
   /// Called when the user presses RIGHT and there's no focusable item to the right.
   /// Used to navigate from the last column to the alpha jump bar.
@@ -122,6 +123,7 @@ class FocusableMediaCard extends StatefulWidget {
     this.onNavigateUp,
     this.onNavigateDown,
     this.onNavigateLeft,
+    this.onKeyEvent,
     this.onNavigateRight,
     this.onBack,
     this.onFocusChange,
@@ -147,6 +149,7 @@ class _FocusableMediaCardState extends State<FocusableMediaCard> {
       onNavigateUp: widget.onNavigateUp,
       onNavigateDown: widget.onNavigateDown,
       onNavigateLeft: widget.onNavigateLeft,
+      onKeyEvent: widget.onKeyEvent,
       onNavigateRight: widget.onNavigateRight,
       onBack: widget.onBack,
       onFocusChange: widget.onFocusChange,

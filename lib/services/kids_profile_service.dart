@@ -63,6 +63,7 @@ class KidsProfileService extends ChangeNotifier {
   bool themeFor(String id) => ((_children[id] as Map?)?['theme'] as bool?) ?? true;
   bool get useKidsTheme => isActiveKids && themeFor(_activeId!);
   bool get isOlderKids => isActiveKids && ageFor(_activeId!) >= 12;
+  bool quietSceneryFor(String id) => ((_children[id] as Map?)?['quietScenery'] as bool?) ?? ageFor(id) >= 12;
   Set<String>? librariesFor(String id) => ((_children[id] as Map?)?['libraries'] as List?)?.cast<String>().toSet();
   bool animationOnlyFor(String id) => ((_children[id] as Map?)?['animationOnly'] as bool?) ?? false;
   bool allowUnratedFor(String id) => ((_children[id] as Map?)?['allowUnrated'] as bool?) ?? false;
@@ -136,6 +137,9 @@ class KidsProfileService extends ChangeNotifier {
   bool hideKidsFor(String? id) => ((_data['hideKids'] as Map?)?[id] as bool?) ?? false;
   bool hasHideKidsPreference(String id) => (_data['hideKids'] as Map?)?.containsKey(id) ?? false;
   bool get hasParentPin => (_data['parentPin'] as String?)?.isNotEmpty ?? false;
+
+  /// An explicit opt-out is distinct from a missing or damaged PIN.
+  bool get parentPinOptedOut => !hasParentPin && _data['parentPinOptedOut'] == true;
   bool verifyParentPin(String pin) => hasParentPin && verifyPin(pin, _data['parentPin'] as String);
 
   void selectProfile(String? id) {
@@ -177,6 +181,15 @@ class KidsProfileService extends ChangeNotifier {
   Future<void> setParentPin(String pin) async {
     if (!RegExp(r'^\d{4}$').hasMatch(pin)) throw ArgumentError('A four-digit PIN is required');
     _data['parentPin'] = computePinHash(pin);
+    _data.remove('parentPinOptedOut');
+    await _save();
+  }
+
+  Future<void> disableParentPin() async {
+    if (isActiveKids) throw StateError('An adult session is required');
+    _data.remove('parentPin');
+    _data['parentPinOptedOut'] = true;
+    _approvedParents.clear();
     await _save();
   }
 
@@ -185,6 +198,7 @@ class KidsProfileService extends ChangeNotifier {
     required String parentId,
     required int maxAge,
     bool theme = true,
+    bool? quietScenery,
     KidsAvatarKind? avatar,
     Set<String>? allowedLibraries,
     bool? restrictLibraries,
@@ -195,7 +209,7 @@ class KidsProfileService extends ChangeNotifier {
     int? bedtimeStart,
     int? bedtimeEnd,
   }) async {
-    if (!hasParentPin) throw StateError('Set a parent PIN first');
+    if (!hasParentPin && !parentPinOptedOut) throw StateError('Choose a parent PIN setting first');
     if (isKids(parentId) || id == parentId) throw ArgumentError('An adult parent is required');
     if (!const [0, 7, 12, 16].contains(maxAge)) throw ArgumentError('Unsupported age group');
     if (updateTimeLimits &&
@@ -212,6 +226,7 @@ class KidsProfileService extends ChangeNotifier {
         'parentId': parentId,
         'maxAge': maxAge,
         'theme': theme,
+        'quietScenery': quietScenery ?? (_children.containsKey(id) ? quietSceneryFor(id) : maxAge >= 12),
         'avatar': (avatar ?? avatarFor(id)).name,
         'libraries': restrictLibraries == false ? null : allowedLibraries?.toList() ?? librariesFor(id)?.toList(),
         'animationOnly': animationOnly ?? animationOnlyFor(id),
@@ -228,6 +243,7 @@ class KidsProfileService extends ChangeNotifier {
 
   Future<void> removeProfile(String id) async {
     _data['children'] = {..._children}..remove(id);
+    _data['dismissed'] = {...?(_data['dismissed'] as Map?)}..remove(id);
     _data['watched'] = {...?(_data['watched'] as Map?)}..remove(id);
     _data['hideKids'] = {...?(_data['hideKids'] as Map?)}..remove(id);
     await _save();
@@ -430,19 +446,36 @@ class KidsProfileService extends ChangeNotifier {
   Future<void> recordPlayback(MediaItem item) async {
     final owner = _activeId;
     if (!isKids(owner)) return;
+    // Intentionally playing the title again puts it back on this child's shelf.
+    final dismissed = {...?(_data['dismissed'] as Map?)};
+    final removed = {...?((dismissed[owner] as List?)?.cast<String>())};
+    final restored = removed.remove(titleKey(item));
+    if (restored) {
+      dismissed[owner] = removed.toList();
+      _data['dismissed'] = dismissed;
+    }
     final watched = {...?(_data['watched'] as Map?)};
     final keys = {...?((watched[owner] as List?)?.cast<String>())};
-    if (!keys.add(titleKey(item))) return;
+    if (!keys.add(titleKey(item)) && !restored) return;
     watched[owner] = keys.toList();
     _data['watched'] = watched;
     await _save();
   }
 
   bool isHiddenFromContinueWatching(MediaItem item) {
-    if (isActiveKids || !hideKidsFor(_activeId)) return false;
+    if (isActiveKids) return ((_data['dismissed'] as Map?)?[_activeId] as List?)?.contains(titleKey(item)) ?? false;
+    if (!hideKidsFor(_activeId)) return false;
     final watched = _data['watched'] as Map?;
     final key = titleKey(item);
     return _children.keys.any((id) => (watched?[id] as List?)?.contains(key) ?? false);
+  }
+
+  Future<void> dismissFromKidsShelf(MediaItem item, String owner) async {
+    if (!isActiveKids || activeId != owner || !allows(item)) return;
+    final dismissed = {...?(_data['dismissed'] as Map?)};
+    dismissed[owner] = {...?((dismissed[owner] as List?)?.cast<String>()), titleKey(item)}.toList();
+    _data['dismissed'] = dismissed;
+    await _save();
   }
 
   int? continueWatchingFetchCount(int? requested) {

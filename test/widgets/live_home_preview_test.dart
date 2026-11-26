@@ -199,6 +199,7 @@ void main() {
   });
 
   testWidgets('phone Spotlight shows the full series poster and fits the preview frame', (tester) async {
+    await SettingsService.instance.write(SettingsService.phoneCinematicSpotlight, false);
     tester.view.physicalSize = const Size(320, 640);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -246,6 +247,29 @@ void main() {
     expect(find.byType(Dialog), findsNothing);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('setup draft changes the phone preview without saving the preference', (tester) async {
+    tester.view.physicalSize = const Size(360, 780);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final discover = _Discover();
+    addTearDown(discover.dispose);
+    for (final cinematic in [false, true, false]) {
+      await tester.pumpWidget(ChangeNotifierProvider<DiscoverProvider>.value(
+        value: discover,
+        child: MaterialApp(theme: ThemeData(platform: TargetPlatform.android), home: Scaffold(
+          body: SingleChildScrollView(child: LiveHomePreview(
+            phoneCinematic: cinematic, layout: HomeLayout().copyWith(spotlightSource: HomeSpotlightSource.continueWatching),
+          )),
+        )),
+      ));
+      await tester.pumpAndSettle();
+      final hero = find.byKey(const ValueKey('live-home-phone-spotlight'));
+      final image = tester.widget<OptimizedMediaImage>(find.descendant(of: hero, matching: find.byType(OptimizedMediaImage)));
+      expect(image.imagePath, cinematic ? 'series-backdrop' : 'series-poster');
+      expect(SettingsService.instance.read(SettingsService.phoneCinematicSpotlight), true);
+    }
   });
 
   testWidgets('mobile library preview follows the selected grid or list mode', (tester) async {

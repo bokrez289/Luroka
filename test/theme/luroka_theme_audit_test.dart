@@ -138,7 +138,7 @@ void main() {
     await tester.tap(row);
     await tester.pumpAndSettle();
     expect(find.byType(ThemeSettingsScreen), findsOneWidget);
-    final target = find.byKey(const material.ValueKey(ThemeMode.lurokaNocturne));
+    final target = find.byKey(const material.ValueKey(ThemeMode.lurokaPatina));
     await tester.ensureVisible(target);
     await tester.pumpAndSettle();
     final node = tester
@@ -148,10 +148,10 @@ void main() {
     await tester.pump();
     await tester.sendKeyEvent(LogicalKeyboardKey.select);
     await tester.pumpAndSettle();
-    expect(theme.themeMode, ThemeMode.lurokaNocturne);
+    expect(theme.themeMode, ThemeMode.lurokaPatina);
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
     expect(find.byType(ThemeSettingsScreen), findsNothing);
-    expect(theme.themeMode, ThemeMode.lurokaNocturne);
+    expect(theme.themeMode, ThemeMode.lurokaPatina);
   });
 }

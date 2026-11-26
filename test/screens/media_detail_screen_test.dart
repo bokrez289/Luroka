@@ -2769,6 +2769,7 @@ void main() {
       NavigatorObserver? observer,
       ThemeData? theme,
       bool showLibrarySource = false,
+      bool downloaded = false,
     }) async {
       TvDetectionService.debugSetAppleTVOverride(false);
       await SettingsService.getInstance();
@@ -2788,6 +2789,12 @@ void main() {
       downloadManager.recoveryFuture = Future<void>.value();
       final downloadProvider = DownloadProvider.forTesting(downloadManager: downloadManager, database: db);
       await downloadProvider.ensureInitialized();
+      if (downloaded) {
+        downloadProvider.debugSeedState(
+          downloads: {show.globalKey: DownloadProgress(globalKey: show.globalKey, status: DownloadStatus.completed)},
+          metadata: {show.globalKey: show},
+        );
+      }
 
       // testMultiServer disposes the manager as well as its provider;
       // MultiServerProvider does not own the manager, and manager.dispose() is
@@ -2835,6 +2842,23 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
     }
+
+    testWidgets('episode details chevron replaces the detail without starting playback', (tester) async {
+      final show = buildShow();
+      final first = testMediaItem(id: 'ep-a', title: 'First', kind: MediaKind.episode,
+        backend: show.backend, serverId: show.serverId).copyWith(grandparentId: show.id, parentIndex: 1, index: 1);
+      final second = first.copyWith(id: 'ep-b', title: 'Second', index: 2);
+      final client = _FakeMediaServerClient(show: first, childrenByParent: {show.id: [first, second]});
+      await pumpPhoneDetail(tester, client, first);
+      final forward = find.byTooltip('${t.episodeDetails.next}: ${second.displayTitle}');
+      expect(forward, findsOneWidget);
+      expect(find.byTooltip('${t.episodeDetails.previous}: ${first.displayTitle}'), findsNothing);
+      await tester.tap(forward);
+      await tester.pumpAndSettle();
+      expect(tester.widget<MediaDetailScreen>(find.byType(MediaDetailScreen)).metadata.id, second.id);
+      expect(find.byTooltip('${t.episodeDetails.previous}: ${first.displayTitle}'), findsOneWidget);
+      expect(forward, findsNothing);
+    });
 
     Finder episodeCardFor(String title) => find.ancestor(of: find.text(title), matching: find.byType(EpisodeCard));
 
@@ -3093,6 +3117,26 @@ void main() {
       expect(find.text(t.messages.mediaUnavailable), findsOneWidget);
     });
 
+    testWidgets('downloaded label stays on one line on a phone', (tester) async {
+      final movie = testMediaItem(
+        id: 'downloaded_movie',
+        backend: MediaBackend.plex,
+        kind: MediaKind.movie,
+        title: 'Downloaded movie',
+        serverId: 'server_1',
+      );
+      final client = _FakeMediaServerClient(show: movie, childrenByParent: const {});
+      await pumpPhoneDetail(tester, client, movie, downloaded: true);
+      tester.view.physicalSize = const Size(360, 780);
+      await tester.pumpAndSettle();
+      final label = find.text(t.downloadsRedesign.downloaded);
+      expect(label, findsOneWidget);
+      final paragraph = tester.renderObject<RenderParagraph>(label);
+      expect(paragraph.getBoxesForSelection(TextSelection(baseOffset: 0, extentOffset: t.downloadsRedesign.downloaded.length)).length, 1);
+      expect(paragraph.didExceedMaxLines, isFalse);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('deleting a first-route show cancels its pending download options', (tester) async {
       final show = buildShow();
       final client = _FakeMediaServerClient(show: show, childrenByParent: const {});
@@ -3256,7 +3300,7 @@ void main() {
               MediaRatingSource(source: '', value: 6.4),
             ],
           );
-      final client = _FakeMediaServerClient(show: movie, childrenByParent: const {}, numericRatings: true);
+      final client = _FakeMediaServerClient(show: movie, childrenByParent: const {});
 
       await pumpPhoneDetail(
         tester,
@@ -3339,7 +3383,7 @@ void main() {
         serverId: 'server_1',
         serverName: 'Server',
       );
-      final client = _FakeMediaServerClient(show: movie, childrenByParent: const {}, numericRatings: true);
+      final client = _FakeMediaServerClient(show: movie, childrenByParent: const {});
 
       await pumpPhoneDetail(
         tester,
@@ -4512,7 +4556,8 @@ class _ScheduledShowClient extends _FakeMediaServerClient {
 }
 
 class _FakeMediaServerClient implements MediaServerClient {
-  final bool numericRatings;
+  @override
+  Future<List<MediaItem>?> fetchClientSideEpisodeQueue(String seriesId) async => childrenByParent[seriesId];
   final favoriteWrites = <bool>[];
 
   @override
@@ -4555,7 +4600,6 @@ class _FakeMediaServerClient implements MediaServerClient {
 
   _FakeMediaServerClient({
     required this.show,
-    this.numericRatings = false,
     required this.childrenByParent,
     this.childrenPageFutures = const {},
     Map<String, Future<List<MediaItem>>>? childrenPageFuturesByStart,
@@ -4579,7 +4623,7 @@ class _FakeMediaServerClient implements MediaServerClient {
   MediaBackend get backend => MediaBackend.jellyfin;
 
   @override
-  ServerCapabilities get capabilities => numericRatings ? ServerCapabilities.plex : ServerCapabilities.jellyfin;
+  ServerCapabilities get capabilities => ServerCapabilities.jellyfin;
 
   @override
   Future<({MediaItem? item, MediaItem? onDeckEpisode})> fetchItemWithOnDeck(

@@ -27,6 +27,8 @@ import '../utils/app_logger.dart';
 import '../widgets/auth_error_banner.dart';
 import '../widgets/app_icon.dart';
 import '../widgets/app_menu.dart';
+import '../widgets/tv_edge_menu.dart';
+import 'studios_screen.dart';
 import '../utils/platform_detector.dart';
 import '../utils/error_dialog.dart';
 import '../utils/update_dialog.dart';
@@ -85,6 +87,7 @@ import 'explore_screen.dart';
 import 'favorites_screen.dart';
 import 'libraries/library_quick_picker_sheet.dart';
 import 'libraries/libraries_screen.dart';
+import 'libraries/kids_catalog_screen.dart';
 import 'livetv/live_tv_screen.dart';
 import 'search_screen.dart';
 import 'downloads/downloads_screen.dart';
@@ -505,6 +508,8 @@ class _MainScreenState extends State<MainScreen>
   final Map<NavigationTabId, GlobalKey> _screenKeys = {for (final id in NavigationTabId.values) id: GlobalKey()};
   final GlobalKey<SideNavigationRailState> _sideNavKey = GlobalKey();
   final _tvDockKey = GlobalKey<TvNavigationDockState>();
+  NavigatorState? _edgeNavigator;
+  bool _edgeOpen = false;
 
   /// Measures the mobile navigation area (bottom bar or landscape rail) for
   /// the music mini-player.
@@ -549,6 +554,7 @@ class _MainScreenState extends State<MainScreen>
   /// disconnect/reconnect surfaces it as newly online again and triggers a
   /// fresh resume for rows the queue drain skipped while it was away.
   final Set<String> _resumeCoveredServerIds = {};
+  Timer? _collectionRefreshTimer;
 
   /// Listener that fires when [ActiveProfileBinder] settles (Plex *and*
   /// Jellyfin both bound). Drives the once-per-launch priming of
@@ -614,6 +620,7 @@ class _MainScreenState extends State<MainScreen>
   @override
   void initState() {
     super.initState();
+    profileNavigationRegistry.attachHome(_showProfileHome);
     downloadNotificationNavigation.addListener(_scheduleDownloadNotification);
     _isOffline = widget.isOfflineMode;
     _offlineUntilConnected = widget.isOfflineMode;
@@ -858,12 +865,18 @@ class _MainScreenState extends State<MainScreen>
       ..clear()
       ..addAll(onlineServerIds);
     final downloadProvider = context.read<DownloadProvider>();
-    final serverManager = context.read<MultiServerProvider>().serverManager;
     unawaited(
       downloadProvider.ensureInitialized().then((_) {
         if (!mounted) return;
         downloadProvider.resumeQueuedDownloads(onlineClient);
-        unawaited(downloadProvider.syncDownloadCollections(serverManager, newlyOnline));
+        // Collection membership can enumerate every BoxSet on Emby. Leave
+        // the initial connection to interactive Home requests and transfers.
+        _collectionRefreshTimer ??= Timer(const Duration(minutes: 1), () {
+          _collectionRefreshTimer = null;
+          if (!mounted || _isOffline || _activeProfileForListener?.isBinding == true) return;
+          final servers = context.read<MultiServerProvider>();
+          unawaited(context.read<DownloadProvider>().syncDownloadCollections(servers.serverManager, servers.onlineServerIds));
+        });
       }),
     );
   }
@@ -1125,6 +1138,10 @@ class _MainScreenState extends State<MainScreen>
 
   @override
   void dispose() {
+    _collectionRefreshTimer?.cancel();
+    profileNavigationRegistry.detachHome(_showProfileHome);
+    final edge = _edgeNavigator;
+    if (edge != null) TvEdgeMenuHost.detach(edge, _requestEdgeMenu);
     downloadNotificationNavigation.removeListener(_scheduleDownloadNotification);
     _dockProfileFocus.dispose();
     _dockSearchFocus.dispose();
@@ -1310,7 +1327,8 @@ class _MainScreenState extends State<MainScreen>
     if (!_mountedTabs.contains(tab)) return const SizedBox.shrink();
 
     return switch (tab) {
-      NavigationTabId.discover => DiscoverScreen(key: _screenKeys[tab]),
+      NavigationTabId.discover => DiscoverScreen(key: _screenKeys[tab], onKidsBrowse: (kind) =>
+        _selectTab(kind == MediaKind.movie ? NavigationTabId.kidsMovies : NavigationTabId.kidsShows)),
       NavigationTabId.favorites => FavoritesScreen(key: _screenKeys[tab]),
       NavigationTabId.explore => ExploreScreen(key: _screenKeys[tab]),
       NavigationTabId.libraries => LibrariesScreen(
@@ -1328,8 +1346,8 @@ class _MainScreenState extends State<MainScreen>
         onAddServer: _addServerFromOffline,
       ),
       NavigationTabId.settings => SettingsScreen(key: _screenKeys[tab]),
-      NavigationTabId.kidsMovies => LibrariesScreen(key: _screenKeys[tab], kindFilter: MediaKind.movie),
-      NavigationTabId.kidsShows => LibrariesScreen(key: _screenKeys[tab], kindFilter: MediaKind.show),
+      NavigationTabId.kidsMovies => KidsCatalogScreen(key: _screenKeys[tab], kind: MediaKind.movie),
+      NavigationTabId.kidsShows => KidsCatalogScreen(key: _screenKeys[tab], kind: MediaKind.show),
     };
   }
 
@@ -1717,6 +1735,12 @@ class _MainScreenState extends State<MainScreen>
 
     unawaited(_confirmRootExit());
     return KeyEventResult.handled;
+  }
+
+  void _showProfileHome() {
+    if (!mounted) return;
+    final tabs = _getVisibleTabs(_isOffline);
+    if (tabs.isNotEmpty) _selectTab(tabs.first.id);
   }
 
   /// Asks before leaving the app from the home root, on mobile and TV alike.
@@ -2491,8 +2515,6 @@ class _MainScreenState extends State<MainScreen>
     final watchTogether = context.watch<WatchTogetherProvider>();
     final music = context.watch<MusicPlaybackService?>();
     final active = profile.active;
-    final homeOptions =
-        _currentTab == NavigationTabId.discover && !_isOffline && !KidsProfileService.instance.isActiveKids;
     final colors = Theme.of(context).colorScheme;
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -2549,7 +2571,27 @@ class _MainScreenState extends State<MainScreen>
           disableScale: true,
           borderRadius: 20,
           semanticLabel: active?.displayName ?? t.profiles.sectionTitle,
-          onSelect: () async {
+          onSelect: () => _openDockProfile(context),
+          onNavigateLeft: _focusLeftOfDockProfile,
+          onNavigateRight: () {},
+          onNavigateDown: _focusContent,
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: active == null
+                ? const Icon(Icons.person_rounded, size: 26)
+                : ProfileAvatar(profile: active, size: 28, avatarUrl: profile.avatarUrlFor(active.id)),
+          ),
+        ),
+        const SizedBox(width: 12),
+        SystemClock(style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: colors.onSurface)),
+      ],
+    );
+  }
+
+  Future<void> _openDockProfile(BuildContext context) async {
+    final profile = context.read<ActiveProfileProvider>();
+    final active = profile.active;
+    final homeOptions = _currentTab == NavigationTabId.discover && !_isOffline && !KidsProfileService.instance.isActiveKids;
             if (KidsProfileService.instance.isActiveKids) {
               await Navigator.of(
                 context,
@@ -2604,26 +2646,94 @@ class _MainScreenState extends State<MainScreen>
               case 'remove_current_profile':
                 await confirmAndRemoveCurrentProfile(context);
             }
-          },
-          onNavigateLeft: _focusLeftOfDockProfile,
-          onNavigateRight: () {},
-          onNavigateDown: _focusContent,
-          child: Padding(
-            padding: const EdgeInsets.all(4),
-            child: active == null
-                ? const Icon(Icons.person_rounded, size: 26)
-                : ProfileAvatar(profile: active, size: 28, avatarUrl: profile.avatarUrlFor(active.id)),
-          ),
-        ),
-        const SizedBox(width: 12),
-        SystemClock(
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: colors.onSurface),
-        ),
-      ],
-    );
   }
 
-  Widget _buildTvShell(BuildContext context) => OverlaySheetHost(
+  bool _requestEdgeMenu(BuildContext origin, String? current) {
+    if (_edgeOpen) return true;
+    if (!mounted || !_usesTopDock || _isOverlaySheetOpen || ModalRoute.of(origin)?.isCurrent != true ||
+        !(SettingsService.instanceOrNull?.read(SettingsService.tvEdgeMenu) ?? false)) return false;
+    if (!_edgeOpen) unawaited(_openEdgeMenu(origin, current));
+    return true;
+  }
+
+  Future<void> _openEdgeMenu(BuildContext origin, String? current) async {
+    _edgeOpen = true;
+    final previous = FocusManager.instance.primaryFocus;
+    final shellRoute = ModalRoute.of(context);
+    final navigator = Navigator.of(origin);
+    final profile = context.read<ActiveProfileProvider>();
+    final owner = profile.committedIdentityGeneration;
+    try {
+      final kids = KidsProfileService.instance.isActiveKids;
+      final tabs = _getVisibleTabs(_isOffline);
+      final hidden = context.read<HiddenLibrariesProvider>();
+      final libraries = !_isOffline && !kids && hidden.isInitialized
+          ? context.read<LibrariesProvider>().libraries.where((l) => !hidden.hiddenLibraryKeys.contains(l.globalKey)).toList()
+          : <MediaLibrary>[];
+      final active = current ?? (_currentTab == NavigationTabId.libraries &&
+          libraries.any((l) => l.globalKey == _selectedLibraryGlobalKey) ? 'library:$_selectedLibraryGlobalKey' : _currentTab.name);
+      final choice = await showGeneralDialog<String>(
+        context: origin, useRootNavigator: false, barrierDismissible: true,
+        barrierLabel: MaterialLocalizations.of(origin).modalBarrierDismissLabel,
+        barrierColor: Colors.black38, transitionDuration: const Duration(milliseconds: 160),
+        transitionBuilder: (_, animation, _, child) => SlideTransition(
+          position: Tween(begin: const Offset(-.28, 0), end: Offset.zero).animate(animation), child: child),
+        pageBuilder: (dialog, _, _) => TvEdgeMenu(
+          current: active, libraryLabel: t.navigation.libraries,
+          profileAvatar: profile.active == null ? null : ProfileAvatar(
+            profile: profile.active!, size: 30, avatarUrl: profile.avatarUrlFor(profile.active!.id),
+          ),
+          entries: [
+            (id: 'profile', label: profile.active?.displayName ?? t.profiles.sectionTitle, icon: Icons.account_circle),
+            for (final tab in tabs.where((tab) => tab.id != NavigationTabId.settings)) ...[
+              (id: tab.id.name, label: tab.id == NavigationTabId.libraries ? t.tvEdgeMenu.allLibraries : tab.getLabel(), icon: tab.icon),
+              if (tab.id == NavigationTabId.discover && !kids && !_isOffline)
+                (id: 'studios', label: t.studios.title, icon: Icons.movie_filter_outlined),
+            ],
+            if (!kids && !_isOffline) (id: 'together', label: t.watchTogether.title, icon: Icons.groups_outlined),
+            if (!kids) (id: 'settings', label: t.common.settings, icon: Icons.settings),
+          ],
+          libraryEntries: [
+            for (final l in libraries) (id: 'library:${l.globalKey}',
+              label: libraries.any((other) => other.globalKey != l.globalKey && other.title == l.title)
+                ? '${l.title} · ${l.serverName ?? l.serverId}' : l.title, icon: Icons.video_library_outlined),
+          ],
+          onChoose: (id) => Navigator.pop(dialog, id), onClose: () => Navigator.pop(dialog),
+        ),
+      );
+      if (!mounted || owner != profile.committedIdentityGeneration) return;
+      if (choice == null || choice == active) {
+        if (previous?.context?.mounted == true && previous!.canRequestFocus) previous.requestFocus();
+        return;
+      }
+      if (shellRoute == null || !shellRoute.isActive) return;
+      navigator.popUntil((route) => route == shellRoute || route.isFirst);
+      if (choice == 'profile') {
+        await _openDockProfile(context);
+      } else if (choice == 'studios' || choice == 'together') {
+        // Release the guard before entering another browse route.
+        _edgeOpen = false;
+        unawaited(navigator.push<void>(MaterialPageRoute(builder: (_) =>
+          choice == 'studios' ? const StudiosScreen() : const WatchTogetherScreen())));
+      } else if (choice.startsWith('library:')) {
+        _selectLibrary(choice.substring(8));
+      } else {
+        _selectTab(NavigationTabId.values.byName(choice));
+        _focusContent(restorePreviousFocus: false);
+      }
+    } finally {
+      _edgeOpen = false;
+    }
+  }
+
+  Widget _buildTvShell(BuildContext context) {
+    final navigator = Navigator.of(context);
+    if (_edgeNavigator != navigator) {
+      if (_edgeNavigator != null) TvEdgeMenuHost.detach(_edgeNavigator!, _requestEdgeMenu);
+      _edgeNavigator = navigator;
+      TvEdgeMenuHost.attach(navigator, _requestEdgeMenu);
+    }
+    return OverlaySheetHost(
     onOpenChanged: _handleOverlaySheetOpenChanged,
     canPop: false,
     child: Focus(
@@ -2679,7 +2789,7 @@ class _MainScreenState extends State<MainScreen>
                                 child: TvNavigationDock(
                                   key: _tvDockKey,
                                   tabs: KidsProfileService.instance.isActiveKids
-                                      ? _getVisibleTabs(_isOffline)
+                                      ? _getVisibleTabs(_isOffline).where((tab) => tab.id != NavigationTabId.settings).toList()
                                       : _getVisibleTabs(_isOffline)
                                             .where(
                                               (tab) =>
@@ -2718,6 +2828,8 @@ class _MainScreenState extends State<MainScreen>
       ),
     ),
   );
+
+  }
 
   /// Mobile landscape: the bottom bar's destinations on a leading rail, the
   /// content beside it. The rail absorbs the leading system inset itself, so

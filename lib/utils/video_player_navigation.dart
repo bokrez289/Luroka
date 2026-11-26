@@ -329,6 +329,7 @@ Future<bool?> navigateToVideoPlayer(
   Duration? initialPosition,
   bool strictMediaSelection = false,
   bool explicitStartPolicy = false,
+  bool restartBriefProgress = false,
   PlaybackLaunchObserver? launchObserver,
 }) async {
   if (!KidsProfileService.instance.allows(metadata)) {
@@ -353,6 +354,15 @@ Future<bool?> navigateToVideoPlayer(
   // Plex-only client. The player branches on the returned type internally.
   final manager = context.read<MultiServerProvider>().serverManager;
   final offlineWatchService = context.read<OfflineWatchSyncService>();
+  if (restartBriefProgress && initialPosition == null) {
+    final offlineOffset = isOffline ? await offlineWatchService.getLocalViewOffset(metadata.globalKey) : null;
+    if (!context.mounted || !launchCurrent()) return null;
+    final effective = offlineOffset == null ? metadata : metadata.copyWith(viewOffsetMs: offlineOffset);
+    if ((effective.viewOffsetMs ?? 0) > 0 && !effective.hasMeaningfulProgress) {
+      metadata = metadata.copyWith(viewOffsetMs: 0);
+      initialPosition = Duration.zero;
+    }
+  }
   final serverId = serverIdOrNull(metadata.serverId);
   final mediaClient = serverId != null && (!isOffline || manager.isClientOnline(serverId))
       ? manager.getClient(serverId)
@@ -557,6 +567,7 @@ Future<bool?> navigateToVideoPlayerWithRefresh(
   String? selectedMediaSourceId,
   bool usePushReplacement = false,
   bool Function()? isLaunchCurrent,
+  bool restartBriefProgress = false,
 }) async {
   final result = await navigateToVideoPlayer(
     context,
@@ -569,6 +580,7 @@ Future<bool?> navigateToVideoPlayerWithRefresh(
     selectedMediaSourceId: selectedMediaSourceId,
     usePushReplacement: usePushReplacement,
     isLaunchCurrent: isLaunchCurrent,
+    restartBriefProgress: restartBriefProgress,
   );
 
   appLogger.d('Returned from playback, refreshing metadata');

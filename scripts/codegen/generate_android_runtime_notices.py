@@ -33,7 +33,7 @@ def render(inventory, cache):
                 if not NOTICE.search(name) or name.endswith('/'):
                     continue
                 try:
-                    text = '\n'.join(line.rstrip() for line in archive.read(name).decode('utf-8').splitlines())
+                    text = archive.read(name).decode('utf-8')
                 except UnicodeDecodeError:
                     continue
                 observed.append(prefix + name)

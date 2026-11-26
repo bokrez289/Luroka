@@ -35,7 +35,7 @@ class TranslationsZh extends Translations with BaseTranslations<AppLocale, Trans
 
 	late final TranslationsZh _root = this; // ignore: unused_field
 
-	@override
+	@override 
 	TranslationsZh $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsZh(meta: meta ?? this.$meta);
 
 	// Translations
@@ -143,6 +143,10 @@ class TranslationsZh extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$profileSetupGuide$zh profileSetupGuide = Translations$profileSetupGuide$zh.internal(_root);
 	@override late final Translations$animeFavorites$zh animeFavorites = Translations$animeFavorites$zh.internal(_root);
 	@override late final Translations$addServer$zh addServer = Translations$addServer$zh.internal(_root);
+	@override late final Translations$episodeDetails$zh episodeDetails = Translations$episodeDetails$zh.internal(_root);
+	@override late final Translations$tvEdgeMenu$zh tvEdgeMenu = Translations$tvEdgeMenu$zh.internal(_root);
+	@override late final Translations$showDetailLayout$zh showDetailLayout = Translations$showDetailLayout$zh.internal(_root);
+	@override late final Translations$iconStyles$zh iconStyles = Translations$iconStyles$zh.internal(_root);
 }
 
 // Path: mobileLibrary
@@ -564,6 +568,7 @@ class Translations$kidsShelf$zh extends Translations$kidsShelf$en {
 	final TranslationsZh _root; // ignore: unused_field
 
 	// Translations
+	@override String get quietScenery => '宁静夜景';
 	@override String get movieShelf => '电影时间';
 	@override String get showShelf => '寻找您的下一场演出';
 	@override String get aurora => 'Aurora — 深青色和青柠色';
@@ -925,6 +930,8 @@ class Translations$lurokaDiscovery$zh extends Translations$lurokaDiscovery$en {
 	@override String get noAvailable => '在检查的库中未找到匹配的标题。';
 	@override String get sourceInfo => '每周趋势及获奖者评选 · TMDb';
 	@override String get configure => '发现设置';
+	@override String get filterOwned => '我的媒体库中';
+	@override String get statusRetry => '无法检查 Seerr · 重试';
 }
 
 // Path: app
@@ -1472,6 +1479,10 @@ class Translations$settings$zh extends Translations$settings$en {
 	@override String get playerScopeTitle => '按剧集或电影';
 	@override String get exportDialogTitle => '导出 Luroka 设置';
 	@override String get velvetHourTheme => '天鹅绒时光';
+	@override String get backdropBrightness => '背景亮度';
+	@override String get backdropBrightnessDescription => '调整主页和作品图片上的遮暗程度。默认值为 100%。';
+	@override String get showEarlyNextEpisode => '在当前分集结束前显示下一集';
+	@override String get showEarlyNextEpisodeDescription => '在片尾字幕期间或最后 30 秒显示下一集。';
 }
 
 // Path: themeEditor
@@ -1719,6 +1730,9 @@ class Translations$lurokaThemes$zh extends Translations$lurokaThemes$en {
 	final TranslationsZh _root; // ignore: unused_field
 
 	// Translations
+	@override String get patina => '铜锈 · 深青与赤铜';
+	@override String get afterimage => '残像 · 靛蓝与霓虹玫红';
+	@override String get letterpress => '活版印刷 · 暖纸与酒红墨色';
 	@override String get title => 'Luroka 影院调色板';
 	@override String get coral => '珊瑚·午夜蓝&夕阳';
 	@override String get ocean => '海洋·深蓝&冰';
@@ -1817,6 +1831,14 @@ class Translations$homeLayout$zh extends Translations$homeLayout$en {
 	@override String get resetDescription => '恢复原始行顺序并显示此配置文件的所有行？您固定的收藏将被保留。';
 	@override String get saveFailed => '无法保存您的主页布局。请再试一次。';
 	@override String get emptyHint => '行可能被隐藏。打开个性化主页以再次显示它们。';
+	@override String get upcomingEpisodes => '即将播出的分集';
+	@override String get upcomingFavorites => '收藏';
+	@override String get upcomingWatched => '之前观看过的作品';
+	@override String get upcomingBoth => '收藏和之前观看过的作品';
+	@override String get upcomingAll => '所有剧集';
+	@override String get upcomingOff => '关闭';
+	@override String airDate({required Object date}) => '播出日期：${date}';
+	@override String get upcomingHint => '仅在启用此行时才会在后台检查即将到来的播出日期。结果数量有限，服务器上可能尚未提供相关内容。';
 }
 
 // Path: screenTime
@@ -1886,6 +1908,34 @@ class Translations$activityStats$zh extends Translations$activityStats$en {
 	@override String get emptyTitle => '这里还什么都没有';
 	@override String get emptyBody => '观看一些内容，您的统计数据就会在这里建立起来。';
 	@override String get noDataInPeriod => '在此期间没有播放记录。';
+	@override String get patternsTab => '观看趋势';
+	@override String get moviesFilter => '电影';
+	@override String get episodesFilter => '分集';
+	@override String get datesFilter => '日期';
+	@override String titlesPlayed({required Object count}) => '已播放 ${count} 个作品 · 分集单独计算';
+	@override String get previousPeriod => '上一时段';
+	@override String lifetimeSummary({required Object total, required Object average}) => '全部时间：${total} · 日均：${average}';
+	@override String get dailyAverage => '日均';
+	@override String get allKinds => '全部';
+	@override String get titlesPlayedLabel => '已播放作品';
+	@override String get ledgerScope => '活动数据来自此个人资料的本地 Luroka 播放记录，不包括服务器观看历史或其他应用中的播放记录。';
+	@override String chartScale({required Object duration}) => '刻度：0 – ${duration}';
+	@override String get gettingStarted => '观看记录刚刚开始积累。活跃几天后将显示观看趋势。';
+	@override String get history => '历史记录';
+	@override String get insufficientHistory => '历史记录不足';
+	@override String get monthlyRecap => '月度回顾';
+	@override String get noMatches => '没有符合这些筛选条件的观看记录。';
+	@override String get activeDays => '活跃天数';
+	@override String get measurementHint => '时间反映的是记录的播放时长，并不表示作品已看完。';
+	@override String get historyError => '无法加载历史记录，请重试。';
+	@override String get watchedPeriod => '此时段观看时长';
+	@override String monthWatched({required Object duration}) => '本月观看 ${duration}';
+	@override String get drillDown => '查看这些日期的活动';
+	@override String get searchHistory => '搜索观看历史';
+	@override String get clearDates => '清除日期';
+	@override String get playedHint => '分集单独计算。播放时长不代表已看完。';
+	@override String get allHistory => '查看全部历史记录';
+	@override String get overview => '概览';
 }
 
 // Path: search
@@ -2094,6 +2144,7 @@ class Translations$mediaMenu$zh extends Translations$mediaMenu$en {
 	@override String get rate => '评分';
 	@override String get playFromBeginning => '从头播放';
 	@override String get playVersion => '播放版本…';
+	@override String get removeFromNextUp => '从接下来播放中移除';
 }
 
 // Path: rateSheet
@@ -2110,6 +2161,8 @@ class Translations$rateSheet$zh extends Translations$rateSheet$en {
 	@override String get saved => '已保存';
 	@override String get notAvailable => '未找到匹配项';
 	@override String get noConnectedServices => '在设置中连接服务，即可在此评分。';
+	@override String get addFavorite => '添加到收藏';
+	@override String get removeFavorite => '从收藏中移除';
 }
 
 // Path: accessibility
@@ -2344,6 +2397,8 @@ class Translations$messages$zh extends Translations$messages$en {
 	@override String get streamSelectionFailed => '无法应用所选视频流';
 	@override String get trackSelectionNotRemembered => '此轨道选择仅对当前播放生效。';
 	@override String get serverUnavailableForProfile => '没有可供当前用户资料使用的服务器';
+	@override String get logSupportReference => '支持参考编号';
+	@override String get copyFullLogId => '复制完整日志 ID';
 }
 
 // Path: sourceLibraries
@@ -3917,6 +3972,68 @@ class Translations$addServer$zh extends Translations$addServer$en {
 	@override String redirectUnsupportedEnterFinal({required Object product}) => '服务器重定向到了不受支持的 URL。请直接输入最终的 ${product} URL。';
 }
 
+// Path: episodeDetails
+class Translations$episodeDetails$zh extends Translations$episodeDetails$en {
+	Translations$episodeDetails$zh.internal(TranslationsZh root) : this._root = root, super.internal(root);
+
+	final TranslationsZh _root; // ignore: unused_field
+
+	// Translations
+	@override String get previous => '上一集';
+	@override String get next => '下一集';
+}
+
+// Path: tvEdgeMenu
+class Translations$tvEdgeMenu$zh extends Translations$tvEdgeMenu$en {
+	Translations$tvEdgeMenu$zh.internal(TranslationsZh root) : this._root = root, super.internal(root);
+
+	final TranslationsZh _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '电视导航';
+	@override String get top => '顶部导航栏';
+	@override String get both => '顶部导航栏和侧边菜单';
+	@override String get hint => '在一行的第一个项目上按左键打开侧边菜单。按右键或返回键可返回。';
+	@override String get tryMenu => '试用导航';
+	@override String get allLibraries => '所有媒体库';
+	@override String get browse => '浏览';
+	@override String get more => '更多';
+	@override String get closeHint => '按右键或返回键关闭';
+}
+
+// Path: showDetailLayout
+class Translations$showDetailLayout$zh extends Translations$showDetailLayout$en {
+	Translations$showDetailLayout$zh.internal(TranslationsZh root) : this._root = root, super.internal(root);
+
+	final TranslationsZh _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '剧集详情布局';
+	@override String get description => '选择电视上剧集和分集的显示方式。';
+	@override String get compact => '紧凑分集列表';
+	@override String get cinematic => '影院风格';
+	@override String get seasons => '选择一季';
+	@override String get episodes => '分集';
+	@override String get details => '详情';
+	@override String get cast => '演员';
+	@override String get related => '相似作品';
+}
+
+// Path: iconStyles
+class Translations$iconStyles$zh extends Translations$iconStyles$en {
+	Translations$iconStyles$zh.internal(TranslationsZh root) : this._root = root, super.internal(root);
+
+	final TranslationsZh _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '图标样式';
+	@override String get description => '选择应用控件的外观。更改仅适用于此个人资料。';
+	@override String get current => 'Luroka Bold';
+	@override String get lucide => 'Lucide';
+	@override String get lucideDescription => '简洁的线条图标；不可用的图标将使用 Material 图标替代。';
+	@override String get outline => 'Material Outline';
+}
+
 // Path: appIcon.names
 class Translations$appIcon$names$zh extends Translations$appIcon$names$en {
 	Translations$appIcon$names$zh.internal(TranslationsZh root) : this._root = root, super.internal(root);
@@ -4906,8 +5023,8 @@ extension on TranslationsZh {
 			'family.yourPeople' => '你的人',
 			'family.manageHint' => '管理此设备上的人员、儿童的安全和观看活动。',
 			'family.people' => '人',
-			'family.peopleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}​人', other: '${n}人', ),
-			'family.kidsCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}​子', other: '${n} 儿童', ),
+			'family.peopleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}​人', other: '${n}人', ), 
+			'family.kidsCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}​子', other: '${n} 儿童', ), 
 			'family.you' => '你',
 			'family.adult' => '成人',
 			'family.child' => '儿童',
@@ -5116,6 +5233,7 @@ extension on TranslationsZh {
 			'downloadsRedesign.downloaded' => '已下载',
 			'downloadsRedesign.speed' => '下载速度',
 			'downloadsRedesign.notificationProgress' => '{progress} · {networkSpeed} · {timeRemaining} 剩余',
+			'kidsShelf.quietScenery' => '宁静夜景',
 			'kidsShelf.movieShelf' => '电影时间',
 			'kidsShelf.showShelf' => '寻找您的下一场演出',
 			'kidsShelf.aurora' => 'Aurora — 深青色和青柠色',
@@ -5365,9 +5483,9 @@ extension on TranslationsZh {
 			'kids.historyReset' => '儿童观看排除重置',
 			'kids.blocked' => '此标题在此儿童个人资料中不可用。',
 			'kids.switchProfile' => '切换配置文件',
-			'kids.manageFromAdult' => '切换到成人配置文件以管理设置。',
 			_ => null,
 		} ?? switch (path) {
+			'kids.manageFromAdult' => '切换到成人配置文件以管理设置。',
 			'kids.noConnections' => '在添加儿童个人资料之前，将服务器连接到您的成人个人资料。',
 			'kids.created' => '儿童档案已创建',
 			'kids.updated' => '孩子们的个人资料已更新',
@@ -5407,6 +5525,8 @@ extension on TranslationsZh {
 			'lurokaDiscovery.noAvailable' => '在检查的库中未找到匹配的标题。',
 			'lurokaDiscovery.sourceInfo' => '每周趋势及获奖者评选 · TMDb',
 			'lurokaDiscovery.configure' => '发现设置',
+			'lurokaDiscovery.filterOwned' => '我的媒体库中',
+			'lurokaDiscovery.statusRetry' => '无法检查 Seerr · 重试',
 			'app.title' => 'Luroka',
 			'appIcon.title' => '应用程序图标',
 			'appIcon.defaultIcon' => '默认',
@@ -5877,11 +5997,11 @@ extension on TranslationsZh {
 			'settings.liveTvDefaultFavoritesDescription' => '打开直播电视时仅显示收藏频道',
 			'settings.general' => '通用',
 			'settings.generalDescription' => '语言、启动和窗口行为',
+			_ => null,
+		} ?? switch (path) {
 			'settings.languageAndRegion' => '语言与地区',
 			'settings.startup' => '启动',
 			'settings.display' => '显示',
-			_ => null,
-		} ?? switch (path) {
 			'settings.libraryAndCards' => '媒体库与卡片',
 			'settings.homeScreen' => '主屏幕',
 			'settings.navigation' => '导航',
@@ -5916,6 +6036,10 @@ extension on TranslationsZh {
 			'settings.playerScopeTitle' => '按剧集或电影',
 			'settings.exportDialogTitle' => '导出 Luroka 设置',
 			'settings.velvetHourTheme' => '天鹅绒时光',
+			'settings.backdropBrightness' => '背景亮度',
+			'settings.backdropBrightnessDescription' => '调整主页和作品图片上的遮暗程度。默认值为 100%。',
+			'settings.showEarlyNextEpisode' => '在当前分集结束前显示下一集',
+			'settings.showEarlyNextEpisodeDescription' => '在片尾字幕期间或最后 30 秒显示下一集。',
 			'themeEditor.builtIn' => '内置',
 			'themeEditor.presets' => '预设',
 			'themeEditor.custom' => '定制',
@@ -6057,6 +6181,9 @@ extension on TranslationsZh {
 			'referenceDetails.continuing' => '继续',
 			'referenceDetails.upNext' => '接下来',
 			'referenceDetails.episodesLeft' => ({required Object count}) => '${count} 还剩几集',
+			'lurokaThemes.patina' => '铜锈 · 深青与赤铜',
+			'lurokaThemes.afterimage' => '残像 · 靛蓝与霓虹玫红',
+			'lurokaThemes.letterpress' => '活版印刷 · 暖纸与酒红墨色',
 			'lurokaThemes.title' => 'Luroka 影院调色板',
 			'lurokaThemes.coral' => '珊瑚·午夜蓝&夕阳',
 			'lurokaThemes.ocean' => '海洋·深蓝&冰',
@@ -6137,6 +6264,14 @@ extension on TranslationsZh {
 			'homeLayout.resetDescription' => '恢复原始行顺序并显示此配置文件的所有行？您固定的收藏将被保留。',
 			'homeLayout.saveFailed' => '无法保存您的主页布局。请再试一次。',
 			'homeLayout.emptyHint' => '行可能被隐藏。打开个性化主页以再次显示它们。',
+			'homeLayout.upcomingEpisodes' => '即将播出的分集',
+			'homeLayout.upcomingFavorites' => '收藏',
+			'homeLayout.upcomingWatched' => '之前观看过的作品',
+			'homeLayout.upcomingBoth' => '收藏和之前观看过的作品',
+			'homeLayout.upcomingAll' => '所有剧集',
+			'homeLayout.upcomingOff' => '关闭',
+			'homeLayout.airDate' => ({required Object date}) => '播出日期：${date}',
+			'homeLayout.upcomingHint' => '仅在启用此行时才会在后台检查即将到来的播出日期。结果数量有限，服务器上可能尚未提供相关内容。',
 			'screenTime.title' => '屏幕时间',
 			'screenTime.description' => '查看在此个人资料上观看视频所花费的时间',
 			'screenTime.today' => '今天',
@@ -6157,7 +6292,7 @@ extension on TranslationsZh {
 			'activityStats.heroDailyAverage' => '日平均',
 			'activityStats.consistency' => '一致性',
 			'activityStats.currentStreak' => '当前连胜',
-			'activityStats.dayCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 天', other: '${n} 天', ),
+			'activityStats.dayCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 天', other: '${n} 天', ), 
 			'activityStats.longestStreak' => '最长连续纪录',
 			'activityStats.bestDay' => '最好的一天',
 			'activityStats.bestWeek' => '最好的一周',
@@ -6185,6 +6320,34 @@ extension on TranslationsZh {
 			'activityStats.emptyTitle' => '这里还什么都没有',
 			'activityStats.emptyBody' => '观看一些内容，您的统计数据就会在这里建立起来。',
 			'activityStats.noDataInPeriod' => '在此期间没有播放记录。',
+			'activityStats.patternsTab' => '观看趋势',
+			'activityStats.moviesFilter' => '电影',
+			'activityStats.episodesFilter' => '分集',
+			'activityStats.datesFilter' => '日期',
+			'activityStats.titlesPlayed' => ({required Object count}) => '已播放 ${count} 个作品 · 分集单独计算',
+			'activityStats.previousPeriod' => '上一时段',
+			'activityStats.lifetimeSummary' => ({required Object total, required Object average}) => '全部时间：${total} · 日均：${average}',
+			'activityStats.dailyAverage' => '日均',
+			'activityStats.allKinds' => '全部',
+			'activityStats.titlesPlayedLabel' => '已播放作品',
+			'activityStats.ledgerScope' => '活动数据来自此个人资料的本地 Luroka 播放记录，不包括服务器观看历史或其他应用中的播放记录。',
+			'activityStats.chartScale' => ({required Object duration}) => '刻度：0 – ${duration}',
+			'activityStats.gettingStarted' => '观看记录刚刚开始积累。活跃几天后将显示观看趋势。',
+			'activityStats.history' => '历史记录',
+			'activityStats.insufficientHistory' => '历史记录不足',
+			'activityStats.monthlyRecap' => '月度回顾',
+			'activityStats.noMatches' => '没有符合这些筛选条件的观看记录。',
+			'activityStats.activeDays' => '活跃天数',
+			'activityStats.measurementHint' => '时间反映的是记录的播放时长，并不表示作品已看完。',
+			'activityStats.historyError' => '无法加载历史记录，请重试。',
+			'activityStats.watchedPeriod' => '此时段观看时长',
+			'activityStats.monthWatched' => ({required Object duration}) => '本月观看 ${duration}',
+			'activityStats.drillDown' => '查看这些日期的活动',
+			'activityStats.searchHistory' => '搜索观看历史',
+			'activityStats.clearDates' => '清除日期',
+			'activityStats.playedHint' => '分集单独计算。播放时长不代表已看完。',
+			'activityStats.allHistory' => '查看全部历史记录',
+			'activityStats.overview' => '概览',
 			'search.hint' => '搜索电影、剧集、音乐…',
 			'search.tryDifferentTerm' => '尝试不同的搜索词',
 			'search.searchYourMedia' => '搜索媒体',
@@ -6348,6 +6511,8 @@ extension on TranslationsZh {
 			'mediaMenu.shuffleNotAvailableOffline' => '离线时无法随机播放',
 			'mediaMenu.fileInfo' => '文件信息',
 			'mediaMenu.deleteEpisodeFromServer' => '从服务器删除单集',
+			_ => null,
+		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => '从服务器删除季度',
 			'mediaMenu.deleteShowFromServer' => '从服务器删除剧集',
 			'mediaMenu.deleteMovieFromServer' => '从服务器删除电影',
@@ -6362,9 +6527,9 @@ extension on TranslationsZh {
 			'mediaMenu.deleteAnyway' => '仍然删除',
 			'mediaMenu.confirmDeleteTarget' => ({required Object title}) => '从你的服务器永久删除 ${title}？',
 			'mediaMenu.deleteMultipleWarning' => '这包括所有剧集及其文件。',
-			'mediaMenu.deleteEpisodeCountWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '这将删除其中的所有 ${n} 剧集及其文件。', other: '这将删除其中全部 ${n} 集以及它们的文件。', ),
-			'mediaMenu.deleteMultiPartWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '该项目存储为 ${n} 文件，该文件将被删除。', other: '此项目存储在 ${n} 个文件中，所有这些文件都会被删除。', ),
-			'mediaMenu.deleteSharedFileHeading' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 其他剧集存储在同一文件中，也将被删除：', other: '另外 ${n} 集存储在同一个文件中，也会一并删除：', ),
+			'mediaMenu.deleteEpisodeCountWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '这将删除其中的所有 ${n} 剧集及其文件。', other: '这将删除其中全部 ${n} 集以及它们的文件。', ), 
+			'mediaMenu.deleteMultiPartWarning' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '该项目存储为 ${n} 文件，该文件将被删除。', other: '此项目存储在 ${n} 个文件中，所有这些文件都会被删除。', ), 
+			'mediaMenu.deleteSharedFileHeading' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 其他剧集存储在同一文件中，也将被删除：', other: '另外 ${n} 集存储在同一个文件中，也会一并删除：', ), 
 			'mediaMenu.deleteScopeUnverifiedProbeFailed' => 'Luroka 无法确认此操作会删除哪些文件，因此删除范围可能超出上面提到的项目。请取消后重试，或仍然删除。',
 			'mediaMenu.deleteScopeUnverifiedNoFileInfo' => '你的服务器没有提供此项目的文件详情，因此 Luroka 无法确认此操作会删除哪些文件。删除范围可能超出上面提到的项目。',
 			'mediaMenu.mediaDeletedSuccessfully' => '媒体项已成功删除',
@@ -6372,6 +6537,7 @@ extension on TranslationsZh {
 			'mediaMenu.rate' => '评分',
 			'mediaMenu.playFromBeginning' => '从头播放',
 			'mediaMenu.playVersion' => '播放版本…',
+			'mediaMenu.removeFromNextUp' => '从接下来播放中移除',
 			'rateSheet.title' => '评分',
 			'rateSheet.server' => '服务器',
 			'rateSheet.favorite' => '收藏',
@@ -6379,6 +6545,8 @@ extension on TranslationsZh {
 			'rateSheet.saved' => '已保存',
 			'rateSheet.notAvailable' => '未找到匹配项',
 			'rateSheet.noConnectedServices' => '在设置中连接服务，即可在此评分。',
+			'rateSheet.addFavorite' => '添加到收藏',
+			'rateSheet.removeFavorite' => '从收藏中移除',
 			'accessibility.mediaCardMovie' => ({required Object title}) => '${title}, 电影',
 			'accessibility.mediaCardShow' => ({required Object title}) => '${title}, 电视剧',
 			'accessibility.mediaCardEpisode' => ({required Object title, required Object episodeInfo}) => '${title}, ${episodeInfo}',
@@ -6394,8 +6562,6 @@ extension on TranslationsZh {
 			'accessibility.hue' => '色相',
 			'accessibility.saturation' => '饱和度',
 			'accessibility.brightness' => '亮度',
-			_ => null,
-		} ?? switch (path) {
 			'accessibility.hexColor' => '十六进制颜色',
 			'accessibility.expandText' => '展开文本',
 			'accessibility.collapseText' => '折叠文本',
@@ -6511,7 +6677,7 @@ extension on TranslationsZh {
 			'messages.markedAsWatchedOffline' => '已标记为已观看（将在联网时同步）',
 			'messages.markedAsUnwatchedOffline' => '已标记为未观看（将在联网时同步）',
 			'messages.autoRemovedWatchedDownload' => ({required Object title}) => '已自动移除：${title}',
-			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '自动删除${n}观看下载', other: '已自动移除 ${n} 个看过的下载', ),
+			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '自动删除${n}观看下载', other: '已自动移除 ${n} 个看过的下载', ), 
 			'messages.removedFromContinueWatching' => '已从继续观看中移除',
 			'messages.errorLoading' => ({required Object error}) => '出错：${error}',
 			'messages.searchPartialResults' => '部分媒体服务器无法搜索。正在显示可用的结果。',
@@ -6574,6 +6740,8 @@ extension on TranslationsZh {
 			'messages.streamSelectionFailed' => '无法应用所选视频流',
 			'messages.trackSelectionNotRemembered' => '此轨道选择仅对当前播放生效。',
 			'messages.serverUnavailableForProfile' => '没有可供当前用户资料使用的服务器',
+			'messages.logSupportReference' => '支持参考编号',
+			'messages.copyFullLogId' => '复制完整日志 ID',
 			'sourceLibraries.title' => '您的服务器和库',
 			'sourceLibraries.description' => '选择 Luroka 用于主页、搜索、发现可用性和工作室的库。主行顺序单独定制。',
 			'sourceLibraries.partial' => '某些服务器无法检查。您为这些库保存的选择将被保留。刷新再试一次。',
@@ -6800,7 +6968,7 @@ extension on TranslationsZh {
 			'discover.tvShow' => '电视剧',
 			'discover.minutesLeft' => ({required Object minutes}) => '剩余 ${minutes} 分钟',
 			'discover.moreLikeThis' => '更多类似内容',
-			'discover.titleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 标题', other: '${n} 个标题', ),
+			'discover.titleCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 标题', other: '${n} 个标题', ), 
 			'discover.person.born' => '出生',
 			'discover.person.died' => '死了',
 			'discover.person.birthplace' => '出生地',
@@ -6857,6 +7025,8 @@ extension on TranslationsZh {
 			'libraries.filters' => '筛选',
 			'libraries.confirmActionMessage' => '确定要执行此操作吗？',
 			'libraries.showLibrary' => '显示媒体库',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.hideLibrary' => '隐藏媒体库',
 			'libraries.libraryOptions' => '媒体库选项',
 			'libraries.content' => '媒体库内容',
@@ -6908,8 +7078,6 @@ extension on TranslationsZh {
 			'libraries.sortLabels.dateShared' => '共享日期',
 			'libraries.sortLabels.latestEpisodeAirDate' => '最新一集播出日期',
 			'libraries.sortLabels.lastEpisodeDateAdded' => '最新一集添加日期',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => '下载日期',
 			'libraries.sortLabels.size' => '大小',
 			'libraries.sortLabels.library' => '媒体库',
@@ -7057,7 +7225,7 @@ extension on TranslationsZh {
 			'explore.status.ended' => '已完结',
 			'explore.status.canceled' => '已取消',
 			'explore.status.upcoming' => '即将上线',
-			'explore.episodeCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 剧集', other: '${n} 集', ),
+			'explore.episodeCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 剧集', other: '${n} 集', ), 
 			'explore.cast' => '演员表',
 			'explore.characters' => '角色',
 			'explore.addToWatchlist' => '添加到想看列表',
@@ -7069,7 +7237,7 @@ extension on TranslationsZh {
 			'explore.notInLibrary' => '不在你的媒体库中',
 			'explore.inTheseLibraries' => '在这些媒体库中',
 			'explore.checkingLibrary' => '正在检查你的媒体库…',
-			'explore.libraryCheckFailed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '无法检查 ${n} 服务器', other: '无法检查 ${n} 台服务器', ),
+			'explore.libraryCheckFailed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '无法检查 ${n} 服务器', other: '无法检查 ${n} 台服务器', ), 
 			'explore.emptyTitle' => '这里还什么都没有',
 			'explore.emptyMessage' => ({required Object source}) => '当 ${source} 有内容时，相关内容将显示在这里。',
 			'explore.searchHint' => ({required Object source}) => '搜索 ${source}',
@@ -7106,7 +7274,7 @@ extension on TranslationsZh {
 			'explore.stats.planning' => ({required Object n}) => '${n} 人想看',
 			'explore.stats.favorited' => ({required Object n}) => '${n} 人收藏',
 			'explore.stats.dropRate' => ({required Object percent}) => '${percent} 弃番',
-			'explore.stats.comments' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 评论', other: '${n} 条评论', ),
+			'explore.stats.comments' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 评论', other: '${n} 条评论', ), 
 			'explore.stats.votes' => ({required Object n}) => '${n} 票',
 			'explore.stats.watching' => ({required Object n}) => '${n} 人正在观看',
 			'explore.stats.completed' => ({required Object n}) => '${n} 人已看完',
@@ -7173,14 +7341,14 @@ extension on TranslationsZh {
 			'explore.detail.crew' => '演职人员',
 			'explore.detail.ratings' => '评分',
 			'explore.detail.schedule' => '播出时间',
-			'explore.detail.recommendedByUsers' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}用户推荐', other: '由 ${n} 位用户推荐', ),
+			'explore.detail.recommendedByUsers' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}用户推荐', other: '由 ${n} 位用户推荐', ), 
 			'explore.detail.recommendedBy' => ({required Object who}) => '由 ${who} 推荐',
 			'explore.detail.favoritedBy' => ({required Object who}) => '由 ${who} 收藏',
 			'explore.detail.unairedEpisodes' => ({required Object n}) => '还有 ${n} 集未播出',
 			'explore.detail.recommendedByPercent' => ({required Object percent}) => '${percent} 的观众推荐',
 			'explore.detail.relatedTitles' => '相关作品',
 			'explore.detail.background' => '背景',
-			'explore.totalResults' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 结果', other: '${n} 条结果', ),
+			'explore.totalResults' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 结果', other: '${n} 条结果', ), 
 			'liveTv.title' => '直播电视',
 			'liveTv.guide' => '节目指南',
 			'liveTv.noChannels' => '没有可用的频道',
@@ -7325,7 +7493,7 @@ extension on TranslationsZh {
 			'music.playNext' => '下一首播放',
 			'music.addToQueue' => '添加到队列',
 			'music.discNumber' => ({required Object n}) => '碟片 ${n}',
-			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}轨道', other: '${n} 首', ),
+			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n}轨道', other: '${n} 首', ), 
 			'music.nowPlaying' => '正在播放',
 			'music.playingFrom' => ({required Object title}) => '播放来源：${title}',
 			'music.queue' => '播放队列',
@@ -7371,6 +7539,8 @@ extension on TranslationsZh {
 			'watchTogether.qrShare' => '分享二维码',
 			'watchTogether.qrHint' => '使用Luroka应用程序扫描即可加入该房间。',
 			'watchTogether.phasePlaying' => '演奏',
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.phasePaused' => '已暂停',
 			'watchTogether.phaseWaiting' => '等待大家',
 			'watchTogether.inviteCopied' => '邀请已复制。将其粘贴到消息中。',
@@ -7421,9 +7591,7 @@ extension on TranslationsZh {
 			'watchTogether.offsetPlusTenth' => '+100 毫秒',
 			'watchTogether.offsetPlusSecond' => '+1秒',
 			'watchTogether.participants' => '参与者',
-			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 参与者', other: '${n} 参与者', ),
-			_ => null,
-		} ?? switch (path) {
+			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, one: '${n} 参与者', other: '${n} 参与者', ), 
 			'watchTogether.hostBadge' => '主持人',
 			'watchTogether.nameYou' => ({required Object name}) => '${name}（你）',
 			'watchTogether.playerIdle' => '空闲',
@@ -7885,6 +8053,8 @@ extension on TranslationsZh {
 			'matchScreen.match' => '匹配…',
 			'matchScreen.fixMatch' => '修正匹配…',
 			'matchScreen.unmatch' => '取消匹配',
+			_ => null,
+		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => '清除此匹配？在重新匹配前，Plex 会将其视为未匹配。',
 			'matchScreen.unmatchSuccess' => '已取消匹配',
 			'matchScreen.unmatchFailed' => '无法取消匹配',
@@ -7936,8 +8106,6 @@ extension on TranslationsZh {
 			'seerr.requestFailed' => ({required Object error}) => '请求失败：${error}',
 			'seerr.requestsLoadFailed' => '无法加载请求选项',
 			'seerr.nothingToRequest' => '所有内容都已可用或已请求。',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusAvailable' => '可用',
 			'seerr.statusPartiallyAvailable' => '部分可用',
 			'seerr.statusRequested' => '已请求',
@@ -8116,6 +8284,32 @@ extension on TranslationsZh {
 			'addServer.redirectDifferentHost' => ({required Object product}) => '服务器重定向到了其他主机。请直接输入最终的 ${product} URL。',
 			'addServer.redirectInsecure' => '服务器从 HTTPS 重定向到了不安全的 URL',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => '服务器重定向到了不受支持的 URL。请直接输入最终的 ${product} URL。',
+			'episodeDetails.previous' => '上一集',
+			'episodeDetails.next' => '下一集',
+			'tvEdgeMenu.title' => '电视导航',
+			'tvEdgeMenu.top' => '顶部导航栏',
+			'tvEdgeMenu.both' => '顶部导航栏和侧边菜单',
+			'tvEdgeMenu.hint' => '在一行的第一个项目上按左键打开侧边菜单。按右键或返回键可返回。',
+			'tvEdgeMenu.tryMenu' => '试用导航',
+			'tvEdgeMenu.allLibraries' => '所有媒体库',
+			'tvEdgeMenu.browse' => '浏览',
+			'tvEdgeMenu.more' => '更多',
+			'tvEdgeMenu.closeHint' => '按右键或返回键关闭',
+			'showDetailLayout.title' => '剧集详情布局',
+			'showDetailLayout.description' => '选择电视上剧集和分集的显示方式。',
+			'showDetailLayout.compact' => '紧凑分集列表',
+			'showDetailLayout.cinematic' => '影院风格',
+			'showDetailLayout.seasons' => '选择一季',
+			'showDetailLayout.episodes' => '分集',
+			'showDetailLayout.details' => '详情',
+			'showDetailLayout.cast' => '演员',
+			'showDetailLayout.related' => '相似作品',
+			'iconStyles.title' => '图标样式',
+			'iconStyles.description' => '选择应用控件的外观。更改仅适用于此个人资料。',
+			'iconStyles.current' => 'Luroka Bold',
+			'iconStyles.lucide' => 'Lucide',
+			'iconStyles.lucideDescription' => '简洁的线条图标；不可用的图标将使用 Material 图标替代。',
+			'iconStyles.outline' => 'Material Outline',
 			_ => null,
 		};
 	}

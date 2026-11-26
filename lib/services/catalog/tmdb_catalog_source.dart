@@ -72,7 +72,11 @@ class TmdbCatalogSource implements CatalogSource, CatalogHubSource, CatalogCommu
       try {
         final body = await _request(path, query);
         if (!_disposed) {
-          await PublicCatalogCache.shared.setString(prefs, cacheKey, jsonEncode({'at': DateTime.now().toIso8601String(), 'body': body}));
+          await PublicCatalogCache.shared.setString(
+            prefs,
+            cacheKey,
+            jsonEncode({'at': DateTime.now().toIso8601String(), 'body': body}),
+          );
         }
         return body;
       } catch (error) {
@@ -144,14 +148,25 @@ class TmdbCatalogSource implements CatalogSource, CatalogHubSource, CatalogCommu
     }
 
     final responses = await Future.wait([
-      optional('videos', {'language': language}),
+      optional('videos', {'language': 'en-US'}),
       optional('reviews', {'language': language}),
     ]);
     final rawVideos = (responses[0]['results'] as List? ?? const []).whereType<Map>().toList();
-    if (rawVideos.isEmpty && language != 'en-US') {
-      rawVideos.addAll(
-        ((await optional('videos', {'language': 'en-US'}))['results'] as List? ?? const []).whereType<Map>(),
-      );
+    if (!rawVideos.any(
+      (v) => v['type'] == 'Trailer' && v['site'] == 'YouTube' && RegExp(r'^[\w-]{11}$').hasMatch('${v['key']}'),
+    )) {
+      // An English clip/teaser must not hide the film's original trailer.
+      try {
+        final detail = await _get('/$type/$tmdb', {});
+        final original = detail['original_language'];
+        if (original is String && original != 'en' && RegExp(r'^[a-z]{2}$').hasMatch(original)) {
+          rawVideos.addAll(
+            ((await optional('videos', {'language': original}))['results'] as List? ?? const []).whereType<Map>(),
+          );
+        }
+      } catch (_) {
+        /* Keep the already available English extras. */
+      }
     }
     final seen = <String>{};
     final counts = <String, int>{};
@@ -247,7 +262,11 @@ class TmdbCatalogSource implements CatalogSource, CatalogHubSource, CatalogCommu
       final score = double.tryParse('${meta['imdbRating']}');
       if (score == null || !score.isFinite || score <= 0 || score > 10) return const [];
       if (!_disposed) {
-        await PublicCatalogCache.shared.setString(prefs, key, jsonEncode({'at': DateTime.now().toIso8601String(), 'value': score}));
+        await PublicCatalogCache.shared.setString(
+          prefs,
+          key,
+          jsonEncode({'at': DateTime.now().toIso8601String(), 'value': score}),
+        );
       }
       return [MediaRatingSource(source: 'imdb', value: score)];
     });

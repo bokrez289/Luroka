@@ -101,6 +101,7 @@ extension _MediaDetailPlaybackTracksStatus on _MediaDetailScreenState {
     _playbackProbeTimer?.cancel();
     _playbackProbeRequests.clear();
     _playbackSources.clear();
+    _offlineSubtitleFiles.clear();
     _detailChapters.clear();
     if (refreshItems) _probedPlaybackItems.clear();
     _playbackStatusRevision.value++;
@@ -148,6 +149,10 @@ extension _MediaDetailPlaybackTracksStatus on _MediaDetailScreenState {
               ? -1
               : versions?.indexWhere((version) => version.id == downloaded.mediaSourceId) ?? -1;
           mediaIndex = byId >= 0 ? byId : downloaded.mediaIndex;
+          final tracks = await PlaybackInitializationService().downloadedDetailTracks(item, downloaded, mediaIndex);
+          if (!current()) return;
+          source = tracks.source;
+          _offlineSubtitleFiles[key] = tracks.files;
           if (versions == null || mediaIndex < 0 || mediaIndex >= versions.length) mediaIndex = null;
         }
       } else {
@@ -425,11 +430,11 @@ extension _MediaDetailPlaybackTracksStatus on _MediaDetailScreenState {
 
   Future<void> _openDetailTracks(BuildContext sheetContext, MediaItem metadata, {String? section}) async {
     final target = _playbackTargetItem(metadata);
-    if (target == null || !_canUseDetail || widget.isOffline) return;
-    final client = _getMediaClientForMetadata(sheetContext);
-    if (client == null) return;
+    if (target == null || !_canUseDetail) return;
+    final client = widget.isOffline ? null : _getMediaClientForMetadata(sheetContext);
+    if (!widget.isOffline && client == null) return;
     if (_playbackSources[target.globalKey]?.source == null) {
-      await _probeTarget(client, null, target, _playbackProbeGeneration);
+      await _probeTarget(client, widget.isOffline ? sheetContext.read<DownloadProvider>() : null, target, _playbackProbeGeneration);
     }
     if (!sheetContext.mounted || !_canUseDetail) return;
     final probed = _playbackSources[target.globalKey];
@@ -524,7 +529,8 @@ extension _MediaDetailPlaybackTracksStatus on _MediaDetailScreenState {
     } else if (source != null && selected.startsWith('subtitle:')) {
       final id = int.tryParse(selected.substring(9));
       final row = source.subtitleTracks.where((t) => t.id == id).firstOrNull;
-      if (row != null) _detailSubtitleChoices[target.globalKey] = PlaybackSubtitleResolver.subtitleTrackForSource(row);
+      if (row != null) _detailSubtitleChoices[target.globalKey] =
+          _offlineSubtitleFiles[target.globalKey]?[id] ?? PlaybackSubtitleResolver.subtitleTrackForSource(row);
     }
     _playbackStatusRevision.value++;
   }

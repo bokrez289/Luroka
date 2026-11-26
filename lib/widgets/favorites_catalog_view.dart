@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'tv_edge_menu.dart';
 import 'settings_builder.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -183,13 +184,13 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
     final hadGridFocus = gridItemFocusNodes.values.any((node) => node.hasFocus);
     final followed = _visible.isEmpty ? null : _visible[_selected.clamp(0, _visible.length - 1)].globalKey;
     final libraryTitles = {for (final library in widget.libraries) library.globalKey: library.title};
-    if (_animeOnly && !widget.items.any((item) =>
-        _animeRules.includesTitle(_copiesFor(item), libraryTitles: libraryTitles))) {
+    if (_animeOnly &&
+        !widget.items.any((item) => _animeRules.includesTitle(_copiesFor(item), libraryTitles: libraryTitles))) {
       _animeOnly = false;
       _kind = null;
     }
-    if (_filters[3].hasFocus && !widget.items.any((item) =>
-        _animeRules.includesTitle(_copiesFor(item), libraryTitles: libraryTitles))) {
+    if (_filters[3].hasFocus &&
+        !widget.items.any((item) => _animeRules.includesTitle(_copiesFor(item), libraryTitles: libraryTitles))) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && _active && (ModalRoute.of(context)?.isCurrent ?? false)) _filters[0].requestFocus();
       });
@@ -397,8 +398,9 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
     final narrow = !PlatformDetector.isTV() && width < 600;
     final colors = Theme.of(context).colorScheme;
     final libraryTitles = {for (final library in widget.libraries) library.globalKey: library.title};
-    final hasAnime = widget.items.any((item) =>
-        _animeRules.includesTitle(_copiesFor(item), libraryTitles: libraryTitles));
+    final hasAnime = widget.items.any(
+      (item) => _animeRules.includesTitle(_copiesFor(item), libraryTitles: libraryTitles),
+    );
     final lastFilterIndex = hasAnime ? 3 : 2;
     final chips = <Widget>[
       for (final (index, (kind, label, anime)) in [
@@ -526,260 +528,269 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
               final textScale = MediaQuery.textScalerOf(context).scale(14) / 14;
               _showPreview = viewport.maxWidth >= 700 && viewport.maxHeight >= 400 && textScale <= 1.5;
               final heroHeight = _collapsed ? 88.0 : (viewport.maxHeight * 0.36).clamp(140.0, 280.0);
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
-                    child: Row(
-                      children: [
-                        AppIcon(Symbols.favorite_rounded, fill: 1, size: 22, color: colors.primary),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            t.libraries.filterCategories.favorites,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        if ((viewport.maxWidth >= 400 || textScale <= 1.2) &&
-                            (widget.items.isNotEmpty || (!widget.loading && widget.errorMessage == null)))
-                          Text(
-                            t.discover.titleCount(n: _visible.length),
-                            style: theme.textTheme.labelMedium?.copyWith(color: colors.onSurfaceVariant),
-                          ),
-                        const SizedBox(width: 12),
-                        FocusableButton(
-                          focusNode: _animeSettingsFocus,
-                          autoScroll: false,
-                          onPressed: () => unawaited(_manageAnime()),
-                          onNavigateUp: widget.onNavigation,
-                          onNavigateLeft: _viewFocus.requestFocus,
-                          onNavigateRight: _refreshFocus.requestFocus,
-                          onNavigateDown: focusContent,
-                          child: IconButton(
-                            key: const ValueKey('favorites_anime_settings'),
-                            onPressed: () => unawaited(_manageAnime()),
-                            tooltip: t.animeFavorites.manage,
-                            icon: const AppIcon(Symbols.tune_rounded, size: 22),
-                          ),
-                        ),
-                        FocusableButton(
-                          focusNode: _refreshFocus,
-                          autoScroll: false,
-                          onPressed: widget.onRefresh,
-                          onNavigateUp: widget.onNavigation,
-                          onNavigateLeft: _animeSettingsFocus.requestFocus,
-                          onNavigateDown: focusContent,
-                          child: IconButton(
-                            onPressed: widget.onRefresh,
-                            tooltip: t.common.refresh,
-                            icon: const AppIcon(Symbols.refresh_rounded, size: 22),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (_showPreview && _visible.isNotEmpty)
-                    AnimatedContainer(
-                      key: const ValueKey('favorites_hero'),
-                      height: heroHeight,
-                      duration: MediaQuery.disableAnimationsOf(context)
-                          ? Duration.zero
-                          : const Duration(milliseconds: 240),
-                      curve: Curves.easeOutCubic,
-                      onEnd: () => _reveal(_selected),
-                      child: ValueListenableBuilder<HomePreview?>(
-                        valueListenable: _preview,
-                        builder: (context, preview, _) {
-                          if (preview == null) return const SizedBox.shrink();
-                          return StudioCinematicSpotlight(
-                            item: preview.item,
-                            artwork: preview.artwork,
-                            client: widget.resolveClient(preview.artwork),
-                            tint: colors.primary,
-                            collapsed: _collapsed,
-                            overviewFocus: _overview,
-                            onOverview: () => unawaited(_showOverview()),
-                            onNavigateUp: _refreshFocus.requestFocus,
-                            onNavigateDown: () => _focusIndex(_selected),
-                          );
-                        },
-                      ),
-                    ),
-                  _buildControls(context, viewport.maxWidth),
-                  if (widget.errorMessage != null && widget.items.isNotEmpty)
+              return TweenAnimationBuilder<double>(
+                tween: Tween<double>(end: heroHeight),
+                duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 240),
+                curve: Curves.easeOutCubic,
+                onEnd: () => _reveal(_selected),
+                builder: (context, animatedHeroHeight, _) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                      padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
                       child: Row(
                         children: [
-                          Expanded(child: Text(widget.errorMessage!, style: theme.textTheme.bodySmall)),
+                          AppIcon(Symbols.favorite_rounded, fill: 1, size: 22, color: colors.primary),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              t.libraries.filterCategories.favorites,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          if ((viewport.maxWidth >= 400 || textScale <= 1.2) &&
+                              (widget.items.isNotEmpty || (!widget.loading && widget.errorMessage == null)))
+                            Text(
+                              t.discover.titleCount(n: _visible.length),
+                              style: theme.textTheme.labelMedium?.copyWith(color: colors.onSurfaceVariant),
+                            ),
+                          const SizedBox(width: 12),
                           FocusableButton(
-                            focusNode: _retryFocus,
+                            focusNode: _animeSettingsFocus,
+                            autoScroll: false,
+                            onPressed: () => unawaited(_manageAnime()),
+                            onNavigateUp: widget.onNavigation,
+                            onNavigateLeft: _viewFocus.requestFocus,
+                            onNavigateRight: _refreshFocus.requestFocus,
+                            onNavigateDown: focusContent,
+                            child: IconButton(
+                              key: const ValueKey('favorites_anime_settings'),
+                              onPressed: () => unawaited(_manageAnime()),
+                              tooltip: t.animeFavorites.manage,
+                              icon: const AppIcon(Symbols.tune_rounded, size: 22),
+                            ),
+                          ),
+                          FocusableButton(
+                            focusNode: _refreshFocus,
+                            autoScroll: false,
                             onPressed: widget.onRefresh,
-                            child: TextButton(onPressed: widget.onRefresh, child: Text(t.common.retry)),
+                            onNavigateUp: widget.onNavigation,
+                            onNavigateLeft: _animeSettingsFocus.requestFocus,
+                            onNavigateDown: focusContent,
+                            child: IconButton(
+                              onPressed: widget.onRefresh,
+                              tooltip: t.common.refresh,
+                              icon: const AppIcon(Symbols.refresh_rounded, size: 22),
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  SizedBox(
-                    height: 2,
-                    child: widget.loading && _visible.isNotEmpty ? const LinearProgressIndicator(minHeight: 2) : null,
-                  ),
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, bounds) {
-                        const inset = 20.0;
-                        final gap = tv ? 18.0 : 16.0;
-                        final width = math.max(1.0, bounds.maxWidth - inset * 2);
-                        _columns = _list
-                            ? 1
-                            : tv
-                            ? 5
-                            : (width / 160).floor().clamp(1, 6);
-                        final cellWidth = (width - (_columns - 1) * gap) / _columns;
-                        final caption = _list || (tv && !SettingsService.instance.read(SettingsService.posterDetails))
-                            ? 0.0
-                            : 56.0 * textScale;
-                        final maxHeight = math.max(
-                          48.0,
-                          (bounds.maxHeight - 40) /
-                                  (caption > 0 ? FocusTheme.focusScale : FocusTheme.fullCardFocusScale) -
-                              caption -
-                              8,
-                        );
-                        final posterWidth = tv ? math.min(cellWidth, maxHeight / 1.5) : cellWidth;
-                        final extent = _list ? (tv ? 112.0 : 104.0) * textScale : posterWidth * 1.5 + caption;
-                        _rowExtent = extent + 20;
-                        final geometry = (_columns, extent, bounds.maxHeight);
-                        if (_geometry != geometry) {
-                          _geometry = geometry;
-                          _reveal(_selected);
-                        }
-                        return CustomScrollView(
-                          key: ValueKey(_list ? 'favorites_list' : 'favorites_grid'),
-                          controller: _scroll,
-                          primary: false,
-                          slivers: [
-                            if (widget.loading && widget.items.isEmpty)
-                              if (PlatformDetector.isMobile(context))
-                                const PosterLoadingSliver()
+                    if (_showPreview && _visible.isNotEmpty)
+                      SizedBox(
+                        key: const ValueKey('favorites_hero'),
+                        height: animatedHeroHeight,
+                        child: ValueListenableBuilder<HomePreview?>(
+                          valueListenable: _preview,
+                          builder: (context, preview, _) {
+                            if (preview == null) return const SizedBox.shrink();
+                            return StudioCinematicSpotlight(
+                              item: preview.item,
+                              artwork: preview.artwork,
+                              client: widget.resolveClient(preview.artwork),
+                              tint: colors.primary,
+                              collapsed: _collapsed,
+                              overviewFocus: _overview,
+                              onOverview: () => unawaited(_showOverview()),
+                              onNavigateUp: _refreshFocus.requestFocus,
+                              onNavigateDown: () => _focusIndex(_selected),
+                            );
+                          },
+                        ),
+                      ),
+                    _buildControls(context, viewport.maxWidth),
+                    if (widget.errorMessage != null && widget.items.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                        child: Row(
+                          children: [
+                            Expanded(child: Text(widget.errorMessage!, style: theme.textTheme.bodySmall)),
+                            FocusableButton(
+                              focusNode: _retryFocus,
+                              onPressed: widget.onRefresh,
+                              child: TextButton(onPressed: widget.onRefresh, child: Text(t.common.retry)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    SizedBox(
+                      height: 2,
+                      child: widget.loading && _visible.isNotEmpty ? const LinearProgressIndicator(minHeight: 2) : null,
+                    ),
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, bounds) {
+                          const inset = 20.0;
+                          final gap = tv ? 18.0 : 16.0;
+                          final width = math.max(1.0, bounds.maxWidth - inset * 2);
+                          _columns = _list
+                              ? 1
+                              : tv
+                              ? 5
+                              : (width / 160).floor().clamp(1, 6);
+                          final cellWidth = (width - (_columns - 1) * gap) / _columns;
+                          final caption = _list || (tv && !SettingsService.instance.read(SettingsService.posterDetails))
+                              ? 0.0
+                              : 56.0 * textScale;
+                          // Size TV posters for the compact hero's viewport even while the
+                          // hero is expanded or animating. The expanded viewport can show
+                          // only part of a row, rather than shrinking every poster.
+                          final sizingHeight = tv && _showPreview && _visible.isNotEmpty
+                              ? bounds.maxHeight + math.max(0.0, animatedHeroHeight - 88.0)
+                              : bounds.maxHeight;
+                          final maxHeight = math.max(
+                            48.0,
+                            (sizingHeight - 40) /
+                                    (caption > 0 ? FocusTheme.focusScale : FocusTheme.fullCardFocusScale) -
+                                caption -
+                                8,
+                          );
+                          final posterWidth = tv ? math.min(cellWidth, maxHeight / 1.5) : cellWidth;
+                          final extent = _list ? (tv ? 112.0 : 104.0) * textScale : posterWidth * 1.5 + caption;
+                          _rowExtent = extent + 20;
+                          final geometry = (_columns, extent, bounds.maxHeight);
+                          if (_geometry != geometry) {
+                            _geometry = geometry;
+                            _reveal(_selected);
+                          }
+                          return CustomScrollView(
+                            key: ValueKey(_list ? 'favorites_list' : 'favorites_grid'),
+                            controller: _scroll,
+                            primary: false,
+                            slivers: [
+                              if (widget.loading && widget.items.isEmpty)
+                                if (PlatformDetector.isMobile(context))
+                                  const PosterLoadingSliver()
+                                else
+                                  LoadingIndicatorBox.sliver
+                              else if (widget.errorMessage != null && widget.items.isEmpty)
+                                SliverErrorState(
+                                  message: widget.errorMessage!,
+                                  onRetry: widget.onRefresh,
+                                  actionFocusNode: _retryFocus,
+                                  onActionNavigateUp: focusContent,
+                                  onActionBack: widget.onNavigation,
+                                )
+                              else if (_visible.isEmpty)
+                                SliverEmptyState(
+                                  message: _animeOnly ? t.animeFavorites.empty : t.messages.noItemsAvailable,
+                                  icon: Symbols.favorite_border_rounded,
+                                  onAction: _animeOnly ? () => unawaited(_manageAnime()) : null,
+                                  actionLabel: _animeOnly ? t.animeFavorites.manage : null,
+                                  actionFocusNode: _animeOnly ? _animeEmptyFocus : null,
+                                  onActionNavigateUp: focusContent,
+                                  onActionBack: widget.onNavigation,
+                                )
                               else
-                                LoadingIndicatorBox.sliver
-                            else if (widget.errorMessage != null && widget.items.isEmpty)
-                              SliverErrorState(
-                                message: widget.errorMessage!,
-                                onRetry: widget.onRefresh,
-                                actionFocusNode: _retryFocus,
-                                onActionNavigateUp: focusContent,
-                                onActionBack: widget.onNavigation,
-                              )
-                            else if (_visible.isEmpty)
-                              SliverEmptyState(
-                                message: _animeOnly ? t.animeFavorites.empty : t.messages.noItemsAvailable,
-                                icon: Symbols.favorite_border_rounded,
-                                onAction: _animeOnly ? () => unawaited(_manageAnime()) : null,
-                                actionLabel: _animeOnly ? t.animeFavorites.manage : null,
-                                actionFocusNode: _animeOnly ? _animeEmptyFocus : null,
-                                onActionNavigateUp: focusContent,
-                                onActionBack: widget.onNavigation,
-                              )
-                            else
-                              SliverPadding(
-                                padding: const EdgeInsets.fromLTRB(inset, 12, inset, 28),
-                                sliver: SliverGrid.builder(
-                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: _columns,
-                                    mainAxisExtent: extent,
-                                    crossAxisSpacing: gap,
-                                    mainAxisSpacing: 20,
-                                  ),
-                                  itemCount: _visible.length,
-                                  findChildIndexCallback: (key) {
-                                    if (key is! ValueKey<String>) return null;
-                                    final index = _visible.indexWhere((item) => item.globalKey == key.value);
-                                    return index < 0 ? null : index;
-                                  },
-                                  itemBuilder: (context, index) {
-                                    final item = _visible[index];
-                                    final node = focusNodeForIndex(
-                                      index,
-                                      getGridItemFocusNode(0, prefix: 'favorites_item'),
-                                      prefix: 'favorites_item',
-                                      itemIdentity: item.globalKey,
-                                    );
-                                    return KeyedSubtree(
-                                      key: ValueKey(item.globalKey),
-                                      child: MouseRegion(
-                                        onEnter: (_) => _select(index),
-                                        child: Align(
-                                          alignment: Alignment.topCenter,
-                                          child: SizedBox(
-                                            width: _list ? cellWidth : posterWidth,
-                                            height: extent,
-                                            child: FocusableMediaCard(
-                                              item: item.copyWith(
-                                                raw: {
-                                                  ...?item.raw,
-                                                  'lurokaLibraryCaptions': true,
-                                                  'lurokaCopyCount': widget.copyCount?.call(item) ?? 1,
+                                SliverPadding(
+                                  padding: const EdgeInsets.fromLTRB(inset, 12, inset, 28),
+                                  sliver: SliverGrid.builder(
+                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: _columns,
+                                      mainAxisExtent: extent,
+                                      crossAxisSpacing: gap,
+                                      mainAxisSpacing: 20,
+                                    ),
+                                    itemCount: _visible.length,
+                                    findChildIndexCallback: (key) {
+                                      if (key is! ValueKey<String>) return null;
+                                      final index = _visible.indexWhere((item) => item.globalKey == key.value);
+                                      return index < 0 ? null : index;
+                                    },
+                                    itemBuilder: (context, index) {
+                                      final item = _visible[index];
+                                      final node = focusNodeForIndex(
+                                        index,
+                                        getGridItemFocusNode(0, prefix: 'favorites_item'),
+                                        prefix: 'favorites_item',
+                                        itemIdentity: item.globalKey,
+                                      );
+                                      return KeyedSubtree(
+                                        key: ValueKey(item.globalKey),
+                                        child: MouseRegion(
+                                          onEnter: (_) => _select(index),
+                                          child: Align(
+                                            alignment: Alignment.topCenter,
+                                            child: SizedBox(
+                                              width: _list ? cellWidth : posterWidth,
+                                              height: extent,
+                                              child: FocusableMediaCard(
+                                                item: item.copyWith(
+                                                  raw: {
+                                                    ...?item.raw,
+                                                    'lurokaLibraryCaptions': true,
+                                                    'lurokaCopyCount': widget.copyCount?.call(item) ?? 1,
+                                                  },
+                                                ),
+                                                focusNode: node,
+                                                viewModeOverride: _list ? ViewMode.list : ViewMode.grid,
+                                                fullBleedImage:
+                                                    tv &&
+                                                    !_list &&
+                                                    !SettingsService.instance.read(SettingsService.posterDetails),
+                                                disableScale: _list,
+                                                autoScroll: false,
+                                                showServerName: _list,
+                                                libraryName: _list ? item.libraryTitle : null,
+                                                onTap: () => unawaited(_open(index)),
+                                                onRefresh: (_) => widget.onRefresh(),
+                                                onFocusChange: (focused) {
+                                                  trackGridItemFocus(index, focused);
+                                                  if (!focused) return;
+                                                  if (!_collapsed) setState(() => _collapsed = true);
+                                                  _select(index);
+                                                  _reveal(index);
+                                                  evictDistantFocusNodes(index);
                                                 },
+                                                onNavigateUp: index < _columns
+                                                    ? () {
+                                                        if (_collapsed) setState(() => _collapsed = false);
+                                                        focusContent();
+                                                      }
+                                                    : () => _focusIndex(index - _columns),
+                                                onNavigateDown: () {
+                                                  if ((index ~/ _columns + 1) * _columns < _visible.length) {
+                                                    _focusIndex(index + _columns);
+                                                  }
+                                                },
+                                                onNavigateLeft: index % _columns == 0
+                                                    ? () {
+                                                        if (!TvEdgeMenuHost.open(context)) _focusOverview();
+                                                      }
+                                                    : () => _focusIndex(index - 1),
+                                                onNavigateRight: () {
+                                                  if (_columns > 1 && index + 1 < _visible.length) {
+                                                    _focusIndex(index + 1);
+                                                  }
+                                                },
+                                                onBack: widget.onNavigation,
                                               ),
-                                              focusNode: node,
-                                              viewModeOverride: _list ? ViewMode.list : ViewMode.grid,
-                                              fullBleedImage:
-                                                  tv &&
-                                                  !_list &&
-                                                  !SettingsService.instance.read(SettingsService.posterDetails),
-                                              disableScale: _list,
-                                              autoScroll: false,
-                                              showServerName: _list,
-                                              libraryName: _list ? item.libraryTitle : null,
-                                              onTap: () => unawaited(_open(index)),
-                                              onRefresh: (_) => widget.onRefresh(),
-                                              onFocusChange: (focused) {
-                                                trackGridItemFocus(index, focused);
-                                                if (!focused) return;
-                                                if (!_collapsed) setState(() => _collapsed = true);
-                                                _select(index);
-                                                _reveal(index);
-                                                evictDistantFocusNodes(index);
-                                              },
-                                              onNavigateUp: index < _columns
-                                                  ? () {
-                                                      if (_collapsed) setState(() => _collapsed = false);
-                                                      focusContent();
-                                                    }
-                                                  : () => _focusIndex(index - _columns),
-                                              onNavigateDown: () {
-                                                if ((index ~/ _columns + 1) * _columns < _visible.length) {
-                                                  _focusIndex(index + _columns);
-                                                }
-                                              },
-                                              onNavigateLeft: index % _columns == 0
-                                                  ? _focusOverview
-                                                  : () => _focusIndex(index - 1),
-                                              onNavigateRight: () {
-                                                if (_columns > 1 && index + 1 < _visible.length) {
-                                                  _focusIndex(index + 1);
-                                                }
-                                              },
-                                              onBack: widget.onNavigation,
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                          ],
-                        );
-                      },
+                            ],
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               );
             },
           ),

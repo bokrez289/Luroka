@@ -177,7 +177,7 @@ class ThemeSettingsScreen extends StatelessWidget {
         children: [
           Text(t.tvSettingsV2.previewLive, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 12),
-          const MiniHomePreview(),
+          const Flexible(child: MiniHomePreview()),
         ],
       ),
       children: children,

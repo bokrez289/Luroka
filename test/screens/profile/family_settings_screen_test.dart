@@ -250,6 +250,69 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('one parent PIN opens and saves Kids settings', (tester) async {
+    await kids.setParentPin('1234');
+    await kids.setChild(mia.id, parentId: alex.id, maxAge: 7);
+    final value = await stack(tester);
+    await pump(tester, value);
+    await tester.tap(find.byKey(ValueKey('family_profile_${mia.id}')));
+    await bounded(tester);
+    await tester.enterText(find.byType(TextField), '1234');
+    await bounded(tester);
+    await tester.tap(find.text(t.kids.editorTitle));
+    await bounded(tester);
+    expect(find.byType(KidsProfileScreen), findsOneWidget);
+    expect(find.byType(PinEntryDialog), findsNothing);
+    await tester.ensureVisible(find.text(t.common.save));
+    await tester.tap(find.text(t.common.save));
+    await tester.runAsync(() async {
+      for (var i = 0; i < 100 && find.byType(KidsProfileScreen).evaluate().isNotEmpty; i++) {
+        await tester.pump(const Duration(milliseconds: 30));
+      }
+    });
+    expect(find.byType(KidsProfileScreen), findsNothing);
+    expect(find.byType(PinEntryDialog), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('backgrounding family editing requires the parent PIN again', (tester) async {
+    await kids.setParentPin('1234');
+    await kids.setChild(mia.id, parentId: alex.id, maxAge: 7);
+    final value = await stack(tester);
+    await pump(tester, value);
+    await tester.tap(find.byKey(ValueKey('family_profile_${mia.id}')));
+    await bounded(tester);
+    expect(find.byType(PinEntryDialog), findsOneWidget);
+    await tester.enterText(find.byType(TextField), '1234');
+    await bounded(tester);
+    expect(find.byType(ProfileDetailScreen), findsOneWidget);
+    await tester.tap(find.text(t.kids.editorTitle));
+    await bounded(tester);
+    expect(find.byType(KidsProfileScreen), findsOneWidget);
+    expect(find.byType(PinEntryDialog), findsNothing);
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.ensureVisible(find.text(t.common.save));
+    await tester.tap(find.text(t.common.save));
+    await bounded(tester);
+    expect(find.byType(PinEntryDialog), findsOneWidget);
+    await tester.enterText(find.descendant(of: find.byType(PinEntryDialog), matching: find.byType(TextField)), '1234');
+    await bounded(tester);
+    expect(find.byType(PinEntryDialog), findsNothing);
+    await tester.runAsync(() async {
+      for (var i = 0; i < 100 && find.byType(KidsProfileScreen).evaluate().isNotEmpty; i++) {
+        await tester.pump(const Duration(milliseconds: 30));
+      }
+    });
+    expect(find.byType(KidsProfileScreen), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('missing Parent PIN offers setup rather than prompting for a nonexistent PIN', (tester) async {
     final value = await stack(tester);
     await tester.runAsync(() async {
@@ -349,14 +412,21 @@ void main() {
         await value.db.addScreenTime(profileId: id, localDate: today, durationMs: minutes * 60000, updatedAt: 1);
       }
     });
-    await tester.pumpWidget(MultiProvider(providers: [
-      ChangeNotifierProvider<ActiveProfileProvider>.value(value: value.active),
-      Provider<ProfileRegistry>.value(value: value.profiles),
-      Provider<ProfileConnectionRegistry>.value(value: value.profileConnections),
-      Provider<ConnectionRegistry>.value(value: value.connections),
-      Provider<PlexHomeService>.value(value: value.plexHome),
-      Provider<ScreenTimeService>.value(value: service),
-    ], child: InputModeTracker(child: MaterialApp(theme: monoTheme(MonoPalette.dark), home: const FamilySettingsScreen()))));
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ActiveProfileProvider>.value(value: value.active),
+          Provider<ProfileRegistry>.value(value: value.profiles),
+          Provider<ProfileConnectionRegistry>.value(value: value.profileConnections),
+          Provider<ConnectionRegistry>.value(value: value.connections),
+          Provider<PlexHomeService>.value(value: value.plexHome),
+          Provider<ScreenTimeService>.value(value: service),
+        ],
+        child: InputModeTracker(
+          child: MaterialApp(theme: monoTheme(MonoPalette.dark), home: const FamilySettingsScreen()),
+        ),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(find.byType(FamilyProfileTile), findsNWidgets(4));
     expect(find.text(t.family.namedActivity(name: alex.displayName)), findsOneWidget);
@@ -381,10 +451,16 @@ void main() {
       await value.db.addScreenTime(profileId: child.id, localDate: today, durationMs: 330000, updatedAt: 1);
       await value.db.addScreenTime(profileId: mia.id, localDate: today, durationMs: 220000, updatedAt: 1);
     });
-    Widget page(String target) => MultiProvider(providers: [
-      ChangeNotifierProvider<ActiveProfileProvider>.value(value: value.active),
-      Provider<ScreenTimeService>.value(value: service),
-    ], child: MaterialApp(theme: monoTheme(MonoPalette.dark), home: ScreenTimeScreen(profileId: target)));
+    Widget page(String target) => MultiProvider(
+      providers: [
+        ChangeNotifierProvider<ActiveProfileProvider>.value(value: value.active),
+        Provider<ScreenTimeService>.value(value: service),
+      ],
+      child: MaterialApp(
+        theme: monoTheme(MonoPalette.dark),
+        home: ScreenTimeScreen(profileId: target),
+      ),
+    );
     await tester.pumpWidget(page(mia.id));
     await tester.pumpAndSettle();
     expect(find.text(t.family.activityUnavailable), findsOneWidget);

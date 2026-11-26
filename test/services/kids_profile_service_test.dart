@@ -37,6 +37,23 @@ void main() {
   });
   tearDown(service.resetForTesting);
 
+  test('explicit PIN opt-out needs an adult and keeps restrictions in force', () async {
+    await expectLater(service.disableParentPin(), throwsStateError);
+    expect(service.hasParentPin, isTrue);
+    service.selectProfile('adult');
+    await service.disableParentPin();
+    expect(service.parentPinOptedOut, isTrue);
+    await service.setChild('second', parentId: 'adult', maxAge: 7);
+    await service.reloadAfterBackupRestore();
+    expect(service.parentPinOptedOut, isTrue);
+    service.selectProfile('second');
+    expect(service.allows(_item('mature', rating: 'R')), isFalse);
+    service.selectProfile('adult');
+    await service.setParentPin('9876');
+    expect(service.parentPinOptedOut, isFalse);
+    expect(service.verifyParentPin('9876'), isTrue);
+  });
+
   test('restored parental policy is reloaded before selecting a profile', () async {
     final prefs = await BaseSharedPreferencesService.sharedCache();
     await prefs.setString('luroka_kids_profiles_v1', '{"children":{"restored-child":{"parentId":"adult","maxAge":5}}}');
@@ -296,6 +313,22 @@ void main() {
     await service.recordPlayback(movie);
     await service.setHideKids('adult', true);
     expect(service.isHiddenFromContinueWatching(movie), isFalse);
+  });
+
+  test('dismissing a show from a child shelf persists locally until the child plays it again', () async {
+    final ep = _item('1', kind: MediaKind.episode, series: 'show', rating: 'TV-Y');
+    await service.recordPlayback(ep);
+    await service.dismissFromKidsShelf(ep, 'child');
+    service.resetForTesting();
+    await service.initialize();
+    service.selectProfile('child');
+    expect(service.filter([ep.copyWith(id: '2')], continueWatching: true), isEmpty);
+    expect(service.filter([ep]), isNotEmpty);
+    service.selectProfile('adult');
+    expect(service.filter([ep], continueWatching: true), isNotEmpty);
+    service.selectProfile('child');
+    await service.recordPlayback(ep);
+    expect(service.filter([ep], continueWatching: true), isNotEmpty);
   });
 
   test('only playback shelves lose parent exclusions; other hubs retain their titles', () async {

@@ -170,6 +170,9 @@ class ThemeProvider extends ChangeNotifier with DisposableChangeNotifierMixin, W
     settings.ThemeMode.lurokaElectric => MonoPalette.lurokaElectric,
     settings.ThemeMode.lurokaMidnight => MonoPalette.lurokaMidnight,
     settings.ThemeMode.lurokaNocturne => MonoPalette.lurokaNocturne,
+    settings.ThemeMode.lurokaPatina => MonoPalette.lurokaPatina,
+    settings.ThemeMode.lurokaAfterimage => MonoPalette.lurokaAfterimage,
+    settings.ThemeMode.lurokaLetterpress => MonoPalette.lurokaLetterpress,
   };
 
   /// Light-slot theme for [palette]: the palette itself when it is light,

@@ -146,6 +146,11 @@ class DataAggregationService {
 
   DataAggregationService(this._serverManager);
 
+  // Scope by the actual client object as well as target: an account switch or
+  // reconnect cannot reuse another user's identity lookup. Weak keys allow
+  // disconnected clients and their bounded caches to be collected.
+  final Expando<Map<String, ExternalIds>> _progressIdentities = Expando();
+
   /// Online clients visible to the active profile, or the online clients in
   /// [serverIds]. A supplied set is already profile-scoped: delta refreshes
   /// fan out to newly-online visible servers, and catalog lookups to the
@@ -288,6 +293,54 @@ class DataAggregationService {
     Set<String>? serverIds,
     void Function(OnDeckLibraryResult result)? onPartialLibrary,
   }) async {
+    var candidateLimit = limit;
+    Set<String>? previousKeys;
+    while (true) {
+      final result = await _fetchOnDeckFromAllServers(
+        limit: candidateLimit,
+        splitRows: splitRows,
+        hiddenLibraryKeys: hiddenLibraryKeys,
+        selectedSourceLibraryKeys: selectedSourceLibraryKeys,
+        serverIds: serverIds,
+        onPartialLibrary: onPartialLibrary,
+      );
+      final keys = result.observedItems.map((row) => row.item.globalKey).toSet();
+      final resumeCount = result.items.where((item) => !isHomeNextUp(item)).length;
+      final nextCount = result.items.where(isHomeNextUp).length;
+      final full =
+          limit == null || (splitRows ? resumeCount >= limit && nextCount >= limit : result.items.length >= limit);
+      final exhausted =
+          candidateLimit == null ||
+          (result.succeededServerIds.length == 1 && hasNativeEmbyHomeOrder(result.items)) ||
+          result.observedItems.length < candidateLimit ||
+          (previousKeys != null && keys.length == previousKeys.length && keys.containsAll(previousKeys));
+      // Bound automatic Home work; "View All" requests the uncapped path.
+      if (full ||
+          exhausted ||
+          candidateLimit >= 512 ||
+          result.failedServerIds.isNotEmpty ||
+          result.cancelledServerIds.isNotEmpty) {
+        return (
+          items: limitHomeProgressRows(result.items, limit, split: splitRows),
+          observedItems: result.observedItems,
+          succeededServerIds: result.succeededServerIds,
+          cancelledServerIds: result.cancelledServerIds,
+          failedServerIds: result.failedServerIds,
+        );
+      }
+      previousKeys = keys;
+      candidateLimit = (candidateLimit * 2).clamp(1, 512);
+    }
+  }
+
+  Future<OnDeckAggregationResult> _fetchOnDeckFromAllServers({
+    int? limit,
+    required bool splitRows,
+    Set<String>? hiddenLibraryKeys,
+    Set<String>? selectedSourceLibraryKeys,
+    Set<String>? serverIds,
+    void Function(OnDeckLibraryResult result)? onPartialLibrary,
+  }) async {
     final clients = _clientsFor(serverIds);
     if (clients.isEmpty) {
       return (
@@ -305,7 +358,15 @@ class DataAggregationService {
       clients,
       failureMessage: (serverId) => 'Failed on-deck fetch from $serverId',
       fetch: (serverId, client) async {
-        final excludedIds = _hiddenLibraryIdsOn(serverId, hiddenLibraryKeys);
+        final excludedIds = {..._hiddenLibraryIdsOn(serverId, hiddenLibraryKeys)};
+        if (client is! JellyfinClient && selectedSourceLibraryKeys != null) {
+          final selectedIds = _hiddenLibraryIdsOn(serverId, selectedSourceLibraryKeys);
+          if (selectedIds.isEmpty) return <MediaItem>[];
+          final libraries = await client.fetchLibraries();
+          excludedIds.addAll(
+            libraries.where((library) => !selectedIds.contains(library.id)).map((library) => library.id),
+          );
+        }
         final rows = client is JellyfinClient
             ? await client.fetchContinueWatchingByLibrary(
                 includedLibraryIds: selectedSourceLibraryKeys == null
@@ -333,12 +394,14 @@ class DataAggregationService {
     // Filter out items from hidden libraries
     var filteredOnDeck = _withoutHiddenLibraries(fetched.items, hiddenLibraryKeys);
 
-    // Sort by most recently viewed, falling back to addedAt for unwatched items.
-    // Same key as JellyfinClient's continue-watching merge (MediaItem.recencySortKey)
-    // so per-server and cross-server ordering can't drift apart.
-    filteredOnDeck.sort((a, b) => b.recencySortKey.compareTo(a.recencySortKey));
+    // Use the same backend-ranked ordering as the per-client merge. Library
+    // ingestion dates are not viewing activity.
+    filteredOnDeck = orderHomeProgress(filteredOnDeck);
 
-    filteredOnDeck = await _deduplicateContinueWatching(filteredOnDeck);
+    if (clients.length != 1 || !hasNativeEmbyHomeOrder(filteredOnDeck)) {
+      filteredOnDeck = await _deduplicateContinueWatching(filteredOnDeck);
+    }
+    filteredOnDeck = filteredOnDeck.where(showHomeProgress).toList();
 
     final items = limitHomeProgressRows(filteredOnDeck, limit, split: splitRows);
 
@@ -364,8 +427,15 @@ class DataAggregationService {
     int? limit,
     bool splitRows = false,
   }) async {
-    final combined = [...existing, ...fresh]..sort((a, b) => b.recencySortKey.compareTo(a.recencySortKey));
-    final deduped = await _deduplicateContinueWatching(combined);
+    final combined = orderHomeProgress(
+      {
+        for (final item in existing) item.globalKey: item,
+        for (final item in fresh) item.globalKey: item,
+      }.values.toList(),
+    );
+    final deduped = (hasNativeEmbyHomeOrder(combined) ? combined : await _deduplicateContinueWatching(combined))
+        .where(showHomeProgress)
+        .toList();
     return limitHomeProgressRows(deduped, limit, split: splitRows);
   }
 
@@ -502,10 +572,23 @@ class DataAggregationService {
       try {
         final cacheKey = buildGlobalKey(ServerId(serverId!), targetId);
         final externalIds = await externalIdLoads.putIfAbsent(cacheKey, () async {
-          if (client is! JellyfinClient) return client.fetchExternalIds(targetId);
+          final cache = _progressIdentities[client] ??= <String, ExternalIds>{};
+          final cached = cache[targetId];
+          if (cached != null) return cached;
           final abort = AbortController();
           try {
-            return await client.fetchShelfExternalIds(targetId, abort).timeout(const Duration(seconds: 3));
+            final ids =
+                await (client is JellyfinClient
+                        ? client.fetchShelfExternalIds(targetId, abort)
+                        : client.fetchExternalIds(targetId))
+                    .timeout(const Duration(seconds: 3));
+            final resolved = <String>{};
+            _addExternalIdentityKeys(resolved, scope, ids);
+            if (resolved.isNotEmpty) {
+              if (cache.length >= 4096) cache.remove(cache.keys.first);
+              cache[targetId] = ids;
+            }
+            return ids;
           } finally {
             abort.abort();
           }
@@ -790,6 +873,14 @@ class DataAggregationService {
     // library order regardless of completion order.
     const concurrency = 3;
     final results = List<List<MediaHub>>.filled(visible.length, const []);
+    // Give the first movie and TV shelves a worker before additional
+    // libraries of either kind. Keep the published library order intact.
+    final queue = <int>{
+      if (!includePlaybackHubs && client is JellyfinClient)
+        for (final kind in [MediaKind.movie, MediaKind.show])
+          ...[visible.indexWhere((library) => library.kind == kind)].where((i) => i >= 0),
+      for (var i = 0; i < visible.length; i++) i,
+    }.toList();
     var next = 0;
     var succeeded = false;
     var failed = false;
@@ -797,8 +888,8 @@ class DataAggregationService {
 
     Future<void> worker() async {
       while (true) {
-        final index = next++;
-        if (index >= visible.length) return;
+        if (next >= queue.length) return;
+        final index = queue[next++];
         final library = visible[index];
         final diagnostics = HubFetchDiagnostics();
         try {

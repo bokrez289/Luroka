@@ -31,6 +31,7 @@ import '../../utils/media_image_helper.dart';
 import '../../utils/platform_detector.dart';
 import '../../widgets/desktop_app_bar.dart';
 import '../../widgets/focusable_media_card.dart';
+import '../../widgets/focusable_tab_chip.dart';
 import '../../widgets/media_card_sliver_layout.dart';
 import '../../widgets/download_tree_view.dart';
 import '../../widgets/downloads_dashboard_summary.dart';
@@ -74,6 +75,7 @@ class DownloadsScreen extends StatefulWidget {
 class DownloadsScreenState extends State<DownloadsScreen>
     with TickerProviderStateMixin, TabNavigationMixin, FocusableTab {
   final _queueTabChipFocusNode = FocusNode(debugLabel: 'tab_chip_queue');
+  final _allTabChipFocusNode = FocusNode(debugLabel: 'tab_chip_all');
   final _tvShowsTabChipFocusNode = FocusNode(debugLabel: 'tab_chip_tv_shows');
   final _moviesTabChipFocusNode = FocusNode(debugLabel: 'tab_chip_movies');
   final _musicTabChipFocusNode = FocusNode(debugLabel: 'tab_chip_music');
@@ -82,9 +84,16 @@ class DownloadsScreenState extends State<DownloadsScreen>
   final _addServerFocusNode = FocusNode(debugLabel: 'downloads_add_server');
   final _actionBarKey = GlobalKey<FocusableActionBarState>();
   final _tvShowsTabKey = GlobalKey<_DownloadsGridContentState>();
+  final _allTabKey = GlobalKey<_DownloadsGridContentState>();
   final _moviesTabKey = GlobalKey<_DownloadsGridContentState>();
   final _musicTabKey = GlobalKey<_DownloadedMusicContentState>();
   String? _notificationTarget;
+  bool get _showMusic {
+    final provider = context.read<DownloadProvider>();
+    return provider.metadata.entries.any((entry) =>
+        provider.downloads.containsKey(entry.key) &&
+        (entry.value.kind == MediaKind.track || entry.value.kind == MediaKind.album || entry.value.kind == MediaKind.artist));
+  }
 
   /// Route the notification to the relevant category and, once available,
   /// the same offline details page as a downloaded card.
@@ -96,17 +105,18 @@ class DownloadsScreenState extends State<DownloadsScreen>
     final tab = downloadNotificationTab(item);
     setState(() => _notificationTarget = globalKey);
     tabController.index = tab;
-    if (progress.status != DownloadStatus.completed || tab == 3 || tab == 0) return;
+    if (progress.status != DownloadStatus.completed || tab == 3 || tab == 4) return;
     final details = downloadNotificationDetails(provider, item);
     if (details != null) unawaited(navigateToMediaItemDetails(context, details, isOffline: true));
   }
 
   @override
   List<FocusNode> get tabChipFocusNodes => [
-    _queueTabChipFocusNode,
+    _allTabChipFocusNode,
     _tvShowsTabChipFocusNode,
     _moviesTabChipFocusNode,
     _musicTabChipFocusNode,
+    _queueTabChipFocusNode,
   ];
 
   @override
@@ -124,6 +134,7 @@ class DownloadsScreenState extends State<DownloadsScreen>
   @override
   void dispose() {
     _queueTabChipFocusNode.dispose();
+    _allTabChipFocusNode.dispose();
     _tvShowsTabChipFocusNode.dispose();
     _moviesTabChipFocusNode.dispose();
     _musicTabChipFocusNode.dispose();
@@ -157,6 +168,7 @@ class DownloadsScreenState extends State<DownloadsScreen>
   /// The options-capable tab currently in view, or null on the Manage tab.
   DownloadsOptionsTab? _activeOptionsTab() {
     return switch (tabController.index) {
+      0 => _allTabKey.currentState,
       1 => _tvShowsTabKey.currentState,
       2 => _moviesTabKey.currentState,
       3 => _musicTabKey.currentState,
@@ -190,13 +202,57 @@ class DownloadsScreenState extends State<DownloadsScreen>
   }
 
   Widget _buildTabChip(String label, int index) {
-    return buildTabChip(
-      label,
-      index,
-      onSelectWhenActive: _focusCurrentTab,
+    final visible = [0, 1, 2, if (_showMusic) 3, 4];
+    final position = visible.indexOf(index);
+    void navigate(int target) {
+      setState(() {
+        suppressAutoFocus = true;
+        tabController.index = target;
+      });
+      getTabChipFocusNode(target).requestFocus();
+    }
+    return FocusableTabChip(
+      label: label,
+      isSelected: tabController.index == index,
+      focusNode: getTabChipFocusNode(index),
+      onSelect: () {
+        if (tabController.index == index) {
+          _focusCurrentTab();
+        } else {
+          setState(() {
+            suppressAutoFocus = true;
+            tabController.index = index;
+          });
+        }
+      },
+      onNavigateLeft: position == 0 ? onTabBarBack : () => navigate(visible[position - 1]),
+      onNavigateRight: position == visible.length - 1
+          ? () => _actionBarKey.currentState?.requestFocusOnFirst()
+          : () => navigate(visible[position + 1]),
       onNavigateDown: _focusCurrentTab,
-      onNavigateToActions: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+      onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+      onBack: onTabBarBack,
     );
+  }
+
+  @override
+  void goToPreviousTab() {
+    if (tabController.index == 4 && !_showMusic) {
+      setState(() => tabController.index = 2);
+      getTabChipFocusNode(2).requestFocus();
+    } else {
+      super.goToPreviousTab();
+    }
+  }
+
+  @override
+  void goToNextTab() {
+    if (tabController.index == 2 && !_showMusic) {
+      setState(() => tabController.index = 4);
+      getTabChipFocusNode(4).requestFocus();
+    } else {
+      super.goToNextTab();
+    }
   }
 
   /// Build the app bar title - either tabs on desktop or simple title on mobile
@@ -213,6 +269,19 @@ class DownloadsScreenState extends State<DownloadsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<DownloadProvider>();
+    final hasTransfers = provider.downloads.entries.any((entry) =>
+        (!KidsProfileService.instance.isActiveKids || provider.metadata.containsKey(entry.key)) &&
+        entry.value.status != DownloadStatus.completed &&
+        entry.value.status != DownloadStatus.cancelled);
+    if (!_showMusic && tabController.index == 3) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_showMusic && tabController.index == 3) {
+          setState(() => tabController.index = 0);
+          if (_musicTabChipFocusNode.hasFocus) _allTabChipFocusNode.requestFocus();
+        }
+      });
+    }
     return Scaffold(
       body: CustomScrollView(
         primary: false,
@@ -259,7 +328,7 @@ class DownloadsScreenState extends State<DownloadsScreen>
                       ),
                       // Mobile mirrors the library browse options action; desktop
                       // and TV expose the same options as per-tab chips instead.
-                      if (PlatformDetector.isMobile(context) && tabController.index > 0)
+                      if (PlatformDetector.isMobile(context) && tabController.index != 4)
                         FocusableAction(
                           icon: Symbols.tune_rounded,
                           tooltip: t.downloads.options,
@@ -305,13 +374,17 @@ class DownloadsScreenState extends State<DownloadsScreen>
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        _buildTabChip(t.downloads.manage, 0),
+                        _buildTabChip(t.studios.all, 0),
                         const SizedBox(width: 8),
                         _buildTabChip(t.downloads.tvShows, 1),
                         const SizedBox(width: 8),
                         _buildTabChip(t.downloads.movies, 2),
                         const SizedBox(width: 8),
-                        _buildTabChip(t.downloads.music, 3),
+                        if (_showMusic) ...[
+                          _buildTabChip(t.downloads.music, 3),
+                          const SizedBox(width: 8),
+                        ],
+                        _buildTabChip(hasTransfers ? '${t.downloads.manage} •' : t.downloads.manage, 4),
                       ],
                     ),
                   ),
@@ -340,6 +413,29 @@ class DownloadsScreenState extends State<DownloadsScreen>
                   child: TabBarView(
                     controller: tabController,
                     children: [
+                      _DownloadsGridContent(
+                        key: _allTabKey,
+                        type: DownloadType.all,
+                        isActive: tabController.index == 0,
+                        onBack: focusTabBar,
+                      ),
+                      _DownloadsGridContent(
+                        key: _tvShowsTabKey,
+                        type: DownloadType.tvShows,
+                        isActive: tabController.index == 1,
+                        onBack: focusTabBar,
+                      ),
+                      _DownloadsGridContent(
+                        key: _moviesTabKey,
+                        type: DownloadType.movies,
+                        isActive: tabController.index == 2,
+                        onBack: focusTabBar,
+                      ),
+                      _DownloadedMusicContent(
+                        key: _musicTabKey,
+                        isActive: tabController.index == 3,
+                        onBack: focusTabBar,
+                      ),
                       Consumer<DownloadProvider>(
                         builder: (context, downloadProvider, _) {
                           return DownloadTreeView(
@@ -361,28 +457,18 @@ class DownloadsScreenState extends State<DownloadsScreen>
                             onRetryAll: _retryDownloads,
                             onCancel: downloadProvider.cancelDownload,
                             onDelete: downloadProvider.deleteDownload,
+                            onOpen: (item) {
+                              if (!KidsProfileService.instance.allows(item)) return;
+                              final details = downloadNotificationDetails(downloadProvider, item);
+                              if (details != null && KidsProfileService.instance.allows(details)) {
+                                unawaited(navigateToMediaItemDetails(context, details, isOffline: true));
+                              }
+                            },
                             onNavigateLeft: () => MainScreenFocusScope.focusSidebarOf(context),
                             onBack: focusTabBar,
                             suppressAutoFocus: suppressAutoFocus,
                           );
                         },
-                      ),
-                      _DownloadsGridContent(
-                        key: _tvShowsTabKey,
-                        type: DownloadType.tvShows,
-                        isActive: tabController.index == 1,
-                        onBack: focusTabBar,
-                      ),
-                      _DownloadsGridContent(
-                        key: _moviesTabKey,
-                        type: DownloadType.movies,
-                        isActive: tabController.index == 2,
-                        onBack: focusTabBar,
-                      ),
-                      _DownloadedMusicContent(
-                        key: _musicTabKey,
-                        isActive: tabController.index == 3,
-                        onBack: focusTabBar,
                       ),
                     ],
                   ),
@@ -456,14 +542,14 @@ class DownloadsScreenState extends State<DownloadsScreen>
   }
 }
 
-enum DownloadType { tvShows, movies }
+enum DownloadType { all, tvShows, movies }
 
 @visibleForTesting
 int downloadNotificationTab(MediaItem item) => switch (item.kind) {
   MediaKind.episode || MediaKind.season || MediaKind.show => 1,
   MediaKind.movie => 2,
   MediaKind.track || MediaKind.album || MediaKind.artist => 3,
-  _ => 0,
+  _ => 4,
 };
 
 @visibleForTesting
@@ -499,10 +585,15 @@ class _DownloadsGridContentState extends State<_DownloadsGridContent>
   @override
   bool get wantKeepAlive => true;
   @override
-  String get optionsSectionId => widget.type == DownloadType.tvShows ? 'downloads:tv' : 'downloads:movies';
+  String get optionsSectionId => switch (widget.type) {
+    DownloadType.all => 'downloads:all',
+    DownloadType.tvShows => 'downloads:tv',
+    DownloadType.movies => 'downloads:movies',
+  };
 
   @override
   List<String> get groupingOptions => switch (widget.type) {
+    DownloadType.all => const [browseGroupingShows],
     DownloadType.tvShows => const [
       browseGroupingShows,
       browseGroupingSeasons,
@@ -536,6 +627,7 @@ class _DownloadsGridContentState extends State<_DownloadsGridContent>
   /// kind (shows/movies).
   List<MediaItem> _items(DownloadProvider provider) {
     final raw = switch (widget.type) {
+      DownloadType.all => [...provider.downloadedShows, ...provider.downloadedMovies],
       DownloadType.tvShows => switch (selectedGrouping) {
         browseGroupingSeasons => provider.downloadedSeasons,
         browseGroupingEpisodes => provider.downloadedEpisodes,

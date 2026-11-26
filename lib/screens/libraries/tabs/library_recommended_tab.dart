@@ -2,6 +2,7 @@ import 'dart:async';
 import '../../../media/ids.dart';
 
 import 'package:flutter/material.dart';
+import '../../../widgets/tv_edge_menu.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../focus/hub_vertical_navigation.dart';
@@ -277,6 +278,7 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
   }
 
   void _navigateToSidebar() {
+    if (TvEdgeMenuHost.open(context)) return;
     if (widget.onNavigateLibraryMenu case final callback?) {
       callback();
       return;

@@ -208,9 +208,9 @@ void main() {
     expect(matcher.checks, lessThanOrEqualTo(6));
     expect(explore.availabilityIncomplete, isTrue);
   });
-  test('Discover defaults to verified results and checks other server sources', () async {
+  test('Discover includes unmatched titles by default and filters to selected libraries on demand', () async {
     final sources = _FakeSourcesProvider();
-    final matcher = _Matcher();
+    final matcher = _Matcher()..noCopies = true;
     final explore = ExploreProvider(sources, matcher: matcher);
     final source = _FakeSource(CatalogSourceId.trakt, rows: const [CatalogRowId.trendingMovies]);
     addTearDown(explore.dispose);
@@ -218,12 +218,15 @@ void main() {
     addTearDown(source.dispose);
     sources.setActive(source);
     await _pumpMicrotasks();
+    expect(explore.availableOnly, isFalse);
+    expect(explore.rowHubs.single.hub.items, hasLength(1));
     await explore.setAvailableOnly(true);
     expect(explore.availableOnly, isTrue);
-    expect(matcher.otherChecks, greaterThan(0));
-    expect(explore.rowHubs.single.hub.items, hasLength(1));
+    expect(matcher.otherChecks, 0);
+    expect(explore.rowHubs, isEmpty);
     await explore.setAvailableOnly(false);
-    expect(explore.availableOnly, isTrue);
+    expect(explore.availableOnly, isFalse);
+    expect(explore.rowHubs.single.hub.items, hasLength(1));
   });
   test('library-only discovery never exposes unmatched catalog entries and keeps exact playable copies', () async {
     final sources = _FakeSourcesProvider();

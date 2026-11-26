@@ -36,6 +36,30 @@ extension _VideoPlayerSeekingMethods on VideoPlayerScreenState {
       await _nativeSeekDrain!.future;
     }
     if (!_isCurrentPlaybackGeneration(generation, currentPlayer) || !(isCurrent?.call() ?? true)) return;
+    if (!widget.isLive &&
+        _currentMetadata.backend == MediaBackend.emby &&
+        _isTranscoding &&
+        (target - currentPlayer.currentPosition).abs() >= const Duration(seconds: 24) &&
+        !currentPlayer.state.bufferRanges.any((range) => target >= range.start && target < range.end)) {
+      // Eight 3-second HLS segments is the observed Emby encoder gap
+      // limit. Negotiate at the new position instead of making sequential
+      // reads on the old playlist restart FFmpeg once per segment.
+      if (_transitionGate.transition == PlaybackTransition.idle) {
+        await _reloadMediaInPlace(
+          metadata: _currentMetadata,
+          selectedMediaSourceId: _currentMediaInfo?.mediaSourceId,
+          resumePosition: target,
+          preserveCurrentTrackSelection: true,
+          preservedSubtitleTrack: SubtitlePreference.trackOrNull(_playbackSession?.subtitleSelection.primaryTrack),
+          preservedSecondarySubtitleTrack: SubtitlePreference.trackOrNull(
+            _playbackSession?.subtitleSelection.secondaryTrack,
+          ),
+          startPaused: !_playbackIntentShouldPlay,
+          reason: 'Emby transcode seek',
+        );
+      }
+      return;
+    }
     _nativeSeekDrain = Completer<void>();
     try {
       await currentPlayer.seek(target);

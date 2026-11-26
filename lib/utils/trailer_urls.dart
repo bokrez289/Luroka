@@ -14,6 +14,19 @@ library;
 
 const _youTubeWatchPrefix = 'https://www.youtube.com/watch?v=';
 
+String? youtubeTrailerKey(String url) {
+  final uri = Uri.tryParse(url);
+  if (uri == null || uri.scheme != 'https') return null;
+  final segments = uri.pathSegments;
+  final key = uri.host == 'youtu.be'
+      ? segments.firstOrNull
+      : uri.host == 'youtube.com' || uri.host.endsWith('.youtube.com')
+      ? uri.queryParameters['v'] ??
+            (segments.length == 2 && const {'embed', 'shorts', 'live'}.contains(segments.first) ? segments.last : null)
+      : null;
+  return key != null && RegExp(r'^[\w-]{11}$').hasMatch(key) ? key : null;
+}
+
 /// Resolves a provider trailer reference to an absolute URL.
 ///
 /// Accepts either a bare YouTube video id or an already-absolute URL, since

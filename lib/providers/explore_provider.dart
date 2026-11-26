@@ -10,6 +10,8 @@ import '../media/catalog_item_ref.dart';
 import '../models/catalog/catalog_item.dart';
 import '../mixins/disposable_change_notifier_mixin.dart';
 import '../services/catalog/catalog_source.dart';
+import '../services/settings_service.dart';
+import '../services/kids_profile_service.dart';
 import '../services/catalog/catalog_library_matcher.dart';
 import '../services/catalog/tmdb_catalog_source.dart';
 import '../services/catalog/cinemeta_catalog_source.dart';
@@ -72,7 +74,7 @@ class ExploreProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
     WikidataAwardsService? awards,
   }) : _awards = awards ?? WikidataAwardsService(),
        _ownsAwards = awards == null {
-    availableOnly = libraryOnly || matcher != null;
+    availableOnly = libraryOnly || (SettingsService.instanceOrNull?.read(SettingsService.discoverAvailableOnly) ?? false);
     _catalogSources.addListener(_onSourcesChanged);
     _source = _catalogSources.activeSource;
     _shelvesRevision = _catalogSources.discoveryShelvesRevision;
@@ -109,9 +111,9 @@ class ExploreProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
     if (!active) {
       _availabilityGeneration++;
       checkingAvailability = false;
-    } else if (availableOnly && matcher != null) {
+    } else if (matcher != null) {
       _availabilityServerUnavailable = false;
-      unawaited(setAvailableOnly(true));
+      unawaited(_refreshAvailability());
     }
   }
 
@@ -159,7 +161,7 @@ class ExploreProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
     checkingAvailability = false;
     _rowsEpoch++;
     safeNotifyListeners();
-    if (availableOnly) unawaited(setAvailableOnly(true));
+    unawaited(_refreshAvailability());
   }
 
   List<MediaItem> _projectItems(List<MediaItem> items) {
@@ -246,7 +248,7 @@ class ExploreProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
   List<MediaItem> _visibleCopies(MediaItem item) => [
     for (final copy in _libraryCopies[item.globalKey] ?? const <MediaItem>[])
       if ((servers?.onlineServerIds.contains(copy.serverId) ?? true) &&
-          (!libraryOnly || (hiddenLibraries?.allowsItem(copy) ?? true)))
+          (hiddenLibraries?.allowsItem(copy) ?? true) && KidsProfileService.instance.allows(copy))
         copy,
   ];
 
@@ -265,7 +267,7 @@ class ExploreProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
     if (matcher == null || catalog == null || _libraryCopies.containsKey(item.globalKey)) return;
     final generation = _availabilityGeneration;
     try {
-      final result = libraryOnly ? await matcher!.match(catalog) : await matcher!.matchOtherSources(catalog);
+      final result = await matcher!.match(catalog);
       if (isDisposed || generation != _availabilityGeneration) return;
       if (result.failedServerIds.isNotEmpty ||
           result.cancelledServerIds.isNotEmpty ||
@@ -291,11 +293,16 @@ class ExploreProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
   }
 
   Future<void> setAvailableOnly(bool value) async {
-    if (libraryOnly || matcher != null) value = true;
+    if (libraryOnly) value = true;
     availableOnly = value;
     _rowsEpoch++;
     safeNotifyListeners();
-    if (!value || checkingAvailability || matcher == null) return;
+    if (!libraryOnly) await SettingsService.instanceOrNull?.write(SettingsService.discoverAvailableOnly, value);
+    if (!isDisposed) await _refreshAvailability();
+  }
+
+  Future<void> _refreshAvailability() async {
+    if (!_active || checkingAvailability || matcher == null) return;
     checkingAvailability = true;
     availabilityIncomplete = false;
     safeNotifyListeners();
@@ -308,7 +315,7 @@ class ExploreProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
     }.values.toList();
     try {
       await hiddenLibraries?.ensureInitialized();
-      await _checkAvailability(items, current: () => _active && generation == _availabilityGeneration && availableOnly);
+      await _checkAvailability(items, current: () => _active && generation == _availabilityGeneration);
     } finally {
       if (!isDisposed && generation == _availabilityGeneration) {
         checkingAvailability = false;
@@ -618,7 +625,7 @@ class ExploreProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
       _scheduleWatchlistRefresh();
     }
     safeNotifyListeners();
-    if (availableOnly) unawaited(setAvailableOnly(true));
+    unawaited(_refreshAvailability());
   }
 
   /// Full item list for a fixed row's View All grid.
@@ -638,7 +645,7 @@ class ExploreProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
       if (shelf != null) {
         final hub = await loadDiscoveryShelf(shelf, source!.id, _awards);
         final items = hub.page.items.map((item) => item.toMediaItem()).toList();
-        if (availableOnly) await _checkAvailability(items);
+        if (matcher != null) await _checkAvailability(items);
         return _projectItems(items);
       }
     }
@@ -660,7 +667,7 @@ class ExploreProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
       }
       page++;
     }
-    if (availableOnly) {
+    if (matcher != null) {
       await _checkAvailability(items);
     }
     return _projectItems(items);
@@ -691,7 +698,6 @@ class ExploreProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
     _previews.clear();
     _catalogByCopy.clear();
     checkingAvailability = false;
-    availableOnly = libraryOnly || matcher != null;
     _watchlistRefreshTimer?.cancel();
     // Detach any in-flight passes for the old source: their generation guard
     // already discards their results, but the new source's load must not

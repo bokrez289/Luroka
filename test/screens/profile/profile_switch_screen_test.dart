@@ -12,6 +12,7 @@ import 'package:luroka/focus/focusable_wrapper.dart';
 import 'package:luroka/focus/input_mode_tracker.dart';
 import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/models/plex/plex_home_user.dart';
+import 'package:luroka/navigation/profile_navigation_scope.dart';
 import 'package:luroka/profiles/active_profile_provider.dart';
 import 'package:luroka/profiles/plex_home_service.dart';
 import 'package:luroka/profiles/profile.dart';
@@ -118,6 +119,28 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('selecting the current profile returns home without reactivation', (tester) async {
+    var homeCalls = 0;
+    void showHome() => homeCalls++;
+    profileNavigationRegistry.attachHome(showHome);
+    addTearDown(() => profileNavigationRegistry.detachHome(showHome));
+    await _pumpPicker(
+      tester,
+      profiles: [Profile.local(id: 'local-owner', displayName: 'Owner', createdAt: DateTime(2026))],
+      connections: const [],
+      activeProfileId: 'local-owner',
+      withHome: true,
+    );
+    await tester.tap(find.text('Open picker'));
+    await tester.pumpAndSettle();
+    await tester.tap(_tileFor('Owner'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ProfileSwitchScreen), findsNothing);
+    expect(find.text('Open picker'), findsOneWidget);
+    expect(homeCalls, 1);
+    expect(find.byType(PinEntryDialog), findsNothing);
+  });
+
   testWidgets('TV remote focus highlights the whole profile and moves independently of the active badge', (
     tester,
   ) async {
@@ -194,6 +217,7 @@ void main() {
       tester,
       profiles: [Profile.local(id: 'local-owner', displayName: 'Owner', createdAt: DateTime(2026, 1, 1))],
       connections: const [],
+      activeProfileId: 'local-owner',
     );
 
     expect(find.text('Owner'), findsOneWidget);
@@ -637,6 +661,7 @@ void main() {
       tester,
       profiles: [Profile.local(id: 'local-owner', displayName: 'Owner', createdAt: DateTime(2026, 1, 1))],
       connections: const [],
+      activeProfileId: 'local-owner',
     );
 
     await _openTileMenu(tester, 'Owner');
@@ -726,6 +751,7 @@ Future<void> _pumpPicker(
   Map<String, DateTime> lastUsedAt = const {},
   bool settle = true,
   bool trackInput = false,
+  bool withHome = false,
 }) async {
   await SettingsService.getInstance();
   final db = AppDatabase.forTesting(NativeDatabase.memory());
@@ -775,7 +801,20 @@ Future<void> _pumpPicker(
         Provider<PlexHomeService>.value(value: plexHome),
         ChangeNotifierProvider<ActiveProfileProvider>.value(value: activeProfile),
       ],
-      child: MaterialApp(theme: monoTheme(MonoPalette.dark), home: const ProfileSwitchScreen()),
+      child: MaterialApp(
+        theme: monoTheme(MonoPalette.dark),
+        home: withHome
+            ? Builder(
+                builder: (context) => Scaffold(
+                  body: TextButton(
+                    onPressed: () =>
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileSwitchScreen())),
+                    child: const Text('Open picker'),
+                  ),
+                ),
+              )
+            : const ProfileSwitchScreen(),
+      ),
     ),
   );
   await tester.pumpWidget(trackInput ? InputModeTracker(child: picker) : picker);

@@ -269,7 +269,7 @@ class _ProfileSessionScreenState extends State<ProfileSessionScreen> {
                   context.read<CatalogSourcesProvider>(),
                   // Catalog titles remain discoverable even when no selected
                   // source owns a copy; detail offers an explicit fallback.
-                  libraryOnly: false,
+                  libraryOnly: KidsProfileService.instance.isKids(activeId),
                   awards: context.read<WikidataAwardsService>(),
                   matcher: context.read<CatalogLibraryMatcher>(),
                   hiddenLibraries: context.read<HiddenLibrariesProvider>(),

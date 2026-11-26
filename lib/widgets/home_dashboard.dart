@@ -101,6 +101,7 @@ class HomeDashboard extends StatefulWidget {
     this.spotlightSource = HomeSpotlightSource.trending,
     this.kidsStyle,
     this.kidsName,
+    this.onKidsBrowse,
     this.previewScrollController,
     this.previewEpisodeThumbnails,
     this.previewPosterDetails,
@@ -140,6 +141,7 @@ class HomeDashboard extends StatefulWidget {
   final HomeSpotlightSource spotlightSource;
   final KidsStyle? kidsStyle;
   final String? kidsName;
+  final ValueChanged<MediaKind>? onKidsBrowse;
 
   /// Read-only settings previews can drive scrolling from the remote overlay.
   final ScrollController? previewScrollController;
@@ -215,6 +217,9 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
   }
 
   void _rotationPreferenceChanged() => _scheduleRotation();
+  void _phoneSpotlightSizeChanged() {
+    if (mounted) setState(() {});
+  }
   void _noteInteraction() => _scheduleRotation(afterInteraction: true);
 
   @override
@@ -262,6 +267,8 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
       SettingsService.instance.listenable(SettingsService.homeSpotlightAutoRotate),
       SettingsService.instance.listenable(SettingsService.homeSpotlightInterval),
     ])..addListener(_rotationPreferenceChanged);
+    SettingsService.instance.listenable(SettingsService.phoneSpotlightSize).addListener(_phoneSpotlightSizeChanged);
+    SettingsService.instance.listenable(SettingsService.phoneCinematicSpotlight).addListener(_phoneSpotlightSizeChanged);
     _preview = HomePreviewController(
       resolveClient: (item) => widget.resolveClient(item),
       canFetch: () => mounted && _previewActive && (ModalRoute.of(context)?.isCurrent ?? false),
@@ -713,6 +720,8 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
     _focusGeneration++;
     _rotationTimer?.cancel();
     _rotationPreferences.removeListener(_rotationPreferenceChanged);
+    SettingsService.instance.listenable(SettingsService.phoneSpotlightSize).removeListener(_phoneSpotlightSizeChanged);
+    SettingsService.instance.listenable(SettingsService.phoneCinematicSpotlight).removeListener(_phoneSpotlightSizeChanged);
     WidgetsBinding.instance.removeObserver(this);
     _preview.dispose();
     _browsePreview.dispose();
@@ -736,6 +745,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
         rows: widget.rows,
         onDeck: widget.onDeck,
         name: widget.kidsName ?? '',
+        onBrowse: widget.onKidsBrowse,
         toolbar: widget.toolbar,
         showToolbar: widget.showToolbar,
         resolveClient: widget.resolveClient,
@@ -1045,6 +1055,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                             SizedBox(
                               height: previewHeight,
                               child: MobileHomeCarousel(
+                                key: ValueKey(SettingsService.instanceOrNull?.read(SettingsService.phoneCinematicSpotlight) ?? false),
                                 items: [for (final feature in features) feature.$1],
                                 label: features.first.$2.title,
                                 labelFor: (item) =>
@@ -1268,6 +1279,7 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
       context,
       MediaQuery.sizeOf(context).width,
       availableHeight: availableHeight - MediaQuery.paddingOf(context).top - 212 * textScale,
+      kids: true,
     );
     if (mobile) _mobileHeroExtent = carouselHeight + 250 + math.max(0, textScale - 1) * 80;
     final inset = tv ? 36.0 : 20.0;

@@ -63,6 +63,8 @@ class CatalogLibraryMatcher {
 
   void dispose() => _multiServer.removeListener(_syncServerScope);
 
+  void invalidateTitle(CatalogItem item) => _cache.remove(_keyFor(item));
+
   String _keyFor(CatalogItem item) =>
       '${item.source.name}/${item.entryIdentityKey}/${item.ids.allKeys.join(',')}/${lookupTitles(item).join('\u0000')}';
 

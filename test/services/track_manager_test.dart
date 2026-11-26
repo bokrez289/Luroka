@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:luroka/utils/media_server_http_client.dart';
 
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -218,6 +222,44 @@ void main() {
   // The constructor doesn't touch prefs, but [dispose] / [applyTrackSelection]
   // could leak across tests — reset to be safe.
   setUp(resetSharedPreferencesForTest);
+
+  for (final leave in [false, true]) {
+    test('late Emby extraction attaches only to the current movie (leave=$leave)', () async {
+      final player = _FakePlayer();
+      final manager = _make(player: player);
+      addTearDown(manager.dispose);
+      final received = Completer<void>();
+      final response = Completer<http.Response>();
+      final client = MediaServerHttpClient(
+        client: MockClient((_) {
+          received.complete();
+          return response.future;
+        }),
+      );
+      addTearDown(client.close);
+      final subtitle = SubtitleTrack.uri('https://example.test/4/Stream.srt');
+      final loaded = Completer<bool>();
+      final attached = <String>[];
+      final extraction = manager.loadExtractedSubtitles(
+        tracks: [subtitle],
+        fileLoaded: loaded.future,
+        client: client,
+        onFailure: () => fail('unexpected extraction failure'),
+        attach: (path, track) async {
+          expect(track, subtitle);
+          attached.add(await File(path).readAsString());
+        },
+      );
+      expect(received.isCompleted, isFalse);
+      loaded.complete(true);
+      await received.future;
+      if (leave) await manager.invalidatePendingSelection();
+      response.complete(http.Response('1\n00:00:01,000 --> 00:00:02,000\nHello\n', 200));
+      await extraction;
+      expect(attached, leave ? isEmpty : hasLength(1));
+      expect(player.openedMedia, isEmpty);
+    });
+  }
 
   group('applyTrackSelectionWhenReady', () {
     test('waits for player subtitle tracks when Plex metadata advertises subtitles', () async {

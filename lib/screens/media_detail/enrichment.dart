@@ -40,7 +40,7 @@ extension _DetailEnrichmentPresentation on _MediaDetailScreenState {
         setStateIfMounted(() {
           _onlineVideos = data.videos;
           _detailReviews = [..._serverReviews(), ...data.reviews];
-          _remoteTrailerUrl ??= data.videos.firstOrNull?.url;
+          _remoteTrailerUrl ??= data.videos.where((v) => v.type.toLowerCase() == 'trailer').firstOrNull?.url;
         });
       } catch (_) {
         /* Enrichment is optional and never blocks local details. */
@@ -226,10 +226,22 @@ extension _DetailEnrichmentPresentation on _MediaDetailScreenState {
     }
   }
 
-  Future<void> _openOnlinePreview(String url, String title) async {
+  Future<void> _openOnlinePreview(String url, String title, {bool chooseTrailer = false}) async {
     if (!_canUseDetail) return;
+    final trailers = [
+      for (final v in [..._onlineVideos, ..._keyFreeVideos])
+        if (v.type.toLowerCase() == 'trailer') v.url,
+      if (_metadata.raw?['RemoteTrailers'] case final List entries)
+        for (final row in entries.whereType<Map>())
+          if (row['Url'] case final String value) value,
+      ?_remoteTrailerUrl,
+    ];
     final route = MaterialPageRoute<void>(
-      builder: (_) => TrailerPlayerScreen(url: url, title: title),
+      builder: (_) => TrailerPlayerScreen(
+        url: chooseTrailer ? trailers.firstOrNull ?? url : url,
+        title: title,
+        alternatives: chooseTrailer || trailers.contains(url) ? trailers : const [],
+      ),
     );
     await Navigator.of(context).push(route);
     await route.completed;

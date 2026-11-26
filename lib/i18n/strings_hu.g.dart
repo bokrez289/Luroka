@@ -143,6 +143,10 @@ class TranslationsHu extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$profileSetupGuide$hu profileSetupGuide = _Translations$profileSetupGuide$hu._(_root);
 	@override late final _Translations$animeFavorites$hu animeFavorites = _Translations$animeFavorites$hu._(_root);
 	@override late final _Translations$addServer$hu addServer = _Translations$addServer$hu._(_root);
+	@override late final _Translations$episodeDetails$hu episodeDetails = _Translations$episodeDetails$hu._(_root);
+	@override late final _Translations$tvEdgeMenu$hu tvEdgeMenu = _Translations$tvEdgeMenu$hu._(_root);
+	@override late final _Translations$showDetailLayout$hu showDetailLayout = _Translations$showDetailLayout$hu._(_root);
+	@override late final _Translations$iconStyles$hu iconStyles = _Translations$iconStyles$hu._(_root);
 }
 
 // Path: mobileLibrary
@@ -564,6 +568,7 @@ class _Translations$kidsShelf$hu extends Translations$kidsShelf$en {
 	final TranslationsHu _root; // ignore: unused_field
 
 	// Translations
+	@override String get quietScenery => 'Nyugodt éjszakai táj';
 	@override String get movieShelf => 'Filmidő';
 	@override String get showShelf => 'Találja meg a következő műsorát';
 	@override String get aurora => 'Aurora – mély kékeszöld és lime';
@@ -925,6 +930,8 @@ class _Translations$lurokaDiscovery$hu extends Translations$lurokaDiscovery$en {
 	@override String get noAvailable => 'Az ellenőrzött könyvtárakban nem található egyező cím.';
 	@override String get sourceInfo => 'Heti trendek és kiválasztott díjnyertesek · TMDb';
 	@override String get configure => 'Felfedezési beállítások';
+	@override String get filterOwned => 'A könyvtáraimban';
+	@override String get statusRetry => 'A Seerr ellenőrzése sikertelen · Újra';
 }
 
 // Path: app
@@ -1472,6 +1479,10 @@ class _Translations$settings$hu extends Translations$settings$en {
 	@override String get playerScopeTitle => 'Sorozatonként vagy filmenként';
 	@override String get exportDialogTitle => 'Luroka-beállítások exportálása';
 	@override String get velvetHourTheme => 'Bársony óra';
+	@override String get backdropBrightness => 'Háttér fényereje';
+	@override String get backdropBrightnessDescription => 'Állítsa be a kezdőlap és a címek képeinek sötétítését. Az alapértelmezett érték 100%.';
+	@override String get showEarlyNextEpisode => 'Következő epizód megjelenítése az aktuális vége előtt';
+	@override String get showEarlyNextEpisodeDescription => 'A következő epizód megjelenítése a stáblista alatt vagy az utolsó 30 másodpercben.';
 }
 
 // Path: themeEditor
@@ -1719,6 +1730,9 @@ class _Translations$lurokaThemes$hu extends Translations$lurokaThemes$en {
 	final TranslationsHu _root; // ignore: unused_field
 
 	// Translations
+	@override String get patina => 'Patina · mély türkiz és réz';
+	@override String get afterimage => 'Utókép · indigó és neonrózsaszín';
+	@override String get letterpress => 'Magasnyomás · papír és bordó tinta';
 	@override String get title => 'Luroka mozi paletták';
 	@override String get coral => 'Korall · éjkék és naplemente';
 	@override String get ocean => 'Óceán · mélykék és jég';
@@ -1817,6 +1831,14 @@ class _Translations$homeLayout$hu extends Translations$homeLayout$en {
 	@override String get resetDescription => 'Visszaállítja az eredeti sorsorrendet, és megjeleníti az összes sort ehhez a profilhoz? A rögzített gyűjteményeit megőrizzük.';
 	@override String get saveFailed => 'Nem sikerült menteni az otthoni elrendezést. Kérjük, próbálja újra.';
 	@override String get emptyHint => 'A sorok rejtve lehetnek. Nyissa meg a Személyre szabás kezdőlapját, hogy újra megjelenjen.';
+	@override String get upcomingEpisodes => 'Közelgő epizódok';
+	@override String get upcomingFavorites => 'Kedvencek';
+	@override String get upcomingWatched => 'Korábban megtekintett';
+	@override String get upcomingBoth => 'Kedvencek és korábban megtekintett';
+	@override String get upcomingAll => 'Összes sorozat';
+	@override String get upcomingOff => 'Ki';
+	@override String airDate({required Object date}) => 'Vetítés dátuma: ${date}';
+	@override String get upcomingHint => 'A közelgő vetítési dátumok ellenőrzése csak a sor bekapcsolt állapotában fut a háttérben. Az eredmények száma korlátozott, és előfordulhat, hogy még nem érhetők el a kiszolgálón.';
 }
 
 // Path: screenTime
@@ -1886,6 +1908,34 @@ class _Translations$activityStats$hu extends Translations$activityStats$en {
 	@override String get emptyTitle => 'Itt még semmi';
 	@override String get emptyBody => 'Nézzen valamit, és a statisztikái itt gyűlnek össze.';
 	@override String get noDataInPeriod => 'Ebben az időszakban nincs lejátszás.';
+	@override String get patternsTab => 'Szokások';
+	@override String get moviesFilter => 'Filmek';
+	@override String get episodesFilter => 'Epizódok';
+	@override String get datesFilter => 'Dátumok';
+	@override String titlesPlayed({required Object count}) => 'Lejátszott címek: ${count} · az epizódok külön számítanak';
+	@override String get previousPeriod => 'Előző időszak';
+	@override String lifetimeSummary({required Object total, required Object average}) => 'Összesen: ${total} · Napi átlag: ${average}';
+	@override String get dailyAverage => 'Napi átlag';
+	@override String get allKinds => 'Összes';
+	@override String get titlesPlayedLabel => 'Lejátszott címek';
+	@override String get ledgerScope => 'A tevékenység e profil helyi Luroka-lejátszási naplójából származik. A kiszolgáló megtekintési előzményei és más alkalmazások lejátszásai nem szerepelnek benne.';
+	@override String chartScale({required Object duration}) => 'Skála: 0 – ${duration}';
+	@override String get gettingStarted => 'A tevékenység gyűjtése most kezdődött. A megtekintési szokások néhány aktív nap után jelennek meg.';
+	@override String get history => 'Előzmények';
+	@override String get insufficientHistory => 'Nincs elég előzmény';
+	@override String get monthlyRecap => 'Havi összegzés';
+	@override String get noMatches => 'Nincs a szűrőknek megfelelő megtekintés.';
+	@override String get activeDays => 'Aktív napok';
+	@override String get measurementHint => 'Az idő a rögzített lejátszást mutatja, nem a befejezett címeket.';
+	@override String get historyError => 'Az előzmények nem tölthetők be. Próbálja újra.';
+	@override String get watchedPeriod => 'Megtekintés ebben az időszakban';
+	@override String monthWatched({required Object duration}) => 'Ebben a hónapban megtekintve: ${duration}';
+	@override String get drillDown => 'Tevékenység megtekintése ezeken a napokon';
+	@override String get searchHistory => 'Keresés a megtekintési előzményekben';
+	@override String get clearDates => 'Dátumok törlése';
+	@override String get playedHint => 'Az epizódok külön számítanak. A lejátszási idő nem jelenti a cím befejezését.';
+	@override String get allHistory => 'Összes előzmény megtekintése';
+	@override String get overview => 'Áttekintés';
 }
 
 // Path: search
@@ -2094,6 +2144,7 @@ class _Translations$mediaMenu$hu extends Translations$mediaMenu$en {
 	@override String get rate => 'Értékelés';
 	@override String get playFromBeginning => 'Lejátszás az elejétől';
 	@override String get playVersion => 'Verzió lejátszása...';
+	@override String get removeFromNextUp => 'Eltávolítás a következők közül';
 }
 
 // Path: rateSheet
@@ -2110,6 +2161,8 @@ class _Translations$rateSheet$hu extends Translations$rateSheet$en {
 	@override String get saved => 'Mentve';
 	@override String get notAvailable => 'Nincs találat';
 	@override String get noConnectedServices => 'Az értékeléshez csatlakoztass egy szolgáltatást a Beállításokban.';
+	@override String get addFavorite => 'Hozzáadás a kedvencekhez';
+	@override String get removeFavorite => 'Eltávolítás a kedvencekből';
 }
 
 // Path: accessibility
@@ -2344,6 +2397,8 @@ class _Translations$messages$hu extends Translations$messages$en {
 	@override String get streamSelectionFailed => 'Nem sikerült alkalmazni a kiválasztott streameket';
 	@override String get trackSelectionNotRemembered => 'Ez a sávválasztás csak az aktuális lejátszásra érvényes.';
 	@override String get serverUnavailableForProfile => 'Az aktív profilhoz nem érhető el szerver';
+	@override String get logSupportReference => 'Támogatási hivatkozás';
+	@override String get copyFullLogId => 'Teljes naplóazonosító másolása';
 }
 
 // Path: sourceLibraries
@@ -3917,6 +3972,68 @@ class _Translations$addServer$hu extends Translations$addServer$en {
 	@override String redirectUnsupportedEnterFinal({required Object product}) => 'A szerver nem támogatott URL-re irányított át. Add meg közvetlenül a végleges ${product} URL-t.';
 }
 
+// Path: episodeDetails
+class _Translations$episodeDetails$hu extends Translations$episodeDetails$en {
+	_Translations$episodeDetails$hu._(TranslationsHu root) : this._root = root, super.internal(root);
+
+	final TranslationsHu _root; // ignore: unused_field
+
+	// Translations
+	@override String get previous => 'Előző epizód';
+	@override String get next => 'Következő epizód';
+}
+
+// Path: tvEdgeMenu
+class _Translations$tvEdgeMenu$hu extends Translations$tvEdgeMenu$en {
+	_Translations$tvEdgeMenu$hu._(TranslationsHu root) : this._root = root, super.internal(root);
+
+	final TranslationsHu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'TV-navigáció';
+	@override String get top => 'Felső sáv';
+	@override String get both => 'Felső sáv és oldalsó menü';
+	@override String get hint => 'Az oldalsó menü megnyitásához nyomjon balra egy sor első elemén. A visszatéréshez nyomjon jobbra vagy használja a Vissza gombot.';
+	@override String get tryMenu => 'Navigáció kipróbálása';
+	@override String get allLibraries => 'Összes könyvtár';
+	@override String get browse => 'Böngészés';
+	@override String get more => 'Továbbiak';
+	@override String get closeHint => 'Jobbra vagy Vissza a bezáráshoz';
+}
+
+// Path: showDetailLayout
+class _Translations$showDetailLayout$hu extends Translations$showDetailLayout$en {
+	_Translations$showDetailLayout$hu._(TranslationsHu root) : this._root = root, super.internal(root);
+
+	final TranslationsHu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Sorozatrészletek elrendezése';
+	@override String get description => 'Válassza ki, hogyan jelenjenek meg a sorozatok és epizódok a televízión.';
+	@override String get compact => 'Tömör epizódlista';
+	@override String get cinematic => 'Moziszerű';
+	@override String get seasons => 'Válasszon évadot';
+	@override String get episodes => 'Epizódok';
+	@override String get details => 'Részletek';
+	@override String get cast => 'Szereplők';
+	@override String get related => 'Hasonló címek';
+}
+
+// Path: iconStyles
+class _Translations$iconStyles$hu extends Translations$iconStyles$en {
+	_Translations$iconStyles$hu._(TranslationsHu root) : this._root = root, super.internal(root);
+
+	final TranslationsHu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Ikonstílus';
+	@override String get description => 'Válassza ki az alkalmazás vezérlőinek megjelenését. A módosítások erre a profilra érvényesek.';
+	@override String get current => 'Luroka Bold';
+	@override String get lucide => 'Lucide';
+	@override String get lucideDescription => 'Letisztult vonalas ikonok, a hiányzó ikonok helyett Material ikonokkal.';
+	@override String get outline => 'Material Outline';
+}
+
 // Path: appIcon.names
 class _Translations$appIcon$names$hu extends Translations$appIcon$names$en {
 	_Translations$appIcon$names$hu._(TranslationsHu root) : this._root = root, super.internal(root);
@@ -5116,6 +5233,7 @@ extension on TranslationsHu {
 			'downloadsRedesign.downloaded' => 'Letöltve',
 			'downloadsRedesign.speed' => 'Letöltési sebesség',
 			'downloadsRedesign.notificationProgress' => '{progress} · {networkSpeed} · {timeRemaining} maradt',
+			'kidsShelf.quietScenery' => 'Nyugodt éjszakai táj',
 			'kidsShelf.movieShelf' => 'Filmidő',
 			'kidsShelf.showShelf' => 'Találja meg a következő műsorát',
 			'kidsShelf.aurora' => 'Aurora – mély kékeszöld és lime',
@@ -5365,9 +5483,9 @@ extension on TranslationsHu {
 			'kids.historyReset' => 'A gyerekek megtekintési kizárásai visszaállítva',
 			'kids.blocked' => 'Ez a cím nem érhető el ebben a gyerekprofilban.',
 			'kids.switchProfile' => 'Profil váltása',
-			'kids.manageFromAdult' => 'A beállítások kezeléséhez váltson felnőtt profilra.',
 			_ => null,
 		} ?? switch (path) {
+			'kids.manageFromAdult' => 'A beállítások kezeléséhez váltson felnőtt profilra.',
 			'kids.noConnections' => 'Csatlakoztasson egy szervert a felnőtt profilhoz, mielőtt hozzáadna egy gyerekprofilt.',
 			'kids.created' => 'Gyermekprofil létrehozva',
 			'kids.updated' => 'A gyerekek profilja frissítve',
@@ -5407,6 +5525,8 @@ extension on TranslationsHu {
 			'lurokaDiscovery.noAvailable' => 'Az ellenőrzött könyvtárakban nem található egyező cím.',
 			'lurokaDiscovery.sourceInfo' => 'Heti trendek és kiválasztott díjnyertesek · TMDb',
 			'lurokaDiscovery.configure' => 'Felfedezési beállítások',
+			'lurokaDiscovery.filterOwned' => 'A könyvtáraimban',
+			'lurokaDiscovery.statusRetry' => 'A Seerr ellenőrzése sikertelen · Újra',
 			'app.title' => 'Luroka',
 			'appIcon.title' => 'App ikonra',
 			'appIcon.defaultIcon' => 'Alapértelmezett',
@@ -5877,11 +5997,11 @@ extension on TranslationsHu {
 			'settings.liveTvDefaultFavoritesDescription' => 'Csak a kedvenc csatornák megjelenítése az Élő TV megnyitásakor',
 			'settings.general' => 'Általános',
 			'settings.generalDescription' => 'Nyelv, indítás és ablakviselkedés',
+			_ => null,
+		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Nyelv és régió',
 			'settings.startup' => 'Indítás',
 			'settings.display' => 'Kijelző',
-			_ => null,
-		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Könyvtár és kártyák',
 			'settings.homeScreen' => 'Kezdőképernyő',
 			'settings.navigation' => 'Navigáció',
@@ -5916,6 +6036,10 @@ extension on TranslationsHu {
 			'settings.playerScopeTitle' => 'Sorozatonként vagy filmenként',
 			'settings.exportDialogTitle' => 'Luroka-beállítások exportálása',
 			'settings.velvetHourTheme' => 'Bársony óra',
+			'settings.backdropBrightness' => 'Háttér fényereje',
+			'settings.backdropBrightnessDescription' => 'Állítsa be a kezdőlap és a címek képeinek sötétítését. Az alapértelmezett érték 100%.',
+			'settings.showEarlyNextEpisode' => 'Következő epizód megjelenítése az aktuális vége előtt',
+			'settings.showEarlyNextEpisodeDescription' => 'A következő epizód megjelenítése a stáblista alatt vagy az utolsó 30 másodpercben.',
 			'themeEditor.builtIn' => 'Beépített',
 			'themeEditor.presets' => 'Előbeállítások',
 			'themeEditor.custom' => 'Egyedi',
@@ -6057,6 +6181,9 @@ extension on TranslationsHu {
 			'referenceDetails.continuing' => 'Folytatás',
 			'referenceDetails.upNext' => 'Legközelebb',
 			'referenceDetails.episodesLeft' => ({required Object count}) => '${count} epizód maradt',
+			'lurokaThemes.patina' => 'Patina · mély türkiz és réz',
+			'lurokaThemes.afterimage' => 'Utókép · indigó és neonrózsaszín',
+			'lurokaThemes.letterpress' => 'Magasnyomás · papír és bordó tinta',
 			'lurokaThemes.title' => 'Luroka mozi paletták',
 			'lurokaThemes.coral' => 'Korall · éjkék és naplemente',
 			'lurokaThemes.ocean' => 'Óceán · mélykék és jég',
@@ -6137,6 +6264,14 @@ extension on TranslationsHu {
 			'homeLayout.resetDescription' => 'Visszaállítja az eredeti sorsorrendet, és megjeleníti az összes sort ehhez a profilhoz? A rögzített gyűjteményeit megőrizzük.',
 			'homeLayout.saveFailed' => 'Nem sikerült menteni az otthoni elrendezést. Kérjük, próbálja újra.',
 			'homeLayout.emptyHint' => 'A sorok rejtve lehetnek. Nyissa meg a Személyre szabás kezdőlapját, hogy újra megjelenjen.',
+			'homeLayout.upcomingEpisodes' => 'Közelgő epizódok',
+			'homeLayout.upcomingFavorites' => 'Kedvencek',
+			'homeLayout.upcomingWatched' => 'Korábban megtekintett',
+			'homeLayout.upcomingBoth' => 'Kedvencek és korábban megtekintett',
+			'homeLayout.upcomingAll' => 'Összes sorozat',
+			'homeLayout.upcomingOff' => 'Ki',
+			'homeLayout.airDate' => ({required Object date}) => 'Vetítés dátuma: ${date}',
+			'homeLayout.upcomingHint' => 'A közelgő vetítési dátumok ellenőrzése csak a sor bekapcsolt állapotában fut a háttérben. Az eredmények száma korlátozott, és előfordulhat, hogy még nem érhetők el a kiszolgálón.',
 			'screenTime.title' => 'Képernyőidő',
 			'screenTime.description' => 'Tekintse meg a videónézéssel töltött időt ezen a profilon',
 			'screenTime.today' => 'Ma',
@@ -6185,6 +6320,34 @@ extension on TranslationsHu {
 			'activityStats.emptyTitle' => 'Itt még semmi',
 			'activityStats.emptyBody' => 'Nézzen valamit, és a statisztikái itt gyűlnek össze.',
 			'activityStats.noDataInPeriod' => 'Ebben az időszakban nincs lejátszás.',
+			'activityStats.patternsTab' => 'Szokások',
+			'activityStats.moviesFilter' => 'Filmek',
+			'activityStats.episodesFilter' => 'Epizódok',
+			'activityStats.datesFilter' => 'Dátumok',
+			'activityStats.titlesPlayed' => ({required Object count}) => 'Lejátszott címek: ${count} · az epizódok külön számítanak',
+			'activityStats.previousPeriod' => 'Előző időszak',
+			'activityStats.lifetimeSummary' => ({required Object total, required Object average}) => 'Összesen: ${total} · Napi átlag: ${average}',
+			'activityStats.dailyAverage' => 'Napi átlag',
+			'activityStats.allKinds' => 'Összes',
+			'activityStats.titlesPlayedLabel' => 'Lejátszott címek',
+			'activityStats.ledgerScope' => 'A tevékenység e profil helyi Luroka-lejátszási naplójából származik. A kiszolgáló megtekintési előzményei és más alkalmazások lejátszásai nem szerepelnek benne.',
+			'activityStats.chartScale' => ({required Object duration}) => 'Skála: 0 – ${duration}',
+			'activityStats.gettingStarted' => 'A tevékenység gyűjtése most kezdődött. A megtekintési szokások néhány aktív nap után jelennek meg.',
+			'activityStats.history' => 'Előzmények',
+			'activityStats.insufficientHistory' => 'Nincs elég előzmény',
+			'activityStats.monthlyRecap' => 'Havi összegzés',
+			'activityStats.noMatches' => 'Nincs a szűrőknek megfelelő megtekintés.',
+			'activityStats.activeDays' => 'Aktív napok',
+			'activityStats.measurementHint' => 'Az idő a rögzített lejátszást mutatja, nem a befejezett címeket.',
+			'activityStats.historyError' => 'Az előzmények nem tölthetők be. Próbálja újra.',
+			'activityStats.watchedPeriod' => 'Megtekintés ebben az időszakban',
+			'activityStats.monthWatched' => ({required Object duration}) => 'Ebben a hónapban megtekintve: ${duration}',
+			'activityStats.drillDown' => 'Tevékenység megtekintése ezeken a napokon',
+			'activityStats.searchHistory' => 'Keresés a megtekintési előzményekben',
+			'activityStats.clearDates' => 'Dátumok törlése',
+			'activityStats.playedHint' => 'Az epizódok külön számítanak. A lejátszási idő nem jelenti a cím befejezését.',
+			'activityStats.allHistory' => 'Összes előzmény megtekintése',
+			'activityStats.overview' => 'Áttekintés',
 			'search.hint' => 'Keresés filmek, sorozatok és zenék között...',
 			'search.tryDifferentTerm' => 'Próbálj másik keresési kifejezést',
 			'search.searchYourMedia' => 'Keresés a saját médiatartalmak között',
@@ -6348,6 +6511,8 @@ extension on TranslationsHu {
 			'mediaMenu.shuffleNotAvailableOffline' => 'A véletlenszerű lejátszás nem érhető el offline',
 			'mediaMenu.fileInfo' => 'Fájlinformáció',
 			'mediaMenu.deleteEpisodeFromServer' => 'Epizód törlése a szerverről',
+			_ => null,
+		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Évad törlése a szerverről',
 			'mediaMenu.deleteShowFromServer' => 'Sorozat törlése a szerverről',
 			'mediaMenu.deleteMovieFromServer' => 'Film törlése a szerverről',
@@ -6372,6 +6537,7 @@ extension on TranslationsHu {
 			'mediaMenu.rate' => 'Értékelés',
 			'mediaMenu.playFromBeginning' => 'Lejátszás az elejétől',
 			'mediaMenu.playVersion' => 'Verzió lejátszása...',
+			'mediaMenu.removeFromNextUp' => 'Eltávolítás a következők közül',
 			'rateSheet.title' => 'Értékelés',
 			'rateSheet.server' => 'Szerver',
 			'rateSheet.favorite' => 'Kedvenc',
@@ -6379,6 +6545,8 @@ extension on TranslationsHu {
 			'rateSheet.saved' => 'Mentve',
 			'rateSheet.notAvailable' => 'Nincs találat',
 			'rateSheet.noConnectedServices' => 'Az értékeléshez csatlakoztass egy szolgáltatást a Beállításokban.',
+			'rateSheet.addFavorite' => 'Hozzáadás a kedvencekhez',
+			'rateSheet.removeFavorite' => 'Eltávolítás a kedvencekből',
 			'accessibility.mediaCardMovie' => ({required Object title}) => '${title}, film',
 			'accessibility.mediaCardShow' => ({required Object title}) => '${title}, TV-sorozat',
 			'accessibility.mediaCardEpisode' => ({required Object title, required Object episodeInfo}) => '${title}, ${episodeInfo}',
@@ -6394,8 +6562,6 @@ extension on TranslationsHu {
 			'accessibility.hue' => 'Árnyalat',
 			'accessibility.saturation' => 'Telítettség',
 			'accessibility.brightness' => 'Fényerő',
-			_ => null,
-		} ?? switch (path) {
 			'accessibility.hexColor' => 'Hex színkód',
 			'accessibility.expandText' => 'Szöveg kibontása',
 			'accessibility.collapseText' => 'Szöveg összecsukása',
@@ -6574,6 +6740,8 @@ extension on TranslationsHu {
 			'messages.streamSelectionFailed' => 'Nem sikerült alkalmazni a kiválasztott streameket',
 			'messages.trackSelectionNotRemembered' => 'Ez a sávválasztás csak az aktuális lejátszásra érvényes.',
 			'messages.serverUnavailableForProfile' => 'Az aktív profilhoz nem érhető el szerver',
+			'messages.logSupportReference' => 'Támogatási hivatkozás',
+			'messages.copyFullLogId' => 'Teljes naplóazonosító másolása',
 			'sourceLibraries.title' => 'Az Ön szerverei és könyvtárai',
 			'sourceLibraries.description' => 'Válassza ki a Luroka által használt könyvtárakat az Otthon, a keresés, az elérhetőség felfedezése és a Stúdiók számára. A kezdősorok sorrendje külön személyre szabott.',
 			'sourceLibraries.partial' => 'Néhány szervert nem sikerült ellenőrizni. Az ezekhez a könyvtárakhoz mentett választásai megmaradnak. Frissítse az újbóli próbálkozáshoz.',
@@ -6857,6 +7025,8 @@ extension on TranslationsHu {
 			'libraries.filters' => 'Szűrők',
 			'libraries.confirmActionMessage' => 'Biztosan végre szeretnéd hajtani ezt a műveletet?',
 			'libraries.showLibrary' => 'Könyvtár megjelenítése',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Könyvtár elrejtése',
 			'libraries.libraryOptions' => 'Könyvtár beállításai',
 			'libraries.content' => 'könyvtár tartalma',
@@ -6908,8 +7078,6 @@ extension on TranslationsHu {
 			'libraries.sortLabels.dateShared' => 'Megosztás dátuma',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'A legutóbbi epizód sugárzási dátuma',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Utolsó epizód hozzáadásának dátuma',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Letöltés dátuma',
 			'libraries.sortLabels.size' => 'Méret',
 			'libraries.sortLabels.library' => 'Könyvtár',
@@ -7371,6 +7539,8 @@ extension on TranslationsHu {
 			'watchTogether.qrShare' => 'QR-kód megosztása',
 			'watchTogether.qrHint' => 'Olvassa be a Luroka alkalmazással, hogy csatlakozzon ehhez a szobához.',
 			'watchTogether.phasePlaying' => 'Játék',
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Szüneteltetve',
 			'watchTogether.phaseWaiting' => 'Mindenkit várok',
 			'watchTogether.inviteCopied' => 'Meghívó másolva. Illessze be egy üzenetbe.',
@@ -7422,8 +7592,6 @@ extension on TranslationsHu {
 			'watchTogether.offsetPlusSecond' => '+1 s',
 			'watchTogether.participants' => 'Résztvevők',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('hu'))(n, one: '${n} résztvevő', other: '${n} résztvevők', ), 
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'HÁZIGAZDA',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (Ön)',
 			'watchTogether.playerIdle' => 'Tétlen',
@@ -7885,6 +8053,8 @@ extension on TranslationsHu {
 			'matchScreen.match' => 'Párosítás...',
 			'matchScreen.fixMatch' => 'Párosítás javítása...',
 			'matchScreen.unmatch' => 'Párosítás megszüntetése',
+			_ => null,
+		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Törlöd ezt a párosítást? A Plex párosítatlanként kezeli az újrapárosításig.',
 			'matchScreen.unmatchSuccess' => 'Párosítás megszüntetve',
 			'matchScreen.unmatchFailed' => 'Nem sikerült a párosítás megszüntetése',
@@ -7936,8 +8106,6 @@ extension on TranslationsHu {
 			'seerr.requestFailed' => ({required Object error}) => 'Az igénylés nem sikerült: ${error}',
 			'seerr.requestsLoadFailed' => 'Nem sikerült betölteni az igénylési opciókat',
 			'seerr.nothingToRequest' => 'Minden elem már elérhető vagy igényelve van.',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Elérhető',
 			'seerr.statusPartiallyAvailable' => 'Részben elérhető',
 			'seerr.statusRequested' => 'Igényelve',
@@ -8116,6 +8284,32 @@ extension on TranslationsHu {
 			'addServer.redirectDifferentHost' => ({required Object product}) => 'A szerver egy másik gazdagépre irányított át. Add meg közvetlenül a végleges ${product} URL-t.',
 			'addServer.redirectInsecure' => 'A szerver HTTPS-ről nem biztonságos URL-re irányított át',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'A szerver nem támogatott URL-re irányított át. Add meg közvetlenül a végleges ${product} URL-t.',
+			'episodeDetails.previous' => 'Előző epizód',
+			'episodeDetails.next' => 'Következő epizód',
+			'tvEdgeMenu.title' => 'TV-navigáció',
+			'tvEdgeMenu.top' => 'Felső sáv',
+			'tvEdgeMenu.both' => 'Felső sáv és oldalsó menü',
+			'tvEdgeMenu.hint' => 'Az oldalsó menü megnyitásához nyomjon balra egy sor első elemén. A visszatéréshez nyomjon jobbra vagy használja a Vissza gombot.',
+			'tvEdgeMenu.tryMenu' => 'Navigáció kipróbálása',
+			'tvEdgeMenu.allLibraries' => 'Összes könyvtár',
+			'tvEdgeMenu.browse' => 'Böngészés',
+			'tvEdgeMenu.more' => 'Továbbiak',
+			'tvEdgeMenu.closeHint' => 'Jobbra vagy Vissza a bezáráshoz',
+			'showDetailLayout.title' => 'Sorozatrészletek elrendezése',
+			'showDetailLayout.description' => 'Válassza ki, hogyan jelenjenek meg a sorozatok és epizódok a televízión.',
+			'showDetailLayout.compact' => 'Tömör epizódlista',
+			'showDetailLayout.cinematic' => 'Moziszerű',
+			'showDetailLayout.seasons' => 'Válasszon évadot',
+			'showDetailLayout.episodes' => 'Epizódok',
+			'showDetailLayout.details' => 'Részletek',
+			'showDetailLayout.cast' => 'Szereplők',
+			'showDetailLayout.related' => 'Hasonló címek',
+			'iconStyles.title' => 'Ikonstílus',
+			'iconStyles.description' => 'Válassza ki az alkalmazás vezérlőinek megjelenését. A módosítások erre a profilra érvényesek.',
+			'iconStyles.current' => 'Luroka Bold',
+			'iconStyles.lucide' => 'Lucide',
+			'iconStyles.lucideDescription' => 'Letisztult vonalas ikonok, a hiányzó ikonok helyett Material ikonokkal.',
+			'iconStyles.outline' => 'Material Outline',
 			_ => null,
 		};
 	}

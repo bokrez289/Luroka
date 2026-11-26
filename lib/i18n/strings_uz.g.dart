@@ -143,6 +143,10 @@ class TranslationsUz extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$profileSetupGuide$uz profileSetupGuide = _Translations$profileSetupGuide$uz._(_root);
 	@override late final _Translations$animeFavorites$uz animeFavorites = _Translations$animeFavorites$uz._(_root);
 	@override late final _Translations$addServer$uz addServer = _Translations$addServer$uz._(_root);
+	@override late final _Translations$episodeDetails$uz episodeDetails = _Translations$episodeDetails$uz._(_root);
+	@override late final _Translations$tvEdgeMenu$uz tvEdgeMenu = _Translations$tvEdgeMenu$uz._(_root);
+	@override late final _Translations$showDetailLayout$uz showDetailLayout = _Translations$showDetailLayout$uz._(_root);
+	@override late final _Translations$iconStyles$uz iconStyles = _Translations$iconStyles$uz._(_root);
 }
 
 // Path: mobileLibrary
@@ -564,6 +568,7 @@ class _Translations$kidsShelf$uz extends Translations$kidsShelf$en {
 	final TranslationsUz _root; // ignore: unused_field
 
 	// Translations
+	@override String get quietScenery => 'Sokin tun manzarasi';
 	@override String get movieShelf => 'Kino vaqti';
 	@override String get showShelf => 'Keyingi ko\'rsatuvingizni toping';
 	@override String get aurora => 'Aurora - chuqur choy va ohak';
@@ -925,6 +930,8 @@ class _Translations$lurokaDiscovery$uz extends Translations$lurokaDiscovery$en {
 	@override String get noAvailable => 'Kutubxonalarda mos keladigan nomlar topilmadi.';
 	@override String get sourceInfo => 'Haftalik tendentsiyalar va tanlangan mukofot g\'oliblari · TMDb';
 	@override String get configure => 'Kashfiyot sozlamalari';
+	@override String get filterOwned => 'Mening kutubxonalarimda';
+	@override String get statusRetry => 'Seerr tekshirib bo‘lmadi · Qayta urinish';
 }
 
 // Path: app
@@ -1472,6 +1479,10 @@ class _Translations$settings$uz extends Translations$settings$en {
 	@override String get playerScopeTitle => 'Serial yoki film boʻyicha';
 	@override String get exportDialogTitle => 'Luroka sozlamalarini eksport qilish';
 	@override String get velvetHourTheme => 'Velvet soati';
+	@override String get backdropBrightness => 'Fon yorqinligi';
+	@override String get backdropBrightnessDescription => 'Bosh sahifa va asar rasmlari ustidagi qoraytirishni sozlang. Standart qiymat 100%.';
+	@override String get showEarlyNextEpisode => 'Joriy qism tugashidan oldin keyingi qismni ko‘rsatish';
+	@override String get showEarlyNextEpisodeDescription => 'Keyingi qismni titrlar vaqtida yoki oxirgi 30 soniyada ko‘rsating.';
 }
 
 // Path: themeEditor
@@ -1719,6 +1730,9 @@ class _Translations$lurokaThemes$uz extends Translations$lurokaThemes$en {
 	final TranslationsUz _root; // ignore: unused_field
 
 	// Translations
+	@override String get patina => 'Patina · to‘q moviy-yashil va mis';
+	@override String get afterimage => 'Qoldiq tasvir · indigo va neon pushti';
+	@override String get letterpress => 'Bosmaxona · qog‘oz va to‘q qizil siyoh';
 	@override String get title => 'Luroka kino palitralari';
 	@override String get coral => 'Marjon · yarim tunda ko\'k va quyosh botishi';
 	@override String get ocean => 'Okean · chuqur ko\'k va muz';
@@ -1817,6 +1831,14 @@ class _Translations$homeLayout$uz extends Translations$homeLayout$en {
 	@override String get resetDescription => 'Asl qatorlar tartibi tiklansinmi va ushbu profil uchun barcha qatorlar koʻrsatilsinmi? Qadalgan kollektsiyalaringiz saqlanadi.';
 	@override String get saveFailed => 'Uyingiz tartibini saqlab bo‘lmadi. Iltimos, qayta urinib koʻring.';
 	@override String get emptyHint => 'Qatorlar yashirilishi mumkin. Ularni yana koʻrsatish uchun “Uyni shaxsiylashtirish”ni oching.';
+	@override String get upcomingEpisodes => 'Kelgusi qismlar';
+	@override String get upcomingFavorites => 'Sevimlilar';
+	@override String get upcomingWatched => 'Avval ko‘rilganlar';
+	@override String get upcomingBoth => 'Sevimlilar va avval ko‘rilganlar';
+	@override String get upcomingAll => 'Barcha seriallar';
+	@override String get upcomingOff => 'O‘chiq';
+	@override String airDate({required Object date}) => 'Efirdagi sana: ${date}';
+	@override String get upcomingHint => 'Kelgusi efir sanalari faqat ushbu qator yoqilganda fonda tekshiriladi. Natijalar cheklangan va serveringizda hali mavjud bo‘lmasligi mumkin.';
 }
 
 // Path: screenTime
@@ -1886,6 +1908,34 @@ class _Translations$activityStats$uz extends Translations$activityStats$en {
 	@override String get emptyTitle => 'Bu yerda hali hech narsa';
 	@override String get emptyBody => 'Biror narsani tomosha qiling va statistikangiz shu yerda to\'planadi.';
 	@override String get noDataInPeriod => 'Bu davrda hech qanday ijro qayd etilmagan.';
+	@override String get patternsTab => 'Tomosha odatlari';
+	@override String get moviesFilter => 'Filmlar';
+	@override String get episodesFilter => 'Qismlar';
+	@override String get datesFilter => 'Sanalar';
+	@override String titlesPlayed({required Object count}) => 'Ijro etilgan asarlar: ${count} · qismlar alohida hisoblanadi';
+	@override String get previousPeriod => 'Oldingi davr';
+	@override String lifetimeSummary({required Object total, required Object average}) => 'Jami: ${total} · Kunlik o‘rtacha: ${average}';
+	@override String get dailyAverage => 'Kunlik o‘rtacha';
+	@override String get allKinds => 'Barchasi';
+	@override String get titlesPlayedLabel => 'Ijro etilgan asarlar';
+	@override String get ledgerScope => 'Faollik ushbu profilning mahalliy Luroka ijro jurnalidan olinadi. Server tomosha tarixi va boshqa ilovalardagi ijro hisobga olinmaydi.';
+	@override String chartScale({required Object duration}) => 'Shkala: 0 – ${duration}';
+	@override String get gettingStarted => 'Faollik endigina to‘planmoqda. Tomosha odatlari bir necha faol kundan so‘ng ko‘rinadi.';
+	@override String get history => 'Tarix';
+	@override String get insufficientHistory => 'Tarix yetarli emas';
+	@override String get monthlyRecap => 'Oylik xulosa';
+	@override String get noMatches => 'Bu filtrlarga mos tomosha yozuvlari yo‘q.';
+	@override String get activeDays => 'Faol kunlar';
+	@override String get measurementHint => 'Vaqt tugatilgan asarlarni emas, qayd etilgan ijroni bildiradi.';
+	@override String get historyError => 'Tarixni yuklab bo‘lmadi. Qayta urinib ko‘ring.';
+	@override String get watchedPeriod => 'Shu davrda tomosha qilingan';
+	@override String monthWatched({required Object duration}) => 'Shu oy ${duration} tomosha qilindi';
+	@override String get drillDown => 'Ushbu sanalardagi faollikni ko‘rish';
+	@override String get searchHistory => 'Tomosha tarixidan qidirish';
+	@override String get clearDates => 'Sanalarni tozalash';
+	@override String get playedHint => 'Qismlar alohida hisoblanadi. Ijro vaqti asar to‘liq ko‘rilganini bildirmaydi.';
+	@override String get allHistory => 'Barcha tarixni ko‘rish';
+	@override String get overview => 'Umumiy ko‘rinish';
 }
 
 // Path: search
@@ -2094,6 +2144,7 @@ class _Translations$mediaMenu$uz extends Translations$mediaMenu$en {
 	@override String get rate => 'Baho berish';
 	@override String get playFromBeginning => 'Boshidan ijro etish';
 	@override String get playVersion => 'Versiyani ijro etish...';
+	@override String get removeFromNextUp => 'Keyingilar ro‘yxatidan olib tashlash';
 }
 
 // Path: rateSheet
@@ -2110,6 +2161,8 @@ class _Translations$rateSheet$uz extends Translations$rateSheet$en {
 	@override String get saved => 'Saqlandi';
 	@override String get notAvailable => 'Moslik topilmadi';
 	@override String get noConnectedServices => 'Baho berish uchun Sozlamalardan xizmatni ulang.';
+	@override String get addFavorite => 'Sevimlilarga qo‘shish';
+	@override String get removeFavorite => 'Sevimlilardan olib tashlash';
 }
 
 // Path: accessibility
@@ -2344,6 +2397,8 @@ class _Translations$messages$uz extends Translations$messages$en {
 	@override String get streamSelectionFailed => 'Tanlangan oqimlarni qoʻllab boʻlmadi';
 	@override String get trackSelectionNotRemembered => 'Bu trek tanlovi faqat joriy ijroga qoʻllanadi.';
 	@override String get serverUnavailableForProfile => 'Faol profil uchun hech qanday server mavjud emas';
+	@override String get logSupportReference => 'Yordam uchun murojaat raqami';
+	@override String get copyFullLogId => 'Jurnalning to‘liq ID raqamini nusxalash';
 }
 
 // Path: sourceLibraries
@@ -3917,6 +3972,68 @@ class _Translations$addServer$uz extends Translations$addServer$en {
 	@override String redirectUnsupportedEnterFinal({required Object product}) => 'Server qoʻllab-quvvatlanmaydigan URL-ga yoʻnaltirdi. Yakuniy ${product} URL-ini bevosita kiriting.';
 }
 
+// Path: episodeDetails
+class _Translations$episodeDetails$uz extends Translations$episodeDetails$en {
+	_Translations$episodeDetails$uz._(TranslationsUz root) : this._root = root, super.internal(root);
+
+	final TranslationsUz _root; // ignore: unused_field
+
+	// Translations
+	@override String get previous => 'Oldingi qism';
+	@override String get next => 'Keyingi qism';
+}
+
+// Path: tvEdgeMenu
+class _Translations$tvEdgeMenu$uz extends Translations$tvEdgeMenu$en {
+	_Translations$tvEdgeMenu$uz._(TranslationsUz root) : this._root = root, super.internal(root);
+
+	final TranslationsUz _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'TV navigatsiyasi';
+	@override String get top => 'Yuqori panel';
+	@override String get both => 'Yuqori panel va yon menyu';
+	@override String get hint => 'Yon menyuni ochish uchun qatorning birinchi elementida chap tugmani bosing. Qaytish uchun o‘ng yoki Orqaga tugmasini bosing.';
+	@override String get tryMenu => 'Navigatsiyani sinab ko‘rish';
+	@override String get allLibraries => 'Barcha kutubxonalar';
+	@override String get browse => 'Ko‘rib chiqish';
+	@override String get more => 'Yana';
+	@override String get closeHint => 'Yopish uchun o‘ng yoki Orqaga tugmasini bosing';
+}
+
+// Path: showDetailLayout
+class _Translations$showDetailLayout$uz extends Translations$showDetailLayout$en {
+	_Translations$showDetailLayout$uz._(TranslationsUz root) : this._root = root, super.internal(root);
+
+	final TranslationsUz _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Serial tafsilotlari tartibi';
+	@override String get description => 'Serial va qismlarning televizorda ko‘rsatilish usulini tanlang.';
+	@override String get compact => 'Ixcham qismlar ro‘yxati';
+	@override String get cinematic => 'Kinouslub';
+	@override String get seasons => 'Mavsumni tanlang';
+	@override String get episodes => 'Qismlar';
+	@override String get details => 'Tafsilotlar';
+	@override String get cast => 'Aktyorlar';
+	@override String get related => 'O‘xshash asarlar';
+}
+
+// Path: iconStyles
+class _Translations$iconStyles$uz extends Translations$iconStyles$en {
+	_Translations$iconStyles$uz._(TranslationsUz root) : this._root = root, super.internal(root);
+
+	final TranslationsUz _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Belgi uslubi';
+	@override String get description => 'Ilova boshqaruv elementlarining ko‘rinishini tanlang. O‘zgarishlar ushbu profilga tatbiq etiladi.';
+	@override String get current => 'Luroka Bold';
+	@override String get lucide => 'Lucide';
+	@override String get lucideDescription => 'Sodda chiziqli belgilar; mavjud bo‘lmagan belgilar Material belgilari bilan almashtiriladi.';
+	@override String get outline => 'Material Outline';
+}
+
 // Path: appIcon.names
 class _Translations$appIcon$names$uz extends Translations$appIcon$names$en {
 	_Translations$appIcon$names$uz._(TranslationsUz root) : this._root = root, super.internal(root);
@@ -5116,6 +5233,7 @@ extension on TranslationsUz {
 			'downloadsRedesign.downloaded' => 'Yuklab olingan',
 			'downloadsRedesign.speed' => 'Yuklab olish tezligi',
 			'downloadsRedesign.notificationProgress' => '{progress} · {networkSpeed} · {timeRemaining} qoldi',
+			'kidsShelf.quietScenery' => 'Sokin tun manzarasi',
 			'kidsShelf.movieShelf' => 'Kino vaqti',
 			'kidsShelf.showShelf' => 'Keyingi ko\'rsatuvingizni toping',
 			'kidsShelf.aurora' => 'Aurora - chuqur choy va ohak',
@@ -5365,9 +5483,9 @@ extension on TranslationsUz {
 			'kids.historyReset' => 'Bolalar uchun koʻrish istisnolari qayta tiklandi',
 			'kids.blocked' => 'Bu nom ushbu bolalar profilida mavjud emas.',
 			'kids.switchProfile' => 'Profilni almashtirish',
-			'kids.manageFromAdult' => 'Sozlamalarni boshqarish uchun kattalar profiliga oʻting.',
 			_ => null,
 		} ?? switch (path) {
+			'kids.manageFromAdult' => 'Sozlamalarni boshqarish uchun kattalar profiliga oʻting.',
 			'kids.noConnections' => 'Bolalar profilini qo\'shishdan oldin serverni kattalar profilingizga ulang.',
 			'kids.created' => 'Bolalar profili yaratildi',
 			'kids.updated' => 'Bolalar profili yangilandi',
@@ -5407,6 +5525,8 @@ extension on TranslationsUz {
 			'lurokaDiscovery.noAvailable' => 'Kutubxonalarda mos keladigan nomlar topilmadi.',
 			'lurokaDiscovery.sourceInfo' => 'Haftalik tendentsiyalar va tanlangan mukofot g\'oliblari · TMDb',
 			'lurokaDiscovery.configure' => 'Kashfiyot sozlamalari',
+			'lurokaDiscovery.filterOwned' => 'Mening kutubxonalarimda',
+			'lurokaDiscovery.statusRetry' => 'Seerr tekshirib bo‘lmadi · Qayta urinish',
 			'app.title' => 'Luroka',
 			'appIcon.title' => 'Ilova belgisi',
 			'appIcon.defaultIcon' => 'Standart',
@@ -5877,11 +5997,11 @@ extension on TranslationsUz {
 			'settings.liveTvDefaultFavoritesDescription' => 'Jonli TV ochilganda faqat tanlangan kanallarni koʻrsatish',
 			'settings.general' => 'Umumiy',
 			'settings.generalDescription' => 'Til, ishga tushirish va oyna xatti-harakati',
+			_ => null,
+		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Til va mintaqa',
 			'settings.startup' => 'Ishga tushirish',
 			'settings.display' => 'Displey',
-			_ => null,
-		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Kutubxona va kartochkalar',
 			'settings.homeScreen' => 'Bosh ekran',
 			'settings.navigation' => 'Navigatsiya',
@@ -5916,6 +6036,10 @@ extension on TranslationsUz {
 			'settings.playerScopeTitle' => 'Serial yoki film boʻyicha',
 			'settings.exportDialogTitle' => 'Luroka sozlamalarini eksport qilish',
 			'settings.velvetHourTheme' => 'Velvet soati',
+			'settings.backdropBrightness' => 'Fon yorqinligi',
+			'settings.backdropBrightnessDescription' => 'Bosh sahifa va asar rasmlari ustidagi qoraytirishni sozlang. Standart qiymat 100%.',
+			'settings.showEarlyNextEpisode' => 'Joriy qism tugashidan oldin keyingi qismni ko‘rsatish',
+			'settings.showEarlyNextEpisodeDescription' => 'Keyingi qismni titrlar vaqtida yoki oxirgi 30 soniyada ko‘rsating.',
 			'themeEditor.builtIn' => 'O\'rnatilgan',
 			'themeEditor.presets' => 'Oldindan sozlash',
 			'themeEditor.custom' => 'Maxsus',
@@ -6057,6 +6181,9 @@ extension on TranslationsUz {
 			'referenceDetails.continuing' => 'Davom etilmoqda',
 			'referenceDetails.upNext' => 'Keyingi',
 			'referenceDetails.episodesLeft' => ({required Object count}) => '${count} qismlari qoldi',
+			'lurokaThemes.patina' => 'Patina · to‘q moviy-yashil va mis',
+			'lurokaThemes.afterimage' => 'Qoldiq tasvir · indigo va neon pushti',
+			'lurokaThemes.letterpress' => 'Bosmaxona · qog‘oz va to‘q qizil siyoh',
 			'lurokaThemes.title' => 'Luroka kino palitralari',
 			'lurokaThemes.coral' => 'Marjon · yarim tunda ko\'k va quyosh botishi',
 			'lurokaThemes.ocean' => 'Okean · chuqur ko\'k va muz',
@@ -6137,6 +6264,14 @@ extension on TranslationsUz {
 			'homeLayout.resetDescription' => 'Asl qatorlar tartibi tiklansinmi va ushbu profil uchun barcha qatorlar koʻrsatilsinmi? Qadalgan kollektsiyalaringiz saqlanadi.',
 			'homeLayout.saveFailed' => 'Uyingiz tartibini saqlab bo‘lmadi. Iltimos, qayta urinib koʻring.',
 			'homeLayout.emptyHint' => 'Qatorlar yashirilishi mumkin. Ularni yana koʻrsatish uchun “Uyni shaxsiylashtirish”ni oching.',
+			'homeLayout.upcomingEpisodes' => 'Kelgusi qismlar',
+			'homeLayout.upcomingFavorites' => 'Sevimlilar',
+			'homeLayout.upcomingWatched' => 'Avval ko‘rilganlar',
+			'homeLayout.upcomingBoth' => 'Sevimlilar va avval ko‘rilganlar',
+			'homeLayout.upcomingAll' => 'Barcha seriallar',
+			'homeLayout.upcomingOff' => 'O‘chiq',
+			'homeLayout.airDate' => ({required Object date}) => 'Efirdagi sana: ${date}',
+			'homeLayout.upcomingHint' => 'Kelgusi efir sanalari faqat ushbu qator yoqilganda fonda tekshiriladi. Natijalar cheklangan va serveringizda hali mavjud bo‘lmasligi mumkin.',
 			'screenTime.title' => 'Ekran vaqti',
 			'screenTime.description' => 'Ushbu profilda video tomosha qilish uchun sarflangan vaqtni ko\'ring',
 			'screenTime.today' => 'Bugun',
@@ -6185,6 +6320,34 @@ extension on TranslationsUz {
 			'activityStats.emptyTitle' => 'Bu yerda hali hech narsa',
 			'activityStats.emptyBody' => 'Biror narsani tomosha qiling va statistikangiz shu yerda to\'planadi.',
 			'activityStats.noDataInPeriod' => 'Bu davrda hech qanday ijro qayd etilmagan.',
+			'activityStats.patternsTab' => 'Tomosha odatlari',
+			'activityStats.moviesFilter' => 'Filmlar',
+			'activityStats.episodesFilter' => 'Qismlar',
+			'activityStats.datesFilter' => 'Sanalar',
+			'activityStats.titlesPlayed' => ({required Object count}) => 'Ijro etilgan asarlar: ${count} · qismlar alohida hisoblanadi',
+			'activityStats.previousPeriod' => 'Oldingi davr',
+			'activityStats.lifetimeSummary' => ({required Object total, required Object average}) => 'Jami: ${total} · Kunlik o‘rtacha: ${average}',
+			'activityStats.dailyAverage' => 'Kunlik o‘rtacha',
+			'activityStats.allKinds' => 'Barchasi',
+			'activityStats.titlesPlayedLabel' => 'Ijro etilgan asarlar',
+			'activityStats.ledgerScope' => 'Faollik ushbu profilning mahalliy Luroka ijro jurnalidan olinadi. Server tomosha tarixi va boshqa ilovalardagi ijro hisobga olinmaydi.',
+			'activityStats.chartScale' => ({required Object duration}) => 'Shkala: 0 – ${duration}',
+			'activityStats.gettingStarted' => 'Faollik endigina to‘planmoqda. Tomosha odatlari bir necha faol kundan so‘ng ko‘rinadi.',
+			'activityStats.history' => 'Tarix',
+			'activityStats.insufficientHistory' => 'Tarix yetarli emas',
+			'activityStats.monthlyRecap' => 'Oylik xulosa',
+			'activityStats.noMatches' => 'Bu filtrlarga mos tomosha yozuvlari yo‘q.',
+			'activityStats.activeDays' => 'Faol kunlar',
+			'activityStats.measurementHint' => 'Vaqt tugatilgan asarlarni emas, qayd etilgan ijroni bildiradi.',
+			'activityStats.historyError' => 'Tarixni yuklab bo‘lmadi. Qayta urinib ko‘ring.',
+			'activityStats.watchedPeriod' => 'Shu davrda tomosha qilingan',
+			'activityStats.monthWatched' => ({required Object duration}) => 'Shu oy ${duration} tomosha qilindi',
+			'activityStats.drillDown' => 'Ushbu sanalardagi faollikni ko‘rish',
+			'activityStats.searchHistory' => 'Tomosha tarixidan qidirish',
+			'activityStats.clearDates' => 'Sanalarni tozalash',
+			'activityStats.playedHint' => 'Qismlar alohida hisoblanadi. Ijro vaqti asar to‘liq ko‘rilganini bildirmaydi.',
+			'activityStats.allHistory' => 'Barcha tarixni ko‘rish',
+			'activityStats.overview' => 'Umumiy ko‘rinish',
 			'search.hint' => 'Filmlar, seriallar, musiqa qidirish...',
 			'search.tryDifferentTerm' => 'Boshqa qidiruv soʻzini kiriting',
 			'search.searchYourMedia' => 'Medialaringizdan qidiring',
@@ -6348,6 +6511,8 @@ extension on TranslationsUz {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Aralashtirib ijro etish oflayn rejimda mavjud emas',
 			'mediaMenu.fileInfo' => 'Fayl haqida maʼlumot',
 			'mediaMenu.deleteEpisodeFromServer' => 'Qismni serverdan oʻchirish',
+			_ => null,
+		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Mavsumni serverdan oʻchirish',
 			'mediaMenu.deleteShowFromServer' => 'Shouni serverdan oʻchirish',
 			'mediaMenu.deleteMovieFromServer' => 'Filmni serverdan oʻchirish',
@@ -6372,6 +6537,7 @@ extension on TranslationsUz {
 			'mediaMenu.rate' => 'Baho berish',
 			'mediaMenu.playFromBeginning' => 'Boshidan ijro etish',
 			'mediaMenu.playVersion' => 'Versiyani ijro etish...',
+			'mediaMenu.removeFromNextUp' => 'Keyingilar ro‘yxatidan olib tashlash',
 			'rateSheet.title' => 'Baho berish',
 			'rateSheet.server' => 'Server',
 			'rateSheet.favorite' => 'Tanlangan',
@@ -6379,6 +6545,8 @@ extension on TranslationsUz {
 			'rateSheet.saved' => 'Saqlandi',
 			'rateSheet.notAvailable' => 'Moslik topilmadi',
 			'rateSheet.noConnectedServices' => 'Baho berish uchun Sozlamalardan xizmatni ulang.',
+			'rateSheet.addFavorite' => 'Sevimlilarga qo‘shish',
+			'rateSheet.removeFavorite' => 'Sevimlilardan olib tashlash',
 			'accessibility.mediaCardMovie' => ({required Object title}) => '${title}, film',
 			'accessibility.mediaCardShow' => ({required Object title}) => '${title}, TV shou',
 			'accessibility.mediaCardEpisode' => ({required Object title, required Object episodeInfo}) => '${title}, ${episodeInfo}',
@@ -6394,8 +6562,6 @@ extension on TranslationsUz {
 			'accessibility.hue' => 'Rang jilosi',
 			'accessibility.saturation' => 'Toʻyinganlik',
 			'accessibility.brightness' => 'Yorqinlik',
-			_ => null,
-		} ?? switch (path) {
 			'accessibility.hexColor' => 'Hex rangi',
 			'accessibility.expandText' => 'Matnni yoyish',
 			'accessibility.collapseText' => 'Matnni yigʻish',
@@ -6574,6 +6740,8 @@ extension on TranslationsUz {
 			'messages.streamSelectionFailed' => 'Tanlangan oqimlarni qoʻllab boʻlmadi',
 			'messages.trackSelectionNotRemembered' => 'Bu trek tanlovi faqat joriy ijroga qoʻllanadi.',
 			'messages.serverUnavailableForProfile' => 'Faol profil uchun hech qanday server mavjud emas',
+			'messages.logSupportReference' => 'Yordam uchun murojaat raqami',
+			'messages.copyFullLogId' => 'Jurnalning to‘liq ID raqamini nusxalash',
 			'sourceLibraries.title' => 'Sizning serverlaringiz va kutubxonalaringiz',
 			'sourceLibraries.description' => 'Luroka bosh sahifa, qidiruv, kashfiyotdagi mavjudlik va studiyalar uchun foydalanadigan kutubxonalarni tanlang. Bosh sahifadagi qatorlar tartibi alohida sozlanadi.',
 			'sourceLibraries.partial' => 'Ba\'zi serverlarni tekshirib bo\'lmadi. Ushbu kutubxonalar uchun saqlangan tanlovlaringiz saqlanadi. Qayta urinish uchun yangilang.',
@@ -6857,6 +7025,8 @@ extension on TranslationsUz {
 			'libraries.filters' => 'Filtrlar',
 			'libraries.confirmActionMessage' => 'Ushbu harakatni bajarmoqchimisiz?',
 			'libraries.showLibrary' => 'Kutubxonani koʻrsatish',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Kutubxonani yashirish',
 			'libraries.libraryOptions' => 'Kutubxona parametrlari',
 			'libraries.content' => 'kutubxona tarkibi',
@@ -6908,8 +7078,6 @@ extension on TranslationsUz {
 			'libraries.sortLabels.dateShared' => 'Ulashilgan sanasi',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Soʻnggi qism chiqqan sana',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Soʻnggi qoʻshilgan qism sanasi',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Yuklab olingan sanasi',
 			'libraries.sortLabels.size' => 'Hajmi',
 			'libraries.sortLabels.library' => 'Kutubxona',
@@ -7371,6 +7539,8 @@ extension on TranslationsUz {
 			'watchTogether.qrShare' => 'QR kodini ulashing',
 			'watchTogether.qrHint' => 'Bu xonaga qo‘shilish uchun Luroka ilovasi bilan skanerlang.',
 			'watchTogether.phasePlaying' => 'Oʻynamoqda',
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Pauza qilingan',
 			'watchTogether.phaseWaiting' => 'Hammani kutaman',
 			'watchTogether.inviteCopied' => 'Taklif nusxalandi. Uni xabarga joylashtiring.',
@@ -7422,8 +7592,6 @@ extension on TranslationsUz {
 			'watchTogether.offsetPlusSecond' => '+1 s',
 			'watchTogether.participants' => 'Ishtirokchilar',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('uz'))(n, one: '${n} ishtirokchisi', other: '${n} ishtirokchilari', ), 
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'TASHKILOTCHI',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (siz)',
 			'watchTogether.playerIdle' => 'Bo\'sh',
@@ -7885,6 +8053,8 @@ extension on TranslationsUz {
 			'matchScreen.match' => 'Moslashtirish...',
 			'matchScreen.fixMatch' => 'Moslikni tuzatish...',
 			'matchScreen.unmatch' => 'Moslikni oʻchirish',
+			_ => null,
+		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Ushbu moslik oʻchirilsinmi? Qayta moslashtirilgunga qadar Plex uni moslashtirilmagan deb hisoblaydi.',
 			'matchScreen.unmatchSuccess' => 'Moslik oʻchirildi',
 			'matchScreen.unmatchFailed' => 'Moslikni oʻchirib boʻlmadi',
@@ -7936,8 +8106,6 @@ extension on TranslationsUz {
 			'seerr.requestFailed' => ({required Object error}) => 'Soʻrov xatoligi: ${error}',
 			'seerr.requestsLoadFailed' => 'Parametrlarni yuklab boʻlmadi',
 			'seerr.nothingToRequest' => 'Barchasi avvaldan bor yoki soʻralgan.',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Mavjud',
 			'seerr.statusPartiallyAvailable' => 'Qisman mavjud',
 			'seerr.statusRequested' => 'Soʻraldi',
@@ -8116,6 +8284,32 @@ extension on TranslationsUz {
 			'addServer.redirectDifferentHost' => ({required Object product}) => 'Server boshqa xostga yoʻnaltirdi. Yakuniy ${product} URL-ini bevosita kiriting.',
 			'addServer.redirectInsecure' => 'Server HTTPS manzilidan xavfsiz boʻlmagan URL-ga yoʻnaltirdi',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'Server qoʻllab-quvvatlanmaydigan URL-ga yoʻnaltirdi. Yakuniy ${product} URL-ini bevosita kiriting.',
+			'episodeDetails.previous' => 'Oldingi qism',
+			'episodeDetails.next' => 'Keyingi qism',
+			'tvEdgeMenu.title' => 'TV navigatsiyasi',
+			'tvEdgeMenu.top' => 'Yuqori panel',
+			'tvEdgeMenu.both' => 'Yuqori panel va yon menyu',
+			'tvEdgeMenu.hint' => 'Yon menyuni ochish uchun qatorning birinchi elementida chap tugmani bosing. Qaytish uchun o‘ng yoki Orqaga tugmasini bosing.',
+			'tvEdgeMenu.tryMenu' => 'Navigatsiyani sinab ko‘rish',
+			'tvEdgeMenu.allLibraries' => 'Barcha kutubxonalar',
+			'tvEdgeMenu.browse' => 'Ko‘rib chiqish',
+			'tvEdgeMenu.more' => 'Yana',
+			'tvEdgeMenu.closeHint' => 'Yopish uchun o‘ng yoki Orqaga tugmasini bosing',
+			'showDetailLayout.title' => 'Serial tafsilotlari tartibi',
+			'showDetailLayout.description' => 'Serial va qismlarning televizorda ko‘rsatilish usulini tanlang.',
+			'showDetailLayout.compact' => 'Ixcham qismlar ro‘yxati',
+			'showDetailLayout.cinematic' => 'Kinouslub',
+			'showDetailLayout.seasons' => 'Mavsumni tanlang',
+			'showDetailLayout.episodes' => 'Qismlar',
+			'showDetailLayout.details' => 'Tafsilotlar',
+			'showDetailLayout.cast' => 'Aktyorlar',
+			'showDetailLayout.related' => 'O‘xshash asarlar',
+			'iconStyles.title' => 'Belgi uslubi',
+			'iconStyles.description' => 'Ilova boshqaruv elementlarining ko‘rinishini tanlang. O‘zgarishlar ushbu profilga tatbiq etiladi.',
+			'iconStyles.current' => 'Luroka Bold',
+			'iconStyles.lucide' => 'Lucide',
+			'iconStyles.lucideDescription' => 'Sodda chiziqli belgilar; mavjud bo‘lmagan belgilar Material belgilari bilan almashtiriladi.',
+			'iconStyles.outline' => 'Material Outline',
 			_ => null,
 		};
 	}

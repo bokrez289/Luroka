@@ -106,9 +106,7 @@ class DownloadStatusIcon extends StatelessWidget {
         return AppIcon(Symbols.cancel_rounded, fill: 1, size: size, color: _tint(Colors.grey));
       case DownloadStatus.completed:
         return AppIcon(
-          variant == DownloadStatusIconVariant.muted
-              ? Symbols.file_download_done_rounded
-              : Symbols.check_circle_rounded,
+          Symbols.check_circle_rounded,
           fill: 1,
           size: size,
           color: _tint(Colors.green),

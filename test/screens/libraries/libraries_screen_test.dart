@@ -11,6 +11,7 @@ import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/media/ids.dart';
 import 'package:luroka/media/library_filter_result.dart';
 import 'package:luroka/media/library_query.dart';
+import 'package:luroka/screens/libraries/kids_catalog_screen.dart';
 import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_hub.dart';
 import 'package:luroka/media/media_item.dart';
@@ -48,6 +49,7 @@ import 'package:luroka/media/library_change_event.dart';
 import 'package:luroka/widgets/hub_section.dart';
 import 'package:luroka/widgets/tv_browse_rail.dart';
 import 'package:luroka/widgets/overlay_sheet.dart';
+import 'package:luroka/widgets/tv_edge_menu.dart';
 import 'package:luroka/utils/platform_detector.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
@@ -150,6 +152,83 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
+  for (final compact in [false, true]) {
+    testWidgets('left edge opens drawer from library grid with compact=$compact', (tester) async {
+      TvDetectionService.debugSetAppleTVOverride(true);
+      final harness = await _Harness.create(
+        _GatedPreferences({
+          'selected_library_key': _musicLibrary.globalKey,
+          'library_tab_${_musicLibrary.globalKey}': LibraryTabType.browse.name,
+        }),
+        clients: [_PagedClient('server-c')],
+        libraryOrder: const [_musicLibrary],
+      );
+      addTearDown(harness.dispose);
+      await SettingsService.instance.write(SettingsService.tvEdgeMenu, true);
+      await SettingsService.instance.write(SettingsService.compactTvLibraryNavigation, compact);
+      await harness.pump(tester);
+      var opened = 0;
+      final navigator = Navigator.of(tester.element(find.byType(LibrariesScreen)));
+      bool open(BuildContext _, String? current) {
+        opened++;
+        return true;
+      }
+
+      TvEdgeMenuHost.attach(navigator, open);
+      addTearDown(() => TvEdgeMenuHost.detach(navigator, open));
+      final card = tester.widget<FocusableMediaCard>(find.byType(FocusableMediaCard).first);
+      card.focusNode!.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pump();
+      expect(opened, 1);
+      expect(find.byKey(const ValueKey('compact-library-tab:browse')), findsNothing);
+    });
+  }
+
+  testWidgets('left at a later row wraps on tap and opens the drawer on hold', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    final harness = await _Harness.create(
+      _GatedPreferences({
+        'selected_library_key': _musicLibrary.globalKey,
+        'library_tab_${_musicLibrary.globalKey}': LibraryTabType.browse.name,
+      }),
+      clients: [_ManyPagedClient()],
+      libraryOrder: const [_musicLibrary],
+    );
+    addTearDown(harness.dispose);
+    await SettingsService.instance.write(SettingsService.tvEdgeMenu, true);
+    await harness.pump(tester);
+    var opened = 0;
+    final navigator = Navigator.of(tester.element(find.byType(LibrariesScreen)));
+    bool open(BuildContext _, String? current) {
+      opened++;
+      return true;
+    }
+
+    TvEdgeMenuHost.attach(navigator, open);
+    addTearDown(() => TvEdgeMenuHost.detach(navigator, open));
+
+    final edge = tester
+        .widgetList<FocusableMediaCard>(find.byType(FocusableMediaCard))
+        .firstWhere((card) => card.onKeyEvent != null);
+    final index = int.parse((edge.item as MediaItem).id.split('-').last);
+    edge.focusNode!.requestFocus();
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pumpAndSettle();
+    expect(opened, 0);
+    expect(FocusManager.instance.primaryFocus?.debugLabel, contains('browse_grid_item_${index - 1}'));
+
+    edge.focusNode!.requestFocus();
+    await tester.pump();
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(opened, 1);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.arrowLeft);
+    expect(FocusManager.instance.primaryFocus, edge.focusNode);
+  });
+
   testWidgets('switching the TV layout live keeps the default layout and updates grid navigation', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(true);
     final harness = await _Harness.create(
@@ -245,6 +324,27 @@ void main() {
     expect((await StorageService.getInstance()).getLibraryTab(_libraryA.globalKey), LibraryTabType.browse.name);
     expect(find.textContaining(' · ${t.lurokaCatalog.browse}'), findsOneWidget);
     expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('Kids combined catalog merges permitted copies and excludes other libraries and adult titles', (tester) async {
+    final kids = KidsProfileService.instance;
+    kids.resetForTesting();
+    addTearDown(kids.resetForTesting);
+    final client = _KidsMoviesClient();
+    final harness = await _Harness.create(_GatedPreferences({}), clients: [client], libraryOrder: [
+      for (final id in ['movies', 'anime', 'blocked']) MediaLibrary(id: id, title: id, kind: MediaKind.movie,
+        serverId: 'server-c', backend: MediaBackend.jellyfin)
+    ]);
+    addTearDown(harness.dispose);
+    await kids.initialize();
+    await kids.setParentPin('1234');
+    await kids.setChild('child', parentId: 'adult', maxAge: 7, allowedLibraries: {'server-c:movies', 'server-c:anime'});
+    kids.selectProfile('child');
+    await harness.pump(tester, child: const KidsCatalogScreen(kind: MediaKind.movie));
+    final cards = tester.widgetList<FocusableMediaCard>(find.byType(FocusableMediaCard));
+    expect(cards.map((c) => (c.item as MediaItem).displayTitle), ['A', 'Shared feature', 'Z']);
+    expect(client.visited, {'movies', 'anime'});
     await tester.pumpWidget(const SizedBox());
   });
 
@@ -380,6 +480,31 @@ void main() {
     await tester.pumpAndSettle();
     expect(selected.last, _libraryB.globalKey);
     expect(harness.controller(tester).index, 1);
+  });
+
+  testWidgets('destination library appears immediately on its own saved tab while persistence waits', (tester) async {
+    final preferences = _GatedPreferences({
+      'selected_library_key': _libraryB.globalKey,
+      'library_tab_${_libraryA.globalKey}': LibraryTabType.recommended.name,
+      'library_tab_${_libraryB.globalKey}': LibraryTabType.browse.name,
+    });
+    final harness = await _Harness.create(preferences);
+    addTearDown(harness.dispose);
+    await harness.pump(tester);
+    expect(harness.controller(tester).index, LibraryTabType.browse.index);
+
+    preferences.blockNextSelectedLibraryWrite(_libraryA.globalKey);
+    (tester.state(find.byType(LibrariesScreen)) as LibraryLoadable).loadLibraryByKey(_libraryA.globalKey);
+    await preferences.blocked;
+    await tester.pump();
+    expect(harness.controller(tester).index, LibraryTabType.recommended.index);
+    final active = tester.widgetList<BaseLibraryTab>(
+      find.byWidgetPredicate((widget) => widget is BaseLibraryTab && widget.isActive, skipOffstage: false),
+    );
+    expect(active.single.library.globalKey, _libraryA.globalKey);
+    expect(active.single, isA<LibraryRecommendedTab>());
+    preferences.release();
+    await tester.pumpAndSettle();
   });
 
   testWidgets('a tab set change restores the destination library saved tab', (tester) async {
@@ -870,6 +995,7 @@ final class _Harness {
     ValueListenable<bool>? enabled,
     VoidCallback? onNavigation,
     MediaKind? kindFilter,
+    Widget? child,
   }) async {
     final downloads = NoSyncRulesDownloadProvider();
     addTearDown(downloads.dispose);
@@ -900,13 +1026,13 @@ final class _Harness {
                 focusSidebar: onNavigation ?? () {},
                 sideNavigationWidth: 0,
                 child: FocusScope(
-                  child: enabled == null
+                  child: child ?? (enabled == null
                       ? LibrariesScreen(onLibrarySelected: onLibrarySelected, kindFilter: kindFilter)
                       : ValueListenableBuilder<bool>(
                           valueListenable: enabled,
                           child: LibrariesScreen(onLibrarySelected: onLibrarySelected, kindFilter: kindFilter),
                           builder: (_, value, child) => TickerMode(enabled: value, child: child!),
-                        ),
+                        )),
                 ),
               ),
             ),
@@ -1017,6 +1143,22 @@ class _PagedClient implements MediaServerClient {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _KidsMoviesClient extends _PagedClient {
+  _KidsMoviesClient() : super('server-c');
+  final visited = <String>{};
+  @override
+  Future<LibraryPage<MediaItem>> fetchLibraryPagedContent(String libraryId,
+      {required LibraryQuery query, MediaKind? libraryKind, AbortController? abort}) async {
+    visited.add(libraryId);
+    final items = [
+      for (final title in libraryId == 'anime' ? ['A', 'Mature', 'Shared feature'] : ['Shared feature', 'Z'])
+        testMediaItem(id: '$libraryId-$title', title: title, year: 2024, serverId: serverId.value,
+          backend: backend).copyWith(contentRating: title == 'Mature' ? 'R' : 'G'),
+    ];
+    return LibraryPage(items: items, totalCount: items.length);
+  }
 }
 
 class _ManyPagedClient extends _PagedClient {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'tv_edge_menu.dart';
 
 import '../i18n/strings.g.dart';
 import 'app_icon.dart';
@@ -217,7 +218,7 @@ class TvNavigationDockState extends State<TvNavigationDock> {
                                     onLongPress: tab.id == NavigationTabId.libraries ? widget.onLibraryPicker : null,
                                     onNavigateDown: () => _activate(tab.id),
                                     onNavigateUp: () {},
-                                    onNavigateLeft: index > 0 ? _node(widget.tabs[index - 1].id).requestFocus : () {},
+                                    onNavigateLeft: index > 0 ? _node(widget.tabs[index - 1].id).requestFocus : () => TvEdgeMenuHost.open(context),
                                     onNavigateRight: index < widget.tabs.length - 1
                                         ? _node(widget.tabs[index + 1].id).requestFocus
                                         : widget.onNavigateToTrailing ?? () {},

@@ -106,7 +106,7 @@ void main() {
   test('mpv registers the core properties (plus its track/device extras)', () async {
     final player = PlayerNative();
     final observations = await capturedObservations(
-      channelName: 'com.plezy/mpv_player',
+      channelName: 'com.luroka/mpv_player',
       initialize: () => player.setLogLevel('warn'), // forces _ensureInitialized
       dispose: () => player.dispose(),
     );
@@ -126,7 +126,7 @@ void main() {
   test('audio-only mpv registers only the properties the music path consumes', () async {
     final player = PlayerNative.audio();
     final observations = await capturedObservations(
-      channelName: 'com.plezy/mpv_audio_player',
+      channelName: 'com.luroka/mpv_audio_player',
       initialize: () => player.setLogLevel('warn'), // forces _ensureInitialized
       dispose: () => player.dispose(),
     );

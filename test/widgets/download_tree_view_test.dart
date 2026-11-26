@@ -48,6 +48,24 @@ MediaItem _episodeMeta({
 );
 
 void main() {
+  testWidgets('completed movie opens from the management tree, active transfer does not', (tester) async {
+    final movie = testMediaItem(id: 'movie', kind: MediaKind.movie, title: 'Ready movie', serverId: 'server');
+    final queued = testMediaItem(id: 'queued', kind: MediaKind.movie, title: 'Queued movie', serverId: 'server');
+    MediaItem? opened;
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: DownloadTreeView(
+      downloads: {
+        movie.globalKey: DownloadProgress(globalKey: movie.globalKey, status: DownloadStatus.completed),
+        queued.globalKey: DownloadProgress(globalKey: queued.globalKey, status: DownloadStatus.queued),
+      },
+      metadata: {movie.globalKey: movie, queued.globalKey: queued},
+      onOpen: (item) => opened = item,
+    ))));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Queued movie'));
+    expect(opened, isNull);
+    await tester.tap(find.text('Ready movie'));
+    expect(opened?.id, 'movie');
+  });
   testWidgets('notification reveals and highlights the exact episode and can reopen it', (tester) async {
     final episode = _seasonEpisode(id: 's1e2', season: 1, episode: 2);
     final other = _seasonEpisode(id: 's2e1', season: 2, episode: 1);

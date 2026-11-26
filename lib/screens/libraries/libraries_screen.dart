@@ -83,6 +83,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
 
   /// Flag to prevent onTabChanged from focusing when we're programmatically changing tabs
   bool _isRestoringTab = false;
+  int _librarySelectionGeneration = 0;
 
   /// Whether a post-frame [_initializeWithLibraries] is already queued.
   bool _initializeScheduled = false;
@@ -631,6 +632,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
   }
 
   Future<void> _loadLibraryContent(String libraryGlobalKey) async {
+    final generation = ++_librarySelectionGeneration;
     final librariesProvider = context.read<LibrariesProvider>();
     final allLibraries = _librariesFor(librariesProvider.libraries);
 
@@ -639,11 +641,29 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     final selectedLibrary = allLibraries.where((lib) => lib.globalKey == libraryGlobalKey).firstOrNull;
     if (selectedLibrary == null) return;
 
+    final storage = await StorageService.getInstance();
+    if (!mounted || generation != _librarySelectionGeneration) return;
+    // Read the destination's tab before publishing its library. Otherwise the
+    // previous tab briefly builds and starts loading for the wrong library.
+    final savedTabName = storage.getLibraryTab(libraryGlobalKey);
+    final savedType = LibraryTabType.values.where((t) => t.name == savedTabName).firstOrNull;
     final isLibraryChange = _selectedLibraryGlobalKey != libraryGlobalKey;
 
     // Update visible tabs and state in the same synchronous block so no
     // intermediate rebuild can see a mismatched controller/key pair.
     _updateVisibleTabs(visibleLibraryTabs(selectedLibrary));
+    final savedTabIndex = savedType == null ? -1 : _visibleTabs.indexOf(savedType);
+    final overviewIndex = _visibleTabs.indexOf(LibraryTabType.recommended);
+    final targetTabIndex = savedTabIndex >= 0
+        ? savedTabIndex
+        : overviewIndex >= 0
+        ? overviewIndex
+        : 0;
+    if (targetTabIndex != tabController.index) {
+      _isRestoringTab = true;
+      tabController.index = targetTabIndex;
+      _isRestoringTab = false;
+    }
 
     _updateState(() {
       _selectedLibraryGlobalKey = libraryGlobalKey;
@@ -662,33 +682,9 @@ class _LibrariesScreenState extends State<LibrariesScreen>
       });
     }
 
-    // Save selected library key and restore saved tab (async — safe after state is consistent)
-    final storage = await StorageService.getInstance();
-    if (!mounted || _selectedLibraryGlobalKey != libraryGlobalKey) return;
+    // The view is already committed on the correct tab before persistence.
     await storage.saveSelectedLibraryKey(libraryGlobalKey);
-    if (!mounted || _selectedLibraryGlobalKey != libraryGlobalKey) return;
-
-    // Restore saved tab by name
-    final savedTabName = storage.getLibraryTab(libraryGlobalKey);
-    final savedType = LibraryTabType.values.where((t) => t.name == savedTabName).firstOrNull;
-    final savedTabIndex = savedType == null ? -1 : _visibleTabs.indexOf(savedType);
-    // A library without a saved preference starts on Overview (or the first
-    // tab it supports). Never carry the previous library's tab into it: tab
-    // state belongs to the library, not to the Libraries screen instance.
-    final overviewIndex = _visibleTabs.indexOf(LibraryTabType.recommended);
-    final targetTabIndex = savedTabIndex >= 0
-        ? savedTabIndex
-        : overviewIndex >= 0
-        ? overviewIndex
-        : 0;
-    if (targetTabIndex >= 0 && targetTabIndex != tabController.index) {
-      // Set flag to prevent _onTabChanged from triggering focus
-      _isRestoringTab = true;
-      // Use animateTo with zero duration for instant switch without animation race conditions
-      tabController.animateTo(targetTabIndex, duration: Duration.zero);
-      // Clear flag synchronously - animateTo with zero duration completes immediately
-      _isRestoringTab = false;
-    }
+    if (!mounted || generation != _librarySelectionGeneration || _selectedLibraryGlobalKey != libraryGlobalKey) return;
 
     // Focus is handled by onDataLoaded callbacks from each tab.
     // However, on first load the tab might finish loading before the tab index
@@ -1041,11 +1037,20 @@ class _LibrariesScreenState extends State<LibrariesScreen>
       return provider.getClientForServer(serverId)?.capabilities.folderGrouping ?? false;
     });
 
+    Offset tvMenuPosition() {
+      final focused = FocusManager.instance.primaryFocus?.context?.findRenderObject();
+      if (focused is RenderBox && focused.hasSize && focused.attached) {
+        return focused.localToGlobal(Offset(0, focused.size.height));
+      }
+      return MediaQuery.sizeOf(context).center(Offset.zero);
+    }
+
     Future<void> selectKidsLibrary() async {
       final selected = await showAdaptiveAppMenu<String>(
         context,
         title: t.libraries.selectLibrary,
         focusFirstItem: true,
+        position: tvMenuPosition(),
         entries: _buildGroupedLibraryMenuItems(visibleLibraries, groupByServer: groupByServerSetting),
       );
       if (mounted && selected != null && visibleLibraries.any((library) => library.globalKey == selected)) {
@@ -1098,6 +1103,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
               context,
               title: t.libraries.libraryOptions,
               focusFirstItem: true,
+              position: tvMenuPosition(),
               entries: [
                 AppMenuItem(value: 'refresh', icon: Symbols.refresh_rounded, label: t.common.refresh),
                 AppMenuItem(

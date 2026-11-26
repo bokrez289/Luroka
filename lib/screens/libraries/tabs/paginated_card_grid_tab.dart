@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../widgets/tv_edge_menu.dart';
 import '../../../media/library_query.dart';
 import '../../../media/media_playlist.dart';
 import '../../../utils/media_server_http_client.dart';
@@ -385,7 +386,12 @@ abstract class PaginatedCardGridTabState<T extends Object, W extends BaseLibrary
         : () => _focusGridItem(index - columnCount);
     final navigateDown = index + columnCount < totalSize ? () => _focusGridItem(index + columnCount) : null;
     final wrap = PlatformDetector.isTV() && position.isGrid;
-    final navigateLeft = position.isFirstColumn && (widget.onNavigateLibraryMenu != null || !wrap || index == 0)
+    final navigateLeft =
+        position.isFirstColumn &&
+            ((PlatformDetector.isTV() && SettingsService.instance.read(SettingsService.tvEdgeMenu)) ||
+                widget.onNavigateLibraryMenu != null ||
+                !wrap ||
+                index == 0)
         ? _navigateToSidebar
         : () => _focusGridItem(index - 1);
     final navigateRight = (!position.isLastColumn || wrap) && index + 1 < totalSize
@@ -439,6 +445,7 @@ abstract class PaginatedCardGridTabState<T extends Object, W extends BaseLibrary
   }
 
   void _navigateToSidebar() {
+    if (TvEdgeMenuHost.open(context)) return;
     if (widget.onNavigateLibraryMenu case final callback?) {
       callback();
       return;

@@ -36,7 +36,6 @@ import 'profile_name_field.dart';
 import '../../services/kids_profile_service.dart';
 import 'kids_settings_screen.dart';
 import 'kids_profile_screen.dart';
-import 'kids_profile_backup_actions.dart';
 import 'parent_access.dart';
 import '../../widgets/focusable_list_tile.dart';
 import 'profile_picture_screen.dart';
@@ -50,7 +49,8 @@ import 'profile_picture_screen.dart';
 class ProfileDetailScreen extends StatefulWidget {
   final Profile profile;
 
-  const ProfileDetailScreen({super.key, required this.profile});
+  const ProfileDetailScreen({super.key, required this.profile, this.familyAccess});
+  final FamilyParentAccess? familyAccess;
 
   @override
   State<ProfileDetailScreen> createState() => _ProfileDetailScreenState();
@@ -269,6 +269,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> with Controll
     if (KidsProfileService.instance.isActiveKids) return const KidsSettingsScreen();
     final theme = Theme.of(context);
     final isLocal = _profile.isLocal;
+    final child = KidsProfileService.instance.isKids(_profile.id);
     final avatarUrl = context.watch<ActiveProfileProvider>().avatarUrlFor(_profile.id);
 
     return FocusedScrollScaffold(
@@ -282,38 +283,38 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> with Controll
                 child: ProfileAvatar(profile: _profile, size: 96, avatarUrl: avatarUrl),
               ),
               const SizedBox(height: 24),
-              Text(t.profiles.profileNameLabel, style: theme.textTheme.labelLarge),
-              const SizedBox(height: 8),
-              if (isLocal)
-                ProfileNameField(
-                  controller: _nameController,
-                  focusNode: _nameFocusNode,
-                  onChanged: () => setState(() {}),
-                  onNavigateRight: _saveNameFocusNode.requestFocus,
-                  trailing: FocusableButton(
-                    focusNode: _saveNameFocusNode,
-                    useBackgroundFocus: true,
-                    onNavigateLeft: _nameFocusNode.requestFocus,
-                    onPressed:
-                        _nameController.text.trim().isEmpty || _nameController.text.trim() == _profile.displayName
-                        ? null
-                        : _saveName,
-                    child: FilledButton(
+              if (!child) ...[
+                Text(t.profiles.profileNameLabel, style: theme.textTheme.labelLarge),
+                const SizedBox(height: 8),
+                if (isLocal)
+                  ProfileNameField(
+                    controller: _nameController,
+                    focusNode: _nameFocusNode,
+                    onChanged: () => setState(() {}),
+                    onNavigateRight: _saveNameFocusNode.requestFocus,
+                    trailing: FocusableButton(
+                      focusNode: _saveNameFocusNode,
+                      useBackgroundFocus: true,
+                      onNavigateLeft: _nameFocusNode.requestFocus,
                       onPressed:
                           _nameController.text.trim().isEmpty || _nameController.text.trim() == _profile.displayName
                           ? null
                           : _saveName,
-                      child: Text(t.common.save),
+                      child: FilledButton(
+                        onPressed:
+                            _nameController.text.trim().isEmpty || _nameController.text.trim() == _profile.displayName
+                            ? null
+                            : _saveName,
+                        child: Text(t.common.save),
+                      ),
                     ),
+                  )
+                else
+                  Text(
+                    _profile.displayName,
+                    style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                   ),
-                )
-              else
-                Text(
-                  _profile.displayName,
-                  style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                ),
-              const SizedBox(height: 24),
-              if (!KidsProfileService.instance.isKids(_profile.id))
+                const SizedBox(height: 24),
                 OutlinedButton.icon(
                   key: const ValueKey('profile-change-picture'),
                   onPressed: () => Navigator.of(
@@ -322,27 +323,52 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> with Controll
                   icon: const Icon(Icons.account_circle_outlined),
                   label: Text(t.household.changePicture),
                 ),
-              const SizedBox(height: 24),
-              if (KidsProfileService.instance.isKids(_profile.id)) ...[
+                const SizedBox(height: 24),
+              ],
+              if (child) ...[
                 FocusableListTile(
                   leading: const Icon(Icons.shield_outlined),
-                  title: Text(t.family.editRestrictions),
+                  title: Text(t.kids.editorTitle),
+                  subtitle: Text(
+                    [
+                      KidsProfileService.instance.ageFor(_profile.id) == 0
+                          ? t.family.allAges
+                          : t.family.upToAge(age: KidsProfileService.instance.ageFor(_profile.id)),
+                      KidsProfileService.instance.librariesFor(_profile.id) == null
+                          ? t.kids.allLibraries
+                          : t.kids.libraryCount(count: KidsProfileService.instance.librariesFor(_profile.id)!.length),
+                      KidsProfileService.instance.dailyWatchMinutesFor(_profile.id) == null
+                          ? t.kids.noTimeLimit
+                          : t.kids.minutesLimit(
+                              minutes: KidsProfileService.instance.dailyWatchMinutesFor(_profile.id)!,
+                            ),
+                    ].join(' · '),
+                  ),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () async {
-                    if (!await ensureParentAccess(context) || !mounted || !context.mounted) return;
-                    await Navigator.of(
-                      context,
-                    ).push(MaterialPageRoute(builder: (_) => KidsProfileScreen(profile: _profile)));
+                    if (!await (widget.familyAccess?.ensure(context) ?? ensureParentAccess(context)) ||
+                        !mounted ||
+                        !context.mounted) {
+                      return;
+                    }
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => KidsProfileScreen(profile: _profile, familyAccess: widget.familyAccess),
+                      ),
+                    );
+                    if (!context.mounted) return;
+                    if (!KidsProfileService.instance.isKids(_profile.id)) {
+                      Navigator.of(context).pop();
+                    } else {
+                      setState(() {});
+                    }
                   },
-                ),
-                FocusableListTile(
-                  leading: const Icon(Icons.backup_outlined),
-                  title: Text(t.kids.backupProfile),
-                  onTap: () => backUpKidsProfile(context, _profile),
                 ),
                 const SizedBox(height: 24),
               ],
               Text(t.family.profilePin, style: theme.textTheme.labelLarge),
+              const SizedBox(height: 8),
+              Text(t.kids.pinDifference, style: theme.textTheme.bodySmall),
               const SizedBox(height: 8),
               if (!isLocal)
                 Text(
@@ -363,30 +389,17 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> with Controll
               else
                 PinStatusRow(onChange: _setPin, onRemove: _clearPin, changeFocusNode: _changePinFocusNode),
               const SizedBox(height: 32),
-              Row(
-                children: [
-                  Expanded(child: Text(t.profiles.connectionsLabel, style: theme.textTheme.labelLarge)),
-                  FocusableButton(
-                    focusNode: _addConnectionFocusNode,
-                    useBackgroundFocus: true,
-                    onPressed: _addConnection,
-                    child: TextButton.icon(
-                      onPressed: _addConnection,
-                      icon: const AppIcon(Symbols.add_rounded, fill: 1),
-                      label: Text(t.profiles.add),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              _ConnectionsList(
-                profile: _profile,
-                onRemove: _removeConnection,
-                onEdit: _editConnection,
-                onSignOutParent: _signOutParentAccount,
-              ),
+              if (child)
+                ExpansionTile(
+                  leading: const Icon(Icons.dns_outlined),
+                  title: Text(t.settings.advanced),
+                  subtitle: Text(t.profiles.connectionsLabel),
+                  children: _connectionControls(theme),
+                )
+              else
+                ..._connectionControls(theme),
               const SizedBox(height: 24),
-              if (isLocal)
+              if (isLocal && !child)
                 FocusableButton(
                   focusNode: _deleteProfileFocusNode,
                   useBackgroundFocus: true,
@@ -403,6 +416,31 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> with Controll
       ],
     );
   }
+
+  List<Widget> _connectionControls(ThemeData theme) => [
+    Row(
+      children: [
+        Expanded(child: Text(t.profiles.connectionsLabel, style: theme.textTheme.labelLarge)),
+        FocusableButton(
+          focusNode: _addConnectionFocusNode,
+          useBackgroundFocus: true,
+          onPressed: _addConnection,
+          child: TextButton.icon(
+            onPressed: _addConnection,
+            icon: const AppIcon(Symbols.add_rounded, fill: 1),
+            label: Text(t.profiles.add),
+          ),
+        ),
+      ],
+    ),
+    const SizedBox(height: 8),
+    _ConnectionsList(
+      profile: _profile,
+      onRemove: _removeConnection,
+      onEdit: _editConnection,
+      onSignOutParent: _signOutParentAccount,
+    ),
+  ];
 }
 
 class _ConnectionsList extends StatefulWidget {

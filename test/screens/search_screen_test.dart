@@ -460,6 +460,33 @@ void main() {
     expect(client.queries, ['movie']);
   });
 
+  testWidgets('TV search keeps the focused title visible after scrolling past the spotlight', (tester) async {
+    final items = [
+      for (var i = 0; i < 60; i++)
+        testMediaItem(
+          id: 'poster-$i',
+          backend: MediaBackend.plex,
+          kind: MediaKind.movie,
+          title: 'Poster ${i.toString().padLeft(2, '0')}',
+          serverId: 'server_1',
+        ),
+    ];
+    final (_, key) = await _pumpTvSearchScreen(tester, items: items);
+    (key.currentState! as SearchInputFocusable).submitSearchQuery('Poster');
+    await tester.pumpAndSettle();
+    final scroll = tester.widget<CustomScrollView>(find.byType(CustomScrollView));
+    scroll.controller!.jumpTo(900);
+    await tester.pumpAndSettle();
+    final grid = tester.widgetList<FocusableMediaCard>(find.byType(FocusableMediaCard));
+    final card = grid.firstWhere((card) => card.focusNode?.context != null && (card.item as MediaItem).id != 'poster-0');
+    card.focusNode!.requestFocus();
+    await tester.pumpAndSettle();
+    final strip = find.byKey(const ValueKey('search-focused-result-info'));
+    expect(strip, findsOneWidget);
+    expect(find.descendant(of: strip, matching: find.text((card.item as MediaItem).displayTitle)), findsOneWidget);
+    expect(tester.getTopLeft(strip).dy, greaterThanOrEqualTo(0));
+  });
+
   testWidgets('TV native Search action before debounce searches immediately', (tester) async {
     final (client, _) = await _pumpTvSearchScreen(tester);
     await tester.pumpAndSettle();

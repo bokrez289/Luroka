@@ -7,6 +7,8 @@ import '../providers/home_layout_provider.dart';
 import '../widgets/desktop_app_bar.dart';
 import '../widgets/poster_loading_placeholder.dart';
 import '../widgets/studio_card.dart';
+import '../widgets/tv_edge_menu.dart';
+import '../utils/platform_detector.dart';
 import '../focus/focusable_button.dart';
 import 'studio_browser_screen.dart';
 
@@ -85,15 +87,22 @@ class _StudiosScreenState extends State<StudiosScreen> {
                         builder: (context, tile) {
                           final group = groups[index];
                           final source = group.sources.first;
-                          return StudioCard(
+                          void open() => Navigator.of(context).push(MaterialPageRoute<void>(
+                            builder: (_) => StudioBrowserScreen(studioKey: group.key)));
+                          final card = StudioCard(
                             item: group.homeItem,
                             width: tile.maxWidth,
                             height: tile.maxHeight - 6,
                             client: source.client,
                             imagePath: group.homeItem.thumbPath,
-                            onTap: () => Navigator.of(
-                              context,
-                            ).push(MaterialPageRoute<void>(builder: (_) => StudioBrowserScreen(studioKey: group.key))),
+                            onTap: open,
+                          );
+                          if (!PlatformDetector.isTV()) return card;
+                          return FocusableButton(
+                            onPressed: open,
+                            onNavigateLeft: index % (bounds.crossAxisExtent / 170).floor().clamp(2, 5) == 0
+                                ? () => TvEdgeMenuHost.open(context, current: 'studios') : null,
+                            child: card,
                           );
                         },
                       ),

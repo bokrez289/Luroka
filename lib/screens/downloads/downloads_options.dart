@@ -253,7 +253,7 @@ mixin DownloadsTabOptionsMixin<T extends StatefulWidget> on State<T> implements 
         shrinkWrap: true,
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
-          FocusableListTile(
+          if (groupingOptions.length > 1) FocusableListTile(
             leading: const AppIcon(Symbols.category_rounded, fill: 1),
             title: Text(t.libraries.groupings.title),
             subtitle: Text(_groupingLabel(_grouping)),
@@ -525,7 +525,7 @@ mixin DownloadsTabOptionsMixin<T extends StatefulWidget> on State<T> implements 
   Widget buildOptionsChipsBar() {
     return OptionsChipsBar(
       chips: [
-        OptionsChipDescriptor(
+        if (groupingOptions.length > 1) OptionsChipDescriptor(
           anchorKey: _groupingChipKey,
           focusNode: _groupingChipFocusNode,
           icon: Symbols.category_rounded,
@@ -584,13 +584,13 @@ mixin DownloadsTabOptionsMixin<T extends StatefulWidget> on State<T> implements 
       navigateToTabBar();
       return;
     }
-    _groupingChipFocusNode.requestFocus();
+    (groupingOptions.length > 1 ? _groupingChipFocusNode : _filtersChipFocusNode).requestFocus();
   }
 
   @override
   void focusTopContent() {
     if (_usesChipsBar) {
-      _groupingChipFocusNode.requestFocus();
+      (groupingOptions.length > 1 ? _groupingChipFocusNode : _filtersChipFocusNode).requestFocus();
     } else {
       firstItemFocusNode.requestFocus();
     }

@@ -28,6 +28,7 @@ import 'media_detail_screen.dart';
 import '../models/catalog/catalog_item.dart';
 import '../models/catalog/catalog_labels.dart';
 import '../models/catalog/catalog_metadata.dart';
+import '../media/media_kind.dart';
 import '../providers/catalog_sources_provider.dart';
 import '../providers/multi_server_provider.dart';
 import '../providers/hidden_libraries_provider.dart';
@@ -403,6 +404,13 @@ class _CatalogItemDetailScreenState extends State<CatalogItemDetailScreen> {
   /// its disposed client. `build` subscribes to both so the action bar
   /// tracks grants and revocations.
   SeerrCatalogSource? get _requestSource {
+    if (KidsProfileService.instance.isActiveKids ||
+        _matches == null ||
+        _resolvingMatches ||
+        _matches!.isNotEmpty ||
+        (_otherSourceCopies?.isNotEmpty ?? false)) {
+      return null;
+    }
     final seerr = context.read<CatalogSourcesProvider>().seerrSource;
     return seerr != null && seerr.canRequest(widget.item.kind) ? seerr : null;
   }
@@ -783,7 +791,7 @@ class _CatalogItemDetailScreenState extends State<CatalogItemDetailScreen> {
             width: _libraryMatchFocusNodes[index].hasFocus ? 2 : 1,
           ),
         ),
-        child: tile,
+        child: Material(type: MaterialType.transparency, child: tile),
       ),
     );
   }
@@ -944,10 +952,14 @@ class _CatalogItemDetailScreenState extends State<CatalogItemDetailScreen> {
 
   Future<void> _openOtherSourceCopy(MediaItem copy) async {
     final libraryKey = copy.libraryGlobalKey;
+    final anchor = _otherCopyFocus[copy.globalKey]?.context?.findRenderObject();
     final action = await showAdaptiveAppMenu<String>(
       context,
       title: copy.libraryTitle ?? copy.serverName ?? copy.displayTitle,
       focusFirstItem: true,
+      position: anchor is RenderBox && anchor.hasSize
+          ? anchor.localToGlobal(Offset(0, anchor.size.height))
+          : MediaQuery.sizeOf(context).center(Offset.zero),
       entries: [
         AppMenuItem(value: 'once', icon: Symbols.play_arrow_rounded, label: t.sourceLibraries.playOnce),
         if (libraryKey != null)
@@ -1568,23 +1580,89 @@ class _CatalogItemDetailScreenState extends State<CatalogItemDetailScreen> {
     Navigator.pop(context);
   }
 
+  (SeerrCatalogSource, int)? _requestKey;
+  CatalogServerState? _requestState;
+  bool _requestBlocked = false, _requestLoading = false, _requestError = false, _sheetOpen = false;
+
+  Future<void> _readRequestStatus(SeerrCatalogSource source, CatalogItem item) async {
+    final key = (source, item.ids.tmdb!);
+    _requestKey = key;
+    _requestLoading = true;
+    _requestError = false;
+    try {
+      final result = await source.requestStatus(item.kind, key.$2);
+      if (!mounted || _requestKey != key) return;
+      _requestState = result.state;
+      _requestBlocked = result.blocked;
+    } catch (_) {
+      if (!mounted || _requestKey != key) return;
+      _requestError = true;
+    }
+    if (mounted && _requestKey == key) setState(() => _requestLoading = false);
+  }
+
   FocusableAction _requestAction(BuildContext hostContext, CatalogItem item, SeerrCatalogSource source) {
-    void request() => unawaited(
-      showSeerrRequestSheet(hostContext, source: source, kind: item.kind, tmdbId: item.ids.tmdb!, title: item.title),
-    );
+    if (_requestKey != (source, item.ids.tmdb!)) unawaited(_readRequestStatus(source, item));
+    final available = _requestState?.availability == CatalogAvailability.available;
+    final pending = const {
+      CatalogRequestState.pending,
+      CatalogRequestState.approved,
+      CatalogRequestState.processing,
+    }.contains(_requestState?.request);
+    final label = _requestLoading
+        ? t.common.loading
+        : _requestError
+        ? t.lurokaDiscovery.statusRetry
+        : available
+        ? '${t.seerr.statusAvailable} · ${t.common.refresh}'
+        : _requestBlocked
+        ? t.seerr.statusBlocklisted
+        : pending
+        ? t.seerr.statusRequested
+        : t.seerr.request;
+    final enabled =
+        !_requestLoading &&
+        (_requestError || available || (!_requestBlocked && (!pending || item.kind == MediaKind.show)));
+    Future<void> request() async {
+      if (_sheetOpen || !enabled || _requestSource != source) return;
+      if (available && !_requestError) {
+        context.read<CatalogLibraryMatcher>().invalidateTitle(item);
+        await _resolveMatches(item);
+        return;
+      }
+      if (!_requestError) {
+        _sheetOpen = true;
+        try {
+          await showSeerrRequestSheet(
+            hostContext,
+            source: source,
+            kind: item.kind,
+            tmdbId: item.ids.tmdb!,
+            title: item.title,
+          );
+        } finally {
+          _sheetOpen = false;
+        }
+      }
+      if (mounted && _requestSource == source) {
+        setState(() => _requestLoading = true);
+        await _readRequestStatus(source, item);
+      }
+    }
+
     return FocusableAction(
       debugLabel: 'catalog_request',
-      onPressed: request,
+      onPressed: enabled ? request : null,
       builder: (context, state) {
         final colors = Theme.of(context).colorScheme;
         return Tooltip(
-          message: t.seerr.request,
+          message: label,
           child: Material(
             color: state.showFocus ? colors.onSurface : colors.primary,
             borderRadius: BorderRadius.circular(24),
             child: InkWell(
               borderRadius: BorderRadius.circular(24),
-              onTap: request,
+              onTap: enabled ? request : null,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Row(
@@ -1597,7 +1675,7 @@ class _CatalogItemDetailScreenState extends State<CatalogItemDetailScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      t.seerr.request,
+                      label,
                       style: TextStyle(
                         color: state.showFocus ? colors.surface : colors.onPrimary,
                         fontWeight: FontWeight.w700,
@@ -1781,7 +1859,11 @@ class _CatalogItemDetailScreenState extends State<CatalogItemDetailScreen> {
                       onPressed: () => unawaited(
                         Navigator.of(context).push<void>(
                           MaterialPageRoute(
-                            builder: (_) => TrailerPlayerScreen(url: trailer, title: item.title),
+                            builder: (_) => TrailerPlayerScreen(
+                              url: trailer,
+                              title: item.title,
+                              alternatives: item.alternateTrailerUrls,
+                            ),
                           ),
                         ),
                       ),
@@ -1815,7 +1897,8 @@ class _CatalogItemDetailScreenState extends State<CatalogItemDetailScreen> {
           onPressed: () => unawaited(
             Navigator.of(context).push<void>(
               MaterialPageRoute(
-                builder: (_) => TrailerPlayerScreen(url: trailer, title: item.title),
+                builder: (_) =>
+                    TrailerPlayerScreen(url: trailer, title: item.title, alternatives: item.alternateTrailerUrls),
               ),
             ),
           ),
@@ -2066,8 +2149,11 @@ class _CatalogItemDetailScreenState extends State<CatalogItemDetailScreen> {
                                                       onPressed: () => unawaited(
                                                         Navigator.of(context).push<void>(
                                                           MaterialPageRoute(
-                                                            builder: (_) =>
-                                                                TrailerPlayerScreen(url: trailer, title: item.title),
+                                                            builder: (_) => TrailerPlayerScreen(
+                                                              url: trailer,
+                                                              title: item.title,
+                                                              alternatives: item.alternateTrailerUrls,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),

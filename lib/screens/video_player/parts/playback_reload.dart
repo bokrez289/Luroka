@@ -1,5 +1,11 @@
 part of '../../video_player_screen.dart';
 
+bool _canExtractSubtitle(Player player, MediaBackend backend, PlaybackSubtitleSidecar sidecar) =>
+    player is PlayerNative &&
+    (backend == MediaBackend.emby || backend == MediaBackend.jellyfin) &&
+    !sidecar.preload &&
+    const {'srt', 'subrip'}.contains(sidecar.track.codec?.toLowerCase());
+
 /// Keeps an explicit transcode subtitle choice pending while the native
 /// player finishes discovering sidecars that were attached during open.
 ///
@@ -155,7 +161,7 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
       } catch (e) {
         if (sourceSwitchWasSuperseded()) return PlaybackSourceChangeOutcome.superseded;
         if (mounted) {
-          showErrorDialog(context, t.messages.errorLoading(error: localizedErrorReason(e)));
+          unawaited(showErrorDialog(context, t.messages.errorLoading(error: localizedErrorReason(e))));
         }
         return PlaybackSourceChangeOutcome.failed;
       }
@@ -193,6 +199,7 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
 
     try {
       if (newSubtitleTrack != null && serverId != null) {
+        if (!mounted) return PlaybackSourceChangeOutcome.superseded;
         final subtitleClient = context.tryGetMediaClientForServer(ServerId(serverId));
         final downloads = context.read<DownloadProvider?>();
         final saved = subtitleClient == null
@@ -279,7 +286,7 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
       // lease; real errors after an owned phase change must remain failures.
       if (sourceSwitchWasSuperseded()) return PlaybackSourceChangeOutcome.superseded;
       if (mounted) {
-        showErrorDialog(context, t.messages.errorLoading(error: localizedErrorReason(e)));
+        unawaited(showErrorDialog(context, t.messages.errorLoading(error: localizedErrorReason(e))));
       }
       return PlaybackSourceChangeOutcome.failed;
     }
@@ -296,6 +303,11 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
     final burnSession = _playbackSession;
     final burnedSourceStreamId = burnSession?.subtitleSelection.primarySourceStreamId;
     final targetSourceStreamId = choice.sourceStreamId;
+    final targetSidecar = burnSession == null || targetSourceStreamId == null
+        ? null
+        : _sidecarForSourceStreamId(burnSession, targetSourceStreamId);
+    final extractLocally =
+        targetSidecar != null && _canExtractSubtitle(currentPlayer, _currentMetadata.backend, targetSidecar);
     if (PlaybackSubtitleResolver.burnRequiresRenegotiation(
       isTranscoding: _isTranscoding,
       currentSourceStreamId: burnedSourceStreamId,
@@ -310,14 +322,15 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
       // uses to decide what it must not burn. Reading only `isExternalFile` classified every Plex
       // external file as an embedded target and sent an already-loaded track switch to the server.
       targetIsExternalFile:
+          extractLocally ||
           targetSourceStreamId != null &&
-          (_currentMediaInfo?.subtitleTracks.any(
-                (track) =>
-                    track.id == targetSourceStreamId &&
-                    (track.isExternalFile ||
-                        (_currentMetadata.backend == MediaBackend.plex && (track.key?.isNotEmpty ?? false))),
-              ) ??
-              false),
+              (_currentMediaInfo?.subtitleTracks.any(
+                    (track) =>
+                        track.id == targetSourceStreamId &&
+                        (track.isExternalFile ||
+                            (_currentMetadata.backend == MediaBackend.plex && (track.key?.isNotEmpty ?? false))),
+                  ) ??
+                  false),
     )) {
       return false;
     }
@@ -347,18 +360,45 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
     final nativeTracks = currentPlayer.state.tracks.subtitle;
     final session = _playbackSession;
     final sourceSidecar = session == null ? null : _sidecarForSourceStreamId(session, sourceStreamId);
-    final nativeTrack = PlaybackSubtitleResolver.nativeTrackForSource(
-      sourceTrack: sourceTrack,
-      nativeTracks: nativeTracks,
-      allSourceTracks: info.subtitleTracks,
-      isResolvedSidecar: sourceSidecar != null,
-      isContainerSidecar: sourceSidecar?.track.isContainer == true,
-      currentSourceStreamId: session?.subtitleSelection.primarySourceStreamId,
-      selectedNativeTrack: currentPlayer.state.track.subtitle,
-    );
+    final loadedExtraction = extractLocally
+        ? nativeTracks.where((track) => track.isExternal && track.uri == targetSidecar.track.uri).firstOrNull
+        : null;
+    final nativeTrack =
+        loadedExtraction ??
+        PlaybackSubtitleResolver.nativeTrackForSource(
+          sourceTrack: sourceTrack,
+          nativeTracks: nativeTracks,
+          allSourceTracks: info.subtitleTracks,
+          isResolvedSidecar: sourceSidecar != null,
+          isContainerSidecar: sourceSidecar?.track.isContainer == true,
+          currentSourceStreamId: session?.subtitleSelection.primarySourceStreamId,
+          selectedNativeTrack: currentPlayer.state.track.subtitle,
+        );
     if (nativeTrack == null) {
       final trackManager = _trackManager;
       if (!_isTranscoding || sourceSidecar == null || trackManager == null) return false;
+
+      if (extractLocally && currentPlayer is PlayerNative) {
+        final descriptor = PlaybackSubtitleResolver.subtitleTrackForSource(sourceTrack, sidecar: sourceSidecar);
+        await currentPlayer.selectSubtitleTrack(SubtitleTrack.off);
+        if (!shouldContinue()) return false;
+        await _onSubtitleTrackChanged(descriptor, sourceStreamId: sourceStreamId);
+        if (!shouldContinue()) return false;
+        trackManager.preferredSubtitleTrack = SubtitlePreference.track(descriptor);
+        unawaited(
+          trackManager.loadExtractedSubtitles(
+            tracks: [sourceSidecar.track],
+            fileLoaded: Future.value(true),
+            attach: currentPlayer.attachDownloadedSubtitle,
+            onFailure: () {
+              if (mounted && identical(_trackManager, trackManager)) {
+                unawaited(showErrorDialog(context, t.videoControls.subtitleUnavailableFallback));
+              }
+            },
+          ),
+        );
+        return true;
+      }
 
       return deferTranscodeSubtitleSelection(
         trackManager: trackManager,
@@ -416,7 +456,7 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
   }) async {
     if (_shuttingDown) return MediaReloadOutcome.superseded;
     if (!KidsProfileService.instance.allows(metadata)) {
-      if (mounted && showErrorUi) showErrorDialog(context, t.kids.blocked);
+      if (mounted && showErrorUi) unawaited(showErrorDialog(context, t.kids.blocked));
       _clearEpisodeLoadingFlags();
       return MediaReloadOutcome.rejected;
     }
@@ -516,7 +556,7 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
       } catch (e, stackTrace) {
         appLogger.e('Failed to prepare media reload during $reason', error: e, stackTrace: stackTrace);
         if (mounted && showErrorUi) {
-          showErrorDialog(context, t.messages.errorLoading(error: localizedErrorReason(e)));
+          unawaited(showErrorDialog(context, t.messages.errorLoading(error: localizedErrorReason(e))));
         }
         _clearEpisodeLoadingFlags();
         return MediaReloadOutcome.failed;
@@ -603,7 +643,17 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
         // Local resume lookup can overlap the old stop, but source resolution
         // below must not: Plex can use that stop to terminate any new
         // transcode sharing this playback session identifier.
-        final stoppedProgressFuture = _sendStoppedProgressOnce();
+        // Jellyfin deletes the old HLS segments on Stopped. Keep the old
+        // session alive during negotiation; mpv can still read ahead on a
+        // paused file. Its replacement has a separate PlaySessionId.
+        final outgoingJellyfinTracker =
+            previousMetadata.backend == MediaBackend.jellyfin && previousSession?.isTranscoding == true
+            ? _progressTracker
+            : null;
+        Future<void>? outgoingStop;
+        final stoppedProgressFuture = outgoingJellyfinTracker != null
+            ? Future<void>.value()
+            : _sendStoppedProgressOnce();
 
         var openResumePosition = await _resolveOpenResumePosition(
           metadata: metadata,
@@ -683,7 +733,7 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
           subtitleSelection: subtitleSelection,
         );
         if (result.fallbackReason != null && !targetQualityPreset.isOriginal && mounted) {
-          showErrorDialog(context, t.videoControls.transcodeUnavailableFallback);
+          unawaited(showErrorDialog(context, t.videoControls.transcodeUnavailableFallback));
         }
 
         final settingsService = await SettingsService.getInstance();
@@ -772,6 +822,7 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
             return true;
           },
           onOpening: () {
+            outgoingStop ??= outgoingJellyfinTracker?.sendStoppedProgressOnce();
             _stopScreenTimeAccounting();
             _firstFrame.resetRenderedForAttempt();
             // 503s observed from here on belong to the replacement open.
@@ -790,6 +841,8 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
 
         // Same helper as the initial start flow, so any future change lands in
         // both paths together.
+        await outgoingStop;
+        if (!isCurrentReload()) return MediaReloadOutcome.superseded;
         _wirePerItemPlaybackServices(
           metadata: metadata,
           mediaClient: mediaClient,
@@ -900,7 +953,7 @@ extension _VideoPlayerReloadMethods on VideoPlayerScreenState {
         if (isItemChange) _showChromeForSwappedItem();
         appLogger.e('Failed to reload media in-place during $reason', error: e);
         if (mounted && showErrorUi) {
-          showErrorDialog(context, t.messages.errorLoading(error: localizedErrorReason(e)));
+          unawaited(showErrorDialog(context, t.messages.errorLoading(error: localizedErrorReason(e))));
         }
         return didOpenReplacement ? MediaReloadOutcome.opened : MediaReloadOutcome.failed;
       } finally {

@@ -300,6 +300,7 @@
     "notificationProgress": "{progress} · {networkSpeed} · {timeRemaining} återstår"
   },
   "kidsShelf": {
+    "quietScenery": "Lugnt nattlandskap",
     "movieShelf": "Filmtid",
     "showShelf": "Hitta din nästa show",
     "aurora": "Aurora — djup kricka och lime",
@@ -604,7 +605,9 @@
     "availabilityUnknown": "Vissa bibliotek kunde inte kontrolleras. Försök att uppdatera.",
     "noAvailable": "Inga matchande titlar hittades i de markerade biblioteken.",
     "sourceInfo": "Veckotrender och utvalda pristagare · TMDb",
-    "configure": "Upptäcktsinställningar"
+    "configure": "Upptäcktsinställningar",
+    "filterOwned": "I mina bibliotek",
+    "statusRetry": "Det gick inte att kontrollera Seerr · Försök igen"
   },
   "app": {
     "title": "Luroka"
@@ -1139,7 +1142,11 @@
     "playerScopeLibrary": "Per bibliotek",
     "playerScopeTitle": "Per serie eller film",
     "exportDialogTitle": "Exportera Luroka-inställningar",
-    "velvetHourTheme": "Sammetstimme"
+    "velvetHourTheme": "Sammetstimme",
+    "backdropBrightness": "Bakgrundens ljusstyrka",
+    "backdropBrightnessDescription": "Justera skuggningen över startsidan och titelbilden. 100 % är standard.",
+    "showEarlyNextEpisode": "Visa Nästa innan ett avsnitt avslutas",
+    "showEarlyNextEpisodeDescription": "Visa nästa avsnitt under eftertexterna eller under de sista 30 sekunderna."
   },
   "themeEditor": {
     "builtIn": "Inbyggd",
@@ -1311,6 +1318,9 @@
     "episodesLeft": "${count} avsnitt kvar"
   },
   "lurokaThemes": {
+    "patina": "Patina · djup blågrön och koppar",
+    "afterimage": "Efterbild · indigo och neonrosa",
+    "letterpress": "Boktryck · papper och vinrött bläck",
     "title": "Luroka biopaletter",
     "coral": "Korall · midnattsblå & solnedgång",
     "ocean": "Hav · djupblått & is",
@@ -1394,7 +1404,15 @@
     "reset": "Återställ standardrader",
     "resetDescription": "Återställa den ursprungliga radordningen och visa alla rader för den här profilen? Dina fästa samlingar kommer att behållas.",
     "saveFailed": "Det gick inte att spara din hemlayout. Försök igen.",
-    "emptyHint": "Rader kan vara dolda. Öppna Anpassa hem för att visa dem igen."
+    "emptyHint": "Rader kan vara dolda. Öppna Anpassa hem för att visa dem igen.",
+    "upcomingEpisodes": "Kommande avsnitt",
+    "upcomingOff": "Av",
+    "upcomingFavorites": "Favoriter",
+    "upcomingWatched": "Tittat på tidigare",
+    "upcomingAll": "Alla program",
+    "upcomingBoth": "Favoriter och tidigare visade",
+    "upcomingHint": "Kommande sändningsdatum kontrolleras endast i bakgrunden när den här raden är aktiverad. Resultaten är begränsade och kanske inte är tillgängliga på din server ännu.",
+    "airDate": "Sändningsdatum: ${date}"
   },
   "screenTime": {
     "title": "Skärmtid",
@@ -1449,7 +1467,35 @@
     "sessionNoTitle": "Oidentifierad uppspelning",
     "emptyTitle": "Inget här ännu",
     "emptyBody": "Titta på något och din statistik kommer att byggas upp här.",
-    "noDataInPeriod": "Ingen uppspelning inspelad under denna period."
+    "noDataInPeriod": "Ingen uppspelning inspelad under denna period.",
+    "overview": "Översikt",
+    "history": "Historik",
+    "patternsTab": "Mönster",
+    "gettingStarted": "Aktiviteten har precis börjat. Visningsmönster kommer att visas efter några aktiva dagar.",
+    "monthlyRecap": "Månadsöversikt",
+    "measurementHint": "Tiden återspeglar inspelad uppspelning, inte slutförda titlar.",
+    "ledgerScope": "Aktiviteten kommer från den här profilens lokala Luroka-uppspelningsregister. Tittarhistorik på servern och uppspelning i andra appar ingår inte.",
+    "watchedPeriod": "Tittat på under den här perioden",
+    "activeDays": "Aktiva dagar",
+    "dailyAverage": "Dagsgenomsnitt",
+    "previousPeriod": "Föregående period",
+    "insufficientHistory": "Inte tillräckligt med historik",
+    "drillDown": "Visa aktivitet för dessa datum",
+    "searchHistory": "Sök i visningshistoriken",
+    "allKinds": "Alla",
+    "moviesFilter": "Filmer",
+    "episodesFilter": "Avsnitt",
+    "datesFilter": "Datum",
+    "clearDates": "Rensa datum",
+    "noMatches": "Ingen visning matchar dessa filter.",
+    "allHistory": "Visa hela historiken",
+    "historyError": "Det gick inte att ladda historiken. Försök igen.",
+    "titlesPlayed": "${count} titlar uppspelade · avsnitt räknas separat",
+    "monthWatched": "${duration} tittade på den här månaden",
+    "lifetimeSummary": "Totalt: ${total} · Dagligt genomsnitt: ${average}",
+    "chartScale": "Skala: 0 – ${duration}",
+    "titlesPlayedLabel": "Titlar som har spelats upp",
+    "playedHint": "Avsnitt räknas separat. Uppspelningstiden indikerar inte slutförande."
   },
   "search": {
     "hint": "Sök filmer, serier, musik...",
@@ -1655,7 +1701,8 @@
     "mediaFailedToDelete": "Det gick inte att ta bort medieobjektet",
     "rate": "Betygsätt",
     "playFromBeginning": "Spela från början",
-    "playVersion": "Spela version..."
+    "playVersion": "Spela version...",
+    "removeFromNextUp": "Ta bort från Nästa"
   },
   "rateSheet": {
     "title": "Betygsätt",
@@ -1664,7 +1711,9 @@
     "favorited": "Tillagd i favoriter",
     "saved": "Sparat",
     "notAvailable": "Ingen matchning hittades",
-    "noConnectedServices": "Anslut en tjänst i Inställningar för att betygsätta där."
+    "noConnectedServices": "Anslut en tjänst i Inställningar för att betygsätta där.",
+    "addFavorite": "Lägg till i favoriter",
+    "removeFavorite": "Ta bort från favoriter"
   },
   "accessibility": {
     "mediaCardMovie": "${title}, film",
@@ -1873,7 +1922,9 @@
     "streamSelectionUnavailable": "Val av ström är inte tillgängligt för den här källan",
     "streamSelectionFailed": "Kunde inte tillämpa de valda strömmarna",
     "trackSelectionNotRemembered": "Det här spårvalet gäller bara den aktuella uppspelningen.",
-    "serverUnavailableForProfile": "Ingen server är tillgänglig för den aktiva profilen"
+    "serverUnavailableForProfile": "Ingen server är tillgänglig för den aktiva profilen",
+    "logSupportReference": "Supportreferens",
+    "copyFullLogId": "Kopiera fullständigt logg-ID"
   },
   "sourceLibraries": {
     "title": "Dina servrar och bibliotek",
@@ -3596,5 +3647,39 @@
     "redirectDifferentHost": "Servern omdirigerade till en annan värd. Ange den slutliga URL:en för ${product} direkt.",
     "redirectInsecure": "Servern omdirigerade från HTTPS till en osäker URL",
     "redirectUnsupportedEnterFinal": "Servern omdirigerade till en URL som inte stöds. Ange den slutliga URL:en för ${product} direkt."
+  },
+  "episodeDetails": {
+    "previous": "Föregående avsnitt",
+    "next": "Nästa avsnitt"
+  },
+  "tvEdgeMenu": {
+    "title": "TV-navigering",
+    "top": "Övre fältet",
+    "both": "Övre fält + sidomeny",
+    "hint": "Tryck på Vänster från det första objektet i en rad för att öppna sidomenyn. Tryck på Höger eller Tillbaka för att gå tillbaka.",
+    "browse": "Bläddra",
+    "more": "Mer",
+    "closeHint": "Höger eller Tillbaka för att stänga",
+    "tryMenu": "Prova navigering",
+    "allLibraries": "Alla bibliotek"
+  },
+  "showDetailLayout": {
+    "title": "Visa layout för detaljer",
+    "description": "Välj hur TV-program och avsnitt ska presenteras på TV:n.",
+    "cinematic": "Filmliknande",
+    "compact": "Kompakt avsnittslista",
+    "seasons": "Välj en säsong",
+    "episodes": "Avsnitt",
+    "details": "Detaljer",
+    "cast": "Skådespelare",
+    "related": "Mer som detta"
+  },
+  "iconStyles": {
+    "title": "Ikonstil",
+    "description": "Välj hur appkontrollerna ska se ut. Ändringarna gäller för den här profilen.",
+    "current": "Luroka Bold",
+    "outline": "Material Outline",
+    "lucide": "Lucide",
+    "lucideDescription": "Rena linjeikoner med Material-alternativ för symboler som inte är tillgängliga."
   }
 }

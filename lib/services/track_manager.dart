@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import '../exceptions/media_server_exceptions.dart';
 import '../i18n/strings.g.dart';
@@ -13,6 +14,7 @@ import '../services/subtitle_preference.dart';
 import '../services/track_selection_service.dart';
 import '../utils/app_logger.dart';
 import '../utils/track_label_builder.dart';
+import '../utils/media_server_http_client.dart';
 
 /// Persists a track choice for the current part to the server and reports
 /// whether the server stored it. Plex only: backends whose picks ride the
@@ -100,6 +102,7 @@ class TrackManager {
   Timer? _trackSelectionFallbackTimer;
   bool _disposed = false;
   int _selectionGeneration = 0;
+  AbortController? _subtitleDownload;
 
   /// Whether this item's user has already been told a pick is session-only.
   /// One notice per item: every later pick on the same source would fail the
@@ -151,6 +154,8 @@ class TrackManager {
   /// on that replacement. Disposal deliberately ignores the drain so teardown
   /// is never held by a native command.
   Future<void> invalidatePendingSelection() {
+    _subtitleDownload?.abort();
+    _subtitleDownload = null;
     final activePlayerMutationDrain = _activePlayerMutationDrain;
     _selectionGeneration++;
     _trackLoadingSubscription?.cancel();
@@ -161,6 +166,53 @@ class TrackManager {
   }
 
   // ── Track selection ────────────────────────────────────────────────
+
+  /// Emby extracts embedded text on demand. Keep its network wait outside
+  /// loadfile (and outside the native mutation drain); only attach to the
+  /// open that requested it. An explicit user pick always wins.
+  Future<void> loadExtractedSubtitles({
+    required List<SubtitleTrack> tracks,
+    required Future<bool> fileLoaded,
+    required Future<void> Function(String path, SubtitleTrack track) attach,
+    required void Function() onFailure,
+    MediaServerHttpClient? client,
+  }) async {
+    final generation = _selectionGeneration;
+    final abort = AbortController();
+    _subtitleDownload = abort;
+    Directory? temp;
+    try {
+      if (!await fileLoaded || !_isSelectionCurrent(generation)) return;
+      temp = await Directory.systemTemp.createTemp('luroka-subs-');
+      for (var i = 0; i < tracks.length; i++) {
+        if (!_isSelectionCurrent(generation)) return;
+        final track = tracks[i];
+        final path = '${temp.path}/$i.srt';
+        // Cold extraction scans the entire source: Jellyfin took 125s on
+        // Poupelle. This budget is cancellable and never holds video startup.
+        await (client ?? httpClient).downloadFile(track.uri!, path, timeout: const Duration(minutes: 5), abort: abort);
+        if (!_isSelectionCurrent(generation)) return;
+        final mutation = attach(path, track);
+        _trackDispatchedPlayerMutation(mutation);
+        await mutation;
+      }
+    } catch (error) {
+      if (_isSelectionCurrent(generation)) {
+        appLogger.w('Could not attach extracted subtitle (${error.runtimeType}); keeping video open');
+        onFailure();
+      }
+    } finally {
+      if (identical(_subtitleDownload, abort)) _subtitleDownload = null;
+      if (temp != null) {
+        try {
+          await temp.delete(recursive: true);
+        } on FileSystemException {
+          // The OS can reclaim its temporary directory.
+        }
+      }
+      if (_isSelectionCurrent(generation)) applyTrackSelectionWhenReady();
+    }
+  }
 
   /// Apply track selection once tracks are available.
   ///

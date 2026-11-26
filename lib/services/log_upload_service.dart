@@ -7,9 +7,8 @@ import 'luroka_server.dart';
 /// Luroka server endpoint that returns a short, quotable Log ID.
 const String logUploadEndpoint = '$lurokaServerBaseUrl/logs';
 
-/// Short reference for support staff with access to the relay's log store.
-/// Public retrieval still requires the full ID returned by the relay.
-String logSupportReference(String id) => id.length <= 10 ? id : id.substring(0, 10);
+/// Always display the complete retrieval capability, even with an older relay.
+String logSupportReference(String id) => id;
 
 /// The server's `/logs` accepts 1 MiB. The in-memory buffer intentionally remains
 /// larger for local viewing and copying; uploads retain the device header and

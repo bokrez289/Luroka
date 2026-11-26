@@ -4,6 +4,8 @@ import 'dart:math' as math;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../widgets/settings_builder.dart';
+import '../widgets/tv_edge_menu.dart';
+import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
@@ -82,6 +84,8 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
   bool _cursorHasPublished = false;
   StudioDiscovery _discovery = StudioDiscovery(const []);
   Object? _sourcesKey;
+  (StudioSort, MediaKind?)? _catalogQuery;
+  bool _extendedSources = false;
   String _name = '';
   int _columns = 1;
   double _rowExtent = 250;
@@ -128,7 +132,8 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
 
   void _onCatalogScroll() {
     if (!mounted || !PlatformDetector.isMobile(context) || !_browseAll || !_scroll.hasClients) return;
-    if (_scroll.position.extentAfter < _scroll.position.viewportDimension && !_loading && !_failed) {
+    if (_scroll.position.extentAfter < _scroll.position.viewportDimension * 1.5 &&
+        !_opening && !_loading && !_failed && _cursor?.hasMore == true) {
       unawaited(_load());
     }
   }
@@ -190,8 +195,22 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
         sources.map((source) => (source.library.globalKey, source.client, source.kind, source.studio.id)),
       ),
     );
-    if (key == _sourcesKey) return;
+    final query = (_sort, _kind);
+    if (key == _sourcesKey && query == _catalogQuery) return;
     _sourcesKey = key;
+    Object identity(StudioSource s) => (s.library.globalKey, s.client, s.kind, s.studio.id);
+    final cursor = _cursor;
+    final current = sources.map(identity).toSet();
+    if (cursor != null && _catalogQuery == query && cursor.sources.isNotEmpty &&
+        cursor.sources.every((s) => current.contains(identity(s)))) {
+      final known = cursor.sources.map(identity).toSet();
+      cursor.sources.addAll(sources.where((s) => !known.contains(identity(s))));
+      _extendedSources = true;
+      if (!_loading && !_failed) unawaited(_load());
+      return;
+    }
+    _catalogQuery = query;
+    _extendedSources = false;
     _abort.abort();
     _titleLookupAbort.abort();
     _titleLookupAbort = AbortController();
@@ -215,7 +234,7 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
     final previewAbort = _abort;
     final previewCursor = _cursor;
     final previewTimer = Stopwatch()..start();
-    unawaited(
+    if (!PlatformDetector.isMobile(context) || !_browseAll) unawaited(
       _studios.loadPreviewPages(sources, _sort, previewAbort, (items) {
         if (!mounted || previewAbort.isAborted || previewCursor != _cursor || _cursorHasPublished || _opening) return;
         setState(() {
@@ -235,7 +254,10 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
     unawaited(_load());
   }
 
-  Future<void> _load() => _loadTask ??= _loadAll();
+  Future<void> _load() {
+    if (_cursor?.hasMore != true) return Future<void>.value();
+    return _loadTask ??= _loadAll();
+  }
 
   Future<void> _loadAll() async {
     final cursor = _cursor;
@@ -250,6 +272,10 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
         final previousCount = _items.length;
         final items = await cursor.next(abort);
         if (!mounted || abort.isAborted || cursor != _cursor) return;
+        final offset = _scroll.hasClients ? _scroll.offset : 0.0;
+        final anchorIndex = ((_rowExtent > 0 ? (offset - _gridTopInset) / _rowExtent : 0).floor() * _columns)
+            .clamp(0, math.max(0, _items.length - 1)).toInt();
+        final anchor = _browseAll && offset > 0 && _items.isNotEmpty ? _items[anchorIndex].globalKey : null;
         setState(() {
           if (!_cursorHasPublished) {
             _cursorHasPublished = true;
@@ -260,10 +286,21 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
             for (final item in _titles.items)
               item.copyWith(raw: {...?item.raw, 'lurokaCopyCount': _titles.copiesFor(item).length}),
           ];
-          if (_sort != StudioSort.recentlyAddedEpisode && _sort != StudioSort.recentlyAdded) _items.sort(_sort.compare);
+          if (_extendedSources || (_sort != StudioSort.recentlyAddedEpisode && _sort != StudioSort.recentlyAdded)) {
+            _items.sort(_sort.compare);
+          }
           reconcileGridFocusNodes({for (final (index, item) in _items.indexed) item.globalKey: index});
           if (_discovery.featured == null) _discovery = StudioDiscovery(_items);
         });
+        if (anchor != null) {
+          final index = _items.indexWhere((item) => item.globalKey == anchor);
+          final delta = (index ~/ _columns - anchorIndex ~/ _columns) * _rowExtent;
+          if (index >= 0 && delta != 0) WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted || abort.isAborted || !_scroll.hasClients) return;
+            final pos = _scroll.position;
+            _scroll.jumpTo((pos.pixels + delta).clamp(pos.minScrollExtent, pos.maxScrollExtent));
+          });
+        }
         if (_preview.value == null && _items.isNotEmpty) {
           _select(PlatformDetector.isTV() && !_browseAll ? _discovery.featured! : _items.first);
         }
@@ -306,6 +343,9 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
       if (identical(cursor, _cursor)) {
         _loadTask = null;
         _continueDiscovery();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && !abort.isAborted && ModalRoute.of(context)?.isCurrent == true) _onCatalogScroll();
+        });
       }
     }
   }
@@ -744,7 +784,13 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
         canPop: true,
         child: Focus(
           canRequestFocus: false,
-          onKeyEvent: (_, event) => handleBackKeyAction(event, _back),
+          onKeyEvent: (_, event) {
+            if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.arrowLeft &&
+                (_backFocus.hasFocus || _overviewFocus.hasFocus) && TvEdgeMenuHost.open(context, current: 'studios')) {
+              return KeyEventResult.handled;
+            }
+            return handleBackKeyAction(event, _back);
+          },
           child: Scaffold(
             body: (tv || PlatformDetector.isMobile(context)) && !_browseAll
                 ? StudioDiscoveryView(
@@ -1322,7 +1368,9 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
                                                                   }
                                                                 },
                                                                 onNavigateLeft: index % _columns == 0
-                                                                    ? _focusOverview
+                                                                    ? () {
+                                                                        if (!TvEdgeMenuHost.open(context, current: 'studios')) _focusOverview();
+                                                                      }
                                                                     : () => _focusIndex(index - 1),
                                                                 onNavigateRight:
                                                                     ((index + 1) % _columns != 0 || (tv && !_list)) &&
@@ -1344,6 +1392,11 @@ class _StudioBrowserScreenState extends State<StudioBrowserScreen> with GridFocu
                                                         onTap: _load,
                                                       ),
                                                     ),
+                                                  if (_loading && _items.isNotEmpty && mobile)
+                                                    const SliverToBoxAdapter(child: Padding(
+                                                      padding: EdgeInsets.all(12),
+                                                      child: Center(child: CircularProgressIndicator()),
+                                                    )),
                                                 ],
                                               );
                                             },

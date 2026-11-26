@@ -143,6 +143,10 @@ class TranslationsSv extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$profileSetupGuide$sv profileSetupGuide = _Translations$profileSetupGuide$sv._(_root);
 	@override late final _Translations$animeFavorites$sv animeFavorites = _Translations$animeFavorites$sv._(_root);
 	@override late final _Translations$addServer$sv addServer = _Translations$addServer$sv._(_root);
+	@override late final _Translations$episodeDetails$sv episodeDetails = _Translations$episodeDetails$sv._(_root);
+	@override late final _Translations$tvEdgeMenu$sv tvEdgeMenu = _Translations$tvEdgeMenu$sv._(_root);
+	@override late final _Translations$showDetailLayout$sv showDetailLayout = _Translations$showDetailLayout$sv._(_root);
+	@override late final _Translations$iconStyles$sv iconStyles = _Translations$iconStyles$sv._(_root);
 }
 
 // Path: mobileLibrary
@@ -564,6 +568,7 @@ class _Translations$kidsShelf$sv extends Translations$kidsShelf$en {
 	final TranslationsSv _root; // ignore: unused_field
 
 	// Translations
+	@override String get quietScenery => 'Lugnt nattlandskap';
 	@override String get movieShelf => 'Filmtid';
 	@override String get showShelf => 'Hitta din nästa show';
 	@override String get aurora => 'Aurora — djup kricka och lime';
@@ -925,6 +930,8 @@ class _Translations$lurokaDiscovery$sv extends Translations$lurokaDiscovery$en {
 	@override String get noAvailable => 'Inga matchande titlar hittades i de markerade biblioteken.';
 	@override String get sourceInfo => 'Veckotrender och utvalda pristagare · TMDb';
 	@override String get configure => 'Upptäcktsinställningar';
+	@override String get filterOwned => 'I mina bibliotek';
+	@override String get statusRetry => 'Det gick inte att kontrollera Seerr · Försök igen';
 }
 
 // Path: app
@@ -1472,6 +1479,10 @@ class _Translations$settings$sv extends Translations$settings$en {
 	@override String get playerScopeTitle => 'Per serie eller film';
 	@override String get exportDialogTitle => 'Exportera Luroka-inställningar';
 	@override String get velvetHourTheme => 'Sammetstimme';
+	@override String get backdropBrightness => 'Bakgrundens ljusstyrka';
+	@override String get backdropBrightnessDescription => 'Justera skuggningen över startsidan och titelbilden. 100 % är standard.';
+	@override String get showEarlyNextEpisode => 'Visa Nästa innan ett avsnitt avslutas';
+	@override String get showEarlyNextEpisodeDescription => 'Visa nästa avsnitt under eftertexterna eller under de sista 30 sekunderna.';
 }
 
 // Path: themeEditor
@@ -1719,6 +1730,9 @@ class _Translations$lurokaThemes$sv extends Translations$lurokaThemes$en {
 	final TranslationsSv _root; // ignore: unused_field
 
 	// Translations
+	@override String get patina => 'Patina · djup blågrön och koppar';
+	@override String get afterimage => 'Efterbild · indigo och neonrosa';
+	@override String get letterpress => 'Boktryck · papper och vinrött bläck';
 	@override String get title => 'Luroka biopaletter';
 	@override String get coral => 'Korall · midnattsblå & solnedgång';
 	@override String get ocean => 'Hav · djupblått & is';
@@ -1817,6 +1831,14 @@ class _Translations$homeLayout$sv extends Translations$homeLayout$en {
 	@override String get resetDescription => 'Återställa den ursprungliga radordningen och visa alla rader för den här profilen? Dina fästa samlingar kommer att behållas.';
 	@override String get saveFailed => 'Det gick inte att spara din hemlayout. Försök igen.';
 	@override String get emptyHint => 'Rader kan vara dolda. Öppna Anpassa hem för att visa dem igen.';
+	@override String get upcomingEpisodes => 'Kommande avsnitt';
+	@override String get upcomingOff => 'Av';
+	@override String get upcomingFavorites => 'Favoriter';
+	@override String get upcomingWatched => 'Tittat på tidigare';
+	@override String get upcomingAll => 'Alla program';
+	@override String get upcomingBoth => 'Favoriter och tidigare visade';
+	@override String get upcomingHint => 'Kommande sändningsdatum kontrolleras endast i bakgrunden när den här raden är aktiverad. Resultaten är begränsade och kanske inte är tillgängliga på din server ännu.';
+	@override String airDate({required Object date}) => 'Sändningsdatum: ${date}';
 }
 
 // Path: screenTime
@@ -1886,6 +1908,34 @@ class _Translations$activityStats$sv extends Translations$activityStats$en {
 	@override String get emptyTitle => 'Inget här ännu';
 	@override String get emptyBody => 'Titta på något och din statistik kommer att byggas upp här.';
 	@override String get noDataInPeriod => 'Ingen uppspelning inspelad under denna period.';
+	@override String get overview => 'Översikt';
+	@override String get history => 'Historik';
+	@override String get patternsTab => 'Mönster';
+	@override String get gettingStarted => 'Aktiviteten har precis börjat. Visningsmönster kommer att visas efter några aktiva dagar.';
+	@override String get monthlyRecap => 'Månadsöversikt';
+	@override String get measurementHint => 'Tiden återspeglar inspelad uppspelning, inte slutförda titlar.';
+	@override String get ledgerScope => 'Aktiviteten kommer från den här profilens lokala Luroka-uppspelningsregister. Tittarhistorik på servern och uppspelning i andra appar ingår inte.';
+	@override String get watchedPeriod => 'Tittat på under den här perioden';
+	@override String get activeDays => 'Aktiva dagar';
+	@override String get dailyAverage => 'Dagsgenomsnitt';
+	@override String get previousPeriod => 'Föregående period';
+	@override String get insufficientHistory => 'Inte tillräckligt med historik';
+	@override String get drillDown => 'Visa aktivitet för dessa datum';
+	@override String get searchHistory => 'Sök i visningshistoriken';
+	@override String get allKinds => 'Alla';
+	@override String get moviesFilter => 'Filmer';
+	@override String get episodesFilter => 'Avsnitt';
+	@override String get datesFilter => 'Datum';
+	@override String get clearDates => 'Rensa datum';
+	@override String get noMatches => 'Ingen visning matchar dessa filter.';
+	@override String get allHistory => 'Visa hela historiken';
+	@override String get historyError => 'Det gick inte att ladda historiken. Försök igen.';
+	@override String titlesPlayed({required Object count}) => '${count} titlar uppspelade · avsnitt räknas separat';
+	@override String monthWatched({required Object duration}) => '${duration} tittade på den här månaden';
+	@override String lifetimeSummary({required Object total, required Object average}) => 'Totalt: ${total} · Dagligt genomsnitt: ${average}';
+	@override String chartScale({required Object duration}) => 'Skala: 0 – ${duration}';
+	@override String get titlesPlayedLabel => 'Titlar som har spelats upp';
+	@override String get playedHint => 'Avsnitt räknas separat. Uppspelningstiden indikerar inte slutförande.';
 }
 
 // Path: search
@@ -2094,6 +2144,7 @@ class _Translations$mediaMenu$sv extends Translations$mediaMenu$en {
 	@override String get rate => 'Betygsätt';
 	@override String get playFromBeginning => 'Spela från början';
 	@override String get playVersion => 'Spela version...';
+	@override String get removeFromNextUp => 'Ta bort från Nästa';
 }
 
 // Path: rateSheet
@@ -2110,6 +2161,8 @@ class _Translations$rateSheet$sv extends Translations$rateSheet$en {
 	@override String get saved => 'Sparat';
 	@override String get notAvailable => 'Ingen matchning hittades';
 	@override String get noConnectedServices => 'Anslut en tjänst i Inställningar för att betygsätta där.';
+	@override String get addFavorite => 'Lägg till i favoriter';
+	@override String get removeFavorite => 'Ta bort från favoriter';
 }
 
 // Path: accessibility
@@ -2344,6 +2397,8 @@ class _Translations$messages$sv extends Translations$messages$en {
 	@override String get streamSelectionFailed => 'Kunde inte tillämpa de valda strömmarna';
 	@override String get trackSelectionNotRemembered => 'Det här spårvalet gäller bara den aktuella uppspelningen.';
 	@override String get serverUnavailableForProfile => 'Ingen server är tillgänglig för den aktiva profilen';
+	@override String get logSupportReference => 'Supportreferens';
+	@override String get copyFullLogId => 'Kopiera fullständigt logg-ID';
 }
 
 // Path: sourceLibraries
@@ -3917,6 +3972,68 @@ class _Translations$addServer$sv extends Translations$addServer$en {
 	@override String redirectUnsupportedEnterFinal({required Object product}) => 'Servern omdirigerade till en URL som inte stöds. Ange den slutliga URL:en för ${product} direkt.';
 }
 
+// Path: episodeDetails
+class _Translations$episodeDetails$sv extends Translations$episodeDetails$en {
+	_Translations$episodeDetails$sv._(TranslationsSv root) : this._root = root, super.internal(root);
+
+	final TranslationsSv _root; // ignore: unused_field
+
+	// Translations
+	@override String get previous => 'Föregående avsnitt';
+	@override String get next => 'Nästa avsnitt';
+}
+
+// Path: tvEdgeMenu
+class _Translations$tvEdgeMenu$sv extends Translations$tvEdgeMenu$en {
+	_Translations$tvEdgeMenu$sv._(TranslationsSv root) : this._root = root, super.internal(root);
+
+	final TranslationsSv _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'TV-navigering';
+	@override String get top => 'Övre fältet';
+	@override String get both => 'Övre fält + sidomeny';
+	@override String get hint => 'Tryck på Vänster från det första objektet i en rad för att öppna sidomenyn. Tryck på Höger eller Tillbaka för att gå tillbaka.';
+	@override String get browse => 'Bläddra';
+	@override String get more => 'Mer';
+	@override String get closeHint => 'Höger eller Tillbaka för att stänga';
+	@override String get tryMenu => 'Prova navigering';
+	@override String get allLibraries => 'Alla bibliotek';
+}
+
+// Path: showDetailLayout
+class _Translations$showDetailLayout$sv extends Translations$showDetailLayout$en {
+	_Translations$showDetailLayout$sv._(TranslationsSv root) : this._root = root, super.internal(root);
+
+	final TranslationsSv _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Visa layout för detaljer';
+	@override String get description => 'Välj hur TV-program och avsnitt ska presenteras på TV:n.';
+	@override String get cinematic => 'Filmliknande';
+	@override String get compact => 'Kompakt avsnittslista';
+	@override String get seasons => 'Välj en säsong';
+	@override String get episodes => 'Avsnitt';
+	@override String get details => 'Detaljer';
+	@override String get cast => 'Skådespelare';
+	@override String get related => 'Mer som detta';
+}
+
+// Path: iconStyles
+class _Translations$iconStyles$sv extends Translations$iconStyles$en {
+	_Translations$iconStyles$sv._(TranslationsSv root) : this._root = root, super.internal(root);
+
+	final TranslationsSv _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Ikonstil';
+	@override String get description => 'Välj hur appkontrollerna ska se ut. Ändringarna gäller för den här profilen.';
+	@override String get current => 'Luroka Bold';
+	@override String get outline => 'Material Outline';
+	@override String get lucide => 'Lucide';
+	@override String get lucideDescription => 'Rena linjeikoner med Material-alternativ för symboler som inte är tillgängliga.';
+}
+
 // Path: appIcon.names
 class _Translations$appIcon$names$sv extends Translations$appIcon$names$en {
 	_Translations$appIcon$names$sv._(TranslationsSv root) : this._root = root, super.internal(root);
@@ -5116,6 +5233,7 @@ extension on TranslationsSv {
 			'downloadsRedesign.downloaded' => 'Nedladdat',
 			'downloadsRedesign.speed' => 'Nedladdningshastighet',
 			'downloadsRedesign.notificationProgress' => '{progress} · {networkSpeed} · {timeRemaining} återstår',
+			'kidsShelf.quietScenery' => 'Lugnt nattlandskap',
 			'kidsShelf.movieShelf' => 'Filmtid',
 			'kidsShelf.showShelf' => 'Hitta din nästa show',
 			'kidsShelf.aurora' => 'Aurora — djup kricka och lime',
@@ -5365,9 +5483,9 @@ extension on TranslationsSv {
 			'kids.historyReset' => 'Barns visningsuteslutningar har återställts',
 			'kids.blocked' => 'Den här titeln är inte tillgänglig i den här barnprofilen.',
 			'kids.switchProfile' => 'Byt profil',
-			'kids.manageFromAdult' => 'Byt till en vuxenprofil för att hantera inställningar.',
 			_ => null,
 		} ?? switch (path) {
+			'kids.manageFromAdult' => 'Byt till en vuxenprofil för att hantera inställningar.',
 			'kids.noConnections' => 'Anslut en server till din vuxenprofil innan du lägger till en barnprofil.',
 			'kids.created' => 'Barnprofil skapad',
 			'kids.updated' => 'Barnprofilen uppdaterad',
@@ -5407,6 +5525,8 @@ extension on TranslationsSv {
 			'lurokaDiscovery.noAvailable' => 'Inga matchande titlar hittades i de markerade biblioteken.',
 			'lurokaDiscovery.sourceInfo' => 'Veckotrender och utvalda pristagare · TMDb',
 			'lurokaDiscovery.configure' => 'Upptäcktsinställningar',
+			'lurokaDiscovery.filterOwned' => 'I mina bibliotek',
+			'lurokaDiscovery.statusRetry' => 'Det gick inte att kontrollera Seerr · Försök igen',
 			'app.title' => 'Luroka',
 			'appIcon.title' => 'App-ikon',
 			'appIcon.defaultIcon' => 'Standard',
@@ -5877,11 +5997,11 @@ extension on TranslationsSv {
 			'settings.liveTvDefaultFavoritesDescription' => 'Visa endast favoritkanaler när Live-TV öppnas',
 			'settings.general' => 'Allmänt',
 			'settings.generalDescription' => 'Språk, start och fönsterbeteende',
+			_ => null,
+		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Språk och region',
 			'settings.startup' => 'Start',
 			'settings.display' => 'Skärm',
-			_ => null,
-		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Bibliotek och kort',
 			'settings.homeScreen' => 'Hemskärm',
 			'settings.navigation' => 'Navigering',
@@ -5916,6 +6036,10 @@ extension on TranslationsSv {
 			'settings.playerScopeTitle' => 'Per serie eller film',
 			'settings.exportDialogTitle' => 'Exportera Luroka-inställningar',
 			'settings.velvetHourTheme' => 'Sammetstimme',
+			'settings.backdropBrightness' => 'Bakgrundens ljusstyrka',
+			'settings.backdropBrightnessDescription' => 'Justera skuggningen över startsidan och titelbilden. 100 % är standard.',
+			'settings.showEarlyNextEpisode' => 'Visa Nästa innan ett avsnitt avslutas',
+			'settings.showEarlyNextEpisodeDescription' => 'Visa nästa avsnitt under eftertexterna eller under de sista 30 sekunderna.',
 			'themeEditor.builtIn' => 'Inbyggd',
 			'themeEditor.presets' => 'Förinställningar',
 			'themeEditor.custom' => 'Anpassad',
@@ -6057,6 +6181,9 @@ extension on TranslationsSv {
 			'referenceDetails.continuing' => 'Fortsätter',
 			'referenceDetails.upNext' => 'Nästa',
 			'referenceDetails.episodesLeft' => ({required Object count}) => '${count} avsnitt kvar',
+			'lurokaThemes.patina' => 'Patina · djup blågrön och koppar',
+			'lurokaThemes.afterimage' => 'Efterbild · indigo och neonrosa',
+			'lurokaThemes.letterpress' => 'Boktryck · papper och vinrött bläck',
 			'lurokaThemes.title' => 'Luroka biopaletter',
 			'lurokaThemes.coral' => 'Korall · midnattsblå & solnedgång',
 			'lurokaThemes.ocean' => 'Hav · djupblått & is',
@@ -6137,6 +6264,14 @@ extension on TranslationsSv {
 			'homeLayout.resetDescription' => 'Återställa den ursprungliga radordningen och visa alla rader för den här profilen? Dina fästa samlingar kommer att behållas.',
 			'homeLayout.saveFailed' => 'Det gick inte att spara din hemlayout. Försök igen.',
 			'homeLayout.emptyHint' => 'Rader kan vara dolda. Öppna Anpassa hem för att visa dem igen.',
+			'homeLayout.upcomingEpisodes' => 'Kommande avsnitt',
+			'homeLayout.upcomingOff' => 'Av',
+			'homeLayout.upcomingFavorites' => 'Favoriter',
+			'homeLayout.upcomingWatched' => 'Tittat på tidigare',
+			'homeLayout.upcomingAll' => 'Alla program',
+			'homeLayout.upcomingBoth' => 'Favoriter och tidigare visade',
+			'homeLayout.upcomingHint' => 'Kommande sändningsdatum kontrolleras endast i bakgrunden när den här raden är aktiverad. Resultaten är begränsade och kanske inte är tillgängliga på din server ännu.',
+			'homeLayout.airDate' => ({required Object date}) => 'Sändningsdatum: ${date}',
 			'screenTime.title' => 'Skärmtid',
 			'screenTime.description' => 'Se tiden som ägnas åt att titta på video på den här profilen',
 			'screenTime.today' => 'Idag',
@@ -6185,6 +6320,34 @@ extension on TranslationsSv {
 			'activityStats.emptyTitle' => 'Inget här ännu',
 			'activityStats.emptyBody' => 'Titta på något och din statistik kommer att byggas upp här.',
 			'activityStats.noDataInPeriod' => 'Ingen uppspelning inspelad under denna period.',
+			'activityStats.overview' => 'Översikt',
+			'activityStats.history' => 'Historik',
+			'activityStats.patternsTab' => 'Mönster',
+			'activityStats.gettingStarted' => 'Aktiviteten har precis börjat. Visningsmönster kommer att visas efter några aktiva dagar.',
+			'activityStats.monthlyRecap' => 'Månadsöversikt',
+			'activityStats.measurementHint' => 'Tiden återspeglar inspelad uppspelning, inte slutförda titlar.',
+			'activityStats.ledgerScope' => 'Aktiviteten kommer från den här profilens lokala Luroka-uppspelningsregister. Tittarhistorik på servern och uppspelning i andra appar ingår inte.',
+			'activityStats.watchedPeriod' => 'Tittat på under den här perioden',
+			'activityStats.activeDays' => 'Aktiva dagar',
+			'activityStats.dailyAverage' => 'Dagsgenomsnitt',
+			'activityStats.previousPeriod' => 'Föregående period',
+			'activityStats.insufficientHistory' => 'Inte tillräckligt med historik',
+			'activityStats.drillDown' => 'Visa aktivitet för dessa datum',
+			'activityStats.searchHistory' => 'Sök i visningshistoriken',
+			'activityStats.allKinds' => 'Alla',
+			'activityStats.moviesFilter' => 'Filmer',
+			'activityStats.episodesFilter' => 'Avsnitt',
+			'activityStats.datesFilter' => 'Datum',
+			'activityStats.clearDates' => 'Rensa datum',
+			'activityStats.noMatches' => 'Ingen visning matchar dessa filter.',
+			'activityStats.allHistory' => 'Visa hela historiken',
+			'activityStats.historyError' => 'Det gick inte att ladda historiken. Försök igen.',
+			'activityStats.titlesPlayed' => ({required Object count}) => '${count} titlar uppspelade · avsnitt räknas separat',
+			'activityStats.monthWatched' => ({required Object duration}) => '${duration} tittade på den här månaden',
+			'activityStats.lifetimeSummary' => ({required Object total, required Object average}) => 'Totalt: ${total} · Dagligt genomsnitt: ${average}',
+			'activityStats.chartScale' => ({required Object duration}) => 'Skala: 0 – ${duration}',
+			'activityStats.titlesPlayedLabel' => 'Titlar som har spelats upp',
+			'activityStats.playedHint' => 'Avsnitt räknas separat. Uppspelningstiden indikerar inte slutförande.',
 			'search.hint' => 'Sök filmer, serier, musik...',
 			'search.tryDifferentTerm' => 'Prova en annan sökterm',
 			'search.searchYourMedia' => 'Sök i dina media',
@@ -6348,6 +6511,8 @@ extension on TranslationsSv {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Blandad uppspelning är inte tillgänglig offline',
 			'mediaMenu.fileInfo' => 'Filinformation',
 			'mediaMenu.deleteEpisodeFromServer' => 'Ta bort avsnitt från servern',
+			_ => null,
+		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Ta bort säsong från servern',
 			'mediaMenu.deleteShowFromServer' => 'Ta bort serie från servern',
 			'mediaMenu.deleteMovieFromServer' => 'Ta bort film från servern',
@@ -6372,6 +6537,7 @@ extension on TranslationsSv {
 			'mediaMenu.rate' => 'Betygsätt',
 			'mediaMenu.playFromBeginning' => 'Spela från början',
 			'mediaMenu.playVersion' => 'Spela version...',
+			'mediaMenu.removeFromNextUp' => 'Ta bort från Nästa',
 			'rateSheet.title' => 'Betygsätt',
 			'rateSheet.server' => 'Server',
 			'rateSheet.favorite' => 'Favorit',
@@ -6379,6 +6545,8 @@ extension on TranslationsSv {
 			'rateSheet.saved' => 'Sparat',
 			'rateSheet.notAvailable' => 'Ingen matchning hittades',
 			'rateSheet.noConnectedServices' => 'Anslut en tjänst i Inställningar för att betygsätta där.',
+			'rateSheet.addFavorite' => 'Lägg till i favoriter',
+			'rateSheet.removeFavorite' => 'Ta bort från favoriter',
 			'accessibility.mediaCardMovie' => ({required Object title}) => '${title}, film',
 			'accessibility.mediaCardShow' => ({required Object title}) => '${title}, TV-serie',
 			'accessibility.mediaCardEpisode' => ({required Object title, required Object episodeInfo}) => '${title}, ${episodeInfo}',
@@ -6394,8 +6562,6 @@ extension on TranslationsSv {
 			'accessibility.hue' => 'Nyans',
 			'accessibility.saturation' => 'Mättnad',
 			'accessibility.brightness' => 'Ljusstyrka',
-			_ => null,
-		} ?? switch (path) {
 			'accessibility.hexColor' => 'Hexfärg',
 			'accessibility.expandText' => 'Expandera text',
 			'accessibility.collapseText' => 'Fäll ihop text',
@@ -6574,6 +6740,8 @@ extension on TranslationsSv {
 			'messages.streamSelectionFailed' => 'Kunde inte tillämpa de valda strömmarna',
 			'messages.trackSelectionNotRemembered' => 'Det här spårvalet gäller bara den aktuella uppspelningen.',
 			'messages.serverUnavailableForProfile' => 'Ingen server är tillgänglig för den aktiva profilen',
+			'messages.logSupportReference' => 'Supportreferens',
+			'messages.copyFullLogId' => 'Kopiera fullständigt logg-ID',
 			'sourceLibraries.title' => 'Dina servrar och bibliotek',
 			'sourceLibraries.description' => 'Välj de bibliotek Luroka använder för Hem, sökning, Upptäck tillgänglighet och Studios. Hemradsordning anpassas separat.',
 			'sourceLibraries.partial' => 'Vissa servrar kunde inte kontrolleras. Dina sparade val för dessa bibliotek behålls. Uppdatera för att försöka igen.',
@@ -6857,6 +7025,8 @@ extension on TranslationsSv {
 			'libraries.filters' => 'Filter',
 			'libraries.confirmActionMessage' => 'Är du säker på att du vill utföra denna åtgärd?',
 			'libraries.showLibrary' => 'Visa bibliotek',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Dölj bibliotek',
 			'libraries.libraryOptions' => 'Biblioteksalternativ',
 			'libraries.content' => 'bibliotekets innehåll',
@@ -6908,8 +7078,6 @@ extension on TranslationsSv {
 			'libraries.sortLabels.dateShared' => 'Delningsdatum',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Senaste avsnittets sändningsdatum',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Datum då senaste avsnittet lades till',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Nedladdningsdatum',
 			'libraries.sortLabels.size' => 'Storlek',
 			'libraries.sortLabels.library' => 'Bibliotek',
@@ -7371,6 +7539,8 @@ extension on TranslationsSv {
 			'watchTogether.qrShare' => 'Dela QR-kod',
 			'watchTogether.qrHint' => 'Skanna med Luroka-appen för att gå med i det här rummet.',
 			'watchTogether.phasePlaying' => 'Spelar',
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Pausad',
 			'watchTogether.phaseWaiting' => 'Väntar på alla',
 			'watchTogether.inviteCopied' => 'Inbjudan har kopierats. Klistra in det i ett meddelande.',
@@ -7422,8 +7592,6 @@ extension on TranslationsSv {
 			'watchTogether.offsetPlusSecond' => '+1 s',
 			'watchTogether.participants' => 'Deltagare',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('sv'))(n, one: '${n}-deltagare', other: '${n} deltagare', ), 
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'VÄRD',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (Du)',
 			'watchTogether.playerIdle' => 'Inaktiv',
@@ -7885,6 +8053,8 @@ extension on TranslationsSv {
 			'matchScreen.match' => 'Matcha...',
 			'matchScreen.fixMatch' => 'Rätta matchning...',
 			'matchScreen.unmatch' => 'Ta bort matchning',
+			_ => null,
+		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Rensa denna matchning? Plex behandlar den som omatchad tills den matchas igen.',
 			'matchScreen.unmatchSuccess' => 'Matchning borttagen',
 			'matchScreen.unmatchFailed' => 'Det gick inte att ta bort matchningen',
@@ -7936,8 +8106,6 @@ extension on TranslationsSv {
 			'seerr.requestFailed' => ({required Object error}) => 'Begäran kunde inte genomföras: ${error}',
 			'seerr.requestsLoadFailed' => 'Det gick inte att läsa in alternativ för begäran',
 			'seerr.nothingToRequest' => 'Allt är redan tillgängligt eller begärt.',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Tillgänglig',
 			'seerr.statusPartiallyAvailable' => 'Delvis tillgänglig',
 			'seerr.statusRequested' => 'Begärd',
@@ -8116,6 +8284,32 @@ extension on TranslationsSv {
 			'addServer.redirectDifferentHost' => ({required Object product}) => 'Servern omdirigerade till en annan värd. Ange den slutliga URL:en för ${product} direkt.',
 			'addServer.redirectInsecure' => 'Servern omdirigerade från HTTPS till en osäker URL',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'Servern omdirigerade till en URL som inte stöds. Ange den slutliga URL:en för ${product} direkt.',
+			'episodeDetails.previous' => 'Föregående avsnitt',
+			'episodeDetails.next' => 'Nästa avsnitt',
+			'tvEdgeMenu.title' => 'TV-navigering',
+			'tvEdgeMenu.top' => 'Övre fältet',
+			'tvEdgeMenu.both' => 'Övre fält + sidomeny',
+			'tvEdgeMenu.hint' => 'Tryck på Vänster från det första objektet i en rad för att öppna sidomenyn. Tryck på Höger eller Tillbaka för att gå tillbaka.',
+			'tvEdgeMenu.browse' => 'Bläddra',
+			'tvEdgeMenu.more' => 'Mer',
+			'tvEdgeMenu.closeHint' => 'Höger eller Tillbaka för att stänga',
+			'tvEdgeMenu.tryMenu' => 'Prova navigering',
+			'tvEdgeMenu.allLibraries' => 'Alla bibliotek',
+			'showDetailLayout.title' => 'Visa layout för detaljer',
+			'showDetailLayout.description' => 'Välj hur TV-program och avsnitt ska presenteras på TV:n.',
+			'showDetailLayout.cinematic' => 'Filmliknande',
+			'showDetailLayout.compact' => 'Kompakt avsnittslista',
+			'showDetailLayout.seasons' => 'Välj en säsong',
+			'showDetailLayout.episodes' => 'Avsnitt',
+			'showDetailLayout.details' => 'Detaljer',
+			'showDetailLayout.cast' => 'Skådespelare',
+			'showDetailLayout.related' => 'Mer som detta',
+			'iconStyles.title' => 'Ikonstil',
+			'iconStyles.description' => 'Välj hur appkontrollerna ska se ut. Ändringarna gäller för den här profilen.',
+			'iconStyles.current' => 'Luroka Bold',
+			'iconStyles.outline' => 'Material Outline',
+			'iconStyles.lucide' => 'Lucide',
+			'iconStyles.lucideDescription' => 'Rena linjeikoner med Material-alternativ för symboler som inte är tillgängliga.',
 			_ => null,
 		};
 	}

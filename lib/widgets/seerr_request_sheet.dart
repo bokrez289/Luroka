@@ -31,6 +31,7 @@ import 'stat_chip.dart';
 /// Why the sheet closed itself; a caller surfaces it on its own scaffold
 /// since the sheet is unmounting.
 enum SeerrRequestSheetClose {
+  submitted,
   /// The signed-in user lost permission to request this kind while open.
   permissionRevoked,
 }
@@ -52,7 +53,9 @@ Future<void> showSeerrRequestSheet(
     builder: (_) => SeerrRequestSheet(source: source, kind: kind, tmdbId: tmdbId, title: title),
   );
   if (close == SeerrRequestSheetClose.permissionRevoked && context.mounted) {
-    showErrorDialog(context, t.seerr.permissionRevoked);
+    await showErrorDialog(context, t.seerr.permissionRevoked);
+  } else if (close == SeerrRequestSheetClose.submitted && context.mounted) {
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text(t.seerr.requestSubmitted)));
   }
 }
 
@@ -525,7 +528,7 @@ class _SeerrRequestSheetState extends State<SeerrRequestSheet> {
       if (!mounted || !_connected) return;
       // The sheet may be hosted by an OverlaySheetHost (no route of its own),
       // so a bare Navigator.pop would pop the screen underneath instead.
-      OverlaySheetController.closeAdaptive(context);
+      OverlaySheetController.closeAdaptive(context, SeerrRequestSheetClose.submitted);
       return;
     } on SeerrApiException catch (e) {
       errorText = e.message;

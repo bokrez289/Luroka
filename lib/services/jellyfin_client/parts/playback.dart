@@ -296,12 +296,8 @@ mixin _JellyfinPlaybackMethods on _JellyfinClientInternals {
               : findSourceAudioTrackForIntent(options.preferredAudioTrack!, mediaInfo.audioTracks)?.id
         : _validJellyfinAudioStreamId(options.selectedAudioStreamId, mediaInfo);
     final requestedSubtitleStreamId = _validJellyfinSubtitleStreamId(options.preferredSubtitleTrack, mediaInfo);
-    // A real external subtitle file stays a file the client fetches, on a transcode as much as on
-    // a direct play - it is the one case where the client genuinely holds it. Jellyfin decides
-    // delivery from the profile and matches on format alone, never on whether a stream is embedded
-    // or a file, so the two rules are only expressible per request: withhold `External` when the
-    // selected stream is embedded (the server then burns it in), and offer it when the selection is
-    // a file. Deciding it per selection is what lets both hold at once.
+    // Both servers match the device profile by format, so choose the
+    // delivery profile from the selected row on each request.
     //
     // The *effective* selection, not just an explicit one: the normal launch path sends no
     // preferred track and lets the server's `DefaultSubtitleStreamIndex` decide. Reading only the
@@ -314,12 +310,15 @@ mixin _JellyfinPlaybackMethods on _JellyfinClientInternals {
     // Text only, because that is all the profile can actually deliver externally: a bitmap file
     // falls through to `Encode` and gets burned in whatever we ask for, so classifying one as
     // externally delivered would leave the client fetching a copy of pixels already in the video.
-    final requestedSubtitleIsExternalFile =
+    // Both servers can also extract embedded SubRip as a sidecar. Withholding that
+    // capability makes it render text into every frame before serving even
+    // the HLS initialization segment during a bitrate switch.
+    final requestSidecar =
         effectiveSubtitleStreamId != null &&
         mediaInfo.subtitleTracks.any(
           (track) =>
               track.id == effectiveSubtitleStreamId &&
-              track.isExternalFile &&
+              (track.isExternalFile || const {'srt', 'subrip'}.contains(track.codec?.toLowerCase())) &&
               CodecUtils.isTextSubtitleCodec(track.codec),
         );
     final int? maxStreamingBitrate = wantsOriginal
@@ -328,7 +327,7 @@ mixin _JellyfinPlaybackMethods on _JellyfinClientInternals {
         // Non-original audio presets always carry a bitrate by construction.
         ? audioPreset.bitrateKbps! * 1000
         : (preset.videoBitrateKbps ?? 100_000) * 1000;
-    final resumeOffsetMs = metadata.viewOffsetMs;
+    final resumeOffsetMs = options.startPosition?.inMilliseconds ?? metadata.viewOffsetMs;
     final int? transcodeStartTimeTicks = !wantsOriginal && resumeOffsetMs != null && resumeOffsetMs > 0
         ? msToJellyfinTicks(resumeOffsetMs)
         : null;
@@ -343,11 +342,7 @@ mixin _JellyfinPlaybackMethods on _JellyfinClientInternals {
         audioStreamIndex: requestedAudioStreamId,
         subtitleStreamIndex: requestedSubtitleStreamId,
         audioProfile: isTrack,
-        // A capped preset is the only way a transcode is asked for, and on one the server
-        // burns the selected embedded stream in rather than serving it as a file the client
-        // would fetch as well. A selected external *file* keeps `External`, so it is still
-        // delivered as a file - the one case where the client genuinely holds it.
-        burnSubtitles: !wantsOriginal && !requestedSubtitleIsExternalFile,
+        burnSubtitles: !wantsOriginal && !requestSidecar,
       );
       chosenSource = _selectNegotiatedMediaSource(negotiation['MediaSources'], bundle.selectedSourceId);
     } catch (error, stackTrace) {
@@ -414,7 +409,11 @@ mixin _JellyfinPlaybackMethods on _JellyfinClientInternals {
     final negotiatedSubtitleStreamId = requestedSubtitleStreamId == -1
         ? null
         : requestedSubtitleStreamId ?? mediaInfo.defaultSubtitleStreamIndex;
-    final burnedSourceStreamId = isTranscoding && !requestedSubtitleIsExternalFile ? negotiatedSubtitleStreamId : null;
+    final serverBurnsSubtitles =
+        videoUrl != null && Uri.tryParse(videoUrl)?.queryParameters['SubtitleMethod']?.toLowerCase() == 'encode';
+    final burnedSourceStreamId = isTranscoding && (!requestSidecar || serverBurnsSubtitles)
+        ? negotiatedSubtitleStreamId
+        : null;
     final subtitleSidecars = isTrack
         ? const <PlaybackSubtitleSidecar>[]
         : _buildExternalSubtitles(
@@ -915,7 +914,10 @@ mixin _JellyfinPlaybackMethods on _JellyfinClientInternals {
           // Every mpv backend already consumes fMP4 HLS — the Plex VOD
           // target has shipped it since issue.
           'TranscodingProfiles': <Map<String, Object?>>[
-            if (!isLiveTv || !dialect.requiresMpegTsForLiveTv)
+            // Match the Emby web player for VOD as well: its TS segments
+            // carry their own timing instead of reusing an fMP4 init file
+            // across encoder restarts after a seek.
+            if (!dialect.requiresMpegTsForHls)
               {
                 'Type': 'Video',
                 'Container': 'mp4',
@@ -934,7 +936,7 @@ mixin _JellyfinPlaybackMethods on _JellyfinClientInternals {
                 // cannot carry.
                 'AudioCodec': 'aac,mp3,ac3,eac3,flac,opus,dts,truehd',
               },
-            // MPEG-TS is the only Emby Live TV target; otherwise it
+            // MPEG-TS is the Emby HLS target; otherwise it
             // stays second as Jellyfin's fallback. Jellyfin drops every
             // non-ts transcoding profile for a live source with
             // `UseMostCompatibleTranscodingProfile` — hardcoded true for
@@ -993,14 +995,8 @@ mixin _JellyfinPlaybackMethods on _JellyfinClientInternals {
           // is listed for every format purely for the direct paths.
           //
           // `External` asks the server to extract a stream and serve it as a
-          // subtitle file. It is offered only when the caller is not asking for
-          // a transcode: on a transcode the owner decision is that the server
-          // delivers the picture complete, so every subtitle is burned in and
-          // the client fetches nothing alongside it. Jellyfin matches an
-          // external profile by text-vs-image format and never consults whether
-          // the stream is embedded or a real file, so the list cannot express
-          // "files as files, embedded burned" - offering text `External` at all
-          // is what made embedded text arrive as a sidecar.
+          // subtitle file. On capped playback the caller decides this from
+          // the selected source row rather than assuming all subtitles burn.
           //
           // With no matching `External` entry the server finds no external
           // profile and falls through to `Encode`, which is also why image

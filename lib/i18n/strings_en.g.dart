@@ -40,6 +40,8 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	Translations $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => Translations(meta: meta ?? this.$meta);
 
 	// Translations
+	late final Translations$episodeDetails$en episodeDetails = Translations$episodeDetails$en.internal(_root);
+	late final Translations$tvEdgeMenu$en tvEdgeMenu = Translations$tvEdgeMenu$en.internal(_root);
 	late final Translations$mobileLibrary$en mobileLibrary = Translations$mobileLibrary$en.internal(_root);
 	late final Translations$profileStartup$en profileStartup = Translations$profileStartup$en.internal(_root);
 	late final Translations$subtitleUpload$en subtitleUpload = Translations$subtitleUpload$en.internal(_root);
@@ -146,6 +148,57 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$profileSetupGuide$en profileSetupGuide = Translations$profileSetupGuide$en.internal(_root);
 	late final Translations$animeFavorites$en animeFavorites = Translations$animeFavorites$en.internal(_root);
 	late final Translations$addServer$en addServer = Translations$addServer$en.internal(_root);
+}
+
+// Path: episodeDetails
+class Translations$episodeDetails$en {
+	Translations$episodeDetails$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Previous episode'
+	String get previous => 'Previous episode';
+
+	/// en: 'Next episode'
+	String get next => 'Next episode';
+}
+
+// Path: tvEdgeMenu
+class Translations$tvEdgeMenu$en {
+	Translations$tvEdgeMenu$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'TV navigation'
+	String get title => 'TV navigation';
+
+	/// en: 'Top bar'
+	String get top => 'Top bar';
+
+	/// en: 'Top bar + side menu'
+	String get both => 'Top bar + side menu';
+
+	/// en: 'Press Left from the first item in a row to open the side menu. Press Right or Back to return.'
+	String get hint => 'Press Left from the first item in a row to open the side menu. Press Right or Back to return.';
+
+	/// en: 'Browse'
+	String get browse => 'Browse';
+
+	/// en: 'More'
+	String get more => 'More';
+
+	/// en: 'Right or Back to close'
+	String get closeHint => 'Right or Back to close';
+
+	/// en: 'Try navigation'
+	String get tryMenu => 'Try navigation';
+
+	/// en: 'All libraries'
+	String get allLibraries => 'All libraries';
 }
 
 // Path: mobileLibrary
@@ -1092,6 +1145,9 @@ class Translations$kidsShelf$en {
 
 	// Translations
 
+	/// en: 'Quiet night scenery'
+	String get quietScenery => 'Quiet night scenery';
+
 	/// en: 'Movie time'
 	String get movieShelf => 'Movie time';
 
@@ -1704,6 +1760,57 @@ class Translations$kids$en {
 	/// en: 'Kids profile deleted'
 	String get profileDeleted => 'Kids profile deleted';
 
+	/// en: 'Use a Parent PIN'
+	String get pinChoice => 'Use a Parent PIN';
+
+	/// en: 'Recommended. Without a Parent PIN, children can switch to unprotected profiles and change Kids settings. Screen-time limits can be bypassed by switching profiles.'
+	String get pinChoiceHint => 'Recommended. Without a Parent PIN, children can switch to unprotected profiles and change Kids settings. Screen-time limits can be bypassed by switching profiles.';
+
+	/// en: 'Without a Parent PIN, children can leave Kids and access unprotected profiles. Screen-time limits can be bypassed by switching profiles. Individual profile PINs still apply.'
+	String get pinDisabledWarning => 'Without a Parent PIN, children can leave Kids and access unprotected profiles. Screen-time limits can be bypassed by switching profiles. Individual profile PINs still apply.';
+
+	/// en: 'Turn off Parent PIN'
+	String get disableParentPin => 'Turn off Parent PIN';
+
+	/// en: 'Turn off the Parent PIN for all Kids profiles? Children can switch to unprotected profiles and bypass screen-time limits. Profile PINs will still apply.'
+	String get disableParentPinConfirm => 'Turn off the Parent PIN for all Kids profiles? Children can switch to unprotected profiles and bypass screen-time limits. Profile PINs will still apply.';
+
+	/// en: 'Switch profiles to manage screen time. Without a Parent PIN, anyone can switch to an unprotected profile.'
+	String get timeLimitNoPinHint => 'Switch profiles to manage screen time. Without a Parent PIN, anyone can switch to an unprotected profile.';
+
+	/// en: 'Kids profile settings'
+	String get editorTitle => 'Kids profile settings';
+
+	/// en: 'Profile'
+	String get profileSection => 'Profile';
+
+	/// en: 'What they can watch'
+	String get watchSection => 'What they can watch';
+
+	/// en: 'Appearance'
+	String get appearanceSection => 'Appearance';
+
+	/// en: 'More'
+	String get moreSection => 'More';
+
+	/// en: 'Discard changes?'
+	String get discardTitle => 'Discard changes?';
+
+	/// en: 'Your changes have not been saved.'
+	String get discardMessage => 'Your changes have not been saved.';
+
+	/// en: 'Discard changes'
+	String get discardAction => 'Discard changes';
+
+	/// en: 'Libraries selected: $count'
+	String libraryCount({required Object count}) => 'Libraries selected: ${count}';
+
+	/// en: 'New movie and TV libraries will also be included. Turn this off to choose specific libraries.'
+	String get allLibrariesHint => 'New movie and TV libraries will also be included. Turn this off to choose specific libraries.';
+
+	/// en: 'A Parent PIN protects Kids settings. A Profile PIN protects an individual profile. Whether leaving Kids requires the Parent PIN is controlled separately.'
+	String get pinDifference => 'A Parent PIN protects Kids settings. A Profile PIN protects an individual profile. Whether leaving Kids requires the Parent PIN is controlled separately.';
+
 	/// en: 'Allowed libraries'
 	String get allowedLibraries => 'Allowed libraries';
 
@@ -1713,8 +1820,8 @@ class Translations$kids$en {
 	/// en: 'Allow all connected movie and TV libraries'
 	String get allLibraries => 'Allow all connected movie and TV libraries';
 
-	/// en: 'Turn this off to choose specific libraries. Age and animation rules still apply inside the selected libraries. New libraries are not added automatically when using a selection.'
-	String get librariesExplain => 'Turn this off to choose specific libraries. Age and animation rules still apply inside the selected libraries. New libraries are not added automatically when using a selection.';
+	/// en: 'Age and animation rules still apply. When you choose specific libraries, new libraries are not added automatically.'
+	String get librariesExplain => 'Age and animation rules still apply. When you choose specific libraries, new libraries are not added automatically.';
 
 	/// en: 'No movie or TV libraries are loaded. Connect to the server and open Libraries, then return here to choose.'
 	String get librariesUnavailable => 'No movie or TV libraries are loaded. Connect to the server and open Libraries, then return here to choose.';
@@ -1725,14 +1832,14 @@ class Translations$kids$en {
 	/// en: 'Animation only'
 	String get animationOnly => 'Animation only';
 
-	/// en: 'Show only titles tagged with the Animation genre on your server. This does not replace the age limit: animation can also be intended for adults. Missing genre metadata is hidden.'
-	String get animationExplain => 'Show only titles tagged with the Animation genre on your server. This does not replace the age limit: animation can also be intended for adults. Missing genre metadata is hidden.';
+	/// en: 'Only show titles tagged Animation. The age limit still applies.'
+	String get animationExplain => 'Only show titles tagged Animation. The age limit still applies.';
 
 	/// en: 'Allow titles without an age rating'
 	String get allowUnrated => 'Allow titles without an age rating';
 
-	/// en: 'Off by default. When enabled, missing or unrated classifications can appear if the library and animation rules allow them. Their suitability cannot be checked by age. Known ratings above the age limit and unrecognized classifications remain hidden.'
-	String get unratedExplain => 'Off by default. When enabled, missing or unrated classifications can appear if the library and animation rules allow them. Their suitability cannot be checked by age. Known ratings above the age limit and unrecognized classifications remain hidden.';
+	/// en: 'These titles can’t be checked by age. Only allow them if you trust the selected libraries.'
+	String get unratedExplain => 'These titles can’t be checked by age. Only allow them if you trust the selected libraries.';
 
 	/// en: 'Who’s watching?'
 	String get whoIsWatching => 'Who’s watching?';
@@ -1851,8 +1958,8 @@ class Translations$kids$en {
 	/// en: 'Change parent PIN'
 	String get changeParentPin => 'Change parent PIN';
 
-	/// en: 'This PIN protects adult profiles and parental controls on this device.'
-	String get pinExplain => 'This PIN protects adult profiles and parental controls on this device.';
+	/// en: 'The Parent PIN protects Kids settings. Leaving Kids can also require it, depending on your family settings.'
+	String get pinExplain => 'The Parent PIN protects Kids settings. Leaving Kids can also require it, depending on your family settings.';
 
 	/// en: 'Child’s name'
 	String get name => 'Child’s name';
@@ -2015,6 +2122,12 @@ class Translations$lurokaDiscovery$en {
 
 	/// en: 'In your library'
 	String get available => 'In your library';
+
+	/// en: 'In my libraries'
+	String get filterOwned => 'In my libraries';
+
+	/// en: 'Couldn’t check Seerr · Retry'
+	String get statusRetry => 'Couldn’t check Seerr · Retry';
 
 	/// en: 'Checking your libraries…'
 	String get checking => 'Checking your libraries…';
@@ -4004,6 +4117,15 @@ class Translations$lurokaThemes$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Patina · deep teal & copper'
+	String get patina => 'Patina · deep teal & copper';
+
+	/// en: 'Afterimage · indigo & neon rose'
+	String get afterimage => 'Afterimage · indigo & neon rose';
+
+	/// en: 'Letterpress · paper & oxblood ink'
+	String get letterpress => 'Letterpress · paper & oxblood ink';
 
 	/// en: 'Luroka cinema palettes'
 	String get title => 'Luroka cinema palettes';
@@ -11581,6 +11703,17 @@ class Translations$services$libraryFilter$en {
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'episodeDetails.previous' => 'Previous episode',
+			'episodeDetails.next' => 'Next episode',
+			'tvEdgeMenu.title' => 'TV navigation',
+			'tvEdgeMenu.top' => 'Top bar',
+			'tvEdgeMenu.both' => 'Top bar + side menu',
+			'tvEdgeMenu.hint' => 'Press Left from the first item in a row to open the side menu. Press Right or Back to return.',
+			'tvEdgeMenu.browse' => 'Browse',
+			'tvEdgeMenu.more' => 'More',
+			'tvEdgeMenu.closeHint' => 'Right or Back to close',
+			'tvEdgeMenu.tryMenu' => 'Try navigation',
+			'tvEdgeMenu.allLibraries' => 'All libraries',
 			'mobileLibrary.pickerSubtitle' => 'Choose a collection to explore',
 			'mobileLibrary.searchLibraries' => 'Search libraries',
 			'mobileLibrary.noLibraries' => 'No matching libraries',
@@ -11843,6 +11976,7 @@ extension on Translations {
 			'downloadsRedesign.downloaded' => 'Downloaded',
 			'downloadsRedesign.speed' => 'Download speed',
 			'downloadsRedesign.notificationProgress' => '{progress} · {networkSpeed} · {timeRemaining} remaining',
+			'kidsShelf.quietScenery' => 'Quiet night scenery',
 			'kidsShelf.movieShelf' => 'Movie time',
 			'kidsShelf.showShelf' => 'Find your next show',
 			'kidsShelf.aurora' => 'Aurora — deep teal & lime',
@@ -12026,16 +12160,33 @@ extension on Translations {
 			'kids.deleteProfile' => 'Delete kids profile',
 			'kids.deleteExplain' => ({required Object name}) => 'Delete ${name} from Luroka? Their local settings, downloads and viewing exclusions will be removed. Your server account and server-side history will remain. Create a backup first if you want to restore the profile later.',
 			'kids.profileDeleted' => 'Kids profile deleted',
+			'kids.pinChoice' => 'Use a Parent PIN',
+			'kids.pinChoiceHint' => 'Recommended. Without a Parent PIN, children can switch to unprotected profiles and change Kids settings. Screen-time limits can be bypassed by switching profiles.',
+			'kids.pinDisabledWarning' => 'Without a Parent PIN, children can leave Kids and access unprotected profiles. Screen-time limits can be bypassed by switching profiles. Individual profile PINs still apply.',
+			'kids.disableParentPin' => 'Turn off Parent PIN',
+			'kids.disableParentPinConfirm' => 'Turn off the Parent PIN for all Kids profiles? Children can switch to unprotected profiles and bypass screen-time limits. Profile PINs will still apply.',
+			'kids.timeLimitNoPinHint' => 'Switch profiles to manage screen time. Without a Parent PIN, anyone can switch to an unprotected profile.',
+			'kids.editorTitle' => 'Kids profile settings',
+			'kids.profileSection' => 'Profile',
+			'kids.watchSection' => 'What they can watch',
+			'kids.appearanceSection' => 'Appearance',
+			'kids.moreSection' => 'More',
+			'kids.discardTitle' => 'Discard changes?',
+			'kids.discardMessage' => 'Your changes have not been saved.',
+			'kids.discardAction' => 'Discard changes',
+			'kids.libraryCount' => ({required Object count}) => 'Libraries selected: ${count}',
+			'kids.allLibrariesHint' => 'New movie and TV libraries will also be included. Turn this off to choose specific libraries.',
+			'kids.pinDifference' => 'A Parent PIN protects Kids settings. A Profile PIN protects an individual profile. Whether leaving Kids requires the Parent PIN is controlled separately.',
 			'kids.allowedLibraries' => 'Allowed libraries',
 			'kids.unavailableLibrary' => 'Previously selected library (currently unavailable)',
 			'kids.allLibraries' => 'Allow all connected movie and TV libraries',
-			'kids.librariesExplain' => 'Turn this off to choose specific libraries. Age and animation rules still apply inside the selected libraries. New libraries are not added automatically when using a selection.',
+			'kids.librariesExplain' => 'Age and animation rules still apply. When you choose specific libraries, new libraries are not added automatically.',
 			'kids.librariesUnavailable' => 'No movie or TV libraries are loaded. Connect to the server and open Libraries, then return here to choose.',
 			'kids.noLibrariesSelected' => 'No libraries selected: this child will not see any titles.',
 			'kids.animationOnly' => 'Animation only',
-			'kids.animationExplain' => 'Show only titles tagged with the Animation genre on your server. This does not replace the age limit: animation can also be intended for adults. Missing genre metadata is hidden.',
+			'kids.animationExplain' => 'Only show titles tagged Animation. The age limit still applies.',
 			'kids.allowUnrated' => 'Allow titles without an age rating',
-			'kids.unratedExplain' => 'Off by default. When enabled, missing or unrated classifications can appear if the library and animation rules allow them. Their suitability cannot be checked by age. Known ratings above the age limit and unrecognized classifications remain hidden.',
+			'kids.unratedExplain' => 'These titles can’t be checked by age. Only allow them if you trust the selected libraries.',
 			'kids.whoIsWatching' => 'Who’s watching?',
 			'kids.chooseAdventure' => 'A little world of big adventures.',
 			'kids.chooseProfile' => 'Choose your space. Make it a movie night.',
@@ -12064,6 +12215,8 @@ extension on Translations {
 			'kids.avatarPanda' => 'Panda',
 			'kids.avatarOwl' => 'Owl',
 			'kids.avatarBear' => 'Bear',
+			_ => null,
+		} ?? switch (path) {
 			'kids.continueAdventure' => 'Keep the adventure going',
 			'kids.freshStories' => 'New stories to discover',
 			'kids.yourMovies' => 'Movie-time favourites',
@@ -12075,7 +12228,7 @@ extension on Translations {
 			'kids.parentPin' => 'Parent PIN',
 			'kids.setParentPin' => 'Set parent PIN',
 			'kids.changeParentPin' => 'Change parent PIN',
-			'kids.pinExplain' => 'This PIN protects adult profiles and parental controls on this device.',
+			'kids.pinExplain' => 'The Parent PIN protects Kids settings. Leaving Kids can also require it, depending on your family settings.',
 			'kids.name' => 'Child’s name',
 			'kids.ageGroup' => 'Allowed age classification',
 			'kids.allAges' => 'All ages · G, TV-Y, TV-G, U',
@@ -12093,8 +12246,6 @@ extension on Translations {
 			'kids.blocked' => 'This title is not available in this kids profile.',
 			'kids.switchProfile' => 'Switch profile',
 			'kids.manageFromAdult' => 'Switch to an adult profile to manage settings.',
-			_ => null,
-		} ?? switch (path) {
 			'kids.noConnections' => 'Connect a server to your adult profile before adding a kids profile.',
 			'kids.created' => 'Kids profile created',
 			'kids.updated' => 'Kids profile updated',
@@ -12129,6 +12280,8 @@ extension on Translations {
 			'lurokaDiscovery.feedError' => 'TMDb discovery is unavailable. Please try again.',
 			'lurokaDiscovery.allTitles' => 'All titles',
 			'lurokaDiscovery.available' => 'In your library',
+			'lurokaDiscovery.filterOwned' => 'In my libraries',
+			'lurokaDiscovery.statusRetry' => 'Couldn’t check Seerr · Retry',
 			'lurokaDiscovery.checking' => 'Checking your libraries…',
 			'lurokaDiscovery.availabilityUnknown' => 'Some libraries could not be checked. Try refreshing.',
 			'lurokaDiscovery.noAvailable' => 'No matching titles found in the libraries checked.',
@@ -12576,6 +12729,8 @@ extension on Translations {
 			'settings.hdrSdrConversionDevice' => 'Device',
 			'settings.hdrSdrConversionDeviceDescription' => 'Your device\'s video hardware converts it. Fastest, but colors depend on the device',
 			'settings.hdrSdrConversionPlayer' => 'Player',
+			_ => null,
+		} ?? switch (path) {
 			'settings.hdrSdrConversionPlayerDescription' => 'The player converts it. Consistent colors, but 4K may stutter on low-end TV boxes',
 			'settings.deinterlace' => 'Deinterlacing',
 			'settings.deinterlaceDescription' => 'Fix jagged edges in old TV recordings and DVDs (mpv player only)',
@@ -12607,8 +12762,6 @@ extension on Translations {
 			'settings.liveTvDefaultFavorites' => 'Default to Favorite Channels',
 			'settings.liveTvDefaultFavoritesDescription' => 'Show only favorite channels when opening Live TV',
 			'settings.general' => 'General',
-			_ => null,
-		} ?? switch (path) {
 			'settings.generalDescription' => 'Language, startup, and window behavior',
 			'settings.languageAndRegion' => 'Language & Region',
 			'settings.startup' => 'Startup',
@@ -12788,6 +12941,9 @@ extension on Translations {
 			'referenceDetails.continuing' => 'Continuing',
 			'referenceDetails.upNext' => 'Up next',
 			'referenceDetails.episodesLeft' => ({required Object count}) => '${count} episodes left',
+			'lurokaThemes.patina' => 'Patina · deep teal & copper',
+			'lurokaThemes.afterimage' => 'Afterimage · indigo & neon rose',
+			'lurokaThemes.letterpress' => 'Letterpress · paper & oxblood ink',
 			'lurokaThemes.title' => 'Luroka cinema palettes',
 			'lurokaThemes.coral' => 'Coral · midnight blue & sunset',
 			'lurokaThemes.ocean' => 'Ocean · deep blue & ice',
@@ -13087,6 +13243,8 @@ extension on Translations {
 			'fileInfo.deletedAt' => 'Deleted',
 			'fileInfo.remoteSource' => 'Remote Source',
 			'fileInfo.infiniteStream' => 'Infinite Stream',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.directPlay' => 'Direct Play',
 			'fileInfo.directStream' => 'Direct Stream',
 			'fileInfo.transcoding' => 'Transcoding',
@@ -13121,8 +13279,6 @@ extension on Translations {
 			'mediaMenu.deleteMovieFromServer' => 'Delete movie from server',
 			'mediaMenu.deleteEpisodeTitle' => 'Delete this episode?',
 			'mediaMenu.deleteSeasonTitle' => 'Delete this season?',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteShowTitle' => 'Delete this show?',
 			'mediaMenu.deleteMovieTitle' => 'Delete this movie?',
 			'mediaMenu.deleteEpisodeConfirm' => 'Delete episode',
@@ -13601,6 +13757,8 @@ extension on Translations {
 			'libraries.fallbackTitle' => 'Library',
 			'libraries.scanLibraryFiles' => 'Scan Library Files',
 			'libraries.scanLibrary' => 'Scan Library',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.analyze' => 'Analyze',
 			'libraries.analyzeLibrary' => 'Analyze Library',
 			'libraries.refreshMetadata' => 'Refresh Metadata',
@@ -13635,8 +13793,6 @@ extension on Translations {
 			'libraries.selectLibrary' => 'Select library',
 			'libraries.filtersWithCount' => ({required Object count}) => 'Filters (${count})',
 			'libraries.noRecommendations' => 'No recommendations available',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.noCollections' => 'No collections in this library',
 			'libraries.noFoldersFound' => 'No folders found',
 			'libraries.folders' => 'folders',
@@ -14115,6 +14271,8 @@ extension on Translations {
 			'music.repeatOne' => 'Repeat one',
 			'music.instantMixNoServer' => 'No server is available for an instant mix',
 			'music.instantMixFailed' => 'Failed to load the instant mix',
+			_ => null,
+		} ?? switch (path) {
 			'music.instantMixEmpty' => 'The instant mix came back with no tracks',
 			'music.noAudioUrl' => ({required Object track}) => 'No audio URL is available for ${track}',
 			'music.discography.singlesAndEps' => 'Singles & EPs',
@@ -14149,8 +14307,6 @@ extension on Translations {
 			'watchTogether.inviteMessage' => ({required Object code}) => 'Join my Watch Together room in Luroka: luroka://watch?code=${code} — or open Watch Together and enter ${code}.',
 			'watchTogether.openSessionControls' => 'Open Watch Together session controls',
 			'watchTogether.reconnecting' => 'Reconnecting...',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.reconnectingDescription' => 'The connection dropped. You rejoin the room automatically.',
 			'watchTogether.connected' => 'Connected',
 			'watchTogether.disconnected' => 'Disconnected',
@@ -14629,6 +14785,8 @@ extension on Translations {
 			'metadataEdit.notSet' => 'Not set',
 			'metadataEdit.libraryDefault' => 'Library default',
 			'metadataEdit.accountDefault' => 'Account default',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.seriesDefault' => 'Series default',
 			'metadataEdit.episodeSorting' => 'Episode Sorting',
 			'metadataEdit.oldestFirst' => 'Oldest first',
@@ -14663,8 +14821,6 @@ extension on Translations {
 			'metadataEdit.addTag' => 'Add tag',
 			'metadataEdit.genre' => 'Genre',
 			'metadataEdit.director' => 'Director',
-			_ => null,
-		} ?? switch (path) {
 			'metadataEdit.writer' => 'Writer',
 			'metadataEdit.producer' => 'Producer',
 			'metadataEdit.country' => 'Country',
