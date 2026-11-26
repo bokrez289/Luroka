@@ -478,6 +478,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
   bool _restoreSeasonAfterPop = false;
   Timer? _titleSeasonPreviewTimer;
   final FocusNode _compactSeasonFocus = FocusNode(debugLabel: 'compact_show_season');
+  final FocusNode _compactSummaryFocus = FocusNode(debugLabel: 'compact_show_summary');
   final FocusNode _compactEpisodesTabFocus = FocusNode(debugLabel: 'compact_show_episodes_tab');
   final FocusNode _compactCastTabFocus = FocusNode(debugLabel: 'compact_show_cast_tab');
   final FocusNode _compactRelatedTabFocus = FocusNode(debugLabel: 'compact_show_related_tab');
@@ -1317,6 +1318,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
   @override
   void dispose() {
     _compactSeasonFocus.dispose();
+    _compactSummaryFocus.dispose();
     _compactEpisodesTabFocus.dispose();
     _compactCastTabFocus.dispose();
     _compactRelatedTabFocus.dispose();
@@ -2771,6 +2773,10 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
   /// Focus the first available section above the primary action row.
   void _focusAboveActionRow() {
     if (PlatformDetector.isTV()) {
+      if (_compactSummaryFocus.context != null) {
+        _compactSummaryFocus.requestFocus();
+        return;
+      }
       // The hero information block sits directly above the action row and is
       // the D-pad path to the full details sheet.
       if (_playbackTargetItem(_metadata) != null) {

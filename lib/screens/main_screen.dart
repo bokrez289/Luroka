@@ -1,6 +1,7 @@
 import '../widgets/quit_luroka_dialog.dart';
 import 'dart:async';
 import '../services/kids_profile_service.dart';
+import 'profile/kids_settings_screen.dart';
 import '../media/ids.dart';
 import '../media/media_kind.dart';
 import '../media/media_library.dart';
@@ -298,15 +299,18 @@ List<NavigationTab> mainScreenBottomNavigationTabs({
   required bool isMobile,
   required bool isOffline,
   required NavigationTabId currentTab,
+  bool isTablet = false,
+  bool hasDownloads = false,
 }) {
   if (!isMobile) return visibleTabs;
   if (isOffline || KidsProfileService.instance.isActiveKids) return visibleTabs;
   const utilities = {NavigationTabId.settings, NavigationTabId.downloads, NavigationTabId.liveTv};
-  final tabs = visibleTabs.where((tab) => !utilities.contains(tab.id) || tab.id == currentTab).toList();
+  final tabs = visibleTabs.where((tab) => !utilities.contains(tab.id) || tab.id == currentTab ||
+      (isTablet && hasDownloads && tab.id == NavigationTabId.downloads)).toList();
   // Utility destinations opened by a startup preference/remote command remain
   // selected, without growing the phone bar beyond five destinations.
   for (final replaceable in [NavigationTabId.explore, NavigationTabId.favorites]) {
-    if (tabs.length <= 5) break;
+    if (tabs.length <= (isTablet && hasDownloads ? 6 : 5)) break;
     if (currentTab != replaceable) tabs.removeWhere((tab) => tab.id == replaceable);
   }
   return tabs;
@@ -1085,11 +1089,25 @@ class _MainScreenState extends State<MainScreen>
   }
 
   WatchTogetherProvider? _watchTogether;
+  DownloadProvider? _navigationDownloadProvider;
+  bool _hasKidsDownloads = false;
   ValueChanged<String>? _systemShelfTapCallback;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    final downloads = context.read<DownloadProvider>();
+    if (downloads != _navigationDownloadProvider) {
+      _navigationDownloadProvider?.removeListener(_handleKidsDownloadsChanged);
+      KidsProfileService.instance.removeListener(_handleKidsDownloadsChanged);
+      _navigationDownloadProvider = downloads;
+      downloads.addListener(_handleKidsDownloadsChanged);
+      KidsProfileService.instance.addListener(_handleKidsDownloadsChanged);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _handleKidsDownloadsChanged();
+      });
+    }
 
     // Listen for offline/online transitions to refresh navigation & screens.
     // If the provider already observed a failed bind before this listener
@@ -1157,6 +1175,8 @@ class _MainScreenState extends State<MainScreen>
     _offlineModeProvider?.removeListener(_handleOfflineStatusChanged);
     _multiServerProvider?.removeListener(_handleServerCapabilitiesChanged);
     _catalogSourcesProvider?.removeListener(_handleCatalogSourcesChanged);
+    _navigationDownloadProvider?.removeListener(_handleKidsDownloadsChanged);
+    KidsProfileService.instance.removeListener(_handleKidsDownloadsChanged);
     _showExploreTabListenable?.removeListener(_handleCatalogSourcesChanged);
     _showLiveTvListenable?.removeListener(_handleServerCapabilitiesChanged);
     if (_bindingSettleListener != null) {
@@ -1458,6 +1478,15 @@ class _MainScreenState extends State<MainScreen>
     final pending = _pendingStartupTab;
     if (pending != null && _getVisibleTabs(_isOffline).any((t) => t.id == pending)) {
       _selectTab(pending);
+    }
+  }
+
+  void _handleKidsDownloadsChanged() {
+    final hasDownloads = _navigationDownloadProvider?.hasAccessibleKidsDownloads ?? false;
+    if (hasDownloads == _hasKidsDownloads) return;
+    _hasKidsDownloads = hasDownloads;
+    if (mounted && KidsProfileService.instance.isActiveKids && !_isOffline) {
+      _handleTabAvailabilityChanged();
     }
   }
 
@@ -1988,7 +2017,7 @@ class _MainScreenState extends State<MainScreen>
 
   void _selectTab(NavigationTabId tab, {bool focusSearchInput = true}) {
     if (KidsProfileService.instance.isActiveKids && tab == NavigationTabId.settings) {
-      unawaited(_pushProfileSelection());
+      unawaited(Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const KidsSettingsScreen())));
       return;
     }
     // Guard: ignore if tab isn't available in current mode
@@ -2195,15 +2224,20 @@ class _MainScreenState extends State<MainScreen>
       hasLiveTv: _hasLiveTv,
       hasExplore: _lastHasExplore,
       hasFavorites: _lastHasFavorites,
+      hasKidsDownloads: _hasKidsDownloads,
     );
   }
 
   List<NavigationTab> _getBottomNavigationTabs(BuildContext context) {
+    final tablet = PlatformDetector.isMobile(context) && MediaQuery.sizeOf(context).shortestSide >= 600;
+    final hasDownloads = tablet && context.select<DownloadProvider, bool>((provider) => provider.hasVisibleDownloads);
     return mainScreenBottomNavigationTabs(
       visibleTabs: _getVisibleTabs(_isOffline),
       isMobile: PlatformDetector.isMobile(context),
       isOffline: _isOffline,
       currentTab: _currentTab,
+      isTablet: tablet,
+      hasDownloads: hasDownloads,
     );
   }
 
@@ -2651,7 +2685,7 @@ class _MainScreenState extends State<MainScreen>
   bool _requestEdgeMenu(BuildContext origin, String? current) {
     if (_edgeOpen) return true;
     if (!mounted || !_usesTopDock || _isOverlaySheetOpen || ModalRoute.of(origin)?.isCurrent != true ||
-        !(SettingsService.instanceOrNull?.read(SettingsService.tvEdgeMenu) ?? false)) return false;
+        !(SettingsService.instanceOrNull?.read(SettingsService.tvEdgeMenu) ?? true)) return false;
     if (!_edgeOpen) unawaited(_openEdgeMenu(origin, current));
     return true;
   }

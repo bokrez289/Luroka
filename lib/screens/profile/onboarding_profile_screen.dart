@@ -17,6 +17,7 @@ import '../../profiles/profile_registry.dart';
 import '../../services/profile_appearance_service.dart';
 import '../../services/app_exit_service.dart';
 import '../../utils/error_dialog.dart';
+import '../../utils/platform_detector.dart';
 import '../../widgets/onboarding_scaffold.dart';
 import '../../widgets/profile_avatar_artwork.dart';
 import '../settings/add_connection_screen.dart';
@@ -46,6 +47,9 @@ class _OnboardingProfileScreenState extends State<OnboardingProfileScreen> {
   final _nameFocus = FocusNode(debugLabel: 'Onboarding:Name');
   final _continueFocus = FocusNode(debugLabel: 'Onboarding:Continue');
   final _startFocus = FocusNode(debugLabel: 'Onboarding:Start');
+  final _avatarFocus = <ProfileAvatarPreset, FocusNode>{
+    for (final preset in profileAvatarGallery) preset: FocusNode(debugLabel: 'Onboarding:Avatar:${preset.name}'),
+  };
   ProfileAvatarPreset _preset = ProfileAvatarPreset.portraitSunrise;
   bool _ready = false;
   bool _busy = false;
@@ -68,6 +72,9 @@ class _OnboardingProfileScreenState extends State<OnboardingProfileScreen> {
     _nameFocus.dispose();
     _continueFocus.dispose();
     _startFocus.dispose();
+    for (final node in _avatarFocus.values) {
+      node.dispose();
+    }
     super.dispose();
   }
 
@@ -266,21 +273,50 @@ class _OnboardingProfileScreenState extends State<OnboardingProfileScreen> {
                       focusNode: _nameFocus,
                       hintText: t.profiles.profileNameHint,
                       onChanged: () => setState(() {}),
+                      onNavigateDown: PlatformDetector.isTV() ? () => _avatarFocus[_preset]!.requestFocus() : null,
                     ),
                     const SizedBox(height: 24),
                     Text(t.household.avatarGallery, style: theme.textTheme.labelLarge),
                     const SizedBox(height: 12),
-                    Wrap(
+                    LayoutBuilder(builder: (context, constraints) {
+                      final tv = PlatformDetector.isTV();
+                      final columns = tv ? ((constraints.maxWidth + 10) / 94).floor().clamp(2, 6) : 0;
+                      return Wrap(
                       spacing: 10,
                       runSpacing: 10,
                       alignment: WrapAlignment.center,
                       children: [
-                        for (final preset in profileAvatarGallery)
+                        for (final (index, preset) in profileAvatarGallery.indexed)
                           Semantics(
                             selected: _preset == preset,
                             label: profilePresetLabel(preset),
-                            child: FocusableButton(
+                            child: SizedBox(
+                              width: tv ? (constraints.maxWidth - 10 * (columns - 1)) / columns : null,
+                              child: FocusableButton(
+                              focusNode: _avatarFocus[preset],
                               autofocus: preset == _preset,
+                              onNavigateLeft: tv ? () {
+                                if (index % columns > 0) _avatarFocus[profileAvatarGallery[index - 1]]!.requestFocus();
+                              } : null,
+                              onNavigateRight: tv ? () {
+                                if (index % columns < columns - 1 && index + 1 < profileAvatarGallery.length) {
+                                  _avatarFocus[profileAvatarGallery[index + 1]]!.requestFocus();
+                                }
+                              } : null,
+                              onNavigateUp: tv ? () {
+                                if (index >= columns) {
+                                  _avatarFocus[profileAvatarGallery[index - columns]]!.requestFocus();
+                                } else {
+                                  _nameFocus.requestFocus();
+                                }
+                              } : null,
+                              onNavigateDown: tv ? () {
+                                if (index + columns < profileAvatarGallery.length) {
+                                  _avatarFocus[profileAvatarGallery[index + columns]]!.requestFocus();
+                                } else if (_name.text.trim().isNotEmpty && profile != null) {
+                                  _continueFocus.requestFocus();
+                                }
+                              } : null,
                               borderRadius: 16,
                               onPressed: _busy ? null : () => setState(() => _preset = preset),
                               child: OutlinedButton(
@@ -295,15 +331,16 @@ class _OnboardingProfileScreenState extends State<OnboardingProfileScreen> {
                                     width: 2,
                                   ),
                                 ),
-                                child: ProfileAvatarArtwork(preset: preset, size: 44),
+                                child: ProfileAvatarArtwork(preset: preset, size: tv ? 64 : 44),
                               ),
-                            ),
+                            )),
                           ),
                       ],
-                    ),
+                    ); }),
                     const SizedBox(height: 24),
                     FocusableButton(
                       focusNode: _continueFocus,
+                      onNavigateUp: PlatformDetector.isTV() ? () => _avatarFocus[_preset]!.requestFocus() : null,
                       onPressed: _busy || _name.text.trim().isEmpty || profile == null ? null : _save,
                       child: FilledButton(
                         key: const ValueKey('onboarding-profile-continue'),

@@ -19,6 +19,7 @@ import '../../widgets/overlay_sheet.dart';
 import '../../widgets/setting_tile.dart';
 import '../../widgets/appearance_workspace.dart';
 import '../../widgets/settings_builder.dart';
+import '../../widgets/tablet_spotlight_style_selector.dart';
 import '../../widgets/settings_section.dart';
 import '../../widgets/settings_page.dart';
 import '../../widgets/settings_workspace_scope.dart';
@@ -305,6 +306,8 @@ class AppearanceSettingsScreen extends StatelessWidget {
               title: 'Cinematic phone spotlight',
               subtitle: 'Use landscape artwork instead of classic poster cards',
             ),
+          if (PlatformDetector.isMobile(context) && MediaQuery.sizeOf(context).shortestSide >= 600)
+            const TabletSpotlightStyleSelector(),
           SettingStepperTile<int>(
             pref: SettingsService.homePosterSize,
             icon: Symbols.view_carousel_rounded,
@@ -605,7 +608,7 @@ class AppearanceSettingsScreen extends StatelessWidget {
     icon: Symbols.aspect_ratio_rounded,
     title: t.settings.homeHeroSize,
     segments: [
-      const ButtonSegment(value: HomeHeroSize.compact, label: Text('Compact')),
+      ButtonSegment(value: HomeHeroSize.compact, label: Text(t.settings.compact)),
       ButtonSegment(value: HomeHeroSize.small, label: Text(t.settings.homeHeroSizeSmall)),
       ButtonSegment(value: HomeHeroSize.medium, label: Text(t.settings.homeHeroSizeMedium)),
       ButtonSegment(value: HomeHeroSize.large, label: Text(t.settings.homeHeroSizeLarge)),

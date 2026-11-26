@@ -604,6 +604,32 @@ void main() {
     expect(players, hasLength(2));
   });
 
+  testWidgets('compact TV show opens a truncated summary from the action row', (tester) async {
+    await SettingsService.getInstance();
+    await SettingsService.instance.write(SettingsService.showDetailLayout, ShowDetailLayout.compact);
+    tester.view.physicalSize = const Size(1280, 720);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final summary = List.filled(50, 'A long description of this show.').join(' ');
+    final show = testMediaItem(
+      id: 'show', backend: MediaBackend.jellyfin, kind: MediaKind.show,
+      title: 'Show', serverId: 'server_1', summary: summary,
+    );
+    final client = _FakeMediaServerClient(show: show, childrenByParent: {show.id: []});
+    await tester.pumpWidget(TranslationProvider(child: ChangeNotifierProvider<MultiServerProvider>.value(
+      value: testMultiServer(clients: [client]).provider,
+      child: MaterialApp(theme: monoTheme(MonoPalette.dark),
+        home: withProfileNavigationScope(child: MediaDetailScreen(metadata: show))),
+    )));
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pumpAndSettle();
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'compact_show_summary');
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(find.descendant(of: find.byType(AlertDialog), matching: find.text(summary)), findsOneWidget);
+  });
+
   testWidgets('compact TV show switches seasons through the picker', (tester) async {
     await SettingsService.getInstance();
     await SettingsService.instance.write(SettingsService.showDetailLayout, ShowDetailLayout.compact);

@@ -578,6 +578,13 @@ class _Translations$kidsShelf$fr extends Translations$kidsShelf$en {
 	@override String get yourShelf => 'Votre étagère à cinéma';
 	@override String get all => 'Tout';
 	@override String get pickSomething => 'Que veux-tu regarder ?';
+	@override String get atmosphere => 'Ambiance de l’accueil';
+	@override String get atmosphereHint => 'Choisis les couleurs de l’accueil des enfants. La cabane dans l’arbre reste la même.';
+	@override String get sunshine => 'Soleil';
+	@override String get berry => 'Baie';
+	@override String get mint => 'Menthe';
+	@override String get sky => 'Ciel';
+	@override String get atmospherePreview => 'Aperçu de l’accueil';
 }
 
 // Path: kidsHome
@@ -785,6 +792,23 @@ class _Translations$kids$fr extends Translations$kids$en {
 	final TranslationsFr _root; // ignore: unused_field
 
 	// Translations
+	@override String get allLibrariesHint => 'Les nouvelles bibliothèques de films et de séries seront également incluses. Désactivez cette option pour choisir des bibliothèques précises.';
+	@override String get appearanceSection => 'Apparence';
+	@override String get disableParentPin => 'Désactiver le code PIN parental';
+	@override String get disableParentPinConfirm => 'Désactiver le code PIN parental pour tous les profils enfants ? Les enfants pourront passer à des profils non protégés et contourner les limites de temps d’écran. Les codes PIN des profils resteront actifs.';
+	@override String get discardAction => 'Abandonner les modifications';
+	@override String get discardMessage => 'Vos modifications n’ont pas été enregistrées.';
+	@override String get discardTitle => 'Abandonner les modifications ?';
+	@override String get editorTitle => 'Paramètres du profil enfant';
+	@override String libraryCount({required Object count}) => 'Bibliothèques sélectionnées : ${count}';
+	@override String get moreSection => 'Plus';
+	@override String get pinChoice => 'Utiliser un code PIN parental';
+	@override String get pinChoiceHint => 'Recommandé. Sans code PIN parental, les enfants peuvent passer à des profils non protégés et modifier les paramètres enfants. Ils peuvent contourner les limites de temps d’écran en changeant de profil.';
+	@override String get pinDifference => 'Un code PIN parental protège les paramètres enfants. Un code PIN de profil protège un profil individuel. L’obligation du code PIN parental pour quitter le profil enfant se règle séparément.';
+	@override String get pinDisabledWarning => 'Sans code PIN parental, les enfants peuvent quitter le profil enfant et accéder à des profils non protégés. Ils peuvent contourner les limites de temps d’écran en changeant de profil. Les codes PIN individuels restent actifs.';
+	@override String get profileSection => 'Profil';
+	@override String get timeLimitNoPinHint => 'Changez de profil pour gérer le temps d’écran. Sans code PIN parental, tout le monde peut passer à un profil non protégé.';
+	@override String get watchSection => 'Ce qu’ils peuvent regarder';
 	@override String get timeLimits => 'Limites de temps d\'écran';
 	@override String get dailyWatchLimit => 'Durée de visionnage quotidienne';
 	@override String get dailyWatchLimitHint => 'Limite la lecture vidéo sur cet appareil chaque jour.';
@@ -969,6 +993,72 @@ class _Translations$auth$fr extends Translations$auth$en {
 	final TranslationsFr _root; // ignore: unused_field
 
 	// Translations
+	@override String get plexQrSignIn => 'Se connecter à Plex avec un code QR';
+	@override String get setUpWithPhone => 'Configurer avec le téléphone';
+	@override String get loadingRestoredData => 'Chargement de vos profils et connexions restaurés…';
+	@override String get loadingRestoredDataFailed => 'Impossible de charger les données restaurées. Réessayez ou rouvrez Luroka.';
+	@override String get connectTv => 'Connecter une télévision';
+	@override String get restoreEncryptedBackup => 'Restaurer une sauvegarde chiffrée';
+	@override String get restoreCloudBackup => 'Restaurer une sauvegarde cloud';
+	@override String get saveEncryptedBackup => 'Enregistrer la sauvegarde chiffrée';
+	@override String get backupSaved => 'Sauvegarde enregistrée';
+	@override String get createEncryptedBackup => 'Créer une sauvegarde chiffrée';
+	@override String get confirmBackupPassword => 'Confirmer le mot de passe';
+	@override String get enterBackupPassword => 'Saisissez un mot de passe.';
+	@override String get confirmBackupPasswordError => 'Saisissez un mot de passe et confirmez-le.';
+	@override String get restoreBackupAction => 'Restaurer';
+	@override String get backupCreateInstructions => 'Inclut les profils, les identifiants des serveurs et les données de visionnage locales. Gardez le mot de passe en lieu sûr ; il est nécessaire à la restauration.';
+	@override String get backupRestoreInstructions => 'Saisissez le mot de passe ou le code de récupération cloud utilisé pour créer cette sauvegarde. La restauration nécessite une base de profils vide.';
+	@override String get backupCreateFailed => 'Impossible de créer la sauvegarde chiffrée.';
+	@override String get backupRestoreFailed => 'Impossible de restaurer cette sauvegarde. Vérifiez le mot de passe et utilisez une installation vide.';
+	@override String get recoveryCodeStep => 'Étape 2 sur 3 : Enregistrez votre code de récupération';
+	@override String get backupNotUploaded => 'Pas encore envoyé. Terminez l’étape 3 et attendez la confirmation de création de la sauvegarde cloud avant de la restaurer.';
+	@override String get recoveryCodeSavedContinue => 'J’ai enregistré mon code — continuer';
+	@override String get recoveryCodeSaveFile => 'Enregistrer le code dans un fichier';
+	@override String get recoveryCodeShowQr => 'Afficher le code QR';
+	@override String get recoveryCodeHideQr => 'Masquer le code QR';
+	@override String get recoveryCopied => 'Code de récupération copié. Enregistrez-le dans un endroit privé.';
+	@override String get recoveryCopyFailed => 'Impossible de copier le code de récupération.';
+	@override String get recoverySaveDialog => 'Enregistrer le code de récupération en privé';
+	@override String get recoverySaved => 'Code de récupération enregistré. Gardez le fichier privé.';
+	@override String get recoverySaveFailed => 'Impossible d’enregistrer le code de récupération. Essayez plutôt de le copier.';
+	@override String get cloudRestoreApplyFailed => 'La sauvegarde a été téléchargée, mais n’a pas pu être restaurée sur cet appareil. Réessayez ou contactez l’assistance.';
+	@override String get cloudBackupNotFound => 'Aucune sauvegarde cloud ne correspond à ce code. Sur l’appareil d’origine, terminez l’étape 3 et attendez la confirmation de création de la sauvegarde. Vérifiez que vous utilisez le code enregistré pour cette sauvegarde ; elle a aussi pu expirer ou être supprimée.';
+	@override String get cloudBackupConnectionFailed => 'Impossible de se connecter au service de sauvegarde. Vérifiez votre connexion Internet et réessayez.';
+	@override String get cloudBackupInvalidFormat => 'Le code de récupération ou le format de la sauvegarde n’a pas pu être lu. Vérifiez le code complet et réessayez.';
+	@override String get cloudBackupOpenFailed => 'Impossible d’ouvrir la sauvegarde. Vérifiez votre code de récupération et réessayez.';
+	@override String get cloudBackupSelectProfiles => 'Sélectionnez les profils à inclure. La sauvegarde est chiffrée avant l’envoi et reste disponible pendant 90 jours.';
+	@override String get cloudBackupIncludeLogins => 'Inclure les identifiants enregistrés des serveurs et intégrations';
+	@override String get cloudBackupLoginsWarning => 'Inclut les comptes Plex liés et les autres identifiants enregistrés pour faciliter la reconnexion. Toute personne disposant du code de récupération pourrait les utiliser.';
+	@override String get cloudBackupNoLogins => 'Sans identifiants enregistrés, vous devrez reconnecter les serveurs après la restauration.';
+	@override String get pairingHttpPhoneTitle => 'Utiliser HTTP pour ce serveur ?';
+	@override String get pairingHttpPhoneWarning => 'Vos identifiants de serveur et votre trafic multimédia ne seront pas chiffrés. Les personnes sur le réseau pourraient les lire. HTTPS est recommandé. Le transfert Luroka reste chiffré.';
+	@override String get pairingHttpTvTitle => 'Utiliser un serveur non chiffré ?';
+	@override String get pairingHttpTvWarning => 'Votre téléphone a choisi HTTP. Les personnes sur ce réseau pourraient lire le jeton d’accès de votre télévision et le trafic multimédia. Utilisez uniquement un réseau de confiance. HTTPS est recommandé.';
+	@override String get pairingUseHttp => 'Utiliser HTTP';
+	@override String get pairingTvTitle => 'Connecter Jellyfin ou Emby avec votre téléphone';
+	@override String get pairingScanInvitation => 'Scannez avec votre téléphone. L’invitation expire dans cinq minutes.';
+	@override String get pairingWaitForPhone => 'En attente de la connexion de votre téléphone…';
+	@override String get pairingComparePhone => 'Comparez ce code avec celui de votre téléphone :';
+	@override String get pairingConfirmOnPhone => 'Si les codes correspondent, confirmez sur votre téléphone.';
+	@override String get pairingAdultOnly => 'L’association est disponible uniquement depuis un profil adulte.';
+	@override String get pairingProfileChanged => 'L’accès au profil a changé. L’association a été annulée.';
+	@override String get pairingServiceUnavailable => 'Le service d’association est indisponible. Réessayez ou saisissez le serveur manuellement.';
+	@override String get pairingExpired => 'L’association a expiré ou a été interrompue. Recommencez.';
+	@override String get pairingVerifyFailed => 'Impossible de vérifier le serveur et le compte. Recommencez l’association.';
+	@override String get pairingScanOrPaste => 'Scannez le code de la télévision ou collez l’invitation.';
+	@override String get pairingScanTv => 'Scanner le code de la télévision';
+	@override String get pairingTvInvitation => 'Invitation de la télévision';
+	@override String pairingCheckTvCode({required Object code}) => 'Vérifiez que votre télévision affiche le même code : ${code}';
+	@override String get pairingCodesMatch => 'Les codes correspondent';
+	@override String get recoveryCodeLabel => 'Code de récupération';
+	@override String get recoveryCodeScan => 'Scanner le code de récupération';
+	@override String get pairingRecoveryInstructions => 'Scannez ou collez votre code de récupération enregistré. Il sera chiffré pour votre télévision.';
+	@override String get pairingSendTv => 'Envoyer à la télévision';
+	@override String get pairingServerLoginHint => 'Connectez-vous à votre serveur. Votre mot de passe est envoyé à ce serveur, pas à Luroka.';
+	@override String get recoveryCodeWarning => 'Ce code est nécessaire pour restaurer ou supprimer votre sauvegarde. Toute personne qui le possède peut accéder à la sauvegarde. Si vous le perdez, Luroka ne peut pas le récupérer.';
+	@override String get recoveryCodePrivateFile => 'Copiez ou enregistrez le code uniquement dans un endroit privé. Le fichier enregistré contenant le code n’est pas chiffré.';
+	@override String get recoveryCodePhoneInstructions => 'Conservez une copie privée de ce code. Pour restaurer sur votre téléphone, ouvrez l’option de restauration cloud de Luroka et choisissez de scanner le code de récupération.';
 	@override String get signInWithPlex => 'Se connecter avec Plex';
 	@override String get showQRCode => 'Afficher le code QR';
 	@override String get authenticate => 'S\'authentifier';
@@ -3898,6 +3988,13 @@ class _Translations$profileSetupGuide$fr extends Translations$profileSetupGuide$
 	final TranslationsFr _root; // ignore: unused_field
 
 	// Translations
+	@override String get tabletSpotlightStyle => 'Style de la sélection sur tablette';
+	@override String get spotlightClassic => 'Classique';
+	@override String get spotlightMarquee => 'Marquee';
+	@override String get spotlightTonight => 'Les choix de ce soir';
+	@override String get phoneSpotlight => 'Sélection cinéma sur téléphone';
+	@override String get phoneSpotlightCinematic => 'Image horizontale avec le titre superposé';
+	@override String get phoneSpotlightClassic => 'Carte d’affiche classique';
 	@override String get title => 'Personnalisez votre profil';
 	@override String get description => 'Choisissez l\'apparence de Luroka pour ce profil sur cet appareil. Vous pourrez tout modifier plus tard dans Paramètres.';
 	@override String get appearanceStep => '1 sur 2 · Apparence';
@@ -5243,6 +5340,13 @@ extension on TranslationsFr {
 			'kidsShelf.yourShelf' => 'Votre étagère à cinéma',
 			'kidsShelf.all' => 'Tout',
 			'kidsShelf.pickSomething' => 'Que veux-tu regarder ?',
+			'kidsShelf.atmosphere' => 'Ambiance de l’accueil',
+			'kidsShelf.atmosphereHint' => 'Choisis les couleurs de l’accueil des enfants. La cabane dans l’arbre reste la même.',
+			'kidsShelf.sunshine' => 'Soleil',
+			'kidsShelf.berry' => 'Baie',
+			'kidsShelf.mint' => 'Menthe',
+			'kidsShelf.sky' => 'Ciel',
+			'kidsShelf.atmospherePreview' => 'Aperçu de l’accueil',
 			'kidsHome.everything' => 'Pour toi',
 			'kidsHome.keepWatching' => 'Continuez à regarder',
 			'kidsHome.emptyFilter' => 'Rien ici encore. Essayez pour vous ou demandez à votre adulte d\'ajouter quelque chose que vous aimez.',
@@ -5387,6 +5491,23 @@ extension on TranslationsFr {
 			'detailComposition.mediaInformation' => 'Informations médias',
 			'detailComposition.fullFileInformation' => 'Informations complètes sur le dossier',
 			'detailComposition.castAndCrew' => 'Casting et équipe',
+			'kids.allLibrariesHint' => 'Les nouvelles bibliothèques de films et de séries seront également incluses. Désactivez cette option pour choisir des bibliothèques précises.',
+			'kids.appearanceSection' => 'Apparence',
+			'kids.disableParentPin' => 'Désactiver le code PIN parental',
+			'kids.disableParentPinConfirm' => 'Désactiver le code PIN parental pour tous les profils enfants ? Les enfants pourront passer à des profils non protégés et contourner les limites de temps d’écran. Les codes PIN des profils resteront actifs.',
+			'kids.discardAction' => 'Abandonner les modifications',
+			'kids.discardMessage' => 'Vos modifications n’ont pas été enregistrées.',
+			'kids.discardTitle' => 'Abandonner les modifications ?',
+			'kids.editorTitle' => 'Paramètres du profil enfant',
+			'kids.libraryCount' => ({required Object count}) => 'Bibliothèques sélectionnées : ${count}',
+			'kids.moreSection' => 'Plus',
+			'kids.pinChoice' => 'Utiliser un code PIN parental',
+			'kids.pinChoiceHint' => 'Recommandé. Sans code PIN parental, les enfants peuvent passer à des profils non protégés et modifier les paramètres enfants. Ils peuvent contourner les limites de temps d’écran en changeant de profil.',
+			'kids.pinDifference' => 'Un code PIN parental protège les paramètres enfants. Un code PIN de profil protège un profil individuel. L’obligation du code PIN parental pour quitter le profil enfant se règle séparément.',
+			'kids.pinDisabledWarning' => 'Sans code PIN parental, les enfants peuvent quitter le profil enfant et accéder à des profils non protégés. Ils peuvent contourner les limites de temps d’écran en changeant de profil. Les codes PIN individuels restent actifs.',
+			'kids.profileSection' => 'Profil',
+			'kids.timeLimitNoPinHint' => 'Changez de profil pour gérer le temps d’écran. Sans code PIN parental, tout le monde peut passer à un profil non protégé.',
+			'kids.watchSection' => 'Ce qu’ils peuvent regarder',
 			'kids.timeLimits' => 'Limites de temps d\'écran',
 			'kids.dailyWatchLimit' => 'Durée de visionnage quotidienne',
 			'kids.dailyWatchLimitHint' => 'Limite la lecture vidéo sur cet appareil chaque jour.',
@@ -5459,6 +5580,8 @@ extension on TranslationsFr {
 			'kids.freshStories' => 'De nouvelles histoires à découvrir',
 			'kids.yourMovies' => 'Favoris du cinéma',
 			'kids.yourShows' => 'Encore un épisode',
+			_ => null,
+		} ?? switch (path) {
 			'kids.emptyHint' => 'De nouvelles aventures apparaîtront ici lorsque votre serveur disposera de titres avec une classification d\'âge autorisée.',
 			'kids.title' => 'Luroka pour enfants',
 			'kids.addProfile' => 'Ajouter un profil d\'enfant',
@@ -5483,8 +5606,6 @@ extension on TranslationsFr {
 			'kids.historyReset' => 'Réinitialisation des exclusions de visionnage pour les enfants',
 			'kids.blocked' => 'Ce titre n\'est pas disponible dans ce profil d\'enfant.',
 			'kids.switchProfile' => 'Changer de profil',
-			_ => null,
-		} ?? switch (path) {
 			'kids.manageFromAdult' => 'Passez à un profil adulte pour gérer les paramètres.',
 			'kids.noConnections' => 'Connectez un serveur à votre profil adulte avant d\'ajouter un profil enfant.',
 			'kids.created' => 'Profil enfant créé',
@@ -5559,6 +5680,72 @@ extension on TranslationsFr {
 			'appIcon.names.strata' => 'Strates',
 			'appIcon.names.facet' => 'Facette',
 			'appIcon.names.tilde' => 'Tilde',
+			'auth.plexQrSignIn' => 'Se connecter à Plex avec un code QR',
+			'auth.setUpWithPhone' => 'Configurer avec le téléphone',
+			'auth.loadingRestoredData' => 'Chargement de vos profils et connexions restaurés…',
+			'auth.loadingRestoredDataFailed' => 'Impossible de charger les données restaurées. Réessayez ou rouvrez Luroka.',
+			'auth.connectTv' => 'Connecter une télévision',
+			'auth.restoreEncryptedBackup' => 'Restaurer une sauvegarde chiffrée',
+			'auth.restoreCloudBackup' => 'Restaurer une sauvegarde cloud',
+			'auth.saveEncryptedBackup' => 'Enregistrer la sauvegarde chiffrée',
+			'auth.backupSaved' => 'Sauvegarde enregistrée',
+			'auth.createEncryptedBackup' => 'Créer une sauvegarde chiffrée',
+			'auth.confirmBackupPassword' => 'Confirmer le mot de passe',
+			'auth.enterBackupPassword' => 'Saisissez un mot de passe.',
+			'auth.confirmBackupPasswordError' => 'Saisissez un mot de passe et confirmez-le.',
+			'auth.restoreBackupAction' => 'Restaurer',
+			'auth.backupCreateInstructions' => 'Inclut les profils, les identifiants des serveurs et les données de visionnage locales. Gardez le mot de passe en lieu sûr ; il est nécessaire à la restauration.',
+			'auth.backupRestoreInstructions' => 'Saisissez le mot de passe ou le code de récupération cloud utilisé pour créer cette sauvegarde. La restauration nécessite une base de profils vide.',
+			'auth.backupCreateFailed' => 'Impossible de créer la sauvegarde chiffrée.',
+			'auth.backupRestoreFailed' => 'Impossible de restaurer cette sauvegarde. Vérifiez le mot de passe et utilisez une installation vide.',
+			'auth.recoveryCodeStep' => 'Étape 2 sur 3 : Enregistrez votre code de récupération',
+			'auth.backupNotUploaded' => 'Pas encore envoyé. Terminez l’étape 3 et attendez la confirmation de création de la sauvegarde cloud avant de la restaurer.',
+			'auth.recoveryCodeSavedContinue' => 'J’ai enregistré mon code — continuer',
+			'auth.recoveryCodeSaveFile' => 'Enregistrer le code dans un fichier',
+			'auth.recoveryCodeShowQr' => 'Afficher le code QR',
+			'auth.recoveryCodeHideQr' => 'Masquer le code QR',
+			'auth.recoveryCopied' => 'Code de récupération copié. Enregistrez-le dans un endroit privé.',
+			'auth.recoveryCopyFailed' => 'Impossible de copier le code de récupération.',
+			'auth.recoverySaveDialog' => 'Enregistrer le code de récupération en privé',
+			'auth.recoverySaved' => 'Code de récupération enregistré. Gardez le fichier privé.',
+			'auth.recoverySaveFailed' => 'Impossible d’enregistrer le code de récupération. Essayez plutôt de le copier.',
+			'auth.cloudRestoreApplyFailed' => 'La sauvegarde a été téléchargée, mais n’a pas pu être restaurée sur cet appareil. Réessayez ou contactez l’assistance.',
+			'auth.cloudBackupNotFound' => 'Aucune sauvegarde cloud ne correspond à ce code. Sur l’appareil d’origine, terminez l’étape 3 et attendez la confirmation de création de la sauvegarde. Vérifiez que vous utilisez le code enregistré pour cette sauvegarde ; elle a aussi pu expirer ou être supprimée.',
+			'auth.cloudBackupConnectionFailed' => 'Impossible de se connecter au service de sauvegarde. Vérifiez votre connexion Internet et réessayez.',
+			'auth.cloudBackupInvalidFormat' => 'Le code de récupération ou le format de la sauvegarde n’a pas pu être lu. Vérifiez le code complet et réessayez.',
+			'auth.cloudBackupOpenFailed' => 'Impossible d’ouvrir la sauvegarde. Vérifiez votre code de récupération et réessayez.',
+			'auth.cloudBackupSelectProfiles' => 'Sélectionnez les profils à inclure. La sauvegarde est chiffrée avant l’envoi et reste disponible pendant 90 jours.',
+			'auth.cloudBackupIncludeLogins' => 'Inclure les identifiants enregistrés des serveurs et intégrations',
+			'auth.cloudBackupLoginsWarning' => 'Inclut les comptes Plex liés et les autres identifiants enregistrés pour faciliter la reconnexion. Toute personne disposant du code de récupération pourrait les utiliser.',
+			'auth.cloudBackupNoLogins' => 'Sans identifiants enregistrés, vous devrez reconnecter les serveurs après la restauration.',
+			'auth.pairingHttpPhoneTitle' => 'Utiliser HTTP pour ce serveur ?',
+			'auth.pairingHttpPhoneWarning' => 'Vos identifiants de serveur et votre trafic multimédia ne seront pas chiffrés. Les personnes sur le réseau pourraient les lire. HTTPS est recommandé. Le transfert Luroka reste chiffré.',
+			'auth.pairingHttpTvTitle' => 'Utiliser un serveur non chiffré ?',
+			'auth.pairingHttpTvWarning' => 'Votre téléphone a choisi HTTP. Les personnes sur ce réseau pourraient lire le jeton d’accès de votre télévision et le trafic multimédia. Utilisez uniquement un réseau de confiance. HTTPS est recommandé.',
+			'auth.pairingUseHttp' => 'Utiliser HTTP',
+			'auth.pairingTvTitle' => 'Connecter Jellyfin ou Emby avec votre téléphone',
+			'auth.pairingScanInvitation' => 'Scannez avec votre téléphone. L’invitation expire dans cinq minutes.',
+			'auth.pairingWaitForPhone' => 'En attente de la connexion de votre téléphone…',
+			'auth.pairingComparePhone' => 'Comparez ce code avec celui de votre téléphone :',
+			'auth.pairingConfirmOnPhone' => 'Si les codes correspondent, confirmez sur votre téléphone.',
+			'auth.pairingAdultOnly' => 'L’association est disponible uniquement depuis un profil adulte.',
+			'auth.pairingProfileChanged' => 'L’accès au profil a changé. L’association a été annulée.',
+			'auth.pairingServiceUnavailable' => 'Le service d’association est indisponible. Réessayez ou saisissez le serveur manuellement.',
+			'auth.pairingExpired' => 'L’association a expiré ou a été interrompue. Recommencez.',
+			'auth.pairingVerifyFailed' => 'Impossible de vérifier le serveur et le compte. Recommencez l’association.',
+			'auth.pairingScanOrPaste' => 'Scannez le code de la télévision ou collez l’invitation.',
+			'auth.pairingScanTv' => 'Scanner le code de la télévision',
+			'auth.pairingTvInvitation' => 'Invitation de la télévision',
+			'auth.pairingCheckTvCode' => ({required Object code}) => 'Vérifiez que votre télévision affiche le même code : ${code}',
+			'auth.pairingCodesMatch' => 'Les codes correspondent',
+			'auth.recoveryCodeLabel' => 'Code de récupération',
+			'auth.recoveryCodeScan' => 'Scanner le code de récupération',
+			'auth.pairingRecoveryInstructions' => 'Scannez ou collez votre code de récupération enregistré. Il sera chiffré pour votre télévision.',
+			'auth.pairingSendTv' => 'Envoyer à la télévision',
+			'auth.pairingServerLoginHint' => 'Connectez-vous à votre serveur. Votre mot de passe est envoyé à ce serveur, pas à Luroka.',
+			'auth.recoveryCodeWarning' => 'Ce code est nécessaire pour restaurer ou supprimer votre sauvegarde. Toute personne qui le possède peut accéder à la sauvegarde. Si vous le perdez, Luroka ne peut pas le récupérer.',
+			'auth.recoveryCodePrivateFile' => 'Copiez ou enregistrez le code uniquement dans un endroit privé. Le fichier enregistré contenant le code n’est pas chiffré.',
+			'auth.recoveryCodePhoneInstructions' => 'Conservez une copie privée de ce code. Pour restaurer sur votre téléphone, ouvrez l’option de restauration cloud de Luroka et choisissez de scanner le code de récupération.',
 			'auth.signInWithPlex' => 'Se connecter avec Plex',
 			'auth.showQRCode' => 'Afficher le code QR',
 			'auth.authenticate' => 'S\'authentifier',
@@ -5907,6 +6094,8 @@ extension on TranslationsFr {
 			'settings.maxVolumePercent' => ({required Object percent}) => '${percent}%',
 			'settings.discordRichPresence' => 'Statut d’activité Discord',
 			'settings.discordRichPresenceDescription' => 'Afficher sur Discord ce que vous regardez',
+			_ => null,
+		} ?? switch (path) {
 			'settings.services' => 'Services',
 			'settings.servicesDescription' => 'Connecter Trakt, MyAnimeList, Seerr et d’autres services',
 			'settings.manageLibrariesDescription' => 'Réorganiser et masquer les bibliothèques',
@@ -5997,8 +6186,6 @@ extension on TranslationsFr {
 			'settings.liveTvDefaultFavoritesDescription' => 'Afficher uniquement les chaînes favorites à l\'ouverture de la TV en direct',
 			'settings.general' => 'Général',
 			'settings.generalDescription' => 'Langue, démarrage et comportement de la fenêtre',
-			_ => null,
-		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Langue et région',
 			'settings.startup' => 'Démarrage',
 			'settings.display' => 'Affichage',
@@ -6421,6 +6608,8 @@ extension on TranslationsFr {
 			'fileInfo.pixelAspectRatio' => 'Rapport d\'aspect des pixels',
 			'fileInfo.profile' => 'Profil',
 			'fileInfo.level' => 'Niveau',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.bitDepth' => 'Profondeur de bits',
 			'fileInfo.pixelFormat' => 'Format de pixels',
 			'fileInfo.colorSpace' => 'Espace colorimétrique',
@@ -6511,8 +6700,6 @@ extension on TranslationsFr {
 			'mediaMenu.shuffleNotAvailableOffline' => 'La lecture aléatoire n’est pas disponible hors ligne',
 			'mediaMenu.fileInfo' => 'Informations sur le fichier',
 			'mediaMenu.deleteEpisodeFromServer' => 'Supprimer l\'épisode du serveur',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Supprimer la saison du serveur',
 			'mediaMenu.deleteShowFromServer' => 'Supprimer la série du serveur',
 			'mediaMenu.deleteMovieFromServer' => 'Supprimer le film du serveur',
@@ -6935,6 +7122,8 @@ extension on TranslationsFr {
 			'accountPreferences.rewatchingInNextUp' => 'Conserver les séries revues dans « À suivre »',
 			'accountPreferences.rewatchingInNextUpDescription' => 'Une fois une série terminée, si vous la recommencez, « À suivre » suit le revisionnage au lieu de la retirer.',
 			'accountPreferences.watchedIndicator' => 'Indicateurs de visionnage',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.watchedIndicatorOptions.none' => 'Jamais',
 			'accountPreferences.watchedIndicatorOptions.moviesAndShows' => 'Films et séries TV',
 			'accountPreferences.watchedIndicatorOptions.movies' => 'Films uniquement',
@@ -7025,8 +7214,6 @@ extension on TranslationsFr {
 			'libraries.filters' => 'Filtres',
 			'libraries.confirmActionMessage' => 'Êtes-vous sûr de vouloir effectuer cette action ?',
 			'libraries.showLibrary' => 'Afficher la bibliothèque',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Masquer la bibliothèque',
 			'libraries.libraryOptions' => 'Options de bibliothèque',
 			'libraries.content' => 'contenu de la bibliothèque',
@@ -7449,6 +7636,8 @@ extension on TranslationsFr {
 			'collections.deleted' => 'Collection supprimée',
 			'collections.deleteFailed' => 'Échec de la suppression de la collection',
 			'collections.deleteFailedWithError' => ({required Object error}) => 'Échec de la suppression de la collection : ${error}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.selectCollection' => 'Sélectionner une collection',
 			'collections.collectionName' => 'Nom de la collection',
 			'collections.enterCollectionName' => 'Entrez le nom de la collection',
@@ -7539,8 +7728,6 @@ extension on TranslationsFr {
 			'watchTogether.qrShare' => 'Partager le code QR',
 			'watchTogether.qrHint' => 'Scannez avec l\'application Luroka pour rejoindre cette salle.',
 			'watchTogether.phasePlaying' => 'Jouer',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'En pause',
 			'watchTogether.phaseWaiting' => 'En attendant tout le monde',
 			'watchTogether.inviteCopied' => 'Invitation copiée. Collez-le dans un message.',
@@ -7963,6 +8150,8 @@ extension on TranslationsFr {
 			'performanceOverlay.speed' => 'Vitesse',
 			'performanceOverlay.player' => 'Lecteur',
 			'performanceOverlay.memory' => 'Mémoire',
+			_ => null,
+		} ?? switch (path) {
 			'performanceOverlay.uiFps' => 'FPS UI',
 			'performanceOverlay.fps' => 'FPS',
 			'performanceOverlay.decoderAndroidHw' => 'Matériel Android',
@@ -8053,8 +8242,6 @@ extension on TranslationsFr {
 			'metadataEdit.preferredSubtitleLanguage' => 'Langue de sous-titres préférée',
 			'metadataEdit.subtitleMode' => 'Sélection automatique des sous-titres',
 			'metadataEdit.manuallySelected' => 'Sélectionné manuellement',
-			_ => null,
-		} ?? switch (path) {
 			'metadataEdit.shownWithForeignAudio' => 'Avec l’audio en langue étrangère',
 			'metadataEdit.alwaysEnabled' => 'Toujours activé',
 			'metadataEdit.tags' => 'Étiquettes',
@@ -8212,6 +8399,13 @@ extension on TranslationsFr {
 			'profileIntegrations.later' => 'Configurer plus tard',
 			'profileIntegrations.manage' => 'Gérer les intégrations',
 			'profileIntegrations.forProfile' => ({required Object name}) => 'Connexions pour ${name}',
+			'profileSetupGuide.tabletSpotlightStyle' => 'Style de la sélection sur tablette',
+			'profileSetupGuide.spotlightClassic' => 'Classique',
+			'profileSetupGuide.spotlightMarquee' => 'Marquee',
+			'profileSetupGuide.spotlightTonight' => 'Les choix de ce soir',
+			'profileSetupGuide.phoneSpotlight' => 'Sélection cinéma sur téléphone',
+			'profileSetupGuide.phoneSpotlightCinematic' => 'Image horizontale avec le titre superposé',
+			'profileSetupGuide.phoneSpotlightClassic' => 'Carte d’affiche classique',
 			'profileSetupGuide.title' => 'Personnalisez votre profil',
 			'profileSetupGuide.description' => 'Choisissez l\'apparence de Luroka pour ce profil sur cet appareil. Vous pourrez tout modifier plus tard dans Paramètres.',
 			'profileSetupGuide.appearanceStep' => '1 sur 2 · Apparence',

@@ -12,6 +12,7 @@ import '../../media/movie_copy_groups.dart';
 import '../../media/media_server_client.dart';
 import '../../services/kids_profile_service.dart';
 import '../../services/settings_service.dart' hide ThemeMode;
+import '../../models/kids_atmosphere.dart';
 import '../../utils/platform_detector.dart';
 import '../../utils/media_image_helper.dart';
 import '../../utils/error_dialog.dart';
@@ -60,8 +61,13 @@ class KidsMovieShelf extends StatefulWidget {
 }
 
 class KidsMovieShelfState extends State<KidsMovieShelf> {
-  static const _ink = Color(0xff071529);
-  Color get _yellow => _quiet ? const Color(0xff89ecd3) : const Color(0xffffdc55);
+  KidsAtmosphere get _atmosphere {
+    final kids = KidsProfileService.instance;
+    return kids.activeId == null ? KidsAtmosphere.sunshine : kids.atmosphereFor(kids.activeId!);
+  }
+  Color get _ink => _atmosphere.background;
+  Color get _yellow => _atmosphere == KidsAtmosphere.sunshine && _quiet
+      ? const Color(0xff89ecd3) : _atmosphere.accent;
   bool get _quiet {
     final kids = KidsProfileService.instance;
     return kids.activeId != null && kids.quietSceneryFor(kids.activeId!);
@@ -221,6 +227,7 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
   Widget build(BuildContext context) {
     final rows = _rows();
     final tv = PlatformDetector.isTV();
+    final tablet = !tv && PlatformDetector.isMobile(context) && MediaQuery.sizeOf(context).shortestSide >= 600;
     final width = MediaQuery.sizeOf(context).width;
     final inset = tv ? (width * .045).clamp(24.0, 70.0) : 18.0;
     final scale = MediaQuery.textScalerOf(context).scale(14) / 14;
@@ -231,7 +238,7 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
       slivers: [
         if (!tv)
           SliverToBoxAdapter(
-            child: _header(context, tv: false, inset: inset, rows: rows),
+            child: _header(context, tv: false, tablet: tablet, inset: inset, rows: rows),
           ),
         if (widget.loading && rows.isEmpty)
           SliverToBoxAdapter(
@@ -288,8 +295,12 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                   builder: (context, bounds) {
                     final cardWidth = tv
                         ? ((bounds.maxWidth - inset * 2 - 48) / (rows[r].resume ? 4 : 5)).clamp(165.0, 310.0)
+                        : tablet
+                        ? ((bounds.maxWidth - inset * 2 - 42) /
+                                (MediaQuery.orientationOf(context) == Orientation.landscape ? 4 : 3))
+                            .clamp(160.0, 300.0)
                         : (bounds.maxWidth * (rows[r].resume ? .56 : .42)).clamp(130.0, 220.0);
-                    final cardHeight = cardWidth / (tv || rows[r].resume ? 16 / 9 : 1.25) + 48 * scale;
+                    final cardHeight = cardWidth / (tv || tablet || rows[r].resume ? 16 / 9 : 1.25) + 48 * scale;
                     return SizedBox(
                       height: cardHeight + 20,
                       child: ListView.separated(
@@ -303,6 +314,7 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                           rows[r],
                           rows[r].items[index],
                           cardWidth,
+                          tablet: tablet,
                           onUp: r == 0 ? _filters[_shortcut].requestFocus : () => _focusRow(rows[r - 1]),
                           onDown: r + 1 < rows.length ? () => _focusRow(rows[r + 1]) : null,
                           first: index == 0,
@@ -376,6 +388,8 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                               item: selected,
                               client: widget.resolveClient(selected),
                               quiet: _quiet,
+                              background: _ink,
+                              accent: _yellow,
                               inset: inset,
                               resume: resume,
                               spoiler: _hideSpoiler(selected),
@@ -391,10 +405,15 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
     );
   }
 
-  Widget _header(BuildContext context, {required bool tv, required double inset, required List<_KidsRow> rows}) {
+  Widget _header(BuildContext context, {required bool tv, bool tablet = false, required double inset, required List<_KidsRow> rows}) {
     final scale = MediaQuery.textScalerOf(context).scale(14) / 14;
-    final height =
-        (tv ? (MediaQuery.sizeOf(context).height * .36).clamp(185.0, 300.0) : 152.0) + (scale - 1).clamp(0, 3) * 45;
+    final size = MediaQuery.sizeOf(context);
+    final phone = !tv && !tablet && PlatformDetector.isMobile(context);
+    final tabletHeight = MediaQuery.orientationOf(context) == Orientation.landscape
+        ? (size.height * .46).clamp(250.0, 390.0)
+        : (size.width * .46).clamp(260.0, 400.0);
+    final height = (tv ? (size.height * .36).clamp(185.0, 300.0) : tablet ? tabletHeight : 152.0) +
+        (scale - 1).clamp(0, 3) * 45;
     return ConstrainedBox(
       key: const ValueKey('kids-illustrated-header'),
       constraints: BoxConstraints(minHeight: height),
@@ -409,6 +428,14 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
               child: RepaintBoundary(
                 child: _quiet
                     ? const CustomPaint(painter: _KidsLandscapePainter())
+                    : tablet || phone
+                    ? Image.asset(
+                        'assets/branding/kids-world-${tablet && size.width > size.height ? 'tv' : 'phone'}.webp',
+                        key: ValueKey(tablet ? 'kids-tablet-treehouse-art' : 'kids-phone-treehouse-art'),
+                        fit: BoxFit.cover,
+                        alignment: tablet ? const Alignment(0, -.4) : Alignment.centerRight,
+                        errorBuilder: (_, _, _) => const CustomPaint(painter: _KidsLandscapePainter()),
+                      )
                     : ShaderMask(
                         blendMode: BlendMode.dstIn,
                         shaderCallback: (bounds) => const LinearGradient(
@@ -426,12 +453,23 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
             ),
           ),
           Positioned.fill(
+            child: IgnorePointer(child: DecoratedBox(
+              decoration: BoxDecoration(gradient: LinearGradient(
+                colors: [
+                  _atmosphere == KidsAtmosphere.sunshine ? Colors.transparent : _atmosphere.skyTint.withValues(alpha: .38),
+                  Colors.transparent,
+                ],
+                stops: const [0, .72],
+              )),
+            )),
+          ),
+          Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    _ink,
-                    _ink.withValues(alpha: tv ? .8 : .5),
+                    tablet ? _ink.withValues(alpha: .58) : phone ? _ink.withValues(alpha: .70) : _ink,
+                    _ink.withValues(alpha: tv ? .8 : tablet ? .30 : phone ? .38 : .5),
                     Colors.transparent,
                   ],
                   stops: const [0, .30, .78],
@@ -446,7 +484,7 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [_ink.withValues(alpha: .05), _ink.withValues(alpha: .05), _ink],
-                  stops: const [0, .72, 1],
+                  stops: tablet ? const [0, .66, 1] : const [0, .72, 1],
                 ),
               ),
             ),
@@ -459,16 +497,18 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
               children: [
                 Row(
                   children: [
-                    KidsAvatar(
-                      avatar: KidsProfileService.instance.avatarFor(KidsProfileService.instance.activeId ?? ''),
-                      size: tv ? 46 : 38,
-                      older: _quiet,
-                    ),
-                    const SizedBox(width: 12),
+                    if (!(phone && widget.showToolbar)) ...[
+                      KidsAvatar(
+                        avatar: KidsProfileService.instance.avatarFor(KidsProfileService.instance.activeId ?? ''),
+                        size: tv || tablet ? 46 : 38,
+                        older: _quiet,
+                      ),
+                      const SizedBox(width: 12),
+                    ],
                     Expanded(
                       child: Text(
                         widget.name.trim().isEmpty ? t.kids.title : t.kids.welcome(name: widget.name),
-                        style: TextStyle(color: Colors.white, fontSize: tv ? 28 : 21, fontWeight: FontWeight.w800),
+                        style: TextStyle(color: Colors.white, fontSize: tv || tablet ? 28 : 21, fontWeight: FontWeight.w800),
                       ),
                     ),
                     if (widget.showToolbar) SizedBox(width: 52, height: 44, child: widget.toolbar),
@@ -477,11 +517,11 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                 const SizedBox(height: 6),
                 Text(
                   t.kidsShelf.pickSomething,
-                  style: TextStyle(color: Colors.white, fontSize: tv ? 16 : 14, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: Colors.white, fontSize: tv || tablet ? 16 : 14, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 12),
                 ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: tv ? 360 : 300),
+                  constraints: BoxConstraints(maxWidth: tv || tablet ? 360 : 300),
                   child: Row(
                     children: [
                       for (var i = 0; i < 2; i++) ...[
@@ -499,8 +539,8 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                             child: OutlinedButton(
                               key: ValueKey('kids-shelf-filter-$i'),
                               style: OutlinedButton.styleFrom(
-                                backgroundColor: _ink.withValues(alpha: .8),
-                                foregroundColor: Colors.white,
+                                backgroundColor: tablet && i == 0 ? _yellow : _ink.withValues(alpha: .8),
+                                foregroundColor: tablet && i == 0 ? _ink : Colors.white,
                                 side: BorderSide(color: _yellow.withValues(alpha: .65)),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                 minimumSize: const Size(0, 48),
@@ -511,7 +551,7 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(i == 0 ? Icons.movie_rounded : Icons.tv_rounded, size: 19, color: _yellow),
+                                  Icon(i == 0 ? Icons.movie_rounded : Icons.tv_rounded, size: 19, color: tablet && i == 0 ? _ink : _yellow),
                                   const SizedBox(width: 8),
                                   Flexible(
                                     child: Text(
@@ -549,6 +589,7 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
     _KidsRow row,
     MediaItem item,
     double width, {
+    bool tablet = false,
     required VoidCallback onUp,
     VoidCallback? onDown,
     required bool first,
@@ -663,7 +704,7 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
                             ),
                           ),
                         ),
-                      if (row.resume)
+                      if (row.resume && !PlatformDetector.isMobile(context))
                         Positioned(
                           top: 10,
                           right: 10,
@@ -700,6 +741,13 @@ class KidsMovieShelfState extends State<KidsMovieShelf> {
       ),
     );
   }
+}
+
+/// The same reduced-detail scene is also used by the setup preview.
+class KidsQuietScenery extends StatelessWidget {
+  const KidsQuietScenery({super.key});
+  @override
+  Widget build(BuildContext context) => const CustomPaint(painter: _KidsLandscapePainter());
 }
 
 /// Resolution-independent illustrated night landscape; painted once per size.

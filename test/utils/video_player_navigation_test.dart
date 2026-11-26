@@ -41,8 +41,8 @@ void main() {
     final pages = <_PlaybackPageState>[];
     int? nativeOwner;
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       methodHandler: (call) async {
         if (call.method == 'initialize') {
           if (nativeOwner != null) throw PlatformException(code: 'owner_still_active');

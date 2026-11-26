@@ -1174,6 +1174,27 @@ class Translations$kidsShelf$en {
 
 	/// en: 'What do you want to watch?'
 	String get pickSomething => 'What do you want to watch?';
+
+	/// en: 'Home atmosphere'
+	String get atmosphere => 'Home atmosphere';
+
+	/// en: 'Choose the colors of the kids Home. The treehouse stays the same.'
+	String get atmosphereHint => 'Choose the colors of the kids Home. The treehouse stays the same.';
+
+	/// en: 'Sunshine'
+	String get sunshine => 'Sunshine';
+
+	/// en: 'Berry'
+	String get berry => 'Berry';
+
+	/// en: 'Mint'
+	String get mint => 'Mint';
+
+	/// en: 'Sky'
+	String get sky => 'Sky';
+
+	/// en: 'Home preview'
+	String get atmospherePreview => 'Home preview';
 }
 
 // Path: kidsHome
@@ -2199,6 +2220,204 @@ class Translations$auth$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Sign in to Plex with a QR code'
+	String get plexQrSignIn => 'Sign in to Plex with a QR code';
+
+	/// en: 'Set up with phone'
+	String get setUpWithPhone => 'Set up with phone';
+
+	/// en: 'Loading your restored profiles and connections…'
+	String get loadingRestoredData => 'Loading your restored profiles and connections…';
+
+	/// en: 'Could not load the restored data. Try again or reopen Luroka.'
+	String get loadingRestoredDataFailed => 'Could not load the restored data. Try again or reopen Luroka.';
+
+	/// en: 'Connect a TV'
+	String get connectTv => 'Connect a TV';
+
+	/// en: 'Restore encrypted backup'
+	String get restoreEncryptedBackup => 'Restore encrypted backup';
+
+	/// en: 'Restore cloud backup'
+	String get restoreCloudBackup => 'Restore cloud backup';
+
+	/// en: 'Save encrypted backup'
+	String get saveEncryptedBackup => 'Save encrypted backup';
+
+	/// en: 'Backup saved'
+	String get backupSaved => 'Backup saved';
+
+	/// en: 'Create encrypted backup'
+	String get createEncryptedBackup => 'Create encrypted backup';
+
+	/// en: 'Confirm password'
+	String get confirmBackupPassword => 'Confirm password';
+
+	/// en: 'Enter a password.'
+	String get enterBackupPassword => 'Enter a password.';
+
+	/// en: 'Enter a password and confirm it.'
+	String get confirmBackupPasswordError => 'Enter a password and confirm it.';
+
+	/// en: 'Restore'
+	String get restoreBackupAction => 'Restore';
+
+	/// en: 'Includes profiles, server logins and local viewing data. Keep the password safe; it is required to restore.'
+	String get backupCreateInstructions => 'Includes profiles, server logins and local viewing data. Keep the password safe; it is required to restore.';
+
+	/// en: 'Enter the password or cloud recovery code used to create this backup. Restore requires an empty profile database.'
+	String get backupRestoreInstructions => 'Enter the password or cloud recovery code used to create this backup. Restore requires an empty profile database.';
+
+	/// en: 'Could not create the encrypted backup.'
+	String get backupCreateFailed => 'Could not create the encrypted backup.';
+
+	/// en: 'Could not restore this backup. Check the password and use an empty installation.'
+	String get backupRestoreFailed => 'Could not restore this backup. Check the password and use an empty installation.';
+
+	/// en: 'Step 2 of 3: Save your recovery code'
+	String get recoveryCodeStep => 'Step 2 of 3: Save your recovery code';
+
+	/// en: 'You need this code to restore or delete your backup. Anyone with it can access the backup. If you lose it, Luroka cannot recover it.'
+	String get recoveryCodeWarning => 'You need this code to restore or delete your backup. Anyone with it can access the backup. If you lose it, Luroka cannot recover it.';
+
+	/// en: 'Only copy or save the code somewhere private. A saved code file is not encrypted.'
+	String get recoveryCodePrivateFile => 'Only copy or save the code somewhere private. A saved code file is not encrypted.';
+
+	/// en: 'Keep a private copy of this code. To restore on your phone, open Luroka’s cloud backup restore option and choose Scan recovery code.'
+	String get recoveryCodePhoneInstructions => 'Keep a private copy of this code. To restore on your phone, open Luroka’s cloud backup restore option and choose Scan recovery code.';
+
+	/// en: 'Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.'
+	String get backupNotUploaded => 'Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.';
+
+	/// en: 'I saved my code — continue'
+	String get recoveryCodeSavedContinue => 'I saved my code — continue';
+
+	/// en: 'Save code to file'
+	String get recoveryCodeSaveFile => 'Save code to file';
+
+	/// en: 'Show QR code'
+	String get recoveryCodeShowQr => 'Show QR code';
+
+	/// en: 'Hide QR code'
+	String get recoveryCodeHideQr => 'Hide QR code';
+
+	/// en: 'Recovery code copied. Save it somewhere private.'
+	String get recoveryCopied => 'Recovery code copied. Save it somewhere private.';
+
+	/// en: 'Could not copy the recovery code.'
+	String get recoveryCopyFailed => 'Could not copy the recovery code.';
+
+	/// en: 'Save recovery code privately'
+	String get recoverySaveDialog => 'Save recovery code privately';
+
+	/// en: 'Recovery code saved. Keep the file private.'
+	String get recoverySaved => 'Recovery code saved. Keep the file private.';
+
+	/// en: 'Could not save the recovery code. Try copying it instead.'
+	String get recoverySaveFailed => 'Could not save the recovery code. Try copying it instead.';
+
+	/// en: 'The backup was downloaded but could not be restored on this device. Try again or contact support.'
+	String get cloudRestoreApplyFailed => 'The backup was downloaded but could not be restored on this device. Try again or contact support.';
+
+	/// en: 'No cloud backup was found for this code. On the original device, finish step 3 and wait for Cloud backup created. Check that you are using the code saved for that backup; it may also have expired or been deleted.'
+	String get cloudBackupNotFound => 'No cloud backup was found for this code. On the original device, finish step 3 and wait for Cloud backup created. Check that you are using the code saved for that backup; it may also have expired or been deleted.';
+
+	/// en: 'Could not connect to the backup service. Check your internet connection and try again.'
+	String get cloudBackupConnectionFailed => 'Could not connect to the backup service. Check your internet connection and try again.';
+
+	/// en: 'The recovery code or backup format could not be read. Check the complete code and try again.'
+	String get cloudBackupInvalidFormat => 'The recovery code or backup format could not be read. Check the complete code and try again.';
+
+	/// en: 'The backup could not be opened. Check your recovery code and try again.'
+	String get cloudBackupOpenFailed => 'The backup could not be opened. Check your recovery code and try again.';
+
+	/// en: 'Select the profiles to include. Your backup is encrypted before upload and is available for 90 days.'
+	String get cloudBackupSelectProfiles => 'Select the profiles to include. Your backup is encrypted before upload and is available for 90 days.';
+
+	/// en: 'Include saved server and integration logins'
+	String get cloudBackupIncludeLogins => 'Include saved server and integration logins';
+
+	/// en: 'Includes linked Plex accounts and other saved logins to help reconnect. Anyone with the recovery code may be able to use them.'
+	String get cloudBackupLoginsWarning => 'Includes linked Plex accounts and other saved logins to help reconnect. Anyone with the recovery code may be able to use them.';
+
+	/// en: 'Without saved logins, you will need to reconnect servers after restoring.'
+	String get cloudBackupNoLogins => 'Without saved logins, you will need to reconnect servers after restoring.';
+
+	/// en: 'Use HTTP for this server?'
+	String get pairingHttpPhoneTitle => 'Use HTTP for this server?';
+
+	/// en: 'Your server login and media traffic will not be encrypted. People on the network may be able to read them. HTTPS is recommended. The Luroka transfer stays encrypted.'
+	String get pairingHttpPhoneWarning => 'Your server login and media traffic will not be encrypted. People on the network may be able to read them. HTTPS is recommended. The Luroka transfer stays encrypted.';
+
+	/// en: 'Use an unencrypted server?'
+	String get pairingHttpTvTitle => 'Use an unencrypted server?';
+
+	/// en: 'Your phone selected HTTP. People on this network may be able to read your TV access token and media traffic. Use only a network you trust. HTTPS is recommended.'
+	String get pairingHttpTvWarning => 'Your phone selected HTTP. People on this network may be able to read your TV access token and media traffic. Use only a network you trust. HTTPS is recommended.';
+
+	/// en: 'Use HTTP'
+	String get pairingUseHttp => 'Use HTTP';
+
+	/// en: 'Connect Jellyfin or Emby with your phone'
+	String get pairingTvTitle => 'Connect Jellyfin or Emby with your phone';
+
+	/// en: 'Scan with your phone. The invitation expires in five minutes.'
+	String get pairingScanInvitation => 'Scan with your phone. The invitation expires in five minutes.';
+
+	/// en: 'Waiting for your phone to connect…'
+	String get pairingWaitForPhone => 'Waiting for your phone to connect…';
+
+	/// en: 'Compare this code with your phone:'
+	String get pairingComparePhone => 'Compare this code with your phone:';
+
+	/// en: 'If the codes match, confirm on your phone.'
+	String get pairingConfirmOnPhone => 'If the codes match, confirm on your phone.';
+
+	/// en: 'Pairing is available only from an adult profile.'
+	String get pairingAdultOnly => 'Pairing is available only from an adult profile.';
+
+	/// en: 'Profile access changed. Pairing was cancelled.'
+	String get pairingProfileChanged => 'Profile access changed. Pairing was cancelled.';
+
+	/// en: 'Pairing service unavailable. Try again or enter the server manually.'
+	String get pairingServiceUnavailable => 'Pairing service unavailable. Try again or enter the server manually.';
+
+	/// en: 'Pairing expired or was interrupted. Start again.'
+	String get pairingExpired => 'Pairing expired or was interrupted. Start again.';
+
+	/// en: 'Could not verify the server and account. Start pairing again.'
+	String get pairingVerifyFailed => 'Could not verify the server and account. Start pairing again.';
+
+	/// en: 'Scan the TV code or paste the invitation.'
+	String get pairingScanOrPaste => 'Scan the TV code or paste the invitation.';
+
+	/// en: 'Scan TV code'
+	String get pairingScanTv => 'Scan TV code';
+
+	/// en: 'TV invitation'
+	String get pairingTvInvitation => 'TV invitation';
+
+	/// en: 'Check that your TV shows the same code: ${code}'
+	String pairingCheckTvCode({required Object code}) => 'Check that your TV shows the same code: ${code}';
+
+	/// en: 'Codes match'
+	String get pairingCodesMatch => 'Codes match';
+
+	/// en: 'Recovery code'
+	String get recoveryCodeLabel => 'Recovery code';
+
+	/// en: 'Scan recovery code'
+	String get recoveryCodeScan => 'Scan recovery code';
+
+	/// en: 'Scan or paste your saved recovery code. It will be encrypted for your TV.'
+	String get pairingRecoveryInstructions => 'Scan or paste your saved recovery code. It will be encrypted for your TV.';
+
+	/// en: 'Send to TV'
+	String get pairingSendTv => 'Send to TV';
+
+	/// en: 'Sign in to your server. Your password is sent to that server, not to Luroka.'
+	String get pairingServerLoginHint => 'Sign in to your server. Your password is sent to that server, not to Luroka.';
 
 	/// en: 'Sign in with Plex'
 	String get signInWithPlex => 'Sign in with Plex';
@@ -9486,6 +9705,27 @@ class Translations$profileSetupGuide$en {
 
 	// Translations
 
+	/// en: 'Tablet spotlight style'
+	String get tabletSpotlightStyle => 'Tablet spotlight style';
+
+	/// en: 'Classic'
+	String get spotlightClassic => 'Classic';
+
+	/// en: 'Marquee'
+	String get spotlightMarquee => 'Marquee';
+
+	/// en: 'Tonight’s Picks'
+	String get spotlightTonight => 'Tonight’s Picks';
+
+	/// en: 'Cinematic phone spotlight'
+	String get phoneSpotlight => 'Cinematic phone spotlight';
+
+	/// en: 'Landscape artwork with the title overlaid'
+	String get phoneSpotlightCinematic => 'Landscape artwork with the title overlaid';
+
+	/// en: 'Classic poster card'
+	String get phoneSpotlightClassic => 'Classic poster card';
+
 	/// en: 'Make your profile yours'
 	String get title => 'Make your profile yours';
 
@@ -11986,6 +12226,13 @@ extension on Translations {
 			'kidsShelf.yourShelf' => 'Your movie shelf',
 			'kidsShelf.all' => 'Everything',
 			'kidsShelf.pickSomething' => 'What do you want to watch?',
+			'kidsShelf.atmosphere' => 'Home atmosphere',
+			'kidsShelf.atmosphereHint' => 'Choose the colors of the kids Home. The treehouse stays the same.',
+			'kidsShelf.sunshine' => 'Sunshine',
+			'kidsShelf.berry' => 'Berry',
+			'kidsShelf.mint' => 'Mint',
+			'kidsShelf.sky' => 'Sky',
+			'kidsShelf.atmospherePreview' => 'Home preview',
 			'kidsHome.everything' => 'For you',
 			'kidsHome.keepWatching' => 'Keep watching',
 			'kidsHome.emptyFilter' => 'Nothing here yet. Try For you, or ask your grown-up to add something you love.',
@@ -12208,6 +12455,8 @@ extension on Translations {
 			'kids.avatarRobot' => 'Robot',
 			'kids.avatarChildArtist' => 'Little artist',
 			'kids.avatarChildSkater' => 'Little skater',
+			_ => null,
+		} ?? switch (path) {
 			'kids.avatarSunrisePerson' => 'Sunrise portrait',
 			'kids.avatarOceanPerson' => 'Ocean portrait',
 			'kids.avatarCat' => 'Curious cat',
@@ -12215,8 +12464,6 @@ extension on Translations {
 			'kids.avatarPanda' => 'Panda',
 			'kids.avatarOwl' => 'Owl',
 			'kids.avatarBear' => 'Bear',
-			_ => null,
-		} ?? switch (path) {
 			'kids.continueAdventure' => 'Keep the adventure going',
 			'kids.freshStories' => 'New stories to discover',
 			'kids.yourMovies' => 'Movie-time favourites',
@@ -12319,6 +12566,72 @@ extension on Translations {
 			'appIcon.names.strata' => 'Strata',
 			'appIcon.names.facet' => 'Facet',
 			'appIcon.names.tilde' => 'Tilde',
+			'auth.plexQrSignIn' => 'Sign in to Plex with a QR code',
+			'auth.setUpWithPhone' => 'Set up with phone',
+			'auth.loadingRestoredData' => 'Loading your restored profiles and connections…',
+			'auth.loadingRestoredDataFailed' => 'Could not load the restored data. Try again or reopen Luroka.',
+			'auth.connectTv' => 'Connect a TV',
+			'auth.restoreEncryptedBackup' => 'Restore encrypted backup',
+			'auth.restoreCloudBackup' => 'Restore cloud backup',
+			'auth.saveEncryptedBackup' => 'Save encrypted backup',
+			'auth.backupSaved' => 'Backup saved',
+			'auth.createEncryptedBackup' => 'Create encrypted backup',
+			'auth.confirmBackupPassword' => 'Confirm password',
+			'auth.enterBackupPassword' => 'Enter a password.',
+			'auth.confirmBackupPasswordError' => 'Enter a password and confirm it.',
+			'auth.restoreBackupAction' => 'Restore',
+			'auth.backupCreateInstructions' => 'Includes profiles, server logins and local viewing data. Keep the password safe; it is required to restore.',
+			'auth.backupRestoreInstructions' => 'Enter the password or cloud recovery code used to create this backup. Restore requires an empty profile database.',
+			'auth.backupCreateFailed' => 'Could not create the encrypted backup.',
+			'auth.backupRestoreFailed' => 'Could not restore this backup. Check the password and use an empty installation.',
+			'auth.recoveryCodeStep' => 'Step 2 of 3: Save your recovery code',
+			'auth.recoveryCodeWarning' => 'You need this code to restore or delete your backup. Anyone with it can access the backup. If you lose it, Luroka cannot recover it.',
+			'auth.recoveryCodePrivateFile' => 'Only copy or save the code somewhere private. A saved code file is not encrypted.',
+			'auth.recoveryCodePhoneInstructions' => 'Keep a private copy of this code. To restore on your phone, open Luroka’s cloud backup restore option and choose Scan recovery code.',
+			'auth.backupNotUploaded' => 'Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.',
+			'auth.recoveryCodeSavedContinue' => 'I saved my code — continue',
+			'auth.recoveryCodeSaveFile' => 'Save code to file',
+			'auth.recoveryCodeShowQr' => 'Show QR code',
+			'auth.recoveryCodeHideQr' => 'Hide QR code',
+			'auth.recoveryCopied' => 'Recovery code copied. Save it somewhere private.',
+			'auth.recoveryCopyFailed' => 'Could not copy the recovery code.',
+			'auth.recoverySaveDialog' => 'Save recovery code privately',
+			'auth.recoverySaved' => 'Recovery code saved. Keep the file private.',
+			'auth.recoverySaveFailed' => 'Could not save the recovery code. Try copying it instead.',
+			'auth.cloudRestoreApplyFailed' => 'The backup was downloaded but could not be restored on this device. Try again or contact support.',
+			'auth.cloudBackupNotFound' => 'No cloud backup was found for this code. On the original device, finish step 3 and wait for Cloud backup created. Check that you are using the code saved for that backup; it may also have expired or been deleted.',
+			'auth.cloudBackupConnectionFailed' => 'Could not connect to the backup service. Check your internet connection and try again.',
+			'auth.cloudBackupInvalidFormat' => 'The recovery code or backup format could not be read. Check the complete code and try again.',
+			'auth.cloudBackupOpenFailed' => 'The backup could not be opened. Check your recovery code and try again.',
+			'auth.cloudBackupSelectProfiles' => 'Select the profiles to include. Your backup is encrypted before upload and is available for 90 days.',
+			'auth.cloudBackupIncludeLogins' => 'Include saved server and integration logins',
+			'auth.cloudBackupLoginsWarning' => 'Includes linked Plex accounts and other saved logins to help reconnect. Anyone with the recovery code may be able to use them.',
+			'auth.cloudBackupNoLogins' => 'Without saved logins, you will need to reconnect servers after restoring.',
+			'auth.pairingHttpPhoneTitle' => 'Use HTTP for this server?',
+			'auth.pairingHttpPhoneWarning' => 'Your server login and media traffic will not be encrypted. People on the network may be able to read them. HTTPS is recommended. The Luroka transfer stays encrypted.',
+			'auth.pairingHttpTvTitle' => 'Use an unencrypted server?',
+			'auth.pairingHttpTvWarning' => 'Your phone selected HTTP. People on this network may be able to read your TV access token and media traffic. Use only a network you trust. HTTPS is recommended.',
+			'auth.pairingUseHttp' => 'Use HTTP',
+			'auth.pairingTvTitle' => 'Connect Jellyfin or Emby with your phone',
+			'auth.pairingScanInvitation' => 'Scan with your phone. The invitation expires in five minutes.',
+			'auth.pairingWaitForPhone' => 'Waiting for your phone to connect…',
+			'auth.pairingComparePhone' => 'Compare this code with your phone:',
+			'auth.pairingConfirmOnPhone' => 'If the codes match, confirm on your phone.',
+			'auth.pairingAdultOnly' => 'Pairing is available only from an adult profile.',
+			'auth.pairingProfileChanged' => 'Profile access changed. Pairing was cancelled.',
+			'auth.pairingServiceUnavailable' => 'Pairing service unavailable. Try again or enter the server manually.',
+			'auth.pairingExpired' => 'Pairing expired or was interrupted. Start again.',
+			'auth.pairingVerifyFailed' => 'Could not verify the server and account. Start pairing again.',
+			'auth.pairingScanOrPaste' => 'Scan the TV code or paste the invitation.',
+			'auth.pairingScanTv' => 'Scan TV code',
+			'auth.pairingTvInvitation' => 'TV invitation',
+			'auth.pairingCheckTvCode' => ({required Object code}) => 'Check that your TV shows the same code: ${code}',
+			'auth.pairingCodesMatch' => 'Codes match',
+			'auth.recoveryCodeLabel' => 'Recovery code',
+			'auth.recoveryCodeScan' => 'Scan recovery code',
+			'auth.pairingRecoveryInstructions' => 'Scan or paste your saved recovery code. It will be encrypted for your TV.',
+			'auth.pairingSendTv' => 'Send to TV',
+			'auth.pairingServerLoginHint' => 'Sign in to your server. Your password is sent to that server, not to Luroka.',
 			'auth.signInWithPlex' => 'Sign in with Plex',
 			'auth.showQRCode' => 'Show QR Code',
 			'auth.authenticate' => 'Authenticate',
@@ -12656,6 +12969,8 @@ extension on Translations {
 			'settings.selectFolder' => 'Select Folder',
 			'settings.resetToDefault' => 'Reset to Default',
 			'settings.currentPath' => ({required Object path}) => 'Current: ${path}',
+			_ => null,
+		} ?? switch (path) {
 			'settings.downloadLocationChanged' => 'Download location changed',
 			'settings.downloadLocationReset' => 'Download location reset to default',
 			'settings.downloadLocationInvalid' => 'Selected folder is not writable',
@@ -12729,8 +13044,6 @@ extension on Translations {
 			'settings.hdrSdrConversionDevice' => 'Device',
 			'settings.hdrSdrConversionDeviceDescription' => 'Your device\'s video hardware converts it. Fastest, but colors depend on the device',
 			'settings.hdrSdrConversionPlayer' => 'Player',
-			_ => null,
-		} ?? switch (path) {
 			'settings.hdrSdrConversionPlayerDescription' => 'The player converts it. Consistent colors, but 4K may stutter on low-end TV boxes',
 			'settings.deinterlace' => 'Deinterlacing',
 			'settings.deinterlaceDescription' => 'Fix jagged edges in old TV recordings and DVDs (mpv player only)',
@@ -13170,6 +13483,8 @@ extension on Translations {
 			'fileInfo.frameRate' => 'Frame Rate',
 			'fileInfo.rotation' => 'Rotation',
 			'fileInfo.comment' => 'Comment',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.audioDescription' => 'Audio Description',
 			'fileInfo.headerCompression' => 'Header Compression',
 			'fileInfo.sidecarFile' => 'Sidecar File',
@@ -13243,8 +13558,6 @@ extension on Translations {
 			'fileInfo.deletedAt' => 'Deleted',
 			'fileInfo.remoteSource' => 'Remote Source',
 			'fileInfo.infiniteStream' => 'Infinite Stream',
-			_ => null,
-		} ?? switch (path) {
 			'fileInfo.directPlay' => 'Direct Play',
 			'fileInfo.directStream' => 'Direct Stream',
 			'fileInfo.transcoding' => 'Transcoding',
@@ -13684,6 +13997,8 @@ extension on Translations {
 			'accountPreferences.forcedSubtitles' => 'Forced subtitles',
 			'accountPreferences.forcedSubtitleOptions.preferNonForced' => 'Prefer non-forced subtitles',
 			'accountPreferences.forcedSubtitleOptions.preferForced' => 'Prefer forced subtitles',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.forcedSubtitleOptions.onlyForced' => 'Only forced subtitles',
 			'accountPreferences.forcedSubtitleOptions.onlyNonForced' => 'Only non-forced subtitles',
 			'accountPreferences.displayMissingEpisodes' => 'Show missing episodes',
@@ -13757,8 +14072,6 @@ extension on Translations {
 			'libraries.fallbackTitle' => 'Library',
 			'libraries.scanLibraryFiles' => 'Scan Library Files',
 			'libraries.scanLibrary' => 'Scan Library',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.analyze' => 'Analyze',
 			'libraries.analyzeLibrary' => 'Analyze Library',
 			'libraries.refreshMetadata' => 'Refresh Metadata',
@@ -14198,6 +14511,8 @@ extension on Translations {
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day} at ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product} returned invalid Live TV playback data',
 			'liveTv.failedToStartChannel' => 'Could not start the live channel',
+			_ => null,
+		} ?? switch (path) {
 			'liveTv.failedToBuildStreamUrl' => 'Could not build the stream URL',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Couldn\'t start the channel: ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Couldn\'t switch channel: ${reason}',
@@ -14271,8 +14586,6 @@ extension on Translations {
 			'music.repeatOne' => 'Repeat one',
 			'music.instantMixNoServer' => 'No server is available for an instant mix',
 			'music.instantMixFailed' => 'Failed to load the instant mix',
-			_ => null,
-		} ?? switch (path) {
 			'music.instantMixEmpty' => 'The instant mix came back with no tracks',
 			'music.noAudioUrl' => ({required Object track}) => 'No audio URL is available for ${track}',
 			'music.discography.singlesAndEps' => 'Singles & EPs',
@@ -14712,6 +15025,8 @@ extension on Translations {
 			'performanceOverlay.avSync' => 'A/V Sync',
 			'performanceOverlay.dropped' => 'Dropped',
 			'performanceOverlay.dvRpus' => 'DV RPUs',
+			_ => null,
+		} ?? switch (path) {
 			'performanceOverlay.dvRpuAverage' => 'DV RPU Avg',
 			'performanceOverlay.dvSampleAverage' => 'DV Sample Avg',
 			'performanceOverlay.maxLuma' => 'Max Luma',
@@ -14785,8 +15100,6 @@ extension on Translations {
 			'metadataEdit.notSet' => 'Not set',
 			'metadataEdit.libraryDefault' => 'Library default',
 			'metadataEdit.accountDefault' => 'Account default',
-			_ => null,
-		} ?? switch (path) {
 			'metadataEdit.seriesDefault' => 'Series default',
 			'metadataEdit.episodeSorting' => 'Episode Sorting',
 			'metadataEdit.oldestFirst' => 'Oldest first',
@@ -14972,6 +15285,13 @@ extension on Translations {
 			'profileIntegrations.later' => 'Set up later',
 			'profileIntegrations.manage' => 'Manage integrations',
 			'profileIntegrations.forProfile' => ({required Object name}) => 'Connections for ${name}',
+			'profileSetupGuide.tabletSpotlightStyle' => 'Tablet spotlight style',
+			'profileSetupGuide.spotlightClassic' => 'Classic',
+			'profileSetupGuide.spotlightMarquee' => 'Marquee',
+			'profileSetupGuide.spotlightTonight' => 'Tonight’s Picks',
+			'profileSetupGuide.phoneSpotlight' => 'Cinematic phone spotlight',
+			'profileSetupGuide.phoneSpotlightCinematic' => 'Landscape artwork with the title overlaid',
+			'profileSetupGuide.phoneSpotlightClassic' => 'Classic poster card',
 			'profileSetupGuide.title' => 'Make your profile yours',
 			'profileSetupGuide.description' => 'Choose how Luroka looks and feels for this profile on this device. You can change everything later in Settings.',
 			'profileSetupGuide.appearanceStep' => '1 of 2 · Look and feel',

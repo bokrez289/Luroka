@@ -70,8 +70,8 @@ Future<PlayerChromeController> _openPlayerChrome(WidgetTester tester, {VoidCallb
   late PlayerChromeController chrome;
 
   await withMockPlayerChannels(
-    methodChannelName: 'com.luroka/mpv_player',
-    eventChannelName: 'com.luroka/mpv_player/events',
+    methodChannelName: 'com.plezy/mpv_player',
+    eventChannelName: 'com.plezy/mpv_player/events',
     testBody: () async {
       await tester.pumpWidget(
         ChangeNotifierProvider(

@@ -332,4 +332,75 @@ void main() {
     expect(find.byKey(ValueKey('mobile_feature_title_${items[1].globalKey}')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('Marquee reflows the same three actionable picks when a tablet rotates', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1024, 768);
+    addTearDown(tester.view.reset);
+    await SettingsService.instance.write(SettingsService.tabletMarquee, true);
+    MediaItem? opened, played;
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: SizedBox(height: 420, child: MobileHomeCarousel(
+      items: items, label: 'Spotlight', active: false, resolveClient: (_) => null,
+      onPlay: (item) => played = item, onDetails: (item) => opened = item,
+    )))));
+    await tester.pumpAndSettle();
+    Finder title(int index) => find.text(items[index].displayTitle).hitTestable();
+    expect(tester.getCenter(title(1)).dx, greaterThan(tester.getCenter(title(0)).dx));
+    expect(tester.getCenter(title(2)).dy, greaterThan(tester.getCenter(title(1)).dy));
+    await tester.tap(title(1));
+    expect(opened, items[1]);
+    tester.view.physicalSize = const Size(768, 1024);
+    await tester.pumpAndSettle();
+    expect(tester.getCenter(title(1)).dy, greaterThan(tester.getCenter(title(0)).dy));
+    expect(tester.getCenter(title(2)).dx, greaterThan(tester.getCenter(title(1)).dx));
+    await tester.tap(title(2));
+    expect(opened, items[2]);
+    await tester.tap(find.byIcon(Icons.play_arrow_rounded).hitTestable());
+    expect(played, items[0]);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Marquee uses only backdrop even when poster exists', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1024, 768);
+    addTearDown(tester.view.reset);
+    final feature = items.first.copyWith(artPath: 'backdrop', thumbPath: 'poster');
+    final noPoster = items[1].copyWith(artPath: 'other-backdrop');
+    Future<void> mountArtwork() async {
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: SizedBox(height: 360, child: MobileHomeCarousel(
+        marqueeOverride: true,
+        items: [feature, noPoster], label: 'Spotlight', active: false,
+        resolveClient: (_) => null, onPlay: (_) {}, onDetails: (_) {},
+      )))));
+      await tester.pumpAndSettle();
+    }
+    OptimizedMediaImage image(MediaItem item) => tester.widget(find.byKey(ValueKey('marquee_art_${item.globalKey}')).first);
+    await mountArtwork();
+    expect(image(feature).imagePath, 'backdrop');
+    expect(image(feature).fit, BoxFit.contain);
+    expect(image(noPoster).imagePath, 'other-backdrop');
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final size in [const Size(768, 1024), const Size(1024, 768)]) {
+    testWidgets('Tonight’s Picks shows three real actionable titles at $size', (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = size;
+      addTearDown(tester.view.reset);
+      MediaItem? opened;
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: Builder(builder: (context) => SizedBox(
+        height: MobileHomeCarousel.heightFor(context, size.width, availableHeight: size.height - 56, picksOverride: true),
+        child: MobileHomeCarousel(items: items, label: 'Recently added', picksOverride: true, active: false,
+          resolveClient: (_) => null, onPlay: (_) {}, onDetails: (item) => opened = item),
+      )))));
+      await tester.pumpAndSettle();
+      for (final item in items) {
+        expect(find.byKey(ValueKey('tonight_pick_${item.globalKey}')).hitTestable(), findsOneWidget);
+      }
+      await tester.tap(find.byKey(ValueKey('tonight_pick_${items[1].globalKey}')).hitTestable());
+      expect(opened, items[1]);
+      expect(find.text('Recently added'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+  }
 }

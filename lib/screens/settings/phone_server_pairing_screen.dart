@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
+import '../../i18n/strings.g.dart';
 import '../../media/media_browser_dialect.dart';
 import '../../profiles/active_profile_provider.dart';
 import '../../services/kids_profile_service.dart';
@@ -111,7 +112,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
       }
     }
     if (mounted) {
-      setState(() => _error = 'Profile access changed. Pairing was cancelled.');
+      setState(() => _error = t.auth.pairingProfileChanged);
     }
   }
 
@@ -195,13 +196,11 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
       final approved = await showDialog<bool>(
         context: context,
         builder: (dialog) => AlertDialog(
-          title: const Text('Use HTTP for this server?'),
-          content: const Text(
-            'Your server login and media traffic will not be encrypted. People on the network may be able to read them. HTTPS is recommended. The Luroka transfer stays encrypted.',
-          ),
+          title: Text(t.auth.pairingHttpPhoneTitle),
+          content: Text(t.auth.pairingHttpPhoneWarning),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialog, false), child: const Text('Cancel')),
-            TextButton(onPressed: () => Navigator.pop(dialog, true), child: const Text('Use HTTP')),
+            TextButton(onPressed: () => Navigator.pop(dialog, false), child: Text(t.common.cancel)),
+            TextButton(onPressed: () => Navigator.pop(dialog, true), child: Text(t.auth.pairingUseHttp)),
           ],
         ),
       );
@@ -317,7 +316,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
               ),
             ),
           ),
-          actions: [TextButton(onPressed: () => Navigator.pop(dialog), child: const Text('Cancel'))],
+          actions: [TextButton(onPressed: () => Navigator.pop(dialog), child: Text(t.common.cancel))],
         ),
       );
       if (mounted && selected != null) {
@@ -416,32 +415,32 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
                           : 'Connection sent. Finish setup on your TV.',
                     )
                   else if (attempt == null) ...[
-                    const Text('Scan the TV code or paste the invitation.'),
+                    Text(t.auth.pairingScanOrPaste),
                     OutlinedButton.icon(
                       onPressed: _busy ? null : _scan,
                       icon: const Icon(Icons.qr_code_scanner),
-                      label: const Text('Scan TV code'),
+                      label: Text(t.auth.pairingScanTv),
                     ),
                     TextField(
                       controller: _invite,
                       autocorrect: false,
                       enableSuggestions: false,
-                      decoration: const InputDecoration(labelText: 'TV invitation'),
+                      decoration: InputDecoration(labelText: t.auth.pairingTvInvitation),
                     ),
                     const SizedBox(height: 16),
-                    FilledButton(onPressed: _busy ? null : _join, child: const Text('Connect')),
+                    FilledButton(onPressed: _busy ? null : _join, child: Text(t.common.connect)),
                   ] else if (!_confirmed) ...[
-                    Text('Check that your TV shows the same code: ${attempt.checkCode}'),
+                    Text(t.auth.pairingCheckTvCode(code: attempt.checkCode)),
                     const SizedBox(height: 16),
-                    FilledButton(onPressed: _busy ? null : _confirm, child: const Text('Codes match')),
+                    FilledButton(onPressed: _busy ? null : _confirm, child: Text(t.auth.pairingCodesMatch)),
                   ] else if (_recoveryTransfer) ...[
-                    const Text('Scan or paste your saved recovery code. It will be encrypted for your TV.'),
+                    Text(t.auth.pairingRecoveryInstructions),
                     TextField(
                       controller: _recovery,
                       obscureText: true,
                       autocorrect: false,
                       enableSuggestions: false,
-                      decoration: const InputDecoration(labelText: 'Recovery code'),
+                      decoration: InputDecoration(labelText: t.auth.recoveryCodeLabel),
                     ),
                     TextButton.icon(
                       onPressed: _busy
@@ -451,12 +450,12 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
                               if (mounted && code != null) _recovery.text = code;
                             },
                       icon: const Icon(Icons.qr_code_scanner),
-                      label: const Text('Scan recovery code'),
+                      label: Text(t.auth.recoveryCodeScan),
                     ),
-                    FilledButton(onPressed: _busy || _terminal ? null : _sendRecovery, child: const Text('Send to TV')),
+                    FilledButton(onPressed: _busy || _terminal ? null : _sendRecovery, child: Text(t.auth.pairingSendTv)),
                   ] else ...[
                     ..._savedServerChoices(),
-                    const Text('Sign in to your server. Your password is sent to that server, not to Luroka.'),
+                    Text(t.auth.pairingServerLoginHint),
                     const SizedBox(height: 12),
                     const Text('Server type'),
                     const SizedBox(height: 8),
@@ -499,7 +498,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
                       autocorrect: false,
                       enableSuggestions: false,
                       decoration: InputDecoration(
-                        labelText: 'Server URL',
+                        labelText: t.seerr.serverUrl,
                         hintText: 'media.example.com',
                         border: const OutlineInputBorder(),
                       ),
@@ -509,7 +508,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
                       controller: _username,
                       autocorrect: false,
                       enableSuggestions: false,
-                      decoration: const InputDecoration(labelText: 'Username'),
+                      decoration: InputDecoration(labelText: t.addServer.username),
                     ),
                     const SizedBox(height: 20),
                     TextField(
@@ -517,7 +516,7 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
                       obscureText: true,
                       autocorrect: false,
                       enableSuggestions: false,
-                      decoration: const InputDecoration(labelText: 'Password'),
+                      decoration: InputDecoration(labelText: t.addServer.password),
                     ),
                     const SizedBox(height: 16),
                     FilledButton(

@@ -377,8 +377,8 @@ void main() {
     var initializeCount = 0;
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       methodHandler: (call) {
         calls.add(call);
         switch (call.method) {

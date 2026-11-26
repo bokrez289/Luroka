@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import '../../i18n/strings.g.dart';
 import '../../widgets/secure_transfer_qr.dart';
 
 import '../../connection/connection.dart';
@@ -68,7 +69,7 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
     if (_authorized) {
       unawaited(_start());
     } else {
-      _error = 'Pairing is available only from an adult profile.';
+      _error = t.auth.pairingAdultOnly;
     }
   }
 
@@ -118,7 +119,7 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
         // delivery. Do not expose relay capabilities in the UI or logs.
       }
     }
-    if (mounted) setState(() => _error = 'Profile access changed. Pairing was cancelled.');
+    if (mounted) setState(() => _error = t.auth.pairingProfileChanged);
   }
 
   bool _requireAuthorization() {
@@ -140,7 +141,7 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
       _timer = Timer.periodic(const Duration(seconds: 2), (_) => unawaited(_poll()));
       await _poll();
     } catch (_) {
-      if (mounted) setState(() => _error = 'Pairing service unavailable. Try again or enter the server manually.');
+      if (mounted) setState(() => _error = t.auth.pairingServiceUnavailable);
     }
   }
 
@@ -154,7 +155,7 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
       setState(() {});
       if (attempt.hasPayload) await _complete();
     } catch (_) {
-      if (mounted) setState(() => _error = 'Pairing expired or was interrupted. Start again.');
+      if (mounted) setState(() => _error = t.auth.pairingExpired);
       _timer?.cancel();
     } finally {
       _polling = false;
@@ -178,17 +179,15 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
             await showDialog<bool>(
               context: context,
               builder: (dialog) => AlertDialog(
-                title: const Text('Use an unencrypted server?'),
-                content: const Text(
-                  'Your phone selected HTTP. People on this network may be able to read your TV access token and media traffic. Use only a network you trust. HTTPS is recommended.',
-                ),
+                title: Text(t.auth.pairingHttpTvTitle),
+                content: Text(t.auth.pairingHttpTvWarning),
                 actions: [
                   TextButton(
                     autofocus: true,
                     onPressed: () => Navigator.pop(dialog, false),
-                    child: const Text('Cancel'),
+                    child: Text(t.common.cancel),
                   ),
-                  TextButton(onPressed: () => Navigator.pop(dialog, true), child: const Text('Use HTTP')),
+                  TextButton(onPressed: () => Navigator.pop(dialog, true), child: Text(t.auth.pairingUseHttp)),
                 ],
               ),
             ) ==
@@ -200,7 +199,7 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
       if (!mounted || !_requireAuthorization()) return;
       Navigator.of(context).pop(connection);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Could not verify the server and account. Start pairing again.');
+      if (mounted) setState(() => _error = t.auth.pairingVerifyFailed);
     } finally {
       if (mounted) setState(() => _completing = false);
     }
@@ -230,7 +229,7 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
     final attempt = _attempt;
     final code = attempt?.checkCode;
     return AlertDialog(
-      title: const Text('Connect Jellyfin or Emby with your phone'),
+      title: Text(t.auth.pairingTvTitle),
       content: SizedBox(
         width: 650,
         child: _error != null
@@ -250,15 +249,15 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Scan with your phone. The invitation expires in five minutes.'),
+                        Text(t.auth.pairingScanInvitation),
                         const SizedBox(height: 16),
                         if (code == null)
-                          const Text('Waiting for your phone to connect…')
+                          Text(t.auth.pairingWaitForPhone)
                         else ...[
-                          const Text('Compare this code with your phone:'),
+                          Text(t.auth.pairingComparePhone),
                           Text(code, key: const ValueKey('tv-pairing-check-code'),
                               style: Theme.of(context).textTheme.headlineMedium),
-                          const Text('If the codes match, confirm on your phone.'),
+                          Text(t.auth.pairingConfirmOnPhone),
                         ],
                       ],
                     ),
@@ -266,7 +265,7 @@ class _TvServerPairingDialogState extends State<_TvServerPairingDialog> {
                 ],
               ),
       ),
-      actions: [DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(context))],
+      actions: [DialogActionButton(label: t.common.cancel, onPressed: () => Navigator.pop(context))],
     );
   }
 }

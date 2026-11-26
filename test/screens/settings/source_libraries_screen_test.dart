@@ -287,7 +287,10 @@ void main() {
       await tester.tap(find.text('Open sources'));
       await tester.pumpAndSettle();
       final serverB = find.text('Server b');
-      await tester.ensureVisible(serverB);
+      expect(find.text('${t.kids.libraryCount(count: 4)} / 4'), findsOneWidget);
+      expect(find.byKey(const ValueKey('source-library-a:movie')), findsOneWidget);
+      await Scrollable.ensureVisible(tester.element(serverB), alignment: .3);
+      await tester.pumpAndSettle();
       await tester.tap(serverB);
       await tester.pumpAndSettle();
       await tester.tap(find.text(t.common.save));

@@ -273,6 +273,7 @@ void main() {
       libraryOrder: const [_musicLibrary],
     );
     addTearDown(harness.dispose);
+    await SettingsService.instance.write(SettingsService.tvEdgeMenu, false);
     await SettingsService.instance.write(SettingsService.compactTvLibraryNavigation, true);
     await harness.pump(tester);
     final scrollable = find.descendant(of: find.byType(LibraryBrowseTab), matching: find.byType(Scrollable)).first;
@@ -305,7 +306,7 @@ void main() {
   testWidgets('compact TV library menu switches tabs and persists the selection', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(true);
     final harness = await _Harness.create(
-      _GatedPreferences({'selected_library_key': _libraryA.globalKey}),
+      _GatedPreferences({'selected_library_key': _libraryA.globalKey, 'library_tab_${_libraryA.globalKey}': 'recommended'}),
       clients: [_HubClient()],
       libraryOrder: const [_libraryA],
     );
@@ -562,6 +563,18 @@ void main() {
     expect(harness.controller(tester).index, 0);
   });
 
+  testWidgets('an unavailable saved tab falls back to Browse without replacing the saved value', (tester) async {
+    final preferences = _GatedPreferences({
+      'selected_library_key': _libraryA.globalKey,
+      'library_tab_${_libraryA.globalKey}': 'old_removed_tab',
+    });
+    final harness = await _Harness.create(preferences);
+    addTearDown(harness.dispose);
+    await harness.pump(tester);
+    expect(harness.controller(tester).index, LibraryTabType.browse.index);
+    expect((await StorageService.getInstance()).getLibraryTab(_libraryA.globalKey), 'old_removed_tab');
+  });
+
   for (final isTv in [false, true]) {
     testWidgets('user tab changes are saved for the selected library on ${isTv ? 'TV' : 'mobile'}', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
@@ -578,16 +591,23 @@ void main() {
 
       await advanceLibraryFrames();
       final controller = harness.controller(tester);
-      expect(controller.index, LibraryTabType.recommended.index);
-
-      controller.index = LibraryTabType.browse.index;
-      await advanceLibraryFrames();
-      final storage = await StorageService.getInstance();
-      expect(storage.getLibraryTab(_libraryA.globalKey), LibraryTabType.browse.name);
+      expect(controller.index, LibraryTabType.browse.index);
 
       controller.index = LibraryTabType.recommended.index;
       await advanceLibraryFrames();
+      final storage = await StorageService.getInstance();
       expect(storage.getLibraryTab(_libraryA.globalKey), LibraryTabType.recommended.name);
+      final loadable = tester.state(find.byType(LibrariesScreen)) as LibraryLoadable;
+      loadable.loadLibraryByKey(_libraryB.globalKey);
+      await advanceLibraryFrames();
+      expect(controller.index, LibraryTabType.browse.index, reason: 'a different library has no saved choice');
+      loadable.loadLibraryByKey(_libraryA.globalKey);
+      await advanceLibraryFrames();
+      expect(controller.index, LibraryTabType.recommended.index, reason: 'the first library keeps its choice');
+
+      controller.index = LibraryTabType.browse.index;
+      await advanceLibraryFrames();
+      expect(storage.getLibraryTab(_libraryA.globalKey), LibraryTabType.browse.name);
       debugDefaultTargetPlatformOverride = null;
     });
   }
@@ -644,7 +664,7 @@ void main() {
     TvDetectionService.debugSetAppleTVOverride(true);
     final client = _HubClient();
     final harness = await _Harness.create(
-      _GatedPreferences({'selected_library_key': _libraryA.globalKey}),
+      _GatedPreferences({'selected_library_key': _libraryA.globalKey, 'library_tab_${_libraryA.globalKey}': 'recommended'}),
       clients: [client],
       libraryOrder: const [_libraryA],
     );
@@ -692,7 +712,7 @@ void main() {
           ),
       ];
     final harness = await _Harness.create(
-      _GatedPreferences({'selected_library_key': _libraryA.globalKey}),
+      _GatedPreferences({'selected_library_key': _libraryA.globalKey, 'library_tab_${_libraryA.globalKey}': 'recommended'}),
       clients: [client],
       libraryOrder: const [_libraryA],
     );
@@ -732,7 +752,7 @@ void main() {
   testWidgets('TV Up from Overview reaches the library tab then top navigation', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(true);
     final harness = await _Harness.create(
-      _GatedPreferences({'selected_library_key': _libraryA.globalKey}),
+      _GatedPreferences({'selected_library_key': _libraryA.globalKey, 'library_tab_${_libraryA.globalKey}': 'recommended'}),
       clients: [_HubClient()],
       libraryOrder: const [_libraryA],
     );
@@ -757,7 +777,7 @@ void main() {
   ) async {
     final client = _HubClient();
     final harness = await _Harness.create(
-      _GatedPreferences({'selected_library_key': _libraryA.globalKey}),
+      _GatedPreferences({'selected_library_key': _libraryA.globalKey, 'library_tab_${_libraryA.globalKey}': 'recommended'}),
       clients: [client],
       libraryOrder: const [_libraryA],
     );
@@ -819,7 +839,7 @@ void main() {
   testWidgets('Recommended live completion does not reclaim focus from a hosted cover', (tester) async {
     final client = _HubClient();
     final harness = await _Harness.create(
-      _GatedPreferences({'selected_library_key': _libraryA.globalKey}),
+      _GatedPreferences({'selected_library_key': _libraryA.globalKey, 'library_tab_${_libraryA.globalKey}': 'recommended'}),
       clients: [client],
       libraryOrder: const [_libraryA],
     );
@@ -860,7 +880,7 @@ void main() {
   testWidgets('entering the screen while its tab loads focuses the content once it lands', (tester) async {
     final client = _HubClient();
     final harness = await _Harness.create(
-      _GatedPreferences({'selected_library_key': _libraryA.globalKey}),
+      _GatedPreferences({'selected_library_key': _libraryA.globalKey, 'library_tab_${_libraryA.globalKey}': 'recommended'}),
       clients: [client],
       libraryOrder: const [_libraryA],
     );
@@ -888,7 +908,7 @@ void main() {
   testWidgets('service removals evict Discover and Recommended without bypassing their pacers', (tester) async {
     final client = _HubClient();
     final harness = await _Harness.create(
-      _GatedPreferences({'selected_library_key': _libraryA.globalKey}),
+      _GatedPreferences({'selected_library_key': _libraryA.globalKey, 'library_tab_${_libraryA.globalKey}': 'recommended'}),
       clients: [client],
       libraryOrder: const [_libraryA],
     );

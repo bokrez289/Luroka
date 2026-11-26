@@ -96,6 +96,52 @@ void main() {
       .map((card) => card.item as MediaItem)
       .toList();
 
+  testWidgets('watched filter is saved per profile and restored when returning', (tester) async {
+    final storage = await StorageService.getInstance();
+    await storage.setActiveProfileId('first');
+    final key = await mount(tester);
+    final filter = find.byKey(const ValueKey('favorites_hide_watched_shows'));
+    expect(tester.widget<IconButton>(filter).isSelected, isFalse);
+    await tester.tap(filter);
+    await tester.pumpAndSettle();
+    expect(storage.getFavoritesHideWatched('first'), isTrue);
+
+    await storage.setActiveProfileId('second');
+    key.currentState!.setActive(true);
+    await tester.pumpAndSettle();
+    expect(tester.widget<IconButton>(filter).isSelected, isFalse);
+    await storage.setActiveProfileId('first');
+    key.currentState!.setActive(true);
+    await tester.pumpAndSettle();
+    expect(tester.widget<IconButton>(filter).isSelected, isTrue);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await mount(tester);
+    expect(tester.widget<IconButton>(filter).isSelected, isTrue);
+  });
+
+  testWidgets('hide watched titles filters movies and keeps unknown and in-progress items', (tester) async {
+    final data = ValueNotifier<List<MediaItem>>([
+      MediaItem.plex(id: 'done', kind: MediaKind.show, title: 'Done', leafCount: 5, viewedLeafCount: 5),
+      MediaItem.plex(id: 'new', kind: MediaKind.show, title: 'New', leafCount: 6, viewedLeafCount: 5),
+      MediaItem.plex(id: 'unknown', kind: MediaKind.show, title: 'Unknown'),
+      MediaItem.plex(id: 'movie', kind: MediaKind.movie, title: 'Movie', viewCount: 1),
+      MediaItem.plex(id: 'unwatched', kind: MediaKind.movie, title: 'Unwatched'),
+      MediaItem.plex(id: 'rewatching', kind: MediaKind.movie, title: 'Rewatching',
+        viewCount: 1, viewOffsetMs: 60000, durationMs: 600000),
+    ]);
+    addTearDown(data.dispose);
+    await mount(tester, data: data);
+    await tester.tap(find.byKey(const ValueKey('favorites_hide_watched_shows')));
+    await tester.pumpAndSettle();
+    expect(cards(tester).map((item) => item.id), isNot(contains('done')));
+    expect(cards(tester).map((item) => item.id), isNot(contains('movie')));
+    expect(cards(tester).map((item) => item.id), containsAll(['new', 'unknown', 'unwatched', 'rewatching']));
+    await tester.tap(find.byKey(const ValueKey('favorites_hide_watched_shows')));
+    await tester.pumpAndSettle();
+    expect(cards(tester).map((item) => item.id), contains('done'));
+  });
+
   testWidgets('anime filter appears only while favorites contain anime', (tester) async {
     final data = ValueNotifier<List<MediaItem>>([items.first]);
     addTearDown(data.dispose);
@@ -316,7 +362,7 @@ void main() {
     final key = await mount(tester, data: data, libraries: [library]);
     key.currentState!.focusContent();
     await tester.pumpAndSettle();
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 6; i++) {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await tester.pumpAndSettle();
     }

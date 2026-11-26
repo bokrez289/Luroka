@@ -36,6 +36,8 @@ class LiveHomePreview extends StatelessWidget {
     this.layout,
     this.showSpotlight,
     this.phoneCinematic,
+    this.tabletMarquee,
+    this.tabletTonightPicks,
     this.posterDetails,
     this.episodeThumbnails,
     this.previewKey,
@@ -44,6 +46,8 @@ class LiveHomePreview extends StatelessWidget {
   final HomeLayout? layout;
   final bool? showSpotlight;
   final bool? phoneCinematic;
+  final bool? tabletMarquee;
+  final bool? tabletTonightPicks;
   final bool? posterDetails;
   final bool? episodeThumbnails;
   final Key? previewKey;
@@ -123,6 +127,8 @@ class LiveHomePreview extends StatelessWidget {
         SettingsService.homeEpisodeThumbnails,
         SettingsService.homeHeroSize,
         SettingsService.phoneCinematicSpotlight,
+        SettingsService.tabletMarquee,
+        SettingsService.tabletTonightPicks,
         SettingsService.phoneSpotlightSize,
         SettingsService.homePosterSize,
         SettingsService.homeShelfItemCount,
@@ -229,7 +235,11 @@ class LiveHomePreview extends StatelessWidget {
                       if (showHero) ...[
                         const SizedBox(height: 8),
                         PlatformDetector.isMobile(context)
-                            ? _phoneHero(context, hero, home.spotlightSource, selected.firstOrNull?.$2.title)
+                            ? phone
+                                ? _phoneHero(context, hero, home.spotlightSource, selected.firstOrNull?.$2.title)
+                                : _tabletHero(context, home.spotlightSource == HomeSpotlightSource.trending
+                                    ? trending : [for (final entry in selected) entry.$1], selected.firstOrNull?.$2.title,
+                                    {for (final entry in selected) entry.$1.globalKey: entry.$2.title})
                             : _hero(context, hero, heroHeight, home.spotlightSource),
                       ],
                       for (final row in displayRows) ...[
@@ -258,6 +268,35 @@ class LiveHomePreview extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _tabletHero(BuildContext context, List<MediaItem> picks, String? label, Map<String, String> labels) {
+    final size = MediaQuery.sizeOf(context);
+    final items = picks.isNotEmpty ? picks : const [
+      MediaItem.plex(id: 'sample-sand', kind: MediaKind.movie, title: 'Sea of Sand'),
+      MediaItem.plex(id: 'sample-light', kind: MediaKind.show, title: 'Afterglow'),
+      MediaItem.plex(id: 'sample-red', kind: MediaKind.movie, title: 'Red Country'),
+    ];
+    return FittedBox(
+      key: const ValueKey('live-home-spotlight'),
+      fit: BoxFit.contain,
+      child: SizedBox(
+        width: size.width,
+        height: MobileHomeCarousel.heightFor(context, size.width, availableHeight: size.height - 100, marqueeOverride: tabletMarquee, picksOverride: tabletTonightPicks),
+        child: MobileHomeCarousel(
+          key: ValueKey((tabletMarquee ?? SettingsService.instance.read(SettingsService.tabletMarquee), tabletTonightPicks ?? SettingsService.instance.read(SettingsService.tabletTonightPicks))),
+          marqueeOverride: tabletMarquee,
+          picksOverride: tabletTonightPicks,
+          items: items,
+          label: label ?? t.lurokaWorkspace.spotlight,
+          labelFor: (item) => labels[item.globalKey] ?? label ?? t.lurokaWorkspace.spotlight,
+          resolveClient: (item) => item.serverId == null ? null : context.tryGetMediaClientForServer(ServerId(item.serverId!)),
+          onPlay: (_) {},
+          onDetails: (_) {},
+          active: false,
+        ),
+      ),
     );
   }
 

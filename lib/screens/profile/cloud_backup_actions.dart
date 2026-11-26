@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import '../../i18n/strings.g.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -247,7 +248,7 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
                   : 'The backup was not uploaded. Check the selection and try again.',
             ),
             actions: [
-              DialogActionButton(label: 'OK', isPrimary: true, autofocus: true, onPressed: () => Navigator.pop(dialog)),
+              DialogActionButton(label: t.common.ok, isPrimary: true, autofocus: true, onPressed: () => Navigator.pop(dialog)),
             ],
           ),
         );
@@ -307,9 +308,7 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Select the profiles to include. Your backup is encrypted before upload and is available for 90 days.',
-                      ),
+                      Text(t.auth.cloudBackupSelectProfiles),
                       const SizedBox(height: 8),
                       const Text('Include the linked parent with each Kids profile.'),
                       if (requiresPlexConnection && !_includeCredentials)
@@ -330,10 +329,8 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
                                 }),
                         ),
                       FocusableListTile(
-                        title: const Text('Include saved server and integration logins'),
-                        subtitle: const Text(
-                          'Includes linked Plex accounts and other saved logins to help reconnect. Anyone with the recovery code may be able to use them.',
-                        ),
+                        title: Text(t.auth.cloudBackupIncludeLogins),
+                        subtitle: Text(t.auth.cloudBackupLoginsWarning),
                         selected: _includeCredentials,
                         trailing: Icon(_includeCredentials ? Icons.check_box : Icons.check_box_outline_blank),
                         onTap: _busy || _uploadAttempted
@@ -341,14 +338,14 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
                             : () => setState(() => _includeCredentials = !_includeCredentials),
                       ),
                       if (!_includeCredentials)
-                        const Text('Without saved logins, you will need to reconnect servers after restoring.'),
+                        Text(t.auth.cloudBackupNoLogins),
                       const Text('Downloads are not included.'),
                     ],
                   ),
           ),
         ),
         actions: [
-          DialogActionButton(label: 'Cancel', onPressed: _busy ? null : () => Navigator.pop(context)),
+          DialogActionButton(label: t.common.cancel, onPressed: _busy ? null : () => Navigator.pop(context)),
           DialogActionButton(
             label: _uploadAttempted ? 'Retry upload' : 'Continue',
             isPrimary: true,
@@ -372,7 +369,7 @@ Future<bool> _offerLocalCopy(BuildContext context, String envelope) async {
             : 'Choose whether to save a local copy before uploading. The same recovery code is needed for both copies.',
       ),
       actions: [
-        DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(dialog)),
+        DialogActionButton(label: t.common.cancel, onPressed: () => Navigator.pop(dialog)),
         DialogActionButton(
           label: 'Cloud only — upload backup',
           isPrimary: true,
@@ -396,7 +393,7 @@ Future<bool> _offerLocalCopy(BuildContext context, String envelope) async {
       path = file.path;
     } else {
       path = await FilePickerService.instance.saveFile(
-        dialogTitle: 'Save encrypted backup',
+        dialogTitle: t.auth.saveEncryptedBackup,
         fileName: filename,
         bytes: bytes,
         type: FileType.custom,
@@ -451,9 +448,9 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
   Future<void> _copy() async {
     try {
       await Clipboard.setData(ClipboardData(text: widget.code.reveal()));
-      if (mounted) setState(() => _status = 'Recovery code copied. Save it somewhere private.');
+      if (mounted) setState(() => _status = t.auth.recoveryCopied);
     } catch (_) {
-      if (mounted) setState(() => _status = 'Could not copy the recovery code.');
+      if (mounted) setState(() => _status = t.auth.recoveryCopyFailed);
     }
   }
 
@@ -465,15 +462,15 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
     });
     try {
       final path = await FilePickerService.instance.saveFile(
-        dialogTitle: 'Save recovery code privately',
+        dialogTitle: t.auth.recoverySaveDialog,
         fileName: 'luroka-recovery-code.txt',
         bytes: Uint8List.fromList(utf8.encode(widget.code.reveal())),
         type: FileType.custom,
         allowedExtensions: const ['txt'],
       );
-      if (mounted && path != null) setState(() => _status = 'Recovery code saved. Keep the file private.');
+      if (mounted && path != null) setState(() => _status = t.auth.recoverySaved);
     } catch (_) {
-      if (mounted) setState(() => _status = 'Could not save the recovery code. Try copying it instead.');
+      if (mounted) setState(() => _status = t.auth.recoverySaveFailed);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -488,7 +485,7 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
       final size = MediaQuery.sizeOf(context);
       final qrSize = (size.height * .42).clamp(150.0, 280.0);
       return AlertDialog(
-        title: const Text('Step 2 of 3: Save your recovery code'),
+        title: Text(t.auth.recoveryCodeStep),
         content: SizedBox(
           width: 650,
           child: Row(
@@ -507,18 +504,14 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Keep a private copy of this code. To restore on your phone, open Luroka’s cloud backup restore option and choose Scan recovery code.',
-                      ),
+                      Text(t.auth.recoveryCodePhoneInstructions),
                       const SizedBox(height: 8),
-                      const Text(
-                        'You need this code to restore or delete your backup. Anyone with it can access the backup. If you lose it, Luroka cannot recover it.',
-                      ),
+                      Text(t.auth.recoveryCodeWarning),
                       const SizedBox(height: 8),
                       Text(
                         widget.retrying
                             ? 'The previous upload may have completed. Continue to retry with the same code.'
-                            : 'Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.',
+                            : t.auth.backupNotUploaded,
                         style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
                       ),
                       const SizedBox(height: 8),
@@ -531,9 +524,9 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
           ),
         ),
         actions: [
-          DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(context, false)),
+          DialogActionButton(label: t.common.cancel, onPressed: () => Navigator.pop(context, false)),
           DialogActionButton(
-            label: 'I saved my code — continue',
+            label: t.auth.recoveryCodeSavedContinue,
             isPrimary: true,
             autofocus: true,
             onPressed: () => Navigator.pop(context, true),
@@ -542,7 +535,7 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
       );
     }
     return AlertDialog(
-      title: const Text('Step 2 of 3: Save your recovery code'),
+      title: Text(t.auth.recoveryCodeStep),
       content: SizedBox(
         width: 460,
         child: SingleChildScrollView(
@@ -550,14 +543,12 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'You need this code to restore or delete your backup. Anyone with it can access the backup. If you lose it, Luroka cannot recover it.',
-              ),
+              Text(t.auth.recoveryCodeWarning),
               const SizedBox(height: 12),
               Text(
                 widget.retrying
                     ? 'The previous upload may have completed. This is the same recovery code; continue to retry or check it.'
-                    : 'Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.',
+                    : t.auth.backupNotUploaded,
                 style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
               ),
               if (showQr) ...[
@@ -568,24 +559,24 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
               SelectableText(widget.code.reveal(), textAlign: TextAlign.center),
               if (mobile) ...[
                 const SizedBox(height: 8),
-                const Text('Only copy or save the code somewhere private. A saved code file is not encrypted.'),
+                Text(t.auth.recoveryCodePrivateFile),
                 Wrap(
                   alignment: WrapAlignment.center,
                   children: [
                     TextButton.icon(
                       onPressed: _saving ? null : _copy,
                       icon: const Icon(Icons.copy),
-                      label: const Text('Copy code'),
+                      label: Text(t.watchTogether.copyCode),
                     ),
                     TextButton.icon(
                       onPressed: _saving ? null : _saveFile,
                       icon: const Icon(Icons.save_alt),
-                      label: const Text('Save code to file'),
+                      label: Text(t.auth.recoveryCodeSaveFile),
                     ),
                     TextButton.icon(
                       onPressed: _saving ? null : () => setState(() => _showQr = !_showQr),
                       icon: const Icon(Icons.qr_code),
-                      label: Text(_showQr ? 'Hide QR code' : 'Show QR code'),
+                      label: Text(_showQr ? t.auth.recoveryCodeHideQr : t.auth.recoveryCodeShowQr),
                     ),
                   ],
                 ),
@@ -596,9 +587,9 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
         ),
       ),
       actions: [
-        DialogActionButton(label: 'Cancel', onPressed: _saving ? null : () => Navigator.pop(context, false)),
+        DialogActionButton(label: t.common.cancel, onPressed: _saving ? null : () => Navigator.pop(context, false)),
         DialogActionButton(
-          label: 'I saved my code — continue',
+          label: t.auth.recoveryCodeSavedContinue,
           isPrimary: true,
           autofocus: true,
           onPressed: _saving ? null : () => Navigator.pop(context, true),
@@ -626,7 +617,7 @@ Future<bool> showCloudBackupRestore(
             'Cloud backups cannot be merged with profiles or connections already on this device. On an empty installation, choose “Restore cloud backup” on the welcome screen and enter your recovery code.',
           ),
           actions: [
-            DialogActionButton(label: 'OK', isPrimary: true, autofocus: true, onPressed: () => Navigator.pop(dialog)),
+            DialogActionButton(label: t.common.ok, isPrimary: true, autofocus: true, onPressed: () => Navigator.pop(dialog)),
           ],
         ),
       );
@@ -709,20 +700,19 @@ Future<bool> showCloudBackupRestore(
     if (context.mounted) {
       final String message;
       if (applying) {
-        message = 'The backup was downloaded but could not be restored on this device. Try again or contact support.';
+        message = t.auth.cloudRestoreApplyFailed;
       } else if (error is CloudBackupNotFoundException) {
-        message =
-            'No cloud backup was found for this code. On the original device, finish step 3 and wait for Cloud backup created. Check that you are using the code saved for that backup; it may also have expired or been deleted.';
+        message = t.auth.cloudBackupNotFound;
       } else if (error is CloudBackupHttpException) {
         message = error.statusCode == 429
             ? 'The backup service is busy. Please wait a moment and try again.'
             : 'The backup service could not complete the request. Please try again later.';
       } else if (error is SocketException || error is TimeoutException || error is HttpException) {
-        message = 'Could not connect to the backup service. Check your internet connection and try again.';
+        message = t.auth.cloudBackupConnectionFailed;
       } else if (error is FormatException) {
-        message = 'The recovery code or backup format could not be read. Check the complete code and try again.';
+        message = t.auth.cloudBackupInvalidFormat;
       } else {
-        message = 'The backup could not be opened. Check your recovery code and try again.';
+        message = t.auth.cloudBackupOpenFailed;
       }
       await showErrorDialog(context, message);
     }
@@ -860,9 +850,9 @@ class _TvRecoveryCodeDialogState extends State<_TvRecoveryCodeDialog> {
                         const Text('Scan with your phone, then scan or paste your saved recovery code there.'),
                         const SizedBox(height: 16),
                         if (code == null)
-                          const Text('Waiting for your phone to connect…')
+                  Text(t.auth.pairingWaitForPhone)
                         else ...[
-                          const Text('Compare this code with your phone:'),
+                  Text(t.auth.pairingComparePhone),
                           Text(
                             code,
                             key: const ValueKey('tv-restore-check-code'),
@@ -876,7 +866,7 @@ class _TvRecoveryCodeDialogState extends State<_TvRecoveryCodeDialog> {
               ),
       ),
       actions: [
-        DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(context)),
+        DialogActionButton(label: t.common.cancel, onPressed: () => Navigator.pop(context)),
         DialogActionButton(label: 'Enter manually', onPressed: _manual),
       ],
     );
@@ -976,7 +966,7 @@ class _RecoveryCodeDialogState extends State<_RecoveryCodeDialog> {
           FocusableTextField(
             controller: controller,
             obscureText: true,
-            decoration: const InputDecoration(labelText: 'Recovery code'),
+            decoration: InputDecoration(labelText: t.auth.recoveryCodeLabel),
           ),
           if (PlatformDetector.isMobile(context))
             TextButton.icon(
@@ -985,13 +975,13 @@ class _RecoveryCodeDialogState extends State<_RecoveryCodeDialog> {
                 if (mounted && scanned != null) controller.text = scanned;
               },
               icon: const Icon(Icons.qr_code_scanner),
-              label: const Text('Scan recovery code'),
+              label: Text(t.auth.recoveryCodeScan),
             ),
         ],
       ),
     ),
     actions: [
-      DialogActionButton(label: 'Cancel', onPressed: () => Navigator.pop(context)),
+      DialogActionButton(label: t.common.cancel, onPressed: () => Navigator.pop(context)),
       DialogActionButton(
         label: widget.action,
         isPrimary: true,

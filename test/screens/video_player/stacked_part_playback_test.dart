@@ -107,8 +107,8 @@ void main() {
     final player = _StackedPlayer();
     final client = _StackedClient();
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       testBody: () async {
         await startOnPartOne(tester, player, client);
 
@@ -137,8 +137,8 @@ void main() {
     final player = _StackedPlayer();
     final client = _StackedClient();
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       testBody: () async {
         final key = await startOnPartOne(tester, player, client);
 

@@ -578,6 +578,13 @@ class _Translations$kidsShelf$kk extends Translations$kidsShelf$en {
 	@override String get yourShelf => 'Сіздің фильм сөресі';
 	@override String get all => 'Барлығы';
 	@override String get pickSomething => 'Не көргіңіз келеді?';
+	@override String get atmosphere => 'Басты беттің атмосферасы';
+	@override String get atmosphereHint => 'Балаларға арналған басты беттің түстерін таңдаңыз. Ағаш үй өзгермейді.';
+	@override String get sunshine => 'Күн сәулесі';
+	@override String get berry => 'Жидек';
+	@override String get mint => 'Жалбыз';
+	@override String get sky => 'Аспан';
+	@override String get atmospherePreview => 'Басты бетті алдын ала қарау';
 }
 
 // Path: kidsHome
@@ -785,6 +792,23 @@ class _Translations$kids$kk extends Translations$kids$en {
 	final TranslationsKk _root; // ignore: unused_field
 
 	// Translations
+	@override String get allLibrariesHint => 'Жаңа фильмдер мен телехикаялар кітапханалары да қосылады. Белгілі кітапханаларды таңдау үшін бұл параметрді өшіріңіз.';
+	@override String get appearanceSection => 'Сыртқы көрініс';
+	@override String get disableParentPin => 'Ата-ана PIN кодын өшіру';
+	@override String get disableParentPinConfirm => 'Барлық бала профильдері үшін ата-ана PIN кодын өшіру керек пе? Балалар қорғалмаған профильдерге ауысып, экран уақыты шектеулерін айналып өте алады. Профиль PIN кодтары күшінде қалады.';
+	@override String get discardAction => 'Өзгерістерден бас тарту';
+	@override String get discardMessage => 'Өзгерістеріңіз сақталған жоқ.';
+	@override String get discardTitle => 'Өзгерістерден бас тарту керек пе?';
+	@override String get editorTitle => 'Бала профилінің баптаулары';
+	@override String libraryCount({required Object count}) => 'Таңдалған кітапханалар: ${count}';
+	@override String get moreSection => 'Қосымша';
+	@override String get pinChoice => 'Ата-ана PIN кодын пайдалану';
+	@override String get pinChoiceHint => 'Ұсынылады. Ата-ана PIN коды болмаса, балалар қорғалмаған профильдерге ауысып, балалар баптауларын өзгерте алады. Профильді ауыстыру арқылы экран уақыты шектеулерін айналып өте алады.';
+	@override String get pinDifference => 'Ата-ана PIN коды балалар баптауларын қорғайды. Профиль PIN коды жеке профильді қорғайды. Бала профилінен шығу үшін ата-ана PIN кодының қажет болуы бөлек реттеледі.';
+	@override String get pinDisabledWarning => 'Ата-ана PIN коды болмаса, балалар бала профилінен шығып, қорғалмаған профильдерге кіре алады. Профильді ауыстыру арқылы экран уақыты шектеулерін айналып өте алады. Жеке профильдердің PIN кодтары күшінде қалады.';
+	@override String get profileSection => 'Профиль';
+	@override String get timeLimitNoPinHint => 'Экран уақытын басқару үшін профильді ауыстырыңыз. Ата-ана PIN коды болмаса, кез келген адам қорғалмаған профильге ауыса алады.';
+	@override String get watchSection => 'Көруге болатын мазмұн';
 	@override String get timeLimits => 'Экран уақытының шектеулері';
 	@override String get dailyWatchLimit => 'Күнделікті көру уақыты';
 	@override String get dailyWatchLimitHint => 'Бұл құрылғыда күн сайын бейне ойнатуды шектейді.';
@@ -969,6 +993,72 @@ class _Translations$auth$kk extends Translations$auth$en {
 	final TranslationsKk _root; // ignore: unused_field
 
 	// Translations
+	@override String get plexQrSignIn => 'Plex жүйесіне QR кодпен кіру';
+	@override String get setUpWithPhone => 'Телефонмен баптау';
+	@override String get loadingRestoredData => 'Қалпына келтірілген профильдер мен қосылымдар жүктелуде…';
+	@override String get loadingRestoredDataFailed => 'Қалпына келтірілген деректерді жүктеу мүмкін болмады. Қайталап көріңіз немесе Luroka-ны қайта ашыңыз.';
+	@override String get connectTv => 'Теледидарды қосу';
+	@override String get restoreEncryptedBackup => 'Шифрланған сақтық көшірмені қалпына келтіру';
+	@override String get restoreCloudBackup => 'Бұлттағы сақтық көшірмені қалпына келтіру';
+	@override String get saveEncryptedBackup => 'Шифрланған сақтық көшірмені сақтау';
+	@override String get backupSaved => 'Сақтық көшірме сақталды';
+	@override String get createEncryptedBackup => 'Шифрланған сақтық көшірме жасау';
+	@override String get confirmBackupPassword => 'Құпиясөзді растаңыз';
+	@override String get enterBackupPassword => 'Құпиясөзді енгізіңіз.';
+	@override String get confirmBackupPasswordError => 'Құпиясөзді енгізіп, растаңыз.';
+	@override String get restoreBackupAction => 'Қалпына келтіру';
+	@override String get backupCreateInstructions => 'Профильдер, серверге кіру деректері және жергілікті қарау деректері қамтылады. Құпиясөзді қауіпсіз сақтаңыз; ол қалпына келтіру үшін қажет.';
+	@override String get backupRestoreInstructions => 'Бұл сақтық көшірмені жасау кезінде пайдаланылған құпиясөзді немесе бұлттағы қалпына келтіру кодын енгізіңіз. Қалпына келтіру үшін профильдер дерекқоры бос болуы керек.';
+	@override String get backupCreateFailed => 'Шифрланған сақтық көшірмені жасау мүмкін болмады.';
+	@override String get backupRestoreFailed => 'Сақтық көшірмені қалпына келтіру мүмкін болмады. Құпиясөзді тексеріп, бос орнатылымды пайдаланыңыз.';
+	@override String get recoveryCodeStep => '2/3 қадам: Қалпына келтіру кодын сақтаңыз';
+	@override String get backupNotUploaded => 'Әлі жүктелмеді. Қалпына келтіру алдында 3-қадамды аяқтап, бұлттық сақтық көшірме жасалғаны туралы растауды күтіңіз.';
+	@override String get recoveryCodeSavedContinue => 'Кодты сақтадым — жалғастыру';
+	@override String get recoveryCodeSaveFile => 'Кодты файлға сақтау';
+	@override String get recoveryCodeShowQr => 'QR кодын көрсету';
+	@override String get recoveryCodeHideQr => 'QR кодын жасыру';
+	@override String get recoveryCopied => 'Қалпына келтіру коды көшірілді. Оны құпия жерде сақтаңыз.';
+	@override String get recoveryCopyFailed => 'Қалпына келтіру кодын көшіру мүмкін болмады.';
+	@override String get recoverySaveDialog => 'Қалпына келтіру кодын құпия жерде сақтаңыз';
+	@override String get recoverySaved => 'Қалпына келтіру коды сақталды. Файлды құпия ұстаңыз.';
+	@override String get recoverySaveFailed => 'Қалпына келтіру кодын сақтау мүмкін болмады. Оның орнына көшіріп көріңіз.';
+	@override String get cloudRestoreApplyFailed => 'Сақтық көшірме жүктелді, бірақ оны осы құрылғыда қалпына келтіру мүмкін болмады. Қайталап көріңіз немесе қолдау қызметіне хабарласыңыз.';
+	@override String get cloudBackupNotFound => 'Бұл код үшін бұлттық сақтық көшірме табылмады. Бастапқы құрылғыда 3-қадамды аяқтап, көшірме жасалғаны туралы растауды күтіңіз. Сол көшірме үшін сақталған кодты пайдаланып жатқаныңызды тексеріңіз; көшірменің мерзімі өтуі немесе жойылуы мүмкін.';
+	@override String get cloudBackupConnectionFailed => 'Сақтық көшірме қызметіне қосылу мүмкін болмады. Интернет байланысын тексеріп, қайталап көріңіз.';
+	@override String get cloudBackupInvalidFormat => 'Қалпына келтіру кодын немесе көшірме пішімін оқу мүмкін болмады. Кодты толық тексеріп, қайталап көріңіз.';
+	@override String get cloudBackupOpenFailed => 'Сақтық көшірмені ашу мүмкін болмады. Қалпына келтіру кодын тексеріп, қайталап көріңіз.';
+	@override String get cloudBackupSelectProfiles => 'Қосылатын профильдерді таңдаңыз. Сақтық көшірме жүктелмес бұрын шифрланады және 90 күн қолжетімді болады.';
+	@override String get cloudBackupIncludeLogins => 'Сақталған сервер және интеграция кіру деректерін қосу';
+	@override String get cloudBackupLoginsWarning => 'Қайта қосылуға көмектесу үшін байланыстырылған Plex аккаунттары мен басқа сақталған кіру деректері қосылады. Қалпына келтіру коды бар кез келген адам оларды пайдалана алуы мүмкін.';
+	@override String get cloudBackupNoLogins => 'Сақталған кіру деректері болмаса, қалпына келтіргеннен кейін серверлерге қайта қосылуыңыз қажет.';
+	@override String get pairingHttpPhoneTitle => 'Бұл сервер үшін HTTP пайдаланылсын ба?';
+	@override String get pairingHttpPhoneWarning => 'Серверге кіру деректері мен медиа трафигіңіз шифрланбайды. Желідегі адамдар оларды оқуы мүмкін. HTTPS ұсынылады. Luroka арқылы тасымалдау шифрланған күйде қалады.';
+	@override String get pairingHttpTvTitle => 'Шифрланбаған сервер пайдаланылсын ба?';
+	@override String get pairingHttpTvWarning => 'Телефоныңыз HTTP таңдады. Осы желідегі адамдар теледидардың кіру токені мен медиа трафигін оқуы мүмкін. Тек сенімді желіні пайдаланыңыз. HTTPS ұсынылады.';
+	@override String get pairingUseHttp => 'HTTP пайдалану';
+	@override String get pairingTvTitle => 'Jellyfin немесе Emby қызметін телефонмен қосу';
+	@override String get pairingScanInvitation => 'Телефонмен сканерлеңіз. Шақыру мерзімі бес минуттан кейін аяқталады.';
+	@override String get pairingWaitForPhone => 'Телефонның қосылуы күтілуде…';
+	@override String get pairingComparePhone => 'Бұл кодты телефоныңыздағы кодпен салыстырыңыз:';
+	@override String get pairingConfirmOnPhone => 'Кодтар сәйкес келсе, телефоныңызда растаңыз.';
+	@override String get pairingAdultOnly => 'Жұптастыру тек ересек адамның профилінен қолжетімді.';
+	@override String get pairingProfileChanged => 'Профильге қолжетімділік өзгерді. Жұптастыру тоқтатылды.';
+	@override String get pairingServiceUnavailable => 'Жұптастыру қызметі қолжетімсіз. Қайталап көріңіз немесе серверді қолмен енгізіңіз.';
+	@override String get pairingExpired => 'Жұптастыру мерзімі аяқталды немесе үзілді. Қайта бастаңыз.';
+	@override String get pairingVerifyFailed => 'Сервер мен аккаунтты тексеру мүмкін болмады. Жұптастыруды қайта бастаңыз.';
+	@override String get pairingScanOrPaste => 'Теледидар кодын сканерлеңіз немесе шақыруды қойыңыз.';
+	@override String get pairingScanTv => 'Теледидар кодын сканерлеу';
+	@override String get pairingTvInvitation => 'Теледидар шақыруы';
+	@override String pairingCheckTvCode({required Object code}) => 'Теледидарда бірдей код көрсетілгенін тексеріңіз: ${code}';
+	@override String get pairingCodesMatch => 'Кодтар сәйкес келеді';
+	@override String get recoveryCodeLabel => 'Қалпына келтіру коды';
+	@override String get recoveryCodeScan => 'Қалпына келтіру кодын сканерлеу';
+	@override String get pairingRecoveryInstructions => 'Сақталған қалпына келтіру кодын сканерлеңіз немесе қойыңыз. Ол теледидарыңыз үшін шифрланады.';
+	@override String get pairingSendTv => 'Теледидарға жіберу';
+	@override String get pairingServerLoginHint => 'Серверіңізге кіріңіз. Құпиясөз Luroka-ға емес, сол серверге жіберіледі.';
+	@override String get recoveryCodeWarning => 'Сақтық көшірмені қалпына келтіру немесе жою үшін бұл код қажет. Кодты білетін кез келген адам көшірмеге қол жеткізе алады. Оны жоғалтсаңыз, Luroka оны қалпына келтіре алмайды.';
+	@override String get recoveryCodePrivateFile => 'Кодты тек құпия жерде көшіріңіз немесе сақтаңыз. Сақталған код файлы шифрланбайды.';
+	@override String get recoveryCodePhoneInstructions => 'Кодтың құпия көшірмесін сақтаңыз. Телефонда қалпына келтіру үшін Luroka-дағы бұлттық көшірмені қалпына келтіруді ашып, кодты сканерлеуді таңдаңыз.';
 	@override String get signInWithPlex => 'Plex арқылы кіру';
 	@override String get showQRCode => 'QR кодты көрсету';
 	@override String get authenticate => 'Растау';
@@ -3865,6 +3955,13 @@ class _Translations$profileSetupGuide$kk extends Translations$profileSetupGuide$
 	final TranslationsKk _root; // ignore: unused_field
 
 	// Translations
+	@override String get tabletSpotlightStyle => 'Планшеттегі таңдаулы мазмұн стилі';
+	@override String get spotlightClassic => 'Классикалық';
+	@override String get spotlightMarquee => 'Марки';
+	@override String get spotlightTonight => 'Бүгінгі кешке ұсыныстар';
+	@override String get phoneSpotlight => 'Телефондағы кино стиліндегі таңдаулы мазмұн';
+	@override String get phoneSpotlightCinematic => 'Атауы үстіне жазылған көлденең сурет';
+	@override String get phoneSpotlightClassic => 'Классикалық постер картасы';
 	@override String get title => 'Профильіңізді өзіңіздікі етіңіз';
 	@override String get description => 'Luroka осы құрылғыдағы осы профильге қалай қарайтынын таңдаңыз. Барлығын кейін "Параметрлер" бөлімінен өзгертуге болады.';
 	@override String get appearanceStep => '1/2 · Көрініс';
@@ -5243,6 +5340,13 @@ extension on TranslationsKk {
 			'kidsShelf.yourShelf' => 'Сіздің фильм сөресі',
 			'kidsShelf.all' => 'Барлығы',
 			'kidsShelf.pickSomething' => 'Не көргіңіз келеді?',
+			'kidsShelf.atmosphere' => 'Басты беттің атмосферасы',
+			'kidsShelf.atmosphereHint' => 'Балаларға арналған басты беттің түстерін таңдаңыз. Ағаш үй өзгермейді.',
+			'kidsShelf.sunshine' => 'Күн сәулесі',
+			'kidsShelf.berry' => 'Жидек',
+			'kidsShelf.mint' => 'Жалбыз',
+			'kidsShelf.sky' => 'Аспан',
+			'kidsShelf.atmospherePreview' => 'Басты бетті алдын ала қарау',
 			'kidsHome.everything' => 'Сізге',
 			'kidsHome.keepWatching' => 'Қарауды жалғастырыңыз',
 			'kidsHome.emptyFilter' => 'Мұнда әлі ештеңе жоқ. Сіз үшін көріңіз немесе үлкеніңізден өзіңізге ұнайтын нәрсені қосуды сұраңыз.',
@@ -5387,6 +5491,23 @@ extension on TranslationsKk {
 			'detailComposition.mediaInformation' => 'БАҚ туралы ақпарат',
 			'detailComposition.fullFileInformation' => 'Толық файл ақпараты',
 			'detailComposition.castAndCrew' => 'Рөлдер және түсірілім тобы',
+			'kids.allLibrariesHint' => 'Жаңа фильмдер мен телехикаялар кітапханалары да қосылады. Белгілі кітапханаларды таңдау үшін бұл параметрді өшіріңіз.',
+			'kids.appearanceSection' => 'Сыртқы көрініс',
+			'kids.disableParentPin' => 'Ата-ана PIN кодын өшіру',
+			'kids.disableParentPinConfirm' => 'Барлық бала профильдері үшін ата-ана PIN кодын өшіру керек пе? Балалар қорғалмаған профильдерге ауысып, экран уақыты шектеулерін айналып өте алады. Профиль PIN кодтары күшінде қалады.',
+			'kids.discardAction' => 'Өзгерістерден бас тарту',
+			'kids.discardMessage' => 'Өзгерістеріңіз сақталған жоқ.',
+			'kids.discardTitle' => 'Өзгерістерден бас тарту керек пе?',
+			'kids.editorTitle' => 'Бала профилінің баптаулары',
+			'kids.libraryCount' => ({required Object count}) => 'Таңдалған кітапханалар: ${count}',
+			'kids.moreSection' => 'Қосымша',
+			'kids.pinChoice' => 'Ата-ана PIN кодын пайдалану',
+			'kids.pinChoiceHint' => 'Ұсынылады. Ата-ана PIN коды болмаса, балалар қорғалмаған профильдерге ауысып, балалар баптауларын өзгерте алады. Профильді ауыстыру арқылы экран уақыты шектеулерін айналып өте алады.',
+			'kids.pinDifference' => 'Ата-ана PIN коды балалар баптауларын қорғайды. Профиль PIN коды жеке профильді қорғайды. Бала профилінен шығу үшін ата-ана PIN кодының қажет болуы бөлек реттеледі.',
+			'kids.pinDisabledWarning' => 'Ата-ана PIN коды болмаса, балалар бала профилінен шығып, қорғалмаған профильдерге кіре алады. Профильді ауыстыру арқылы экран уақыты шектеулерін айналып өте алады. Жеке профильдердің PIN кодтары күшінде қалады.',
+			'kids.profileSection' => 'Профиль',
+			'kids.timeLimitNoPinHint' => 'Экран уақытын басқару үшін профильді ауыстырыңыз. Ата-ана PIN коды болмаса, кез келген адам қорғалмаған профильге ауыса алады.',
+			'kids.watchSection' => 'Көруге болатын мазмұн',
 			'kids.timeLimits' => 'Экран уақытының шектеулері',
 			'kids.dailyWatchLimit' => 'Күнделікті көру уақыты',
 			'kids.dailyWatchLimitHint' => 'Бұл құрылғыда күн сайын бейне ойнатуды шектейді.',
@@ -5459,6 +5580,8 @@ extension on TranslationsKk {
 			'kids.freshStories' => 'Ашылатын жаңа әңгімелер',
 			'kids.yourMovies' => 'Фильм уақытының таңдаулылары',
 			'kids.yourShows' => 'Тағы бір эпизод',
+			_ => null,
+		} ?? switch (path) {
 			'kids.emptyHint' => 'Серверде рұқсат етілген жас классификациясы бар атаулар болған кезде жаңа шытырман оқиғалар осында пайда болады.',
 			'kids.title' => 'Luroka Балалар',
 			'kids.addProfile' => 'Балалар профилін қосыңыз',
@@ -5483,8 +5606,6 @@ extension on TranslationsKk {
 			'kids.historyReset' => 'Балалардың көру ерекшеліктері қалпына келтірілді',
 			'kids.blocked' => 'Бұл атау осы балалар профилінде қолжетімді емес.',
 			'kids.switchProfile' => 'Профильді ауыстыру',
-			_ => null,
-		} ?? switch (path) {
 			'kids.manageFromAdult' => 'Параметрлерді басқару үшін ересектерге арналған профильге ауысыңыз.',
 			'kids.noConnections' => 'Балалар профилін қоспас бұрын серверді ересек профиліңізге қосыңыз.',
 			'kids.created' => 'Балалар профилі жасалды',
@@ -5559,6 +5680,72 @@ extension on TranslationsKk {
 			'appIcon.names.strata' => 'Қабаттар',
 			'appIcon.names.facet' => 'Фасет',
 			'appIcon.names.tilde' => 'Тильде',
+			'auth.plexQrSignIn' => 'Plex жүйесіне QR кодпен кіру',
+			'auth.setUpWithPhone' => 'Телефонмен баптау',
+			'auth.loadingRestoredData' => 'Қалпына келтірілген профильдер мен қосылымдар жүктелуде…',
+			'auth.loadingRestoredDataFailed' => 'Қалпына келтірілген деректерді жүктеу мүмкін болмады. Қайталап көріңіз немесе Luroka-ны қайта ашыңыз.',
+			'auth.connectTv' => 'Теледидарды қосу',
+			'auth.restoreEncryptedBackup' => 'Шифрланған сақтық көшірмені қалпына келтіру',
+			'auth.restoreCloudBackup' => 'Бұлттағы сақтық көшірмені қалпына келтіру',
+			'auth.saveEncryptedBackup' => 'Шифрланған сақтық көшірмені сақтау',
+			'auth.backupSaved' => 'Сақтық көшірме сақталды',
+			'auth.createEncryptedBackup' => 'Шифрланған сақтық көшірме жасау',
+			'auth.confirmBackupPassword' => 'Құпиясөзді растаңыз',
+			'auth.enterBackupPassword' => 'Құпиясөзді енгізіңіз.',
+			'auth.confirmBackupPasswordError' => 'Құпиясөзді енгізіп, растаңыз.',
+			'auth.restoreBackupAction' => 'Қалпына келтіру',
+			'auth.backupCreateInstructions' => 'Профильдер, серверге кіру деректері және жергілікті қарау деректері қамтылады. Құпиясөзді қауіпсіз сақтаңыз; ол қалпына келтіру үшін қажет.',
+			'auth.backupRestoreInstructions' => 'Бұл сақтық көшірмені жасау кезінде пайдаланылған құпиясөзді немесе бұлттағы қалпына келтіру кодын енгізіңіз. Қалпына келтіру үшін профильдер дерекқоры бос болуы керек.',
+			'auth.backupCreateFailed' => 'Шифрланған сақтық көшірмені жасау мүмкін болмады.',
+			'auth.backupRestoreFailed' => 'Сақтық көшірмені қалпына келтіру мүмкін болмады. Құпиясөзді тексеріп, бос орнатылымды пайдаланыңыз.',
+			'auth.recoveryCodeStep' => '2/3 қадам: Қалпына келтіру кодын сақтаңыз',
+			'auth.backupNotUploaded' => 'Әлі жүктелмеді. Қалпына келтіру алдында 3-қадамды аяқтап, бұлттық сақтық көшірме жасалғаны туралы растауды күтіңіз.',
+			'auth.recoveryCodeSavedContinue' => 'Кодты сақтадым — жалғастыру',
+			'auth.recoveryCodeSaveFile' => 'Кодты файлға сақтау',
+			'auth.recoveryCodeShowQr' => 'QR кодын көрсету',
+			'auth.recoveryCodeHideQr' => 'QR кодын жасыру',
+			'auth.recoveryCopied' => 'Қалпына келтіру коды көшірілді. Оны құпия жерде сақтаңыз.',
+			'auth.recoveryCopyFailed' => 'Қалпына келтіру кодын көшіру мүмкін болмады.',
+			'auth.recoverySaveDialog' => 'Қалпына келтіру кодын құпия жерде сақтаңыз',
+			'auth.recoverySaved' => 'Қалпына келтіру коды сақталды. Файлды құпия ұстаңыз.',
+			'auth.recoverySaveFailed' => 'Қалпына келтіру кодын сақтау мүмкін болмады. Оның орнына көшіріп көріңіз.',
+			'auth.cloudRestoreApplyFailed' => 'Сақтық көшірме жүктелді, бірақ оны осы құрылғыда қалпына келтіру мүмкін болмады. Қайталап көріңіз немесе қолдау қызметіне хабарласыңыз.',
+			'auth.cloudBackupNotFound' => 'Бұл код үшін бұлттық сақтық көшірме табылмады. Бастапқы құрылғыда 3-қадамды аяқтап, көшірме жасалғаны туралы растауды күтіңіз. Сол көшірме үшін сақталған кодты пайдаланып жатқаныңызды тексеріңіз; көшірменің мерзімі өтуі немесе жойылуы мүмкін.',
+			'auth.cloudBackupConnectionFailed' => 'Сақтық көшірме қызметіне қосылу мүмкін болмады. Интернет байланысын тексеріп, қайталап көріңіз.',
+			'auth.cloudBackupInvalidFormat' => 'Қалпына келтіру кодын немесе көшірме пішімін оқу мүмкін болмады. Кодты толық тексеріп, қайталап көріңіз.',
+			'auth.cloudBackupOpenFailed' => 'Сақтық көшірмені ашу мүмкін болмады. Қалпына келтіру кодын тексеріп, қайталап көріңіз.',
+			'auth.cloudBackupSelectProfiles' => 'Қосылатын профильдерді таңдаңыз. Сақтық көшірме жүктелмес бұрын шифрланады және 90 күн қолжетімді болады.',
+			'auth.cloudBackupIncludeLogins' => 'Сақталған сервер және интеграция кіру деректерін қосу',
+			'auth.cloudBackupLoginsWarning' => 'Қайта қосылуға көмектесу үшін байланыстырылған Plex аккаунттары мен басқа сақталған кіру деректері қосылады. Қалпына келтіру коды бар кез келген адам оларды пайдалана алуы мүмкін.',
+			'auth.cloudBackupNoLogins' => 'Сақталған кіру деректері болмаса, қалпына келтіргеннен кейін серверлерге қайта қосылуыңыз қажет.',
+			'auth.pairingHttpPhoneTitle' => 'Бұл сервер үшін HTTP пайдаланылсын ба?',
+			'auth.pairingHttpPhoneWarning' => 'Серверге кіру деректері мен медиа трафигіңіз шифрланбайды. Желідегі адамдар оларды оқуы мүмкін. HTTPS ұсынылады. Luroka арқылы тасымалдау шифрланған күйде қалады.',
+			'auth.pairingHttpTvTitle' => 'Шифрланбаған сервер пайдаланылсын ба?',
+			'auth.pairingHttpTvWarning' => 'Телефоныңыз HTTP таңдады. Осы желідегі адамдар теледидардың кіру токені мен медиа трафигін оқуы мүмкін. Тек сенімді желіні пайдаланыңыз. HTTPS ұсынылады.',
+			'auth.pairingUseHttp' => 'HTTP пайдалану',
+			'auth.pairingTvTitle' => 'Jellyfin немесе Emby қызметін телефонмен қосу',
+			'auth.pairingScanInvitation' => 'Телефонмен сканерлеңіз. Шақыру мерзімі бес минуттан кейін аяқталады.',
+			'auth.pairingWaitForPhone' => 'Телефонның қосылуы күтілуде…',
+			'auth.pairingComparePhone' => 'Бұл кодты телефоныңыздағы кодпен салыстырыңыз:',
+			'auth.pairingConfirmOnPhone' => 'Кодтар сәйкес келсе, телефоныңызда растаңыз.',
+			'auth.pairingAdultOnly' => 'Жұптастыру тек ересек адамның профилінен қолжетімді.',
+			'auth.pairingProfileChanged' => 'Профильге қолжетімділік өзгерді. Жұптастыру тоқтатылды.',
+			'auth.pairingServiceUnavailable' => 'Жұптастыру қызметі қолжетімсіз. Қайталап көріңіз немесе серверді қолмен енгізіңіз.',
+			'auth.pairingExpired' => 'Жұптастыру мерзімі аяқталды немесе үзілді. Қайта бастаңыз.',
+			'auth.pairingVerifyFailed' => 'Сервер мен аккаунтты тексеру мүмкін болмады. Жұптастыруды қайта бастаңыз.',
+			'auth.pairingScanOrPaste' => 'Теледидар кодын сканерлеңіз немесе шақыруды қойыңыз.',
+			'auth.pairingScanTv' => 'Теледидар кодын сканерлеу',
+			'auth.pairingTvInvitation' => 'Теледидар шақыруы',
+			'auth.pairingCheckTvCode' => ({required Object code}) => 'Теледидарда бірдей код көрсетілгенін тексеріңіз: ${code}',
+			'auth.pairingCodesMatch' => 'Кодтар сәйкес келеді',
+			'auth.recoveryCodeLabel' => 'Қалпына келтіру коды',
+			'auth.recoveryCodeScan' => 'Қалпына келтіру кодын сканерлеу',
+			'auth.pairingRecoveryInstructions' => 'Сақталған қалпына келтіру кодын сканерлеңіз немесе қойыңыз. Ол теледидарыңыз үшін шифрланады.',
+			'auth.pairingSendTv' => 'Теледидарға жіберу',
+			'auth.pairingServerLoginHint' => 'Серверіңізге кіріңіз. Құпиясөз Luroka-ға емес, сол серверге жіберіледі.',
+			'auth.recoveryCodeWarning' => 'Сақтық көшірмені қалпына келтіру немесе жою үшін бұл код қажет. Кодты білетін кез келген адам көшірмеге қол жеткізе алады. Оны жоғалтсаңыз, Luroka оны қалпына келтіре алмайды.',
+			'auth.recoveryCodePrivateFile' => 'Кодты тек құпия жерде көшіріңіз немесе сақтаңыз. Сақталған код файлы шифрланбайды.',
+			'auth.recoveryCodePhoneInstructions' => 'Кодтың құпия көшірмесін сақтаңыз. Телефонда қалпына келтіру үшін Luroka-дағы бұлттық көшірмені қалпына келтіруді ашып, кодты сканерлеуді таңдаңыз.',
 			'auth.signInWithPlex' => 'Plex арқылы кіру',
 			'auth.showQRCode' => 'QR кодты көрсету',
 			'auth.authenticate' => 'Растау',
@@ -5907,6 +6094,8 @@ extension on TranslationsKk {
 			'settings.maxVolumePercent' => ({required Object percent}) => '%${percent}',
 			'settings.discordRichPresence' => 'Discord-тағы белсенділік күйі',
 			'settings.discordRichPresenceDescription' => 'Discord-та не көріп жатқаныңызды көрсету',
+			_ => null,
+		} ?? switch (path) {
 			'settings.services' => 'Қызметтер',
 			'settings.servicesDescription' => 'Trakt, MyAnimeList, Seerr және т.б. қосыңыз',
 			'settings.manageLibrariesDescription' => 'Кітапханаларды қайта реттеу және жасыру',
@@ -5997,8 +6186,6 @@ extension on TranslationsKk {
 			'settings.liveTvDefaultFavoritesDescription' => 'Тікелей TV ашылғанда тек таңдаулы арналарды көрсету',
 			'settings.general' => 'Жалпы',
 			'settings.generalDescription' => 'Тіл, іске қосу және терезе мінез-құлқы',
-			_ => null,
-		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Тіл және аймақ',
 			'settings.startup' => 'Іске қосу',
 			'settings.display' => 'Дисплей',
@@ -6421,6 +6608,8 @@ extension on TranslationsKk {
 			'fileInfo.pixelAspectRatio' => 'Пиксель пропорциясы',
 			'fileInfo.profile' => 'Профиль',
 			'fileInfo.level' => 'Деңгей',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.bitDepth' => 'Бит тереңдігі',
 			'fileInfo.pixelFormat' => 'Пиксель форматы',
 			'fileInfo.colorSpace' => 'Түс кеңістігі',
@@ -6511,8 +6700,6 @@ extension on TranslationsKk {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Араластырып ойнату офлайн режимде қолжетімсіз',
 			'mediaMenu.fileInfo' => 'Файл туралы ақпарат',
 			'mediaMenu.deleteEpisodeFromServer' => 'Бөлімді серверден өшіру',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Маусымды серверден өшіру',
 			'mediaMenu.deleteShowFromServer' => 'Сериалды серверден өшіру',
 			'mediaMenu.deleteMovieFromServer' => 'Фильмді серверден өшіру',
@@ -6935,6 +7122,8 @@ extension on TranslationsKk {
 			'accountPreferences.rewatchingInNextUp' => 'Қайта көрілген сериалдарды «Next Up» айдарында қалдыру',
 			'accountPreferences.rewatchingInNextUpDescription' => 'Сериалды аяқтаған соң оны қайта бастасаңыз, «Next Up» сериалды тастамай, қайта көруді жалғастырады.',
 			'accountPreferences.watchedIndicator' => 'Көрілген белгілері',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.watchedIndicatorOptions.none' => 'Ешқашан',
 			'accountPreferences.watchedIndicatorOptions.moviesAndShows' => 'Фильмдер және сериалдар',
 			'accountPreferences.watchedIndicatorOptions.movies' => 'Тек фильмдер',
@@ -7025,8 +7214,6 @@ extension on TranslationsKk {
 			'libraries.filters' => 'Фильтрлер',
 			'libraries.confirmActionMessage' => 'Осы әрекетті орындағыңыз келе ме?',
 			'libraries.showLibrary' => 'Кітапхананы көрсету',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Кітапхананы жасыру',
 			'libraries.libraryOptions' => 'Кітапхана параметрлері',
 			'libraries.content' => 'кітапхана мазмұны',
@@ -7449,6 +7636,8 @@ extension on TranslationsKk {
 			'collections.deleted' => 'Топтама өшірілді',
 			'collections.deleteFailed' => 'Топтаманы өшіру мүмкін болмады',
 			'collections.deleteFailedWithError' => ({required Object error}) => 'Топтаманы өшіру қатесі: ${error}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.selectCollection' => 'Топтаманы таңдау',
 			'collections.collectionName' => 'Топтама атауы',
 			'collections.enterCollectionName' => 'Топтама атауын енгізіңіз',
@@ -7539,8 +7728,6 @@ extension on TranslationsKk {
 			'watchTogether.qrShare' => 'QR кодын бөлісіңіз',
 			'watchTogether.qrHint' => 'Осы бөлмеге қосылу үшін Luroka қолданбасымен сканерлеңіз.',
 			'watchTogether.phasePlaying' => 'Ойнап жатыр',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Кідіртілді',
 			'watchTogether.phaseWaiting' => 'Барлығын күту',
 			'watchTogether.inviteCopied' => 'Шақыру көшірілді. Оны хабарламаға қойыңыз.',
@@ -7963,6 +8150,8 @@ extension on TranslationsKk {
 			'externalPlayer.useExternalPlayer' => 'Сыртқы ойнатқышты пайдалану',
 			'externalPlayer.useExternalPlayerDescription' => 'Видеоларды басқа қолданбада ашу',
 			'externalPlayer.selectPlayer' => 'Ойнатқышты таңдау',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Арнайы ойнатқыштар',
 			'externalPlayer.systemDefault' => 'Жүйелік әдепкі',
 			'externalPlayer.addCustomPlayer' => 'Арнайы ойнатқыш қосу',
@@ -8053,8 +8242,6 @@ extension on TranslationsKk {
 			'matchScreen.match' => 'Сәйкестендіру...',
 			'matchScreen.fixMatch' => 'Сәйкестікті түзету...',
 			'matchScreen.unmatch' => 'Сәйкестікті жою',
-			_ => null,
-		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Бұл сәйкестік жойылсын ба? Қайта сәйкестендірілгенше Plex оны сәйкестендірілмеген деп есептейді.',
 			'matchScreen.unmatchSuccess' => 'Сәйкестік жойылды',
 			'matchScreen.unmatchFailed' => 'Сәйкестікті жою мүмкін болмады',
@@ -8197,6 +8384,13 @@ extension on TranslationsKk {
 			'profileIntegrations.later' => 'Кейінірек орнатыңыз',
 			'profileIntegrations.manage' => 'Интеграцияларды басқару',
 			'profileIntegrations.forProfile' => ({required Object name}) => '${name} үшін қосылымдар',
+			'profileSetupGuide.tabletSpotlightStyle' => 'Планшеттегі таңдаулы мазмұн стилі',
+			'profileSetupGuide.spotlightClassic' => 'Классикалық',
+			'profileSetupGuide.spotlightMarquee' => 'Марки',
+			'profileSetupGuide.spotlightTonight' => 'Бүгінгі кешке ұсыныстар',
+			'profileSetupGuide.phoneSpotlight' => 'Телефондағы кино стиліндегі таңдаулы мазмұн',
+			'profileSetupGuide.phoneSpotlightCinematic' => 'Атауы үстіне жазылған көлденең сурет',
+			'profileSetupGuide.phoneSpotlightClassic' => 'Классикалық постер картасы',
 			'profileSetupGuide.title' => 'Профильіңізді өзіңіздікі етіңіз',
 			'profileSetupGuide.description' => 'Luroka осы құрылғыдағы осы профильге қалай қарайтынын таңдаңыз. Барлығын кейін "Параметрлер" бөлімінен өзгертуге болады.',
 			'profileSetupGuide.appearanceStep' => '1/2 · Көрініс',

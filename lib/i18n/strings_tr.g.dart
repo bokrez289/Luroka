@@ -578,6 +578,13 @@ class _Translations$kidsShelf$tr extends Translations$kidsShelf$en {
 	@override String get yourShelf => 'Film rafınız';
 	@override String get all => 'Herşey';
 	@override String get pickSomething => 'Ne izlemek istiyorsun?';
+	@override String get atmosphere => 'Ana sayfa havası';
+	@override String get atmosphereHint => 'Çocuk ana sayfasının renklerini seç. Ağaç ev aynı kalır.';
+	@override String get sunshine => 'Güneş';
+	@override String get berry => 'Böğürtlen';
+	@override String get mint => 'Nane';
+	@override String get sky => 'Gökyüzü';
+	@override String get atmospherePreview => 'Ana sayfa önizlemesi';
 }
 
 // Path: kidsHome
@@ -785,6 +792,23 @@ class _Translations$kids$tr extends Translations$kids$en {
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
+	@override String get allLibrariesHint => 'Yeni film ve dizi kitaplıkları da dahil edilir. Belirli kitaplıkları seçmek için bunu kapatın.';
+	@override String get appearanceSection => 'Görünüm';
+	@override String get disableParentPin => 'Ebeveyn PIN\'ini kapat';
+	@override String get disableParentPinConfirm => 'Tüm çocuk profilleri için ebeveyn PIN\'i kapatılsın mı? Çocuklar korunmayan profillere geçebilir ve ekran süresi sınırlarını aşabilir. Profil PIN\'leri geçerli olmaya devam eder.';
+	@override String get discardAction => 'Değişiklikleri at';
+	@override String get discardMessage => 'Değişiklikleriniz kaydedilmedi.';
+	@override String get discardTitle => 'Değişiklikler atılsın mı?';
+	@override String get editorTitle => 'Çocuk profili ayarları';
+	@override String libraryCount({required Object count}) => 'Seçilen kitaplıklar: ${count}';
+	@override String get moreSection => 'Daha fazla';
+	@override String get pinChoice => 'Ebeveyn PIN\'i kullan';
+	@override String get pinChoiceHint => 'Önerilir. Ebeveyn PIN\'i olmadan çocuklar korunmayan profillere geçebilir ve çocuk ayarlarını değiştirebilir. Profil değiştirerek ekran süresi sınırlarını aşabilirler.';
+	@override String get pinDifference => 'Ebeveyn PIN\'i çocuk ayarlarını korur. Profil PIN\'i tek bir profili korur. Çocuk profilinden çıkarken ebeveyn PIN\'i gerekip gerekmediği ayrıca ayarlanır.';
+	@override String get pinDisabledWarning => 'Ebeveyn PIN\'i olmadan çocuklar çocuk profilinden çıkıp korunmayan profillere erişebilir. Profil değiştirerek ekran süresi sınırlarını aşabilirler. Profil PIN\'leri geçerli olmaya devam eder.';
+	@override String get profileSection => 'Profil';
+	@override String get timeLimitNoPinHint => 'Ekran süresini yönetmek için profil değiştirin. Ebeveyn PIN\'i olmadan herkes korunmayan bir profile geçebilir.';
+	@override String get watchSection => 'İzleyebilecekleri içerikler';
 	@override String get timeLimits => 'Ekran süresi sınırları';
 	@override String get dailyWatchLimit => 'Günlük izlenme süresi';
 	@override String get dailyWatchLimitHint => 'Bu cihazda her gün video oynatmayı sınırlandırır.';
@@ -969,6 +993,72 @@ class _Translations$auth$tr extends Translations$auth$en {
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
+	@override String get plexQrSignIn => 'QR koduyla Plex\'te oturum aç';
+	@override String get setUpWithPhone => 'Telefonla kur';
+	@override String get loadingRestoredData => 'Geri yüklenen profilleriniz ve bağlantılarınız yükleniyor…';
+	@override String get loadingRestoredDataFailed => 'Geri yüklenen veriler yüklenemedi. Tekrar deneyin veya Luroka\'yı yeniden açın.';
+	@override String get connectTv => 'TV bağla';
+	@override String get restoreEncryptedBackup => 'Şifreli yedeği geri yükle';
+	@override String get restoreCloudBackup => 'Bulut yedeğini geri yükle';
+	@override String get saveEncryptedBackup => 'Şifreli yedeği kaydet';
+	@override String get backupSaved => 'Yedek kaydedildi';
+	@override String get createEncryptedBackup => 'Şifreli yedek oluştur';
+	@override String get confirmBackupPassword => 'Parolayı doğrula';
+	@override String get enterBackupPassword => 'Bir parola girin.';
+	@override String get confirmBackupPasswordError => 'Bir parola girin ve doğrulayın.';
+	@override String get restoreBackupAction => 'Geri yükle';
+	@override String get backupCreateInstructions => 'Profilleri, sunucu giriş bilgilerini ve yerel izleme verilerini içerir. Parolayı güvenli bir yerde saklayın; geri yükleme için gereklidir.';
+	@override String get backupRestoreInstructions => 'Bu yedeği oluştururken kullanılan parolayı veya bulut kurtarma kodunu girin. Geri yükleme için profil veritabanının boş olması gerekir.';
+	@override String get backupCreateFailed => 'Şifreli yedek oluşturulamadı.';
+	@override String get backupRestoreFailed => 'Yedek geri yüklenemedi. Parolayı kontrol edin ve boş bir kurulum kullanın.';
+	@override String get recoveryCodeStep => '2/3. adım: Kurtarma kodunuzu kaydedin';
+	@override String get backupNotUploaded => 'Henüz yüklenmedi. Geri yüklemeden önce 3. adımı tamamlayın ve bulut yedeğinin oluşturulduğuna dair onayı bekleyin.';
+	@override String get recoveryCodeSavedContinue => 'Kodumu kaydettim — devam et';
+	@override String get recoveryCodeSaveFile => 'Kodu dosyaya kaydet';
+	@override String get recoveryCodeShowQr => 'QR kodunu göster';
+	@override String get recoveryCodeHideQr => 'QR kodunu gizle';
+	@override String get recoveryCopied => 'Kurtarma kodu kopyalandı. Özel bir yerde saklayın.';
+	@override String get recoveryCopyFailed => 'Kurtarma kodu kopyalanamadı.';
+	@override String get recoverySaveDialog => 'Kurtarma kodunu özel olarak kaydet';
+	@override String get recoverySaved => 'Kurtarma kodu kaydedildi. Dosyayı gizli tutun.';
+	@override String get recoverySaveFailed => 'Kurtarma kodu kaydedilemedi. Bunun yerine kopyalamayı deneyin.';
+	@override String get cloudRestoreApplyFailed => 'Yedek indirildi ancak bu cihazda geri yüklenemedi. Tekrar deneyin veya destekle iletişime geçin.';
+	@override String get cloudBackupNotFound => 'Bu kod için bulut yedeği bulunamadı. İlk cihazda 3. adımı tamamlayın ve yedeğin oluşturulduğuna dair onayı bekleyin. O yedek için kaydedilen kodu kullandığınızı kontrol edin; yedeğin süresi dolmuş veya silinmiş de olabilir.';
+	@override String get cloudBackupConnectionFailed => 'Yedekleme hizmetine bağlanılamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.';
+	@override String get cloudBackupInvalidFormat => 'Kurtarma kodu veya yedek biçimi okunamadı. Kodun tamamını kontrol edip tekrar deneyin.';
+	@override String get cloudBackupOpenFailed => 'Yedek açılamadı. Kurtarma kodunuzu kontrol edip tekrar deneyin.';
+	@override String get cloudBackupSelectProfiles => 'Dahil edilecek profilleri seçin. Yedek yüklenmeden önce şifrelenir ve 90 gün boyunca kullanılabilir.';
+	@override String get cloudBackupIncludeLogins => 'Kayıtlı sunucu ve entegrasyon girişlerini dahil et';
+	@override String get cloudBackupLoginsWarning => 'Yeniden bağlanmayı kolaylaştırmak için bağlı Plex hesaplarını ve diğer kayıtlı girişleri içerir. Kurtarma koduna sahip herkes bunları kullanabilir.';
+	@override String get cloudBackupNoLogins => 'Kayıtlı girişler olmadan, geri yüklemeden sonra sunuculara yeniden bağlanmanız gerekir.';
+	@override String get pairingHttpPhoneTitle => 'Bu sunucu için HTTP kullanılsın mı?';
+	@override String get pairingHttpPhoneWarning => 'Sunucu giriş bilgileriniz ve medya trafiğiniz şifrelenmeyecek. Ağdaki kişiler bunları okuyabilir. HTTPS önerilir. Luroka aktarımı şifreli kalır.';
+	@override String get pairingHttpTvTitle => 'Şifrelenmemiş bir sunucu kullanılsın mı?';
+	@override String get pairingHttpTvWarning => 'Telefonunuz HTTP seçti. Bu ağdaki kişiler TV erişim belirtecinizi ve medya trafiğinizi okuyabilir. Yalnızca güvendiğiniz bir ağ kullanın. HTTPS önerilir.';
+	@override String get pairingUseHttp => 'HTTP kullan';
+	@override String get pairingTvTitle => 'Telefonunuzla Jellyfin veya Emby\'yi bağlayın';
+	@override String get pairingScanInvitation => 'Telefonunuzla tarayın. Davetin süresi beş dakika içinde dolar.';
+	@override String get pairingWaitForPhone => 'Telefonunuzun bağlanması bekleniyor…';
+	@override String get pairingComparePhone => 'Bu kodu telefonunuzdaki kodla karşılaştırın:';
+	@override String get pairingConfirmOnPhone => 'Kodlar eşleşiyorsa telefonunuzda onaylayın.';
+	@override String get pairingAdultOnly => 'Eşleştirme yalnızca yetişkin profilinden kullanılabilir.';
+	@override String get pairingProfileChanged => 'Profil erişimi değişti. Eşleştirme iptal edildi.';
+	@override String get pairingServiceUnavailable => 'Eşleştirme hizmeti kullanılamıyor. Tekrar deneyin veya sunucuyu elle girin.';
+	@override String get pairingExpired => 'Eşleştirmenin süresi doldu veya işlem kesildi. Yeniden başlayın.';
+	@override String get pairingVerifyFailed => 'Sunucu ve hesap doğrulanamadı. Eşleştirmeyi yeniden başlatın.';
+	@override String get pairingScanOrPaste => 'TV kodunu tarayın veya daveti yapıştırın.';
+	@override String get pairingScanTv => 'TV kodunu tara';
+	@override String get pairingTvInvitation => 'TV daveti';
+	@override String pairingCheckTvCode({required Object code}) => 'TV\'nizin aynı kodu gösterdiğini kontrol edin: ${code}';
+	@override String get pairingCodesMatch => 'Kodlar eşleşiyor';
+	@override String get recoveryCodeLabel => 'Kurtarma kodu';
+	@override String get recoveryCodeScan => 'Kurtarma kodunu tara';
+	@override String get pairingRecoveryInstructions => 'Kayıtlı kurtarma kodunuzu tarayın veya yapıştırın. Kod TV\'niz için şifrelenecektir.';
+	@override String get pairingSendTv => 'TV\'ye gönder';
+	@override String get pairingServerLoginHint => 'Sunucunuzda oturum açın. Parolanız Luroka\'ya değil, bu sunucuya gönderilir.';
+	@override String get recoveryCodeWarning => 'Yedeğinizi geri yüklemek veya silmek için bu kod gereklidir. Koda sahip olan herkes yedeğe erişebilir. Kodu kaybederseniz Luroka onu kurtaramaz.';
+	@override String get recoveryCodePrivateFile => 'Kodu yalnızca özel bir yere kopyalayın veya kaydedin. Kaydedilen kod dosyası şifrelenmez.';
+	@override String get recoveryCodePhoneInstructions => 'Bu kodun özel bir kopyasını saklayın. Telefonda geri yüklemek için Luroka\'nın bulut yedeği geri yükleme seçeneğini açıp kurtarma kodunu taramayı seçin.';
 	@override String get signInWithPlex => 'Plex ile Giriş Yap';
 	@override String get showQRCode => 'QR Kodunu Göster';
 	@override String get authenticate => 'Doğrula';
@@ -3865,6 +3955,13 @@ class _Translations$profileSetupGuide$tr extends Translations$profileSetupGuide$
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
+	@override String get tabletSpotlightStyle => 'Tablet vitrin stili';
+	@override String get spotlightClassic => 'Klasik';
+	@override String get spotlightMarquee => 'Marquee';
+	@override String get spotlightTonight => 'Bu akşamın seçimleri';
+	@override String get phoneSpotlight => 'Telefonda sinematik vitrin';
+	@override String get phoneSpotlightCinematic => 'Üzerinde başlık bulunan yatay görsel';
+	@override String get phoneSpotlightClassic => 'Klasik afiş kartı';
 	@override String get title => 'Profilinizi kendinize ait yapın';
 	@override String get description => 'Luroka\'nun bu cihazda bu profil için nasıl görüneceğini ve nasıl hissettireceğini seçin. Her şeyi daha sonra Ayarlar\'dan değiştirebilirsiniz.';
 	@override String get appearanceStep => '1 / 2 · Görünüm';
@@ -5243,6 +5340,13 @@ extension on TranslationsTr {
 			'kidsShelf.yourShelf' => 'Film rafınız',
 			'kidsShelf.all' => 'Herşey',
 			'kidsShelf.pickSomething' => 'Ne izlemek istiyorsun?',
+			'kidsShelf.atmosphere' => 'Ana sayfa havası',
+			'kidsShelf.atmosphereHint' => 'Çocuk ana sayfasının renklerini seç. Ağaç ev aynı kalır.',
+			'kidsShelf.sunshine' => 'Güneş',
+			'kidsShelf.berry' => 'Böğürtlen',
+			'kidsShelf.mint' => 'Nane',
+			'kidsShelf.sky' => 'Gökyüzü',
+			'kidsShelf.atmospherePreview' => 'Ana sayfa önizlemesi',
 			'kidsHome.everything' => 'senin için',
 			'kidsHome.keepWatching' => 'İzlemeye devam et',
 			'kidsHome.emptyFilter' => 'Burada henüz bir şey yok. Sizin için deneyin veya yetişkininizden sevdiğiniz bir şeyi eklemesini isteyin.',
@@ -5387,6 +5491,23 @@ extension on TranslationsTr {
 			'detailComposition.mediaInformation' => 'Medya Bilgileri',
 			'detailComposition.fullFileInformation' => 'Tam dosya bilgisi',
 			'detailComposition.castAndCrew' => 'Oyuncular ve Ekip',
+			'kids.allLibrariesHint' => 'Yeni film ve dizi kitaplıkları da dahil edilir. Belirli kitaplıkları seçmek için bunu kapatın.',
+			'kids.appearanceSection' => 'Görünüm',
+			'kids.disableParentPin' => 'Ebeveyn PIN\'ini kapat',
+			'kids.disableParentPinConfirm' => 'Tüm çocuk profilleri için ebeveyn PIN\'i kapatılsın mı? Çocuklar korunmayan profillere geçebilir ve ekran süresi sınırlarını aşabilir. Profil PIN\'leri geçerli olmaya devam eder.',
+			'kids.discardAction' => 'Değişiklikleri at',
+			'kids.discardMessage' => 'Değişiklikleriniz kaydedilmedi.',
+			'kids.discardTitle' => 'Değişiklikler atılsın mı?',
+			'kids.editorTitle' => 'Çocuk profili ayarları',
+			'kids.libraryCount' => ({required Object count}) => 'Seçilen kitaplıklar: ${count}',
+			'kids.moreSection' => 'Daha fazla',
+			'kids.pinChoice' => 'Ebeveyn PIN\'i kullan',
+			'kids.pinChoiceHint' => 'Önerilir. Ebeveyn PIN\'i olmadan çocuklar korunmayan profillere geçebilir ve çocuk ayarlarını değiştirebilir. Profil değiştirerek ekran süresi sınırlarını aşabilirler.',
+			'kids.pinDifference' => 'Ebeveyn PIN\'i çocuk ayarlarını korur. Profil PIN\'i tek bir profili korur. Çocuk profilinden çıkarken ebeveyn PIN\'i gerekip gerekmediği ayrıca ayarlanır.',
+			'kids.pinDisabledWarning' => 'Ebeveyn PIN\'i olmadan çocuklar çocuk profilinden çıkıp korunmayan profillere erişebilir. Profil değiştirerek ekran süresi sınırlarını aşabilirler. Profil PIN\'leri geçerli olmaya devam eder.',
+			'kids.profileSection' => 'Profil',
+			'kids.timeLimitNoPinHint' => 'Ekran süresini yönetmek için profil değiştirin. Ebeveyn PIN\'i olmadan herkes korunmayan bir profile geçebilir.',
+			'kids.watchSection' => 'İzleyebilecekleri içerikler',
 			'kids.timeLimits' => 'Ekran süresi sınırları',
 			'kids.dailyWatchLimit' => 'Günlük izlenme süresi',
 			'kids.dailyWatchLimitHint' => 'Bu cihazda her gün video oynatmayı sınırlandırır.',
@@ -5459,6 +5580,8 @@ extension on TranslationsTr {
 			'kids.freshStories' => 'Keşfedilecek yeni hikayeler',
 			'kids.yourMovies' => 'Film zamanının favorileri',
 			'kids.yourShows' => 'Bir bölüm daha',
+			_ => null,
+		} ?? switch (path) {
 			'kids.emptyHint' => 'Sunucunuzda izin verilen yaş sınıflandırmasına sahip oyunlar bulunduğunda burada yeni maceralar görünecektir.',
 			'kids.title' => 'Çocuklar için Luroka',
 			'kids.addProfile' => 'Çocuk profili ekle',
@@ -5483,8 +5606,6 @@ extension on TranslationsTr {
 			'kids.historyReset' => 'Çocukların izleme hariç tutmaları sıfırlandı',
 			'kids.blocked' => 'Bu başlık bu çocuk profilinde mevcut değil.',
 			'kids.switchProfile' => 'Profili değiştir',
-			_ => null,
-		} ?? switch (path) {
 			'kids.manageFromAdult' => 'Ayarları yönetmek için yetişkin profiline geçin.',
 			'kids.noConnections' => 'Çocuk profili eklemeden önce yetişkin profilinize bir sunucu bağlayın.',
 			'kids.created' => 'Çocuk profili oluşturuldu',
@@ -5559,6 +5680,72 @@ extension on TranslationsTr {
 			'appIcon.names.strata' => 'Tabakalar',
 			'appIcon.names.facet' => 'Faset',
 			'appIcon.names.tilde' => 'yaklaşık işareti',
+			'auth.plexQrSignIn' => 'QR koduyla Plex\'te oturum aç',
+			'auth.setUpWithPhone' => 'Telefonla kur',
+			'auth.loadingRestoredData' => 'Geri yüklenen profilleriniz ve bağlantılarınız yükleniyor…',
+			'auth.loadingRestoredDataFailed' => 'Geri yüklenen veriler yüklenemedi. Tekrar deneyin veya Luroka\'yı yeniden açın.',
+			'auth.connectTv' => 'TV bağla',
+			'auth.restoreEncryptedBackup' => 'Şifreli yedeği geri yükle',
+			'auth.restoreCloudBackup' => 'Bulut yedeğini geri yükle',
+			'auth.saveEncryptedBackup' => 'Şifreli yedeği kaydet',
+			'auth.backupSaved' => 'Yedek kaydedildi',
+			'auth.createEncryptedBackup' => 'Şifreli yedek oluştur',
+			'auth.confirmBackupPassword' => 'Parolayı doğrula',
+			'auth.enterBackupPassword' => 'Bir parola girin.',
+			'auth.confirmBackupPasswordError' => 'Bir parola girin ve doğrulayın.',
+			'auth.restoreBackupAction' => 'Geri yükle',
+			'auth.backupCreateInstructions' => 'Profilleri, sunucu giriş bilgilerini ve yerel izleme verilerini içerir. Parolayı güvenli bir yerde saklayın; geri yükleme için gereklidir.',
+			'auth.backupRestoreInstructions' => 'Bu yedeği oluştururken kullanılan parolayı veya bulut kurtarma kodunu girin. Geri yükleme için profil veritabanının boş olması gerekir.',
+			'auth.backupCreateFailed' => 'Şifreli yedek oluşturulamadı.',
+			'auth.backupRestoreFailed' => 'Yedek geri yüklenemedi. Parolayı kontrol edin ve boş bir kurulum kullanın.',
+			'auth.recoveryCodeStep' => '2/3. adım: Kurtarma kodunuzu kaydedin',
+			'auth.backupNotUploaded' => 'Henüz yüklenmedi. Geri yüklemeden önce 3. adımı tamamlayın ve bulut yedeğinin oluşturulduğuna dair onayı bekleyin.',
+			'auth.recoveryCodeSavedContinue' => 'Kodumu kaydettim — devam et',
+			'auth.recoveryCodeSaveFile' => 'Kodu dosyaya kaydet',
+			'auth.recoveryCodeShowQr' => 'QR kodunu göster',
+			'auth.recoveryCodeHideQr' => 'QR kodunu gizle',
+			'auth.recoveryCopied' => 'Kurtarma kodu kopyalandı. Özel bir yerde saklayın.',
+			'auth.recoveryCopyFailed' => 'Kurtarma kodu kopyalanamadı.',
+			'auth.recoverySaveDialog' => 'Kurtarma kodunu özel olarak kaydet',
+			'auth.recoverySaved' => 'Kurtarma kodu kaydedildi. Dosyayı gizli tutun.',
+			'auth.recoverySaveFailed' => 'Kurtarma kodu kaydedilemedi. Bunun yerine kopyalamayı deneyin.',
+			'auth.cloudRestoreApplyFailed' => 'Yedek indirildi ancak bu cihazda geri yüklenemedi. Tekrar deneyin veya destekle iletişime geçin.',
+			'auth.cloudBackupNotFound' => 'Bu kod için bulut yedeği bulunamadı. İlk cihazda 3. adımı tamamlayın ve yedeğin oluşturulduğuna dair onayı bekleyin. O yedek için kaydedilen kodu kullandığınızı kontrol edin; yedeğin süresi dolmuş veya silinmiş de olabilir.',
+			'auth.cloudBackupConnectionFailed' => 'Yedekleme hizmetine bağlanılamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.',
+			'auth.cloudBackupInvalidFormat' => 'Kurtarma kodu veya yedek biçimi okunamadı. Kodun tamamını kontrol edip tekrar deneyin.',
+			'auth.cloudBackupOpenFailed' => 'Yedek açılamadı. Kurtarma kodunuzu kontrol edip tekrar deneyin.',
+			'auth.cloudBackupSelectProfiles' => 'Dahil edilecek profilleri seçin. Yedek yüklenmeden önce şifrelenir ve 90 gün boyunca kullanılabilir.',
+			'auth.cloudBackupIncludeLogins' => 'Kayıtlı sunucu ve entegrasyon girişlerini dahil et',
+			'auth.cloudBackupLoginsWarning' => 'Yeniden bağlanmayı kolaylaştırmak için bağlı Plex hesaplarını ve diğer kayıtlı girişleri içerir. Kurtarma koduna sahip herkes bunları kullanabilir.',
+			'auth.cloudBackupNoLogins' => 'Kayıtlı girişler olmadan, geri yüklemeden sonra sunuculara yeniden bağlanmanız gerekir.',
+			'auth.pairingHttpPhoneTitle' => 'Bu sunucu için HTTP kullanılsın mı?',
+			'auth.pairingHttpPhoneWarning' => 'Sunucu giriş bilgileriniz ve medya trafiğiniz şifrelenmeyecek. Ağdaki kişiler bunları okuyabilir. HTTPS önerilir. Luroka aktarımı şifreli kalır.',
+			'auth.pairingHttpTvTitle' => 'Şifrelenmemiş bir sunucu kullanılsın mı?',
+			'auth.pairingHttpTvWarning' => 'Telefonunuz HTTP seçti. Bu ağdaki kişiler TV erişim belirtecinizi ve medya trafiğinizi okuyabilir. Yalnızca güvendiğiniz bir ağ kullanın. HTTPS önerilir.',
+			'auth.pairingUseHttp' => 'HTTP kullan',
+			'auth.pairingTvTitle' => 'Telefonunuzla Jellyfin veya Emby\'yi bağlayın',
+			'auth.pairingScanInvitation' => 'Telefonunuzla tarayın. Davetin süresi beş dakika içinde dolar.',
+			'auth.pairingWaitForPhone' => 'Telefonunuzun bağlanması bekleniyor…',
+			'auth.pairingComparePhone' => 'Bu kodu telefonunuzdaki kodla karşılaştırın:',
+			'auth.pairingConfirmOnPhone' => 'Kodlar eşleşiyorsa telefonunuzda onaylayın.',
+			'auth.pairingAdultOnly' => 'Eşleştirme yalnızca yetişkin profilinden kullanılabilir.',
+			'auth.pairingProfileChanged' => 'Profil erişimi değişti. Eşleştirme iptal edildi.',
+			'auth.pairingServiceUnavailable' => 'Eşleştirme hizmeti kullanılamıyor. Tekrar deneyin veya sunucuyu elle girin.',
+			'auth.pairingExpired' => 'Eşleştirmenin süresi doldu veya işlem kesildi. Yeniden başlayın.',
+			'auth.pairingVerifyFailed' => 'Sunucu ve hesap doğrulanamadı. Eşleştirmeyi yeniden başlatın.',
+			'auth.pairingScanOrPaste' => 'TV kodunu tarayın veya daveti yapıştırın.',
+			'auth.pairingScanTv' => 'TV kodunu tara',
+			'auth.pairingTvInvitation' => 'TV daveti',
+			'auth.pairingCheckTvCode' => ({required Object code}) => 'TV\'nizin aynı kodu gösterdiğini kontrol edin: ${code}',
+			'auth.pairingCodesMatch' => 'Kodlar eşleşiyor',
+			'auth.recoveryCodeLabel' => 'Kurtarma kodu',
+			'auth.recoveryCodeScan' => 'Kurtarma kodunu tara',
+			'auth.pairingRecoveryInstructions' => 'Kayıtlı kurtarma kodunuzu tarayın veya yapıştırın. Kod TV\'niz için şifrelenecektir.',
+			'auth.pairingSendTv' => 'TV\'ye gönder',
+			'auth.pairingServerLoginHint' => 'Sunucunuzda oturum açın. Parolanız Luroka\'ya değil, bu sunucuya gönderilir.',
+			'auth.recoveryCodeWarning' => 'Yedeğinizi geri yüklemek veya silmek için bu kod gereklidir. Koda sahip olan herkes yedeğe erişebilir. Kodu kaybederseniz Luroka onu kurtaramaz.',
+			'auth.recoveryCodePrivateFile' => 'Kodu yalnızca özel bir yere kopyalayın veya kaydedin. Kaydedilen kod dosyası şifrelenmez.',
+			'auth.recoveryCodePhoneInstructions' => 'Bu kodun özel bir kopyasını saklayın. Telefonda geri yüklemek için Luroka\'nın bulut yedeği geri yükleme seçeneğini açıp kurtarma kodunu taramayı seçin.',
 			'auth.signInWithPlex' => 'Plex ile Giriş Yap',
 			'auth.showQRCode' => 'QR Kodunu Göster',
 			'auth.authenticate' => 'Doğrula',
@@ -5907,6 +6094,8 @@ extension on TranslationsTr {
 			'settings.maxVolumePercent' => ({required Object percent}) => '%${percent}',
 			'settings.discordRichPresence' => 'Discord zengin durum bilgisi',
 			'settings.discordRichPresenceDescription' => 'Discord\'da ne izlediğinizi gösterin',
+			_ => null,
+		} ?? switch (path) {
 			'settings.services' => 'Servisler',
 			'settings.servicesDescription' => 'Trakt, MyAnimeList, Seerr ve daha fazlasını bağlayın',
 			'settings.manageLibrariesDescription' => 'Kitaplıkları yeniden sıralayın ve gizleyin',
@@ -5997,8 +6186,6 @@ extension on TranslationsTr {
 			'settings.liveTvDefaultFavoritesDescription' => 'Canlı TV açıldığında yalnızca favori kanalları göster',
 			'settings.general' => 'Genel',
 			'settings.generalDescription' => 'Dil, başlangıç ve pencere davranışı',
-			_ => null,
-		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Dil ve Bölge',
 			'settings.startup' => 'Başlangıç',
 			'settings.display' => 'Ekran',
@@ -6421,6 +6608,8 @@ extension on TranslationsTr {
 			'fileInfo.pixelAspectRatio' => 'Piksel En Boy Oranı',
 			'fileInfo.profile' => 'Profil',
 			'fileInfo.level' => 'Seviye',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.bitDepth' => 'Bit Derinliği',
 			'fileInfo.pixelFormat' => 'Piksel Biçimi',
 			'fileInfo.colorSpace' => 'Renk Alanı',
@@ -6511,8 +6700,6 @@ extension on TranslationsTr {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Karışık oynatma çevrimdışıyken kullanılamaz',
 			'mediaMenu.fileInfo' => 'Dosya Bilgisi',
 			'mediaMenu.deleteEpisodeFromServer' => 'Bölümü sunucudan sil',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Sezonu sunucudan sil',
 			'mediaMenu.deleteShowFromServer' => 'Diziyi sunucudan sil',
 			'mediaMenu.deleteMovieFromServer' => 'Filmi sunucudan sil',
@@ -6935,6 +7122,8 @@ extension on TranslationsTr {
 			'accountPreferences.rewatchingInNextUp' => 'Tekrar izlenen dizileri Sıradaki\'de tut',
 			'accountPreferences.rewatchingInNextUpDescription' => 'Bir diziyi bitirip tekrar başlattığınızda, Sıradaki diziyi bırakmak yerine tekrar izlemeyi takip eder.',
 			'accountPreferences.watchedIndicator' => 'İzlenme göstergeleri',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.watchedIndicatorOptions.none' => 'Asla',
 			'accountPreferences.watchedIndicatorOptions.moviesAndShows' => 'Filmler ve TV dizileri',
 			'accountPreferences.watchedIndicatorOptions.movies' => 'Yalnızca filmler',
@@ -7025,8 +7214,6 @@ extension on TranslationsTr {
 			'libraries.filters' => 'Filtreler',
 			'libraries.confirmActionMessage' => 'Bu eylemi gerçekleştirmek istediğinizden emin misiniz?',
 			'libraries.showLibrary' => 'Kitaplığı göster',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Kitaplığı gizle',
 			'libraries.libraryOptions' => 'Kitaplık seçenekleri',
 			'libraries.content' => 'kitaplık içeriği',
@@ -7449,6 +7636,8 @@ extension on TranslationsTr {
 			'collections.deleted' => 'Koleksiyon silindi',
 			'collections.deleteFailed' => 'Koleksiyon silinemedi',
 			'collections.deleteFailedWithError' => ({required Object error}) => 'Koleksiyon silinemedi: ${error}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.selectCollection' => 'Koleksiyon Seç',
 			'collections.collectionName' => 'Koleksiyon Adı',
 			'collections.enterCollectionName' => 'Koleksiyon adını girin',
@@ -7539,8 +7728,6 @@ extension on TranslationsTr {
 			'watchTogether.qrShare' => 'QR kodunu paylaşın',
 			'watchTogether.qrHint' => 'Bu odaya katılmak için Luroka uygulamasıyla tarayın.',
 			'watchTogether.phasePlaying' => 'Oynanıyor',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Duraklatıldı',
 			'watchTogether.phaseWaiting' => 'Herkesi bekliyorum',
 			'watchTogether.inviteCopied' => 'Davet kopyalandı. Bunu bir mesaja yapıştırın.',
@@ -7963,6 +8150,8 @@ extension on TranslationsTr {
 			'externalPlayer.useExternalPlayer' => 'Harici Oynatıcı Kullan',
 			'externalPlayer.useExternalPlayerDescription' => 'Videoları başka bir uygulamada açın',
 			'externalPlayer.selectPlayer' => 'Oynatıcı Seç',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Özel Oynatıcılar',
 			'externalPlayer.systemDefault' => 'Sistem Varsayılanı',
 			'externalPlayer.addCustomPlayer' => 'Özel Oynatıcı Ekle',
@@ -8053,8 +8242,6 @@ extension on TranslationsTr {
 			'matchScreen.match' => 'Eşleştir...',
 			'matchScreen.fixMatch' => 'Eşleşmeyi Düzelt...',
 			'matchScreen.unmatch' => 'Eşleşmeyi Kaldır',
-			_ => null,
-		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Bu eşleşme temizlensin mi? Plex, tekrar eşleştirilene kadar bunu eşleşmemiş sayacaktır.',
 			'matchScreen.unmatchSuccess' => 'Öge eşleşmesi kaldırıldı',
 			'matchScreen.unmatchFailed' => 'Eşleşme kaldırılamadı',
@@ -8197,6 +8384,13 @@ extension on TranslationsTr {
 			'profileIntegrations.later' => 'Daha sonra kur',
 			'profileIntegrations.manage' => 'Entegrasyonları yönet',
 			'profileIntegrations.forProfile' => ({required Object name}) => '${name} için bağlantılar',
+			'profileSetupGuide.tabletSpotlightStyle' => 'Tablet vitrin stili',
+			'profileSetupGuide.spotlightClassic' => 'Klasik',
+			'profileSetupGuide.spotlightMarquee' => 'Marquee',
+			'profileSetupGuide.spotlightTonight' => 'Bu akşamın seçimleri',
+			'profileSetupGuide.phoneSpotlight' => 'Telefonda sinematik vitrin',
+			'profileSetupGuide.phoneSpotlightCinematic' => 'Üzerinde başlık bulunan yatay görsel',
+			'profileSetupGuide.phoneSpotlightClassic' => 'Klasik afiş kartı',
 			'profileSetupGuide.title' => 'Profilinizi kendinize ait yapın',
 			'profileSetupGuide.description' => 'Luroka\'nun bu cihazda bu profil için nasıl görüneceğini ve nasıl hissettireceğini seçin. Her şeyi daha sonra Ayarlar\'dan değiştirebilirsiniz.',
 			'profileSetupGuide.appearanceStep' => '1 / 2 · Görünüm',

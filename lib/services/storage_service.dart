@@ -267,6 +267,13 @@ class StorageService extends BaseSharedPreferencesService {
   Future<void> saveAnimeFavoritesRules(String profileId, AnimeFavoritesRules rules) =>
       _setJsonMap('${_userPrefixForProfileId(profileId)}anime_favorites_v1', rules.toJson());
 
+  bool getFavoritesHideWatched(String profileId) =>
+      prefs.getBool('${_userPrefixForProfileId(profileId)}favorites_hide_watched') ?? false;
+
+  Future<void> setFavoritesHideWatched(String profileId, bool value) async {
+    await prefs.setBool('${_userPrefixForProfileId(profileId)}favorites_hide_watched', value);
+  }
+
   static String _prefPrefix(LibraryPreference preference) => switch (preference) {
     LibraryPreference.filters => _prefixLibraryFilters,
     LibraryPreference.sort => _prefixLibrarySort,

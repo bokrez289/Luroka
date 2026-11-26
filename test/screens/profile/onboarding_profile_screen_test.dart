@@ -1,11 +1,13 @@
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:luroka/connection/connection.dart';
 import 'package:luroka/connection/connection_registry.dart';
 import 'package:luroka/database/app_database.dart';
 import 'package:luroka/focus/input_mode_tracker.dart';
+import 'package:luroka/focus/focusable_button.dart';
 import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/profiles/active_profile_provider.dart';
 import 'package:luroka/profiles/active_profile_binder.dart';
@@ -95,6 +97,36 @@ void main() {
     expect(tester.widget<FilledButton>(find.byKey(const ValueKey('onboarding-profile-continue'))).onPressed, isNull);
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump(const Duration(milliseconds: 100));
+  });
+
+  testWidgets('TV avatar gallery moves predictably and advances to Continue', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    tester.view.physicalSize = const Size(960, 540);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await _pumpProfile(tester);
+    final first = profileAvatarGallery.first;
+    final second = profileAvatarGallery[1];
+    final firstButton = find.ancestor(
+      of: find.byKey(ValueKey('onboarding-avatar-${first.name}')),
+      matching: find.byType(FocusableButton),
+    ).first;
+    tester.widget<FocusableButton>(firstButton).focusNode!.requestFocus();
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'Onboarding:Avatar:${second.name}');
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'Onboarding:Avatar:${second.name}');
+    for (var i = 0; i < profileAvatarGallery.length; i++) {
+      if (FocusManager.instance.primaryFocus?.debugLabel == 'Onboarding:Continue') break;
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+    }
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'Onboarding:Continue');
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets('first profile can defer libraries and proceeds to its pending guide', (tester) async {

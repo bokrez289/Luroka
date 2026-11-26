@@ -31,20 +31,33 @@ class ConnectionSetupScaffold extends StatelessWidget {
           builder: (context, bounds) {
             // Keyboard insets must not move the form into a different tree:
             // that would dispose the active field halfway through typing.
-            final wide = bounds.maxWidth >= 960;
+            final wide = MediaQuery.orientationOf(context) == Orientation.landscape &&
+                bounds.maxWidth >= 760 && bounds.maxWidth >= MediaQuery.textScalerOf(context).scale(760);
+            final compact = bounds.maxWidth < 600;
+            final heading = Text(
+              title,
+              style: (wide ? theme.textTheme.displaySmall : theme.textTheme.headlineMedium)?.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.6,
+                height: 1.15,
+              ),
+            );
             final intro = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (emblem != null) ...[emblem!, const SizedBox(height: 24)],
-                Text(
-                  title,
-                  style: (wide ? theme.textTheme.displaySmall : theme.textTheme.headlineMedium)?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -1,
-                    height: 1.15,
-                  ),
-                ),
+                if (emblem != null && compact)
+                  Row(
+                    children: [
+                      emblem!,
+                      const SizedBox(width: 14),
+                      Expanded(child: heading),
+                    ],
+                  )
+                else ...[
+                  if (emblem != null) ...[emblem!, const SizedBox(height: 20)],
+                  heading,
+                ],
                 const SizedBox(height: 12),
                 Text(
                   description,
@@ -69,9 +82,10 @@ class ConnectionSetupScaffold extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: Center(
+                  child: Align(
+                    alignment: compact ? Alignment.topCenter : Alignment.center,
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: wide ? 48 : 24, vertical: wide ? 32 : 24),
+                      padding: EdgeInsets.symmetric(horizontal: wide ? 48 : 20, vertical: compact ? 16 : 32),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(maxWidth: wide ? 1080 : 520),
                         child: wide
@@ -79,13 +93,17 @@ class ConnectionSetupScaffold extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Expanded(child: intro),
-                                  const SizedBox(width: 80),
+                                  const SizedBox(width: 48),
                                   Expanded(child: child),
                                 ],
                               )
                             : Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [intro, const SizedBox(height: 28), child],
+                                children: [
+                                  intro,
+                                  SizedBox(height: compact ? 20 : 28),
+                                  child,
+                                ],
                               ),
                       ),
                     ),

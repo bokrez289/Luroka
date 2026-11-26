@@ -7,6 +7,7 @@ import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_item.dart';
 import 'package:luroka/media/media_kind.dart';
 import 'package:luroka/models/kids_avatar.dart';
+import 'package:luroka/models/kids_atmosphere.dart';
 import 'package:luroka/models/kids_profile_backup.dart';
 import 'package:luroka/profiles/profile.dart';
 import 'package:luroka/services/file_picker_service.dart';
@@ -71,6 +72,7 @@ void main() {
       maxAge: 7,
       theme: false,
       avatar: KidsAvatarKind.fox,
+      atmosphere: KidsAtmosphere.berry,
       allowedLibraries: {'server:kids'},
       animationOnly: true,
       allowUnrated: true,
@@ -95,6 +97,7 @@ void main() {
     expect(backup.maxAge, 7);
     expect(backup.theme, isFalse);
     expect(backup.avatar, KidsAvatarKind.fox);
+    expect(backup.atmosphere, KidsAtmosphere.berry);
     expect(backup.libraries, {'server:kids'});
     expect(backup.animationOnly, isTrue);
     expect(backup.allowUnrated, isTrue);
@@ -117,6 +120,7 @@ void main() {
       maxAge: backup.maxAge,
       theme: backup.theme,
       avatar: backup.avatar,
+      atmosphere: backup.atmosphere,
       restrictLibraries: backup.libraries != null,
       allowedLibraries: backup.libraries,
       animationOnly: backup.animationOnly,
@@ -128,6 +132,7 @@ void main() {
     );
     await kids.restoreViewingExclusions('restored', backup.viewingExclusions);
     expect(kids.parentFor('restored'), 'new-parent');
+    expect(kids.atmosphereFor('restored'), KidsAtmosphere.berry);
     expect(kids.dailyWatchMinutesFor('restored'), 90);
     expect(kids.bedtimeStartFor('restored'), 1200);
     expect(kids.verifyParentPin('4321'), isTrue);

@@ -578,6 +578,13 @@ class _Translations$kidsShelf$uz extends Translations$kidsShelf$en {
 	@override String get yourShelf => 'Sizning kino javoningiz';
 	@override String get all => 'Hamma narsa';
 	@override String get pickSomething => 'Nimani tomosha qilishni xohlaysiz?';
+	@override String get atmosphere => 'Bosh sahifa muhiti';
+	@override String get atmosphereHint => 'Bolalar bosh sahifasi ranglarini tanlang. Daraxt uyi o‘zgarmaydi.';
+	@override String get sunshine => 'Quyosh nuri';
+	@override String get berry => 'Rezavor';
+	@override String get mint => 'Yalpiz';
+	@override String get sky => 'Osmon';
+	@override String get atmospherePreview => 'Bosh sahifani oldindan ko‘rish';
 }
 
 // Path: kidsHome
@@ -785,6 +792,23 @@ class _Translations$kids$uz extends Translations$kids$en {
 	final TranslationsUz _root; // ignore: unused_field
 
 	// Translations
+	@override String get allLibrariesHint => 'Yangi film va serial kutubxonalari ham qo‘shiladi. Muayyan kutubxonalarni tanlash uchun buni o‘chiring.';
+	@override String get appearanceSection => 'Tashqi ko‘rinish';
+	@override String get disableParentPin => 'Ota-ona PIN kodini o‘chirish';
+	@override String get disableParentPinConfirm => 'Barcha bolalar profillari uchun ota-ona PIN kodi o‘chirilsinmi? Bolalar himoyalanmagan profillarga o‘tib, ekran vaqti cheklovlarini chetlab o‘tishi mumkin. Profil PIN kodlari amal qilishda davom etadi.';
+	@override String get discardAction => 'O‘zgarishlarni bekor qilish';
+	@override String get discardMessage => 'O‘zgarishlaringiz saqlanmadi.';
+	@override String get discardTitle => 'O‘zgarishlar bekor qilinsinmi?';
+	@override String get editorTitle => 'Bolalar profili sozlamalari';
+	@override String libraryCount({required Object count}) => 'Tanlangan kutubxonalar: ${count}';
+	@override String get moreSection => 'Batafsil';
+	@override String get pinChoice => 'Ota-ona PIN kodidan foydalanish';
+	@override String get pinChoiceHint => 'Tavsiya etiladi. Ota-ona PIN kodisiz bolalar himoyalanmagan profillarga o‘tib, bolalar sozlamalarini o‘zgartirishi mumkin. Profilni almashtirib, ekran vaqti cheklovlarini chetlab o‘tishlari mumkin.';
+	@override String get pinDifference => 'Ota-ona PIN kodi bolalar sozlamalarini himoya qiladi. Profil PIN kodi alohida profilni himoya qiladi. Bolalar profilidan chiqishda ota-ona PIN kodi talab qilinishi alohida sozlanadi.';
+	@override String get pinDisabledWarning => 'Ota-ona PIN kodisiz bolalar bolalar profilidan chiqib, himoyalanmagan profillarga kirishi mumkin. Profilni almashtirib, ekran vaqti cheklovlarini chetlab o‘tishlari mumkin. Alohida profil PIN kodlari amal qilishda davom etadi.';
+	@override String get profileSection => 'Profil';
+	@override String get timeLimitNoPinHint => 'Ekran vaqtini boshqarish uchun profilni almashtiring. Ota-ona PIN kodisiz har kim himoyalanmagan profilga o‘tishi mumkin.';
+	@override String get watchSection => 'Nimalarni ko‘rishi mumkin';
 	@override String get timeLimits => 'Ekran vaqtini cheklash';
 	@override String get dailyWatchLimit => 'Kundalik tomosha vaqti';
 	@override String get dailyWatchLimitHint => 'Ushbu qurilmada har kuni video ijro etishni cheklaydi.';
@@ -969,6 +993,72 @@ class _Translations$auth$uz extends Translations$auth$en {
 	final TranslationsUz _root; // ignore: unused_field
 
 	// Translations
+	@override String get plexQrSignIn => 'QR kod orqali Plex’ga kirish';
+	@override String get setUpWithPhone => 'Telefon orqali sozlash';
+	@override String get loadingRestoredData => 'Tiklangan profillar va ulanishlaringiz yuklanmoqda…';
+	@override String get loadingRestoredDataFailed => 'Tiklangan ma’lumotlarni yuklab bo‘lmadi. Qayta urinib ko‘ring yoki Luroka’ni qayta oching.';
+	@override String get connectTv => 'Televizorni ulash';
+	@override String get restoreEncryptedBackup => 'Shifrlangan zaxira nusxasini tiklash';
+	@override String get restoreCloudBackup => 'Bulutdagi zaxira nusxasini tiklash';
+	@override String get saveEncryptedBackup => 'Shifrlangan zaxira nusxasini saqlash';
+	@override String get backupSaved => 'Zaxira nusxasi saqlandi';
+	@override String get createEncryptedBackup => 'Shifrlangan zaxira nusxasini yaratish';
+	@override String get confirmBackupPassword => 'Parolni tasdiqlang';
+	@override String get enterBackupPassword => 'Parolni kiriting.';
+	@override String get confirmBackupPasswordError => 'Parolni kiriting va tasdiqlang.';
+	@override String get restoreBackupAction => 'Tiklash';
+	@override String get backupCreateInstructions => 'Profillar, serverga kirish ma’lumotlari va mahalliy tomosha ma’lumotlarini o‘z ichiga oladi. Parolni xavfsiz saqlang; u tiklash uchun kerak.';
+	@override String get backupRestoreInstructions => 'Ushbu zaxira nusxasini yaratishda ishlatilgan parol yoki bulut tiklash kodini kiriting. Tiklash uchun profillar ma’lumotlar bazasi bo‘sh bo‘lishi kerak.';
+	@override String get backupCreateFailed => 'Shifrlangan zaxira nusxasini yaratib bo‘lmadi.';
+	@override String get backupRestoreFailed => 'Zaxira nusxasini tiklab bo‘lmadi. Parolni tekshiring va bo‘sh o‘rnatishdan foydalaning.';
+	@override String get recoveryCodeStep => '2/3-qadam: Tiklash kodini saqlang';
+	@override String get backupNotUploaded => 'Hali yuklanmadi. Tiklashdan oldin 3-qadamni yakunlang va bulut zaxirasi yaratilgani haqidagi tasdiqni kuting.';
+	@override String get recoveryCodeSavedContinue => 'Kodni saqladim — davom etish';
+	@override String get recoveryCodeSaveFile => 'Kodni faylga saqlash';
+	@override String get recoveryCodeShowQr => 'QR kodni ko‘rsatish';
+	@override String get recoveryCodeHideQr => 'QR kodni yashirish';
+	@override String get recoveryCopied => 'Tiklash kodi nusxalandi. Uni maxfiy joyda saqlang.';
+	@override String get recoveryCopyFailed => 'Tiklash kodini nusxalab bo‘lmadi.';
+	@override String get recoverySaveDialog => 'Tiklash kodini maxfiy saqlash';
+	@override String get recoverySaved => 'Tiklash kodi saqlandi. Faylni maxfiy saqlang.';
+	@override String get recoverySaveFailed => 'Tiklash kodini saqlab bo‘lmadi. Uning o‘rniga nusxalashga urinib ko‘ring.';
+	@override String get cloudRestoreApplyFailed => 'Zaxira nusxasi yuklab olindi, ammo ushbu qurilmada tiklab bo‘lmadi. Qayta urinib ko‘ring yoki yordam xizmatiga murojaat qiling.';
+	@override String get cloudBackupNotFound => 'Ushbu kod uchun bulut zaxirasi topilmadi. Asl qurilmada 3-qadamni yakunlang va zaxira yaratilgani haqidagi tasdiqni kuting. Shu zaxira uchun saqlangan koddan foydalanayotganingizni tekshiring; zaxiraning muddati tugagan yoki o‘chirilgan bo‘lishi ham mumkin.';
+	@override String get cloudBackupConnectionFailed => 'Zaxiralash xizmatiga ulanib bo‘lmadi. Internet aloqasini tekshirib, qayta urinib ko‘ring.';
+	@override String get cloudBackupInvalidFormat => 'Tiklash kodi yoki zaxira formati o‘qilmadi. Kodni to‘liq tekshirib, qayta urinib ko‘ring.';
+	@override String get cloudBackupOpenFailed => 'Zaxirani ochib bo‘lmadi. Tiklash kodini tekshirib, qayta urinib ko‘ring.';
+	@override String get cloudBackupSelectProfiles => 'Qo‘shiladigan profillarni tanlang. Zaxira yuklashdan oldin shifrlanadi va 90 kun davomida mavjud bo‘ladi.';
+	@override String get cloudBackupIncludeLogins => 'Saqlangan server va integratsiya kirishlarini qo‘shish';
+	@override String get cloudBackupLoginsWarning => 'Qayta ulanishga yordam berish uchun bog‘langan Plex hisoblari va boshqa saqlangan kirishlar qo‘shiladi. Tiklash kodiga ega har kim ulardan foydalanishi mumkin.';
+	@override String get cloudBackupNoLogins => 'Saqlangan kirishlarsiz tiklashdan keyin serverlarga qayta ulanishingiz kerak bo‘ladi.';
+	@override String get pairingHttpPhoneTitle => 'Bu server uchun HTTP ishlatilsinmi?';
+	@override String get pairingHttpPhoneWarning => 'Serverga kirish ma’lumotlaringiz va media trafigingiz shifrlanmaydi. Tarmoqdagi odamlar ularni o‘qishi mumkin. HTTPS tavsiya etiladi. Luroka uzatmasi shifrlangan holda qoladi.';
+	@override String get pairingHttpTvTitle => 'Shifrlanmagan server ishlatilsinmi?';
+	@override String get pairingHttpTvWarning => 'Telefoningiz HTTP ni tanladi. Ushbu tarmoqdagi odamlar televizoringiz kirish tokeni va media trafigini o‘qishi mumkin. Faqat ishonchli tarmoqdan foydalaning. HTTPS tavsiya etiladi.';
+	@override String get pairingUseHttp => 'HTTP ishlatish';
+	@override String get pairingTvTitle => 'Jellyfin yoki Emby’ni telefoningiz bilan ulang';
+	@override String get pairingScanInvitation => 'Telefoningiz bilan skanerlang. Taklif muddati besh daqiqada tugaydi.';
+	@override String get pairingWaitForPhone => 'Telefoningiz ulanishi kutilmoqda…';
+	@override String get pairingComparePhone => 'Bu kodni telefoningizdagi kod bilan solishtiring:';
+	@override String get pairingConfirmOnPhone => 'Kodlar mos kelsa, telefoningizda tasdiqlang.';
+	@override String get pairingAdultOnly => 'Juftlash faqat kattalar profilida mavjud.';
+	@override String get pairingProfileChanged => 'Profilga kirish o‘zgardi. Juftlash bekor qilindi.';
+	@override String get pairingServiceUnavailable => 'Juftlash xizmati mavjud emas. Qayta urinib ko‘ring yoki serverni qo‘lda kiriting.';
+	@override String get pairingExpired => 'Juftlash muddati tugadi yoki jarayon uzildi. Qaytadan boshlang.';
+	@override String get pairingVerifyFailed => 'Server va hisobni tekshirib bo‘lmadi. Juftlashni qaytadan boshlang.';
+	@override String get pairingScanOrPaste => 'Televizor kodini skanerlang yoki taklifni joylashtiring.';
+	@override String get pairingScanTv => 'Televizor kodini skanerlash';
+	@override String get pairingTvInvitation => 'Televizor taklifi';
+	@override String pairingCheckTvCode({required Object code}) => 'Televizoringizda aynan shu kod ko‘rsatilganini tekshiring: ${code}';
+	@override String get pairingCodesMatch => 'Kodlar mos';
+	@override String get recoveryCodeLabel => 'Tiklash kodi';
+	@override String get recoveryCodeScan => 'Tiklash kodini skanerlash';
+	@override String get pairingRecoveryInstructions => 'Saqlangan tiklash kodini skanerlang yoki joylashtiring. U televizoringiz uchun shifrlanadi.';
+	@override String get pairingSendTv => 'Televizorga yuborish';
+	@override String get pairingServerLoginHint => 'Serveringizga kiring. Parolingiz Luroka’ga emas, o‘sha serverga yuboriladi.';
+	@override String get recoveryCodeWarning => 'Zaxira nusxasini tiklash yoki o‘chirish uchun ushbu kod kerak. Kodga ega har kim nusxaga kira oladi. Kodni yo‘qotsangiz, Luroka uni tiklay olmaydi.';
+	@override String get recoveryCodePrivateFile => 'Kodni faqat maxfiy joyga nusxalang yoki saqlang. Saqlangan kod fayli shifrlanmaydi.';
+	@override String get recoveryCodePhoneInstructions => 'Ushbu kodning maxfiy nusxasini saqlang. Telefonda tiklash uchun Luroka’dagi bulut zaxirasini tiklash bo‘limini ochib, tiklash kodini skanerlashni tanlang.';
 	@override String get signInWithPlex => 'Plex orqali kirish';
 	@override String get showQRCode => 'QR kodni koʻrsatish';
 	@override String get authenticate => 'Tasdiqlash';
@@ -3865,6 +3955,13 @@ class _Translations$profileSetupGuide$uz extends Translations$profileSetupGuide$
 	final TranslationsUz _root; // ignore: unused_field
 
 	// Translations
+	@override String get tabletSpotlightStyle => 'Planshetdagi tavsiyalar uslubi';
+	@override String get spotlightClassic => 'Klassik';
+	@override String get spotlightMarquee => 'Marquee';
+	@override String get spotlightTonight => 'Bugungi kecha uchun tanlovlar';
+	@override String get phoneSpotlight => 'Telefondagi kinematik tavsiyalar';
+	@override String get phoneSpotlightCinematic => 'Ustiga sarlavha joylashtirilgan gorizontal tasvir';
+	@override String get phoneSpotlightClassic => 'Klassik poster kartasi';
 	@override String get title => 'Profilingizni o\'zingizniki qiling';
 	@override String get description => 'Luroka ushbu qurilmadagi ushbu profil qanday ko‘rinishini va his qilishini tanlang. Hammasini keyinroq Sozlamalar orqali o‘zgartirishingiz mumkin.';
 	@override String get appearanceStep => '1 / 2 · Ko‘rinish';
@@ -5243,6 +5340,13 @@ extension on TranslationsUz {
 			'kidsShelf.yourShelf' => 'Sizning kino javoningiz',
 			'kidsShelf.all' => 'Hamma narsa',
 			'kidsShelf.pickSomething' => 'Nimani tomosha qilishni xohlaysiz?',
+			'kidsShelf.atmosphere' => 'Bosh sahifa muhiti',
+			'kidsShelf.atmosphereHint' => 'Bolalar bosh sahifasi ranglarini tanlang. Daraxt uyi o‘zgarmaydi.',
+			'kidsShelf.sunshine' => 'Quyosh nuri',
+			'kidsShelf.berry' => 'Rezavor',
+			'kidsShelf.mint' => 'Yalpiz',
+			'kidsShelf.sky' => 'Osmon',
+			'kidsShelf.atmospherePreview' => 'Bosh sahifani oldindan ko‘rish',
 			'kidsHome.everything' => 'Siz uchun',
 			'kidsHome.keepWatching' => 'Tomosha qilishda davom eting',
 			'kidsHome.emptyFilter' => 'Bu yerda hali hech narsa. Siz uchun sinab ko\'ring yoki kattalaringizdan sizga yoqadigan narsani qo\'shishini so\'rang.',
@@ -5387,6 +5491,23 @@ extension on TranslationsUz {
 			'detailComposition.mediaInformation' => 'OAV ma\'lumotlari',
 			'detailComposition.fullFileInformation' => 'To\'liq fayl ma\'lumotlari',
 			'detailComposition.castAndCrew' => 'Aktyorlar va ekipaj',
+			'kids.allLibrariesHint' => 'Yangi film va serial kutubxonalari ham qo‘shiladi. Muayyan kutubxonalarni tanlash uchun buni o‘chiring.',
+			'kids.appearanceSection' => 'Tashqi ko‘rinish',
+			'kids.disableParentPin' => 'Ota-ona PIN kodini o‘chirish',
+			'kids.disableParentPinConfirm' => 'Barcha bolalar profillari uchun ota-ona PIN kodi o‘chirilsinmi? Bolalar himoyalanmagan profillarga o‘tib, ekran vaqti cheklovlarini chetlab o‘tishi mumkin. Profil PIN kodlari amal qilishda davom etadi.',
+			'kids.discardAction' => 'O‘zgarishlarni bekor qilish',
+			'kids.discardMessage' => 'O‘zgarishlaringiz saqlanmadi.',
+			'kids.discardTitle' => 'O‘zgarishlar bekor qilinsinmi?',
+			'kids.editorTitle' => 'Bolalar profili sozlamalari',
+			'kids.libraryCount' => ({required Object count}) => 'Tanlangan kutubxonalar: ${count}',
+			'kids.moreSection' => 'Batafsil',
+			'kids.pinChoice' => 'Ota-ona PIN kodidan foydalanish',
+			'kids.pinChoiceHint' => 'Tavsiya etiladi. Ota-ona PIN kodisiz bolalar himoyalanmagan profillarga o‘tib, bolalar sozlamalarini o‘zgartirishi mumkin. Profilni almashtirib, ekran vaqti cheklovlarini chetlab o‘tishlari mumkin.',
+			'kids.pinDifference' => 'Ota-ona PIN kodi bolalar sozlamalarini himoya qiladi. Profil PIN kodi alohida profilni himoya qiladi. Bolalar profilidan chiqishda ota-ona PIN kodi talab qilinishi alohida sozlanadi.',
+			'kids.pinDisabledWarning' => 'Ota-ona PIN kodisiz bolalar bolalar profilidan chiqib, himoyalanmagan profillarga kirishi mumkin. Profilni almashtirib, ekran vaqti cheklovlarini chetlab o‘tishlari mumkin. Alohida profil PIN kodlari amal qilishda davom etadi.',
+			'kids.profileSection' => 'Profil',
+			'kids.timeLimitNoPinHint' => 'Ekran vaqtini boshqarish uchun profilni almashtiring. Ota-ona PIN kodisiz har kim himoyalanmagan profilga o‘tishi mumkin.',
+			'kids.watchSection' => 'Nimalarni ko‘rishi mumkin',
 			'kids.timeLimits' => 'Ekran vaqtini cheklash',
 			'kids.dailyWatchLimit' => 'Kundalik tomosha vaqti',
 			'kids.dailyWatchLimitHint' => 'Ushbu qurilmada har kuni video ijro etishni cheklaydi.',
@@ -5459,6 +5580,8 @@ extension on TranslationsUz {
 			'kids.freshStories' => 'Yangi kashfiyotlar',
 			'kids.yourMovies' => 'Sevimli filmlar',
 			'kids.yourShows' => 'Yana bir epizod',
+			_ => null,
+		} ?? switch (path) {
 			'kids.emptyHint' => 'Yangi sarguzashtlar serveringizda ruxsat etilgan yosh tasnifiga ega sarlavhalarga ega bo\'lganda paydo bo\'ladi.',
 			'kids.title' => 'Bolalar uchun Luroka',
 			'kids.addProfile' => 'Bolalar profilini qo\'shing',
@@ -5483,8 +5606,6 @@ extension on TranslationsUz {
 			'kids.historyReset' => 'Bolalar uchun koʻrish istisnolari qayta tiklandi',
 			'kids.blocked' => 'Bu nom ushbu bolalar profilida mavjud emas.',
 			'kids.switchProfile' => 'Profilni almashtirish',
-			_ => null,
-		} ?? switch (path) {
 			'kids.manageFromAdult' => 'Sozlamalarni boshqarish uchun kattalar profiliga oʻting.',
 			'kids.noConnections' => 'Bolalar profilini qo\'shishdan oldin serverni kattalar profilingizga ulang.',
 			'kids.created' => 'Bolalar profili yaratildi',
@@ -5559,6 +5680,72 @@ extension on TranslationsUz {
 			'appIcon.names.strata' => 'Qatlamlar',
 			'appIcon.names.facet' => 'Faset',
 			'appIcon.names.tilde' => 'Tilde',
+			'auth.plexQrSignIn' => 'QR kod orqali Plex’ga kirish',
+			'auth.setUpWithPhone' => 'Telefon orqali sozlash',
+			'auth.loadingRestoredData' => 'Tiklangan profillar va ulanishlaringiz yuklanmoqda…',
+			'auth.loadingRestoredDataFailed' => 'Tiklangan ma’lumotlarni yuklab bo‘lmadi. Qayta urinib ko‘ring yoki Luroka’ni qayta oching.',
+			'auth.connectTv' => 'Televizorni ulash',
+			'auth.restoreEncryptedBackup' => 'Shifrlangan zaxira nusxasini tiklash',
+			'auth.restoreCloudBackup' => 'Bulutdagi zaxira nusxasini tiklash',
+			'auth.saveEncryptedBackup' => 'Shifrlangan zaxira nusxasini saqlash',
+			'auth.backupSaved' => 'Zaxira nusxasi saqlandi',
+			'auth.createEncryptedBackup' => 'Shifrlangan zaxira nusxasini yaratish',
+			'auth.confirmBackupPassword' => 'Parolni tasdiqlang',
+			'auth.enterBackupPassword' => 'Parolni kiriting.',
+			'auth.confirmBackupPasswordError' => 'Parolni kiriting va tasdiqlang.',
+			'auth.restoreBackupAction' => 'Tiklash',
+			'auth.backupCreateInstructions' => 'Profillar, serverga kirish ma’lumotlari va mahalliy tomosha ma’lumotlarini o‘z ichiga oladi. Parolni xavfsiz saqlang; u tiklash uchun kerak.',
+			'auth.backupRestoreInstructions' => 'Ushbu zaxira nusxasini yaratishda ishlatilgan parol yoki bulut tiklash kodini kiriting. Tiklash uchun profillar ma’lumotlar bazasi bo‘sh bo‘lishi kerak.',
+			'auth.backupCreateFailed' => 'Shifrlangan zaxira nusxasini yaratib bo‘lmadi.',
+			'auth.backupRestoreFailed' => 'Zaxira nusxasini tiklab bo‘lmadi. Parolni tekshiring va bo‘sh o‘rnatishdan foydalaning.',
+			'auth.recoveryCodeStep' => '2/3-qadam: Tiklash kodini saqlang',
+			'auth.backupNotUploaded' => 'Hali yuklanmadi. Tiklashdan oldin 3-qadamni yakunlang va bulut zaxirasi yaratilgani haqidagi tasdiqni kuting.',
+			'auth.recoveryCodeSavedContinue' => 'Kodni saqladim — davom etish',
+			'auth.recoveryCodeSaveFile' => 'Kodni faylga saqlash',
+			'auth.recoveryCodeShowQr' => 'QR kodni ko‘rsatish',
+			'auth.recoveryCodeHideQr' => 'QR kodni yashirish',
+			'auth.recoveryCopied' => 'Tiklash kodi nusxalandi. Uni maxfiy joyda saqlang.',
+			'auth.recoveryCopyFailed' => 'Tiklash kodini nusxalab bo‘lmadi.',
+			'auth.recoverySaveDialog' => 'Tiklash kodini maxfiy saqlash',
+			'auth.recoverySaved' => 'Tiklash kodi saqlandi. Faylni maxfiy saqlang.',
+			'auth.recoverySaveFailed' => 'Tiklash kodini saqlab bo‘lmadi. Uning o‘rniga nusxalashga urinib ko‘ring.',
+			'auth.cloudRestoreApplyFailed' => 'Zaxira nusxasi yuklab olindi, ammo ushbu qurilmada tiklab bo‘lmadi. Qayta urinib ko‘ring yoki yordam xizmatiga murojaat qiling.',
+			'auth.cloudBackupNotFound' => 'Ushbu kod uchun bulut zaxirasi topilmadi. Asl qurilmada 3-qadamni yakunlang va zaxira yaratilgani haqidagi tasdiqni kuting. Shu zaxira uchun saqlangan koddan foydalanayotganingizni tekshiring; zaxiraning muddati tugagan yoki o‘chirilgan bo‘lishi ham mumkin.',
+			'auth.cloudBackupConnectionFailed' => 'Zaxiralash xizmatiga ulanib bo‘lmadi. Internet aloqasini tekshirib, qayta urinib ko‘ring.',
+			'auth.cloudBackupInvalidFormat' => 'Tiklash kodi yoki zaxira formati o‘qilmadi. Kodni to‘liq tekshirib, qayta urinib ko‘ring.',
+			'auth.cloudBackupOpenFailed' => 'Zaxirani ochib bo‘lmadi. Tiklash kodini tekshirib, qayta urinib ko‘ring.',
+			'auth.cloudBackupSelectProfiles' => 'Qo‘shiladigan profillarni tanlang. Zaxira yuklashdan oldin shifrlanadi va 90 kun davomida mavjud bo‘ladi.',
+			'auth.cloudBackupIncludeLogins' => 'Saqlangan server va integratsiya kirishlarini qo‘shish',
+			'auth.cloudBackupLoginsWarning' => 'Qayta ulanishga yordam berish uchun bog‘langan Plex hisoblari va boshqa saqlangan kirishlar qo‘shiladi. Tiklash kodiga ega har kim ulardan foydalanishi mumkin.',
+			'auth.cloudBackupNoLogins' => 'Saqlangan kirishlarsiz tiklashdan keyin serverlarga qayta ulanishingiz kerak bo‘ladi.',
+			'auth.pairingHttpPhoneTitle' => 'Bu server uchun HTTP ishlatilsinmi?',
+			'auth.pairingHttpPhoneWarning' => 'Serverga kirish ma’lumotlaringiz va media trafigingiz shifrlanmaydi. Tarmoqdagi odamlar ularni o‘qishi mumkin. HTTPS tavsiya etiladi. Luroka uzatmasi shifrlangan holda qoladi.',
+			'auth.pairingHttpTvTitle' => 'Shifrlanmagan server ishlatilsinmi?',
+			'auth.pairingHttpTvWarning' => 'Telefoningiz HTTP ni tanladi. Ushbu tarmoqdagi odamlar televizoringiz kirish tokeni va media trafigini o‘qishi mumkin. Faqat ishonchli tarmoqdan foydalaning. HTTPS tavsiya etiladi.',
+			'auth.pairingUseHttp' => 'HTTP ishlatish',
+			'auth.pairingTvTitle' => 'Jellyfin yoki Emby’ni telefoningiz bilan ulang',
+			'auth.pairingScanInvitation' => 'Telefoningiz bilan skanerlang. Taklif muddati besh daqiqada tugaydi.',
+			'auth.pairingWaitForPhone' => 'Telefoningiz ulanishi kutilmoqda…',
+			'auth.pairingComparePhone' => 'Bu kodni telefoningizdagi kod bilan solishtiring:',
+			'auth.pairingConfirmOnPhone' => 'Kodlar mos kelsa, telefoningizda tasdiqlang.',
+			'auth.pairingAdultOnly' => 'Juftlash faqat kattalar profilida mavjud.',
+			'auth.pairingProfileChanged' => 'Profilga kirish o‘zgardi. Juftlash bekor qilindi.',
+			'auth.pairingServiceUnavailable' => 'Juftlash xizmati mavjud emas. Qayta urinib ko‘ring yoki serverni qo‘lda kiriting.',
+			'auth.pairingExpired' => 'Juftlash muddati tugadi yoki jarayon uzildi. Qaytadan boshlang.',
+			'auth.pairingVerifyFailed' => 'Server va hisobni tekshirib bo‘lmadi. Juftlashni qaytadan boshlang.',
+			'auth.pairingScanOrPaste' => 'Televizor kodini skanerlang yoki taklifni joylashtiring.',
+			'auth.pairingScanTv' => 'Televizor kodini skanerlash',
+			'auth.pairingTvInvitation' => 'Televizor taklifi',
+			'auth.pairingCheckTvCode' => ({required Object code}) => 'Televizoringizda aynan shu kod ko‘rsatilganini tekshiring: ${code}',
+			'auth.pairingCodesMatch' => 'Kodlar mos',
+			'auth.recoveryCodeLabel' => 'Tiklash kodi',
+			'auth.recoveryCodeScan' => 'Tiklash kodini skanerlash',
+			'auth.pairingRecoveryInstructions' => 'Saqlangan tiklash kodini skanerlang yoki joylashtiring. U televizoringiz uchun shifrlanadi.',
+			'auth.pairingSendTv' => 'Televizorga yuborish',
+			'auth.pairingServerLoginHint' => 'Serveringizga kiring. Parolingiz Luroka’ga emas, o‘sha serverga yuboriladi.',
+			'auth.recoveryCodeWarning' => 'Zaxira nusxasini tiklash yoki o‘chirish uchun ushbu kod kerak. Kodga ega har kim nusxaga kira oladi. Kodni yo‘qotsangiz, Luroka uni tiklay olmaydi.',
+			'auth.recoveryCodePrivateFile' => 'Kodni faqat maxfiy joyga nusxalang yoki saqlang. Saqlangan kod fayli shifrlanmaydi.',
+			'auth.recoveryCodePhoneInstructions' => 'Ushbu kodning maxfiy nusxasini saqlang. Telefonda tiklash uchun Luroka’dagi bulut zaxirasini tiklash bo‘limini ochib, tiklash kodini skanerlashni tanlang.',
 			'auth.signInWithPlex' => 'Plex orqali kirish',
 			'auth.showQRCode' => 'QR kodni koʻrsatish',
 			'auth.authenticate' => 'Tasdiqlash',
@@ -5907,6 +6094,8 @@ extension on TranslationsUz {
 			'settings.maxVolumePercent' => ({required Object percent}) => '%${percent}',
 			'settings.discordRichPresence' => 'Discord’dagi faollik holati',
 			'settings.discordRichPresenceDescription' => 'Discord-da nima tomosha qilayotganingizni koʻrsatish',
+			_ => null,
+		} ?? switch (path) {
 			'settings.services' => 'Xizmatlar',
 			'settings.servicesDescription' => 'Trakt, MyAnimeList, Seerr va boshqalarni ulang',
 			'settings.manageLibrariesDescription' => 'Kutubxonalarni tartiblash va yashirish',
@@ -5997,8 +6186,6 @@ extension on TranslationsUz {
 			'settings.liveTvDefaultFavoritesDescription' => 'Jonli TV ochilganda faqat tanlangan kanallarni koʻrsatish',
 			'settings.general' => 'Umumiy',
 			'settings.generalDescription' => 'Til, ishga tushirish va oyna xatti-harakati',
-			_ => null,
-		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Til va mintaqa',
 			'settings.startup' => 'Ishga tushirish',
 			'settings.display' => 'Displey',
@@ -6421,6 +6608,8 @@ extension on TranslationsUz {
 			'fileInfo.pixelAspectRatio' => 'Piksel tomonlar nisbati',
 			'fileInfo.profile' => 'Profil',
 			'fileInfo.level' => 'Daraja',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.bitDepth' => 'Bit chuqurligi',
 			'fileInfo.pixelFormat' => 'Piksel formati',
 			'fileInfo.colorSpace' => 'Rang makoni',
@@ -6511,8 +6700,6 @@ extension on TranslationsUz {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Aralashtirib ijro etish oflayn rejimda mavjud emas',
 			'mediaMenu.fileInfo' => 'Fayl haqida maʼlumot',
 			'mediaMenu.deleteEpisodeFromServer' => 'Qismni serverdan oʻchirish',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Mavsumni serverdan oʻchirish',
 			'mediaMenu.deleteShowFromServer' => 'Shouni serverdan oʻchirish',
 			'mediaMenu.deleteMovieFromServer' => 'Filmni serverdan oʻchirish',
@@ -6935,6 +7122,8 @@ extension on TranslationsUz {
 			'accountPreferences.rewatchingInNextUp' => 'Qayta koʻrilgan seriallarni "Keyingi" boʻlimida saqlash',
 			'accountPreferences.rewatchingInNextUpDescription' => 'Serialni tugatib, qayta boshlasangiz, "Keyingi" boʻlimi serialni tashlab yuborish oʻrniga qayta tomoshaga ergashadi.',
 			'accountPreferences.watchedIndicator' => 'Koʻrilganlik belgilari',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.watchedIndicatorOptions.none' => 'Hech qachon',
 			'accountPreferences.watchedIndicatorOptions.moviesAndShows' => 'Filmlar va seriallar',
 			'accountPreferences.watchedIndicatorOptions.movies' => 'Faqat filmlar',
@@ -7025,8 +7214,6 @@ extension on TranslationsUz {
 			'libraries.filters' => 'Filtrlar',
 			'libraries.confirmActionMessage' => 'Ushbu harakatni bajarmoqchimisiz?',
 			'libraries.showLibrary' => 'Kutubxonani koʻrsatish',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Kutubxonani yashirish',
 			'libraries.libraryOptions' => 'Kutubxona parametrlari',
 			'libraries.content' => 'kutubxona tarkibi',
@@ -7449,6 +7636,8 @@ extension on TranslationsUz {
 			'collections.deleted' => 'Toʻplam oʻchirildi',
 			'collections.deleteFailed' => 'Toʻplamni oʻchirib boʻlmadi',
 			'collections.deleteFailedWithError' => ({required Object error}) => 'Toʻplamni oʻchirish xatoligi: ${error}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.selectCollection' => 'Toʻplamni tanlash',
 			'collections.collectionName' => 'Toʻplam nomi',
 			'collections.enterCollectionName' => 'Toʻplam nomini kiriting',
@@ -7539,8 +7728,6 @@ extension on TranslationsUz {
 			'watchTogether.qrShare' => 'QR kodini ulashing',
 			'watchTogether.qrHint' => 'Bu xonaga qo‘shilish uchun Luroka ilovasi bilan skanerlang.',
 			'watchTogether.phasePlaying' => 'Oʻynamoqda',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Pauza qilingan',
 			'watchTogether.phaseWaiting' => 'Hammani kutaman',
 			'watchTogether.inviteCopied' => 'Taklif nusxalandi. Uni xabarga joylashtiring.',
@@ -7963,6 +8150,8 @@ extension on TranslationsUz {
 			'externalPlayer.useExternalPlayer' => 'Tashqi pleyerdan foydalanish',
 			'externalPlayer.useExternalPlayerDescription' => 'Videolarni boshqa ilovada ochish',
 			'externalPlayer.selectPlayer' => 'Pleyerni tanlash',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Maxsus pleyerlar',
 			'externalPlayer.systemDefault' => 'Tizim standarti',
 			'externalPlayer.addCustomPlayer' => 'Maxsus pleyer qoʻshish',
@@ -8053,8 +8242,6 @@ extension on TranslationsUz {
 			'matchScreen.match' => 'Moslashtirish...',
 			'matchScreen.fixMatch' => 'Moslikni tuzatish...',
 			'matchScreen.unmatch' => 'Moslikni oʻchirish',
-			_ => null,
-		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Ushbu moslik oʻchirilsinmi? Qayta moslashtirilgunga qadar Plex uni moslashtirilmagan deb hisoblaydi.',
 			'matchScreen.unmatchSuccess' => 'Moslik oʻchirildi',
 			'matchScreen.unmatchFailed' => 'Moslikni oʻchirib boʻlmadi',
@@ -8197,6 +8384,13 @@ extension on TranslationsUz {
 			'profileIntegrations.later' => 'Keyinroq sozlang',
 			'profileIntegrations.manage' => 'Integratsiyalarni boshqarish',
 			'profileIntegrations.forProfile' => ({required Object name}) => '${name} uchun ulanishlar',
+			'profileSetupGuide.tabletSpotlightStyle' => 'Planshetdagi tavsiyalar uslubi',
+			'profileSetupGuide.spotlightClassic' => 'Klassik',
+			'profileSetupGuide.spotlightMarquee' => 'Marquee',
+			'profileSetupGuide.spotlightTonight' => 'Bugungi kecha uchun tanlovlar',
+			'profileSetupGuide.phoneSpotlight' => 'Telefondagi kinematik tavsiyalar',
+			'profileSetupGuide.phoneSpotlightCinematic' => 'Ustiga sarlavha joylashtirilgan gorizontal tasvir',
+			'profileSetupGuide.phoneSpotlightClassic' => 'Klassik poster kartasi',
 			'profileSetupGuide.title' => 'Profilingizni o\'zingizniki qiling',
 			'profileSetupGuide.description' => 'Luroka ushbu qurilmadagi ushbu profil qanday ko‘rinishini va his qilishini tanlang. Hammasini keyinroq Sozlamalar orqali o‘zgartirishingiz mumkin.',
 			'profileSetupGuide.appearanceStep' => '1 / 2 · Ko‘rinish',

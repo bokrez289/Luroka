@@ -29,8 +29,8 @@ void main() {
     final player = _SeekRecordingPlayer(position: const Duration(minutes: 2));
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       testBody: () async {
         final screenKey = GlobalKey<VideoPlayerScreenState>();
         await tester.pumpWidget(_screen(screenKey));
@@ -59,8 +59,8 @@ void main() {
     final player = _SeekRecordingPlayer(position: const Duration(minutes: 2));
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       testBody: () async {
         final screenKey = GlobalKey<VideoPlayerScreenState>();
         await tester.pumpWidget(_screen(screenKey));

@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import '../../database/app_database.dart';
 import '../../focus/focusable_text_field.dart';
+import '../../i18n/strings.g.dart';
 import '../../services/file_picker_service.dart';
 import '../../services/kids_profile_service.dart';
 import '../../services/luroka_backup_snapshot.dart';
@@ -41,7 +42,7 @@ Future<void> exportFullBackup(BuildContext context) async {
       path = file.path;
     } else {
       path = await FilePickerService.instance.saveFile(
-        dialogTitle: 'Save encrypted backup',
+        dialogTitle: t.auth.saveEncryptedBackup,
         fileName: filename,
         bytes: bytes,
         type: FileType.custom,
@@ -52,13 +53,13 @@ Future<void> exportFullBackup(BuildContext context) async {
     await showDialog<void>(
       context: context,
       builder: (dialog) => AlertDialog(
-        title: const Text('Backup saved'),
+        title: Text(t.auth.backupSaved),
         content: SelectableText(path!),
-        actions: [DialogActionButton(onPressed: () => Navigator.pop(dialog), label: 'OK', isPrimary: true)],
+        actions: [DialogActionButton(onPressed: () => Navigator.pop(dialog), label: t.common.ok, isPrimary: true)],
       ),
     );
   } catch (_) {
-    if (context.mounted) await showErrorDialog(context, 'Could not create the encrypted backup.');
+    if (context.mounted) await showErrorDialog(context, t.auth.backupCreateFailed);
   }
 }
 
@@ -94,7 +95,7 @@ Future<bool> restoreFullBackup(BuildContext context) async {
     if (context.mounted) {
       await showErrorDialog(
         context,
-        'Could not restore this backup. Check the password and use an empty installation.',
+        t.auth.backupRestoreFailed,
       );
     }
     return false;
@@ -127,7 +128,7 @@ class _BackupPasswordDialogState extends State<_BackupPasswordDialog> {
 
   void submit() {
     if (password.text.isEmpty || (widget.creating && password.text != confirmation.text)) {
-      setState(() => error = 'Enter a password${widget.creating ? ' and confirm it' : ''}.');
+      setState(() => error = widget.creating ? t.auth.confirmBackupPasswordError : t.auth.enterBackupPassword);
       return;
     }
     Navigator.pop(context, password.text);
@@ -135,33 +136,33 @@ class _BackupPasswordDialogState extends State<_BackupPasswordDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text(widget.creating ? 'Create encrypted backup' : 'Restore encrypted backup'),
+    title: Text(widget.creating ? t.auth.createEncryptedBackup : t.auth.restoreEncryptedBackup),
     content: SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             widget.creating
-                ? 'Includes profiles, server logins and local viewing data. Keep the password safe; it is required to restore.'
-                : 'Enter the password or cloud recovery code used to create this backup. Restore requires an empty profile database.',
+                ? t.auth.backupCreateInstructions
+                : t.auth.backupRestoreInstructions,
           ),
           FocusableTextField(
             controller: password,
             obscureText: true,
-            decoration: InputDecoration(labelText: 'Password', errorText: error),
+            decoration: InputDecoration(labelText: t.addServer.password, errorText: error),
           ),
           if (widget.creating)
             FocusableTextField(
               controller: confirmation,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Confirm password'),
+              decoration: InputDecoration(labelText: t.auth.confirmBackupPassword),
             ),
         ],
       ),
     ),
     actions: [
-      DialogActionButton(onPressed: () => Navigator.pop(context), label: 'Cancel'),
-      DialogActionButton(onPressed: submit, label: widget.creating ? 'Continue' : 'Restore', isPrimary: true),
+      DialogActionButton(onPressed: () => Navigator.pop(context), label: t.common.cancel),
+      DialogActionButton(onPressed: submit, label: widget.creating ? t.profiles.continueButton : t.auth.restoreBackupAction, isPrimary: true),
     ],
   );
 }

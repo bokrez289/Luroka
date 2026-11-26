@@ -551,7 +551,7 @@ class _AddJellyfinScreenState extends State<AddJellyfinScreen>
           child: BackendBadge(backend: widget.dialect.backend, size: 36, color: accent),
         ),
         child: Container(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(MediaQuery.sizeOf(context).width < 600 ? 16 : 24),
           decoration: BoxDecoration(
             color: colors.surfaceContainerLow,
             borderRadius: BorderRadius.circular(20),
@@ -589,13 +589,12 @@ class _AddJellyfinScreenState extends State<AddJellyfinScreen>
         if (serverPairingEnabled && PlatformDetector.isTV()) ...[
           FocusableButton(
             focusNode: _pairFocus,
-            autofocus: true,
             onNavigateDown: () => _httpsFocus.requestFocus(),
             onPressed: busy ? null : _pairWithPhone,
             child: OutlinedButton.icon(
               onPressed: busy ? null : _pairWithPhone,
               icon: const Icon(Icons.qr_code_rounded),
-              label: const Text('Set up with phone'),
+              label: Text(t.auth.setUpWithPhone),
             ),
           ),
           const SizedBox(height: 12),
@@ -613,6 +612,7 @@ class _AddJellyfinScreenState extends State<AddJellyfinScreen>
                 descendantsAreFocusable: false,
                 onNavigateLeft: scheme == 'http' ? () => _httpsFocus.requestFocus() : null,
                 onNavigateRight: scheme == 'https' ? () => _httpFocus.requestFocus() : null,
+                onNavigateUp: serverPairingEnabled && PlatformDetector.isTV() ? _pairFocus.requestFocus : null,
                 onNavigateDown: () => _urlFocus.requestFocus(),
                 onSelect: busy ? null : () => setState(() => _scheme = scheme),
                 child: ChoiceChip(
@@ -633,7 +633,7 @@ class _AddJellyfinScreenState extends State<AddJellyfinScreen>
         // wrap-to-4-lines field to the Flutter overlay, but it is logically
         // single-line URL input the system keyboard handles.
         tvTextInputPresentation: TvTextInputPresentation.platform,
-        autofocus: !(serverPairingEnabled && PlatformDetector.isTV()),
+        autofocus: true,
         tvTextInputAutoOpenBehavior: deferredUrlFieldAutoOpen,
         keyboardType: TextInputType.url,
         minLines: 1,
@@ -660,6 +660,8 @@ class _AddJellyfinScreenState extends State<AddJellyfinScreen>
           // URL example — intentionally not localized.
           hintText: widget.dialect.exampleBaseUrl.replaceFirst(RegExp(r'^https?://'), ''),
           helperText: _serverInfo == null ? t.addServer.serverUrlsHelper : null,
+          helperMaxLines: 8,
+          errorMaxLines: 8,
           prefixIcon: const AppIcon(Symbols.link_rounded, fill: 1),
         ),
         validator: (_) => _enteredUrls().isEmpty ? t.addServer.required : null,
@@ -674,8 +676,8 @@ class _AddJellyfinScreenState extends State<AddJellyfinScreen>
           onPressed: busy ? null : _probe,
           child: FilledButton.icon(
             onPressed: busy ? null : _probe,
-            icon: busy ? const LoadingIndicatorBox() : const AppIcon(Symbols.travel_explore_rounded, fill: 1),
-            label: Text(t.addServer.findServer),
+            icon: busy ? const LoadingIndicatorBox() : const Icon(Icons.arrow_forward_rounded),
+            label: Text(t.profiles.continueButton),
           ),
         ),
       ] else ...[

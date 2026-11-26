@@ -44,7 +44,7 @@ class TvEdgeMenu extends StatefulWidget {
 }
 
 class _TvEdgeMenuState extends State<TvEdgeMenu> {
-  late bool expanded = widget.current.startsWith('library:') || widget.libraryEntries.length <= 6;
+  bool expanded = true;
   final _nodes = <String, FocusNode>{};
   final _scope = FocusScopeNode(debugLabel: 'tv_edge_scope');
   bool _focusRepairScheduled = false;
@@ -52,13 +52,24 @@ class _TvEdgeMenuState extends State<TvEdgeMenu> {
   FocusNode node(String id) => _nodes.putIfAbsent(id, () => FocusNode(debugLabel: 'tv_edge_$id'));
   GlobalKey rowKey(String id) => _rowKeys.putIfAbsent(id, GlobalKey.new);
 
+  FocusNode get _openingFocus {
+    if (expanded && widget.libraryEntries.isNotEmpty) {
+      final library = widget.libraryEntries.firstWhere(
+        (entry) => entry.id == widget.current,
+        orElse: () => widget.libraryEntries.first,
+      );
+      if (_nodes[library.id] case final focus?) return focus;
+    }
+    return _nodes[widget.current] ?? _nodes.values.first;
+  }
+
   @override
   void initState() {
     super.initState();
     if (widget.autofocus) FocusManager.instance.addListener(_keepFocusInMenu);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !widget.autofocus || _nodes.isEmpty) return;
-      final selected = _nodes[widget.current] ?? _nodes.values.first;
+      final selected = _openingFocus;
       selected.requestFocus();
       final row = selected.context;
       if (row != null) Scrollable.ensureVisible(row, alignment: 0.35);
@@ -71,7 +82,7 @@ class _TvEdgeMenuState extends State<TvEdgeMenu> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusRepairScheduled = false;
       if (!mounted || _scope.hasFocus || ModalRoute.of(context)?.isCurrent != true || _nodes.isEmpty) return;
-      (_nodes[widget.current] ?? _nodes.values.first).requestFocus();
+      _openingFocus.requestFocus();
     });
     WidgetsBinding.instance.ensureVisualUpdate();
   }
@@ -196,23 +207,9 @@ class _TvEdgeMenuState extends State<TvEdgeMenu> {
     final colors = Theme.of(context).colorScheme;
     final profile = widget.entries.where((e) => e.id == 'profile').firstOrNull;
     final settings = widget.entries.where((e) => e.id == 'settings').firstOrNull;
-    final browse = widget.entries.where(
-      (e) => const {'discover', 'favorites', 'explore', 'studios', 'search', 'kidsMovies', 'kidsShows'}.contains(e.id),
-    );
     final library = widget.entries.where((e) => e.id == 'libraries').firstOrNull;
     final more = widget.entries.where(
-      (e) => !const {
-        'profile',
-        'settings',
-        'discover',
-        'favorites',
-        'explore',
-        'studios',
-        'search',
-        'kidsMovies',
-        'kidsShows',
-        'libraries',
-      }.contains(e.id),
+      (e) => const {'studios', 'downloads', 'together', 'kidsMovies', 'kidsShows'}.contains(e.id),
     );
 
     return Align(
@@ -245,11 +242,6 @@ class _TvEdgeMenuState extends State<TvEdgeMenu> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              if (profile != null) _row(profile, profile: true),
-                              if (browse.isNotEmpty) ...[
-                                _heading(t.tvEdgeMenu.browse),
-                                for (final entry in browse) _row(entry),
-                              ],
                               if (library != null && widget.libraryEntries.isNotEmpty) ...[
                                 const SizedBox(height: 8),
                                 _row((
@@ -260,9 +252,11 @@ class _TvEdgeMenuState extends State<TvEdgeMenu> {
                                 if (expanded)
                                   for (final entry in widget.libraryEntries) _row(entry),
                               ],
-                              if (more.isNotEmpty) ...[
+                              if (library != null && widget.libraryEntries.isEmpty) _row(library),
+                              if (more.isNotEmpty || profile != null) ...[
                                 _heading(t.tvEdgeMenu.more),
                                 for (final entry in more) _row(entry),
+                                if (profile != null) _row(profile, profile: true),
                               ],
                             ],
                           ),

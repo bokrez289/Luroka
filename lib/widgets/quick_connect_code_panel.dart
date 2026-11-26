@@ -71,7 +71,7 @@ class QuickConnectCodePanel extends StatelessWidget {
             children: [
               const LoadingIndicatorBox(size: 16),
               const SizedBox(width: 10),
-              Text(t.auth.quickConnectWaiting, style: theme.textTheme.bodyMedium?.copyWith(color: muted)),
+              Flexible(child: Text(t.auth.quickConnectWaiting, style: theme.textTheme.bodyMedium?.copyWith(color: muted))),
             ],
           ),
           const SizedBox(height: 32),
