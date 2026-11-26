@@ -143,6 +143,10 @@ class TranslationsAz extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$profileSetupGuide$az profileSetupGuide = _Translations$profileSetupGuide$az._(_root);
 	@override late final _Translations$animeFavorites$az animeFavorites = _Translations$animeFavorites$az._(_root);
 	@override late final _Translations$addServer$az addServer = _Translations$addServer$az._(_root);
+	@override late final _Translations$episodeDetails$az episodeDetails = _Translations$episodeDetails$az._(_root);
+	@override late final _Translations$tvEdgeMenu$az tvEdgeMenu = _Translations$tvEdgeMenu$az._(_root);
+	@override late final _Translations$showDetailLayout$az showDetailLayout = _Translations$showDetailLayout$az._(_root);
+	@override late final _Translations$iconStyles$az iconStyles = _Translations$iconStyles$az._(_root);
 }
 
 // Path: mobileLibrary
@@ -564,6 +568,7 @@ class _Translations$kidsShelf$az extends Translations$kidsShelf$en {
 	final TranslationsAz _root; // ignore: unused_field
 
 	// Translations
+	@override String get quietScenery => 'Sakit gecə mənzərəsi';
 	@override String get movieShelf => 'Kino vaxtı';
 	@override String get showShelf => 'Növbəti verilişinizi tapın';
 	@override String get aurora => 'Aurora - dərin çay və əhəng';
@@ -925,6 +930,8 @@ class _Translations$lurokaDiscovery$az extends Translations$lurokaDiscovery$en {
 	@override String get noAvailable => 'Yoxlanılan kitabxanalarda heç bir uyğun başlıq tapılmadı.';
 	@override String get sourceInfo => 'Həftəlik trendlər və seçilmiş mükafat qalibləri · TMDb';
 	@override String get configure => 'Kəşf parametrləri';
+	@override String get filterOwned => 'Kitabxanalarımda';
+	@override String get statusRetry => 'Seerr yoxlanmadı · Yenidən cəhd edin';
 }
 
 // Path: app
@@ -1472,6 +1479,10 @@ class _Translations$settings$az extends Translations$settings$en {
 	@override String get playerScopeTitle => 'Serial və ya film üzrə';
 	@override String get exportDialogTitle => 'Luroka tənzimləmələrini ixrac et';
 	@override String get velvetHourTheme => 'Məxmər Saat';
+	@override String get backdropBrightness => 'Fonun parlaqlığı';
+	@override String get backdropBrightnessDescription => 'Ana səhifə və məzmun şəkillərinin üzərindəki qaraltmanı tənzimləyin. Standart dəyər 100%-dir.';
+	@override String get showEarlyNextEpisode => 'Bölüm bitməzdən əvvəl növbəti bölümü göstər';
+	@override String get showEarlyNextEpisodeDescription => 'Növbəti bölümü titrlər zamanı və ya son 30 saniyədə göstərin.';
 }
 
 // Path: themeEditor
@@ -1719,6 +1730,9 @@ class _Translations$lurokaThemes$az extends Translations$lurokaThemes$en {
 	final TranslationsAz _root; // ignore: unused_field
 
 	// Translations
+	@override String get patina => 'Patina · tünd firuzəyi və mis';
+	@override String get afterimage => 'Afterimage · indiqo və neon çəhrayı';
+	@override String get letterpress => 'Letterpress · kağız və tünd qırmızı mürəkkəb';
 	@override String get title => 'Luroka kinoteatr palitraları';
 	@override String get coral => 'Mərcan · gecə yarısı mavi və gün batımı';
 	@override String get ocean => 'Okean · dərin mavi və buz';
@@ -1817,6 +1831,14 @@ class _Translations$homeLayout$az extends Translations$homeLayout$en {
 	@override String get resetDescription => 'Orijinal sıra sırası bərpa edilsin və bu profil üçün bütün sıralar göstərilsin? Bağlanmış kolleksiyalarınız saxlanılacaq.';
 	@override String get saveFailed => 'Ev tərtibatınızı saxlamaq mümkün olmadı. Yenidən cəhd edin.';
 	@override String get emptyHint => 'Sətirlər gizlədilə bilər. Onları yenidən göstərmək üçün Fərdiləşdirin Əsas səhifəni açın.';
+	@override String get upcomingEpisodes => 'Yaxınlaşan bölümlər';
+	@override String get upcomingFavorites => 'Sevimlilər';
+	@override String get upcomingWatched => 'Əvvəllər izlənənlər';
+	@override String get upcomingBoth => 'Sevimlilər və əvvəllər izlənənlər';
+	@override String get upcomingAll => 'Bütün seriallar';
+	@override String get upcomingOff => 'Söndürülü';
+	@override String airDate({required Object date}) => 'Yayım tarixi: ${date}';
+	@override String get upcomingHint => 'Yaxınlaşan yayım tarixləri yalnız bu sıra aktiv olduqda arxa planda yoxlanılır. Nəticələr məhduddur və serverinizdə hələ mövcud olmaya bilər.';
 }
 
 // Path: screenTime
@@ -1886,6 +1908,34 @@ class _Translations$activityStats$az extends Translations$activityStats$en {
 	@override String get emptyTitle => 'Burada hələ heç nə yoxdur';
 	@override String get emptyBody => 'Bir şeyə baxın və statistikanız burada qurulacaq.';
 	@override String get noDataInPeriod => 'Bu müddətdə heç bir oxutma qeydə alınmayıb.';
+	@override String get patternsTab => 'İzləmə vərdişləri';
+	@override String get moviesFilter => 'Filmlər';
+	@override String get episodesFilter => 'Bölümlər';
+	@override String get datesFilter => 'Tarixlər';
+	@override String titlesPlayed({required Object count}) => '${count} məzmun başladılıb · bölümlər ayrıca sayılır';
+	@override String get previousPeriod => 'Əvvəlki dövr';
+	@override String lifetimeSummary({required Object total, required Object average}) => 'Bütün dövr: ${total} · Gündəlik orta: ${average}';
+	@override String get dailyAverage => 'Gündəlik orta';
+	@override String get allKinds => 'Hamısı';
+	@override String get titlesPlayedLabel => 'Oynadılmış məzmun';
+	@override String get ledgerScope => 'Fəaliyyət bu profilin yerli Luroka oxutma jurnalından götürülür. Serverin izləmə tarixçəsi və digər tətbiqlərdə oxutma daxil deyil.';
+	@override String chartScale({required Object duration}) => 'Şkala: 0 – ${duration}';
+	@override String get gettingStarted => 'Fəaliyyət yenicə başlayır. İzləmə vərdişləri bir neçə aktiv gündən sonra görünəcək.';
+	@override String get history => 'Tarixçə';
+	@override String get insufficientHistory => 'Tarixçə kifayət deyil';
+	@override String get monthlyRecap => 'Aylıq xülasə';
+	@override String get noMatches => 'Bu filtrlərə uyğun izləmə yoxdur.';
+	@override String get activeDays => 'Aktiv günlər';
+	@override String get measurementHint => 'Vaxt tamamlanmış məzmunu deyil, qeydə alınmış oxutmanı göstərir.';
+	@override String get historyError => 'Tarixçə yüklənmədi. Yenidən cəhd edin.';
+	@override String get watchedPeriod => 'Bu dövrdə izlənən';
+	@override String monthWatched({required Object duration}) => 'Bu ay ${duration} izlənib';
+	@override String get drillDown => 'Bu tarixlər üçün fəaliyyətə bax';
+	@override String get searchHistory => 'İzləmə tarixçəsində axtar';
+	@override String get clearDates => 'Tarixləri təmizlə';
+	@override String get playedHint => 'Bölümlər ayrıca sayılır. Oxutma vaxtı məzmunun tamamlandığını göstərmir.';
+	@override String get allHistory => 'Bütün tarixçəyə bax';
+	@override String get overview => 'Ümumi baxış';
 }
 
 // Path: search
@@ -2094,6 +2144,7 @@ class _Translations$mediaMenu$az extends Translations$mediaMenu$en {
 	@override String get rate => 'Qiymətləndir';
 	@override String get playFromBeginning => 'Əvvəldən oynat';
 	@override String get playVersion => 'Versiyanı oynat...';
+	@override String get removeFromNextUp => 'Növbəti siyahısından çıxar';
 }
 
 // Path: rateSheet
@@ -2110,6 +2161,8 @@ class _Translations$rateSheet$az extends Translations$rateSheet$en {
 	@override String get saved => 'Yadda saxlanıldı';
 	@override String get notAvailable => 'Uyğunluq tapılmadı';
 	@override String get noConnectedServices => 'Orada qiymətləndirmək üçün Tənzimləmələrdən xidmət qoşun.';
+	@override String get addFavorite => 'Sevimlilərə əlavə et';
+	@override String get removeFavorite => 'Sevimlilərdən çıxar';
 }
 
 // Path: accessibility
@@ -2344,6 +2397,8 @@ class _Translations$messages$az extends Translations$messages$en {
 	@override String get streamSelectionFailed => 'Seçilmiş yayımları tətbiq etmək olmadı';
 	@override String get trackSelectionNotRemembered => 'Bu trek seçimi yalnız cari oynatmaya tətbiq olunur.';
 	@override String get serverUnavailableForProfile => 'Aktiv profil üçün heç bir server mövcud deyil';
+	@override String get logSupportReference => 'Dəstək istinadı';
+	@override String get copyFullLogId => 'Tam jurnal ID-sini kopyala';
 }
 
 // Path: sourceLibraries
@@ -3917,6 +3972,68 @@ class _Translations$addServer$az extends Translations$addServer$en {
 	@override String redirectUnsupportedEnterFinal({required Object product}) => 'Server dəstəklənməyən URL-ə yönləndirdi. Son ${product} URL-ni birbaşa daxil edin.';
 }
 
+// Path: episodeDetails
+class _Translations$episodeDetails$az extends Translations$episodeDetails$en {
+	_Translations$episodeDetails$az._(TranslationsAz root) : this._root = root, super.internal(root);
+
+	final TranslationsAz _root; // ignore: unused_field
+
+	// Translations
+	@override String get previous => 'Əvvəlki bölüm';
+	@override String get next => 'Növbəti bölüm';
+}
+
+// Path: tvEdgeMenu
+class _Translations$tvEdgeMenu$az extends Translations$tvEdgeMenu$en {
+	_Translations$tvEdgeMenu$az._(TranslationsAz root) : this._root = root, super.internal(root);
+
+	final TranslationsAz _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'TV naviqasiyası';
+	@override String get top => 'Üst panel';
+	@override String get both => 'Üst panel və yan menyu';
+	@override String get hint => 'Yan menyunu açmaq üçün sıranın ilk elementində sola basın. Qayıtmaq üçün sağa və ya Geri düyməsinə basın.';
+	@override String get tryMenu => 'Naviqasiyanı sınayın';
+	@override String get allLibraries => 'Bütün kitabxanalar';
+	@override String get browse => 'Gözdən keçir';
+	@override String get more => 'Daha çox';
+	@override String get closeHint => 'Bağlamaq üçün sağa və ya Geri basın';
+}
+
+// Path: showDetailLayout
+class _Translations$showDetailLayout$az extends Translations$showDetailLayout$en {
+	_Translations$showDetailLayout$az._(TranslationsAz root) : this._root = root, super.internal(root);
+
+	final TranslationsAz _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Serial təfərrüatlarının düzülüşü';
+	@override String get description => 'Serial və bölümlərin televizorda necə göstəriləcəyini seçin.';
+	@override String get compact => 'Yığcam bölüm siyahısı';
+	@override String get cinematic => 'Kino üslubu';
+	@override String get seasons => 'Mövsüm seçin';
+	@override String get episodes => 'Bölümlər';
+	@override String get details => 'Təfərrüatlar';
+	@override String get cast => 'Aktyor heyəti';
+	@override String get related => 'Oxşar filmlər və seriallar';
+}
+
+// Path: iconStyles
+class _Translations$iconStyles$az extends Translations$iconStyles$en {
+	_Translations$iconStyles$az._(TranslationsAz root) : this._root = root, super.internal(root);
+
+	final TranslationsAz _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Nişan üslubu';
+	@override String get description => 'Tətbiq idarəetmələrinin görünüşünü seçin. Dəyişikliklər bu profilə tətbiq edilir.';
+	@override String get current => 'Luroka Bold';
+	@override String get lucide => 'Lucide';
+	@override String get lucideDescription => 'Sadə xətti nişanlar; mövcud olmayan nişanlar Material nişanları ilə əvəz edilir.';
+	@override String get outline => 'Material Outline';
+}
+
 // Path: appIcon.names
 class _Translations$appIcon$names$az extends Translations$appIcon$names$en {
 	_Translations$appIcon$names$az._(TranslationsAz root) : this._root = root, super.internal(root);
@@ -5116,6 +5233,7 @@ extension on TranslationsAz {
 			'downloadsRedesign.downloaded' => 'Endirildi',
 			'downloadsRedesign.speed' => 'Yükləmə sürəti',
 			'downloadsRedesign.notificationProgress' => '{progress} · {networkSpeed} · {timeRemaining} qalan',
+			'kidsShelf.quietScenery' => 'Sakit gecə mənzərəsi',
 			'kidsShelf.movieShelf' => 'Kino vaxtı',
 			'kidsShelf.showShelf' => 'Növbəti verilişinizi tapın',
 			'kidsShelf.aurora' => 'Aurora - dərin çay və əhəng',
@@ -5365,9 +5483,9 @@ extension on TranslationsAz {
 			'kids.historyReset' => 'Uşaqların baxış istisnaları sıfırlandı',
 			'kids.blocked' => 'Bu başlıq bu uşaq profilində mövcud deyil.',
 			'kids.switchProfile' => 'Profilə keçin',
-			'kids.manageFromAdult' => 'Ayarları idarə etmək üçün böyüklər profilinə keçin.',
 			_ => null,
 		} ?? switch (path) {
+			'kids.manageFromAdult' => 'Ayarları idarə etmək üçün böyüklər profilinə keçin.',
 			'kids.noConnections' => 'Uşaq profili əlavə etməzdən əvvəl serveri böyüklər profilinizə qoşun.',
 			'kids.created' => 'Uşaq profili yaradıldı',
 			'kids.updated' => 'Uşaq profili yeniləndi',
@@ -5407,6 +5525,8 @@ extension on TranslationsAz {
 			'lurokaDiscovery.noAvailable' => 'Yoxlanılan kitabxanalarda heç bir uyğun başlıq tapılmadı.',
 			'lurokaDiscovery.sourceInfo' => 'Həftəlik trendlər və seçilmiş mükafat qalibləri · TMDb',
 			'lurokaDiscovery.configure' => 'Kəşf parametrləri',
+			'lurokaDiscovery.filterOwned' => 'Kitabxanalarımda',
+			'lurokaDiscovery.statusRetry' => 'Seerr yoxlanmadı · Yenidən cəhd edin',
 			'app.title' => 'Luroka',
 			'appIcon.title' => 'Proqram ikonu',
 			'appIcon.defaultIcon' => 'Defolt',
@@ -5877,11 +5997,11 @@ extension on TranslationsAz {
 			'settings.liveTvDefaultFavoritesDescription' => 'Canlı TV açıldıqda yalnız sevimli kanalları göstər',
 			'settings.general' => 'Ümumi',
 			'settings.generalDescription' => 'Dil, başlanğıc və pəncərə davranışı',
+			_ => null,
+		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Dil və Region',
 			'settings.startup' => 'Başlanğıc',
 			'settings.display' => 'Ekran',
-			_ => null,
-		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Kitabxana və kartlar',
 			'settings.homeScreen' => 'Ana ekran',
 			'settings.navigation' => 'Naviqasiya',
@@ -5916,6 +6036,10 @@ extension on TranslationsAz {
 			'settings.playerScopeTitle' => 'Serial və ya film üzrə',
 			'settings.exportDialogTitle' => 'Luroka tənzimləmələrini ixrac et',
 			'settings.velvetHourTheme' => 'Məxmər Saat',
+			'settings.backdropBrightness' => 'Fonun parlaqlığı',
+			'settings.backdropBrightnessDescription' => 'Ana səhifə və məzmun şəkillərinin üzərindəki qaraltmanı tənzimləyin. Standart dəyər 100%-dir.',
+			'settings.showEarlyNextEpisode' => 'Bölüm bitməzdən əvvəl növbəti bölümü göstər',
+			'settings.showEarlyNextEpisodeDescription' => 'Növbəti bölümü titrlər zamanı və ya son 30 saniyədə göstərin.',
 			'themeEditor.builtIn' => 'Daxili',
 			'themeEditor.presets' => 'Əvvəlcədən təyinlər',
 			'themeEditor.custom' => 'Xüsusi',
@@ -6057,6 +6181,9 @@ extension on TranslationsAz {
 			'referenceDetails.continuing' => 'Davam edir',
 			'referenceDetails.upNext' => 'Növbəti',
 			'referenceDetails.episodesLeft' => ({required Object count}) => '${count} epizodları qalıb',
+			'lurokaThemes.patina' => 'Patina · tünd firuzəyi və mis',
+			'lurokaThemes.afterimage' => 'Afterimage · indiqo və neon çəhrayı',
+			'lurokaThemes.letterpress' => 'Letterpress · kağız və tünd qırmızı mürəkkəb',
 			'lurokaThemes.title' => 'Luroka kinoteatr palitraları',
 			'lurokaThemes.coral' => 'Mərcan · gecə yarısı mavi və gün batımı',
 			'lurokaThemes.ocean' => 'Okean · dərin mavi və buz',
@@ -6137,6 +6264,14 @@ extension on TranslationsAz {
 			'homeLayout.resetDescription' => 'Orijinal sıra sırası bərpa edilsin və bu profil üçün bütün sıralar göstərilsin? Bağlanmış kolleksiyalarınız saxlanılacaq.',
 			'homeLayout.saveFailed' => 'Ev tərtibatınızı saxlamaq mümkün olmadı. Yenidən cəhd edin.',
 			'homeLayout.emptyHint' => 'Sətirlər gizlədilə bilər. Onları yenidən göstərmək üçün Fərdiləşdirin Əsas səhifəni açın.',
+			'homeLayout.upcomingEpisodes' => 'Yaxınlaşan bölümlər',
+			'homeLayout.upcomingFavorites' => 'Sevimlilər',
+			'homeLayout.upcomingWatched' => 'Əvvəllər izlənənlər',
+			'homeLayout.upcomingBoth' => 'Sevimlilər və əvvəllər izlənənlər',
+			'homeLayout.upcomingAll' => 'Bütün seriallar',
+			'homeLayout.upcomingOff' => 'Söndürülü',
+			'homeLayout.airDate' => ({required Object date}) => 'Yayım tarixi: ${date}',
+			'homeLayout.upcomingHint' => 'Yaxınlaşan yayım tarixləri yalnız bu sıra aktiv olduqda arxa planda yoxlanılır. Nəticələr məhduddur və serverinizdə hələ mövcud olmaya bilər.',
 			'screenTime.title' => 'Ekran vaxtı',
 			'screenTime.description' => 'Bu profildə videoya baxmağa sərf olunan vaxta baxın',
 			'screenTime.today' => 'Bu gün',
@@ -6185,6 +6320,34 @@ extension on TranslationsAz {
 			'activityStats.emptyTitle' => 'Burada hələ heç nə yoxdur',
 			'activityStats.emptyBody' => 'Bir şeyə baxın və statistikanız burada qurulacaq.',
 			'activityStats.noDataInPeriod' => 'Bu müddətdə heç bir oxutma qeydə alınmayıb.',
+			'activityStats.patternsTab' => 'İzləmə vərdişləri',
+			'activityStats.moviesFilter' => 'Filmlər',
+			'activityStats.episodesFilter' => 'Bölümlər',
+			'activityStats.datesFilter' => 'Tarixlər',
+			'activityStats.titlesPlayed' => ({required Object count}) => '${count} məzmun başladılıb · bölümlər ayrıca sayılır',
+			'activityStats.previousPeriod' => 'Əvvəlki dövr',
+			'activityStats.lifetimeSummary' => ({required Object total, required Object average}) => 'Bütün dövr: ${total} · Gündəlik orta: ${average}',
+			'activityStats.dailyAverage' => 'Gündəlik orta',
+			'activityStats.allKinds' => 'Hamısı',
+			'activityStats.titlesPlayedLabel' => 'Oynadılmış məzmun',
+			'activityStats.ledgerScope' => 'Fəaliyyət bu profilin yerli Luroka oxutma jurnalından götürülür. Serverin izləmə tarixçəsi və digər tətbiqlərdə oxutma daxil deyil.',
+			'activityStats.chartScale' => ({required Object duration}) => 'Şkala: 0 – ${duration}',
+			'activityStats.gettingStarted' => 'Fəaliyyət yenicə başlayır. İzləmə vərdişləri bir neçə aktiv gündən sonra görünəcək.',
+			'activityStats.history' => 'Tarixçə',
+			'activityStats.insufficientHistory' => 'Tarixçə kifayət deyil',
+			'activityStats.monthlyRecap' => 'Aylıq xülasə',
+			'activityStats.noMatches' => 'Bu filtrlərə uyğun izləmə yoxdur.',
+			'activityStats.activeDays' => 'Aktiv günlər',
+			'activityStats.measurementHint' => 'Vaxt tamamlanmış məzmunu deyil, qeydə alınmış oxutmanı göstərir.',
+			'activityStats.historyError' => 'Tarixçə yüklənmədi. Yenidən cəhd edin.',
+			'activityStats.watchedPeriod' => 'Bu dövrdə izlənən',
+			'activityStats.monthWatched' => ({required Object duration}) => 'Bu ay ${duration} izlənib',
+			'activityStats.drillDown' => 'Bu tarixlər üçün fəaliyyətə bax',
+			'activityStats.searchHistory' => 'İzləmə tarixçəsində axtar',
+			'activityStats.clearDates' => 'Tarixləri təmizlə',
+			'activityStats.playedHint' => 'Bölümlər ayrıca sayılır. Oxutma vaxtı məzmunun tamamlandığını göstərmir.',
+			'activityStats.allHistory' => 'Bütün tarixçəyə bax',
+			'activityStats.overview' => 'Ümumi baxış',
 			'search.hint' => 'Kino, serial, musiqi axtar...',
 			'search.tryDifferentTerm' => 'Fərqli axtarış sözü cəhd edin',
 			'search.searchYourMedia' => 'Mediyanızda axtarın',
@@ -6348,6 +6511,8 @@ extension on TranslationsAz {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Qarışıq oynatma oflayn rejimdə əlçatan deyil',
 			'mediaMenu.fileInfo' => 'Fayl məlumatı',
 			'mediaMenu.deleteEpisodeFromServer' => 'Seriyanı serverdən sil',
+			_ => null,
+		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Mövsümü serverdən sil',
 			'mediaMenu.deleteShowFromServer' => 'Serialı serverdən sil',
 			'mediaMenu.deleteMovieFromServer' => 'Kinonu serverdən sil',
@@ -6372,6 +6537,7 @@ extension on TranslationsAz {
 			'mediaMenu.rate' => 'Qiymətləndir',
 			'mediaMenu.playFromBeginning' => 'Əvvəldən oynat',
 			'mediaMenu.playVersion' => 'Versiyanı oynat...',
+			'mediaMenu.removeFromNextUp' => 'Növbəti siyahısından çıxar',
 			'rateSheet.title' => 'Qiymətləndir',
 			'rateSheet.server' => 'Server',
 			'rateSheet.favorite' => 'Sevimli',
@@ -6379,6 +6545,8 @@ extension on TranslationsAz {
 			'rateSheet.saved' => 'Yadda saxlanıldı',
 			'rateSheet.notAvailable' => 'Uyğunluq tapılmadı',
 			'rateSheet.noConnectedServices' => 'Orada qiymətləndirmək üçün Tənzimləmələrdən xidmət qoşun.',
+			'rateSheet.addFavorite' => 'Sevimlilərə əlavə et',
+			'rateSheet.removeFavorite' => 'Sevimlilərdən çıxar',
 			'accessibility.mediaCardMovie' => ({required Object title}) => '${title}, kino',
 			'accessibility.mediaCardShow' => ({required Object title}) => '${title}, TV şou',
 			'accessibility.mediaCardEpisode' => ({required Object title, required Object episodeInfo}) => '${title}, ${episodeInfo}',
@@ -6394,8 +6562,6 @@ extension on TranslationsAz {
 			'accessibility.hue' => 'Rəng çaları',
 			'accessibility.saturation' => 'Doyğunluq',
 			'accessibility.brightness' => 'Parlaqlıq',
-			_ => null,
-		} ?? switch (path) {
 			'accessibility.hexColor' => 'Hex rəngi',
 			'accessibility.expandText' => 'Mətni genişləndir',
 			'accessibility.collapseText' => 'Mətni yığ',
@@ -6574,6 +6740,8 @@ extension on TranslationsAz {
 			'messages.streamSelectionFailed' => 'Seçilmiş yayımları tətbiq etmək olmadı',
 			'messages.trackSelectionNotRemembered' => 'Bu trek seçimi yalnız cari oynatmaya tətbiq olunur.',
 			'messages.serverUnavailableForProfile' => 'Aktiv profil üçün heç bir server mövcud deyil',
+			'messages.logSupportReference' => 'Dəstək istinadı',
+			'messages.copyFullLogId' => 'Tam jurnal ID-sini kopyala',
 			'sourceLibraries.title' => 'Serverləriniz və kitabxanalarınız',
 			'sourceLibraries.description' => 'Luroka-nun Ev, axtarış, mövcudluğu kəşf və Studios üçün istifadə etdiyi kitabxanaları seçin. Əsas sıra sırası ayrıca fərdiləşdirilir.',
 			'sourceLibraries.partial' => 'Bəzi serverləri yoxlamaq mümkün olmadı. Həmin kitabxanalar üçün saxladığınız seçimləriniz saxlanılır. Yenidən cəhd etmək üçün yeniləyin.',
@@ -6857,6 +7025,8 @@ extension on TranslationsAz {
 			'libraries.filters' => 'Filtrlər',
 			'libraries.confirmActionMessage' => 'Bu əməliyyatı yerinə yetirmək istədiyinizdən əminsiniz?',
 			'libraries.showLibrary' => 'Kitabxananı göstər',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Kitabxananı gizlət',
 			'libraries.libraryOptions' => 'Kitabxana seçimləri',
 			'libraries.content' => 'kitabxana məzmunu',
@@ -6908,8 +7078,6 @@ extension on TranslationsAz {
 			'libraries.sortLabels.dateShared' => 'Paylaşılma tarixi',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Son seriya yayın tarixi',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Əlavə olunan son seriya tarixi',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Yüklənmə tarixi',
 			'libraries.sortLabels.size' => 'Həcm',
 			'libraries.sortLabels.library' => 'Kitabxana',
@@ -7371,6 +7539,8 @@ extension on TranslationsAz {
 			'watchTogether.qrShare' => 'QR kodu paylaşın',
 			'watchTogether.qrHint' => 'Bu otağa qoşulmaq üçün Luroka tətbiqi ilə skan edin.',
 			'watchTogether.phasePlaying' => 'Oynamaq',
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Fasilə verildi',
 			'watchTogether.phaseWaiting' => 'Hər kəsi gözləyirik',
 			'watchTogether.inviteCopied' => 'Dəvət kopyalandı. Mesaja yapışdırın.',
@@ -7422,8 +7592,6 @@ extension on TranslationsAz {
 			'watchTogether.offsetPlusSecond' => '+1 s',
 			'watchTogether.participants' => 'İştirakçılar',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('az'))(n, one: '${n} iştirakçısı', other: '${n} iştirakçıları', ), 
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'TƏŞKİLATÇI',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (Siz)',
 			'watchTogether.playerIdle' => 'Boş',
@@ -7885,6 +8053,8 @@ extension on TranslationsAz {
 			'matchScreen.match' => 'Uyğunlaşdır...',
 			'matchScreen.fixMatch' => 'Uyğunluğu düzəlt...',
 			'matchScreen.unmatch' => 'Uyğunluğu ləğv et',
+			_ => null,
+		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Bu uyğunluq təmizlənsin? Yenidən uyğunlaşdırılana qədər Plex onu uyğunlaşdırılmamış sayacaq.',
 			'matchScreen.unmatchSuccess' => 'Element uyğunluğu ləğv edildi',
 			'matchScreen.unmatchFailed' => 'Uyğunluq ləğv edilə bilmədi',
@@ -7936,8 +8106,6 @@ extension on TranslationsAz {
 			'seerr.requestFailed' => ({required Object error}) => 'Sorğu uğursuz oldu: ${error}',
 			'seerr.requestsLoadFailed' => 'Seçimlər yüklənə bilmədi',
 			'seerr.nothingToRequest' => 'Hər şey artıq var və ya sorğu göndərilib.',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Əlçatandır',
 			'seerr.statusPartiallyAvailable' => 'Hissəvi əlçatandır',
 			'seerr.statusRequested' => 'Sorğu göndərildi',
@@ -8116,6 +8284,32 @@ extension on TranslationsAz {
 			'addServer.redirectDifferentHost' => ({required Object product}) => 'Server başqa hosta yönləndirdi. Son ${product} URL-ni birbaşa daxil edin.',
 			'addServer.redirectInsecure' => 'Server HTTPS-dən təhlükəsiz olmayan URL-ə yönləndirdi',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'Server dəstəklənməyən URL-ə yönləndirdi. Son ${product} URL-ni birbaşa daxil edin.',
+			'episodeDetails.previous' => 'Əvvəlki bölüm',
+			'episodeDetails.next' => 'Növbəti bölüm',
+			'tvEdgeMenu.title' => 'TV naviqasiyası',
+			'tvEdgeMenu.top' => 'Üst panel',
+			'tvEdgeMenu.both' => 'Üst panel və yan menyu',
+			'tvEdgeMenu.hint' => 'Yan menyunu açmaq üçün sıranın ilk elementində sola basın. Qayıtmaq üçün sağa və ya Geri düyməsinə basın.',
+			'tvEdgeMenu.tryMenu' => 'Naviqasiyanı sınayın',
+			'tvEdgeMenu.allLibraries' => 'Bütün kitabxanalar',
+			'tvEdgeMenu.browse' => 'Gözdən keçir',
+			'tvEdgeMenu.more' => 'Daha çox',
+			'tvEdgeMenu.closeHint' => 'Bağlamaq üçün sağa və ya Geri basın',
+			'showDetailLayout.title' => 'Serial təfərrüatlarının düzülüşü',
+			'showDetailLayout.description' => 'Serial və bölümlərin televizorda necə göstəriləcəyini seçin.',
+			'showDetailLayout.compact' => 'Yığcam bölüm siyahısı',
+			'showDetailLayout.cinematic' => 'Kino üslubu',
+			'showDetailLayout.seasons' => 'Mövsüm seçin',
+			'showDetailLayout.episodes' => 'Bölümlər',
+			'showDetailLayout.details' => 'Təfərrüatlar',
+			'showDetailLayout.cast' => 'Aktyor heyəti',
+			'showDetailLayout.related' => 'Oxşar filmlər və seriallar',
+			'iconStyles.title' => 'Nişan üslubu',
+			'iconStyles.description' => 'Tətbiq idarəetmələrinin görünüşünü seçin. Dəyişikliklər bu profilə tətbiq edilir.',
+			'iconStyles.current' => 'Luroka Bold',
+			'iconStyles.lucide' => 'Lucide',
+			'iconStyles.lucideDescription' => 'Sadə xətti nişanlar; mövcud olmayan nişanlar Material nişanları ilə əvəz edilir.',
+			'iconStyles.outline' => 'Material Outline',
 			_ => null,
 		};
 	}

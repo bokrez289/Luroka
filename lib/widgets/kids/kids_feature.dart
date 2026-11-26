@@ -26,6 +26,7 @@ class KidsFeature extends StatelessWidget {
     this.onDown,
     this.onUp,
     this.onSidebar,
+    this.resume = false,
   });
   final MediaItem item;
   final KidsStyle style;
@@ -37,12 +38,20 @@ class KidsFeature extends StatelessWidget {
   final VoidCallback? onDown;
   final VoidCallback? onUp;
   final VoidCallback? onSidebar;
+  final bool resume;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
       final compact = constraints.maxWidth < 700;
       final colors = Theme.of(context).colorScheme;
+      Widget fallback() => style.isOlder
+          ? ColoredBox(color: style.background)
+          : Image.asset(
+              'assets/branding/kids-world-${compact ? 'phone' : 'tv'}.webp',
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => ColoredBox(color: style.surface),
+            );
       final artwork = ExcludeSemantics(
         child: OptimizedMediaImage(
           client: client,
@@ -51,11 +60,8 @@ class KidsFeature extends StatelessWidget {
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
           fadeInDuration: KidsStyle.motion(context),
-          placeholder: (_, _) => ColoredBox(color: style.surface),
-          errorWidget: (_, _, _) => ColoredBox(
-            color: style.surface,
-            child: Icon(Icons.auto_awesome_rounded, size: 64, color: style.teal.withValues(alpha: 0.3)),
-          ),
+          placeholder: (_, _) => fallback(),
+          errorWidget: (_, _, _) => fallback(),
         ),
       );
       Widget details() => Padding(
@@ -83,7 +89,7 @@ class KidsFeature extends StatelessWidget {
               maxLines: compact ? 3 : 2,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                fontSize: compact ? 28 : 42,
+                fontSize: compact ? 26 : 32,
                 fontWeight: FontWeight.w800,
                 height: 1.12,
                 color: Colors.white,
@@ -111,7 +117,16 @@ class KidsFeature extends StatelessWidget {
                   Text(item.genres!.take(2).join(' · '), style: const TextStyle(color: Color(0xffe0e5f5))),
               ],
             ),
-            const SizedBox(height: 24),
+            if (item.summary?.trim().isNotEmpty == true && !(item.isEpisode && item.shouldHideSpoiler)) ...[
+              const SizedBox(height: 12),
+              Text(
+                item.summary!.trim(),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.white.withValues(alpha: .9), fontSize: compact ? 14 : 17, height: 1.35),
+              ),
+            ],
+            const SizedBox(height: 16),
             Wrap(
               spacing: 12,
               runSpacing: 12,
@@ -134,7 +149,10 @@ class KidsFeature extends StatelessWidget {
                     ),
                     onPressed: onPlay,
                     icon: const Icon(Icons.play_arrow_rounded),
-                    label: Text(t.common.play, style: const TextStyle(fontWeight: FontWeight.w800)),
+                    label: Text(
+                      resume ? t.common.resume : t.common.play,
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
                   ),
                 ),
                 FocusableButton(
@@ -165,11 +183,6 @@ class KidsFeature extends StatelessWidget {
         container: true,
         child: Container(
           key: const ValueKey('kids-cinematic-feature'),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(style.radius),
-            border: Border.all(color: style.violet.withValues(alpha: 0.3)),
-          ),
-          clipBehavior: Clip.antiAlias,
           child: compact
               ? ColoredBox(
                   color: style.surface,
@@ -181,32 +194,40 @@ class KidsFeature extends StatelessWidget {
                     ],
                   ),
                 )
-              : SizedBox(
-                  height:
-                      math.max(350, MediaQuery.sizeOf(context).height * 0.56) +
-                      math.max(0, MediaQuery.textScalerOf(context).scale(16) / 16 - 1) * 160,
+              : ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: math.max(300, MediaQuery.sizeOf(context).height * 0.54)),
                   child: Stack(
-                    fit: StackFit.expand,
                     children: [
-                      artwork,
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: AlignmentDirectional.centerStart,
-                            end: AlignmentDirectional.centerEnd,
-                            colors: [
-                              style.background,
-                              style.background.withValues(alpha: 0.88),
-                              style.background.withValues(alpha: 0.12),
-                            ],
-                            stops: const [0, 0.35, 1],
+                      Positioned.fill(child: artwork),
+                      Positioned.fill(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: AlignmentDirectional.centerStart,
+                              end: AlignmentDirectional.centerEnd,
+                              colors: [
+                                style.background,
+                                style.background.withValues(alpha: 0.88),
+                                style.background.withValues(alpha: 0.12),
+                              ],
+                              stops: const [0, 0.35, 1],
+                            ),
                           ),
                         ),
                       ),
-                      Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: SizedBox(width: constraints.maxWidth * 0.65, child: details()),
+                      Positioned.fill(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Colors.transparent, style.background.withValues(alpha: .12), style.background],
+                              stops: const [0, .60, 1],
+                            ),
+                          ),
+                        ),
                       ),
+                      SizedBox(width: constraints.maxWidth * 0.58, child: details()),
                     ],
                   ),
                 ),

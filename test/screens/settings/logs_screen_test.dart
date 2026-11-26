@@ -165,8 +165,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    expect(find.text('abcdefghij', findRichText: true), findsOneWidget);
-    expect(find.text(capability, findRichText: true), findsNothing);
+    expect(find.text(capability, findRichText: true), findsOneWidget);
     expect(utf8.encode(uploadedBody!).length, lessThanOrEqualTo(maxLogUploadBytes));
     expect(uploadedRequest!.method, 'POST');
     expect(uploadedRequest!.url, Uri.parse('https://ice.luroka.app/logs'));

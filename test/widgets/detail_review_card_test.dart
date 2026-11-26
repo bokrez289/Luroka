@@ -103,7 +103,7 @@ void main() {
     await tester.runAsync(() => PlaybackCoordinator.instance.shutdownVideo());
   });
 
-  for (final failure in ['resolve', 'open', 'error', 'timeout']) {
+  for (final failure in ['resolve', 'region_blocked', 'open', 'error', 'timeout']) {
     testWidgets('YouTube $failure failure tries embedded playback once', (tester) async {
       final player = _PreviewPlayer()..failOpen = failure == 'open';
       player.initialized.complete(true);
@@ -116,13 +116,14 @@ void main() {
       var closeCalls = 0;
       messenger.setMockMethodCallHandler(trailers, (call) async {
         if (call.method == 'resolve') {
+          if (failure == 'region_blocked') throw PlatformException(code: failure);
           if (failure == 'resolve') throw PlatformException(code: 'unavailable');
           return {'url': 'https://example.com/expired-trailer.mp4'};
         }
         if (call.method == 'openEmbedded') {
           embeddedCalls++;
-          expect(call.arguments['key'], 'abcdefghijk');
-          if (failure != 'resolve') expect(player.disposed, isTrue);
+          expect(call.arguments['key'], failure == 'region_blocked' ? '12345678901' : 'abcdefghijk');
+          if (failure != 'resolve' && failure != 'region_blocked') expect(player.disposed, isTrue);
           return embedded.future;
         }
         if (call.method == 'closeEmbedded') {
@@ -138,8 +139,11 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: TrailerPlayerScreen(
-            url: 'https://www.youtube.com/watch?v=abcdefghijk',
+            url: failure == 'resolve'
+                ? 'https://www.youtube.com/embed/abcdefghijk'
+                : 'https://www.youtube.com/watch?v=abcdefghijk',
             title: 'Trailer',
+            alternatives: failure == 'region_blocked' ? const ['https://youtu.be/12345678901'] : const [],
             playerFactory: () => player,
           ),
         ),
@@ -174,6 +178,38 @@ void main() {
       expect(tester.takeException(), isNull);
     }, variant: TargetPlatformVariant.only(TargetPlatform.android));
   }
+
+  testWidgets('YouTube trailer allows a sharper HLS stream', (tester) async {
+    final player = _PreviewPlayer();
+    player.initialized.complete(true);
+    final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    const wakelock = 'dev.flutter.pigeon.wakelock_plus_platform_interface.WakelockPlusApi.toggle';
+    const trailers = MethodChannel('com.luroka/trailers');
+    messenger.setMockMessageHandler(wakelock, (_) async => const StandardMessageCodec().encodeMessage([null]));
+    messenger.setMockMethodCallHandler(trailers, (call) async {
+      if (call.method == 'resolve') return {'url': 'https://example.com/preview.m3u8'};
+      return null;
+    });
+    addTearDown(() {
+      messenger.setMockMethodCallHandler(trailers, null);
+      messenger.setMockMessageHandler(wakelock, null);
+    });
+    await tester.pumpWidget(
+      MaterialApp(
+        home: TrailerPlayerScreen(
+          url: 'https://www.youtube.com/watch?v=abcdefghijk',
+          title: 'Trailer',
+          playerFactory: () => player,
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(player.properties['hls-bitrate'], '8000000');
+    await tester.runAsync(() => tester.pumpWidget(const SizedBox()));
+    await tester.pumpAndSettle();
+    await tester.runAsync(() => PlaybackCoordinator.instance.shutdownVideo());
+  }, variant: TargetPlatformVariant.only(TargetPlatform.android));
 
   testWidgets('TV review reader scrolls with the remote and Back restores its opener', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(true);

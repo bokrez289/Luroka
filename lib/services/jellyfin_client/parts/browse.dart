@@ -197,13 +197,9 @@ const _episodeQueuePageSize = 200;
 /// improving (0.65s at 3, 0.56s at both 4 and 6).
 const _seriesLastPlayedConcurrency = 4;
 
-/// Ceiling on how many series [_attachSeriesLastPlayed] dates in one call and
-/// on how many series [_fetchRecentlyPlayedSeriesIds] returns — which also
-/// bounds the Emby Next Up history enrichment (unknown rows remain visible). Sits just above `DiscoverProvider`'s 21-row
-/// continue-watching probe so the home shelf is always fully dated, and caps
-/// the uncapped `count: null` shelf, whose Next Up half is limited only by how
-/// many series the user has started.
-const _seriesLastPlayedLookupLimit = 24;
+/// Bounds Jellyfin's per-series enrichment, covering the largest 48-item Home
+/// shelf plus its probe. The shared deadline still limits slow servers.
+const _seriesLastPlayedLookupLimit = 64;
 
 /// Per-phase budget for one [_fetchSeriesLastPlayed] lookup.
 /// [MediaServerHttpClient] applies a per-call `timeout` to connect and receive
@@ -227,13 +223,8 @@ const _seriesLastPlayedBudget = Duration(seconds: 4);
 const _childrenPageSize = 500;
 const _pagedListPageSize = 200;
 
-/// Ceiling on the one dedicated-resume-route window that feeds every Emby
-/// playback shelf (see [_embyResumeWindowQuery]). The route cannot be
-/// server-filtered to either shelf half, so previews slice the split halves
-/// and the see-all surfaces page them in memory; this bounds that response.
-/// The rows arrive recency-ordered — the genuinely in-progress items plus one
-/// row per started series — so anything past a few hundred rows is old enough
-/// that the Next Up cutoff would drop it anyway.
+/// Page size for Emby's hide-aware resume route. A page is not a completeness
+/// boundary: sparse halves and View All continue through subsequent pages.
 const _embyResumeWindowLimit = 300;
 
 const _playableDescendantTypes = 'Movie,Episode,Audio';
@@ -298,6 +289,13 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   /// than the one on screen. Dies with the client, like Plex's
   /// `_providerLibraries`.
   List<MediaLibrary>? _loadedLibraryViews;
+
+  // Client instances are account scoped. Only retain dates for ordering; never
+  // retain shelf membership here (removed/finished shows must stay removed).
+  final _homeProgressDates = HomeProgressDates();
+  bool _embyHomeSectionUnsupported = false;
+
+  List<MediaItem> _rememberHomePlayDates(List<MediaItem> items) => _homeProgressDates.restore(items);
 
   /// In-flight `/Views` request, shared by concurrent callers.
   ///
@@ -854,7 +852,9 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   Future<MediaItem?> fetchPreviewItem(String id, {required AbortController abort}) async {
     final response = await _http.get(
       '/Users/${_segment(connection.userId)}/Items/${_segment(id)}',
-      queryParameters: {'Fields': 'Overview,Genres,People,ProductionYear,OfficialRating,PremiereDate,RecursiveItemCount'},
+      queryParameters: {
+        'Fields': 'Overview,Genres,People,ProductionYear,OfficialRating,PremiereDate,RecursiveItemCount',
+      },
       abort: abort,
       timeout: const Duration(seconds: 8),
     );
@@ -2168,6 +2168,16 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
     void Function(String libraryId, Object error)? onFailure,
   }) async {
     if (includedLibraryIds != null && includedLibraryIds.isEmpty) return const [];
+    // Section rows do not reliably carry a library ID. Keep the scoped path
+    // when we must enforce library selection, exclusions, or Kids rules.
+    if (!dialect.resumeReturnsOnlyStartedItems &&
+        includedLibraryIds == null &&
+        excludedLibraryIds.isEmpty &&
+        !KidsProfileService.instance.isActiveKids &&
+        !_embyHomeSectionUnsupported) {
+      final native = await _fetchEmbyHomeResumeSection(count: count, splitRows: splitRows);
+      if (native != null) return native;
+    }
     var libraries = _loadedLibraryViews;
     if (libraries == null) {
       libraries = await fetchLibraries();
@@ -2231,6 +2241,63 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
     ).allowedForProfile(continueWatching: true);
   }
 
+  /// Fetch Emby Web's server-wide membership and order. Do not enrich dates
+  /// or choose one episode per show here: both can change the native shelf.
+  Future<List<MediaItem>?> _fetchEmbyHomeResumeSection({required int? count, required bool splitRows}) async {
+    if (count != null && count <= 0) return const [];
+    final pageSize = (count ?? 100).clamp(12, 100);
+    final rows = <MediaItem>[];
+    final seen = <String>{};
+    var start = 0;
+    var resume = 0;
+    var nextUp = 0;
+    while (true) {
+      final response = await _getItemsResponseRaw(paths.embyHomeResumeItems, {
+        'Limit': pageSize.toString(),
+        if (start > 0) 'StartIndex': start.toString(),
+        'Fields': _hubRowFields,
+        ...jellyfinImageQueryParameters,
+      }, _continueWatchingRetry);
+      if (start == 0 && (response.statusCode == 404 || response.statusCode == 405 || response.statusCode == 501)) {
+        _embyHomeSectionUnsupported = true;
+        return null;
+      }
+      throwIfHttpError(response);
+      final data = response.data;
+      if (data is! Map || data['Items'] is! List) {
+        throw StateError('Invalid Emby Home resume section response');
+      }
+      final page = _itemsArray(data);
+      if (page.isEmpty) break;
+      var advanced = false;
+      for (final raw in page) {
+        final id = raw['Id']?.toString();
+        if (id == null || !seen.add(id)) continue;
+        advanced = true;
+        final item = _mapItem(raw);
+        if (item == null) continue;
+        final role = item.kind == MediaKind.episode && (item.viewOffsetMs ?? 0) == 0
+            ? HomeProgressRole.nextUp
+            : HomeProgressRole.resume;
+        final tagged = withHomeProgressRole(item, role);
+        if (!showHomeProgress(tagged)) continue;
+        rows.add(tagged);
+        if (role == HomeProgressRole.nextUp) {
+          nextUp++;
+        } else {
+          resume++;
+        }
+      }
+      // Older implementations may ignore StartIndex. Keep the valid prefix.
+      if (!advanced) break;
+      start += page.length;
+      final total = data['TotalRecordCount'];
+      if (total is num && total > 0 ? start >= total : page.length < pageSize) break;
+      if (count != null && (splitRows ? resume >= count && nextUp >= count : rows.length >= count)) break;
+    }
+    return limitHomeProgressRows(rankHomeProgress(rows, embyHomeResumeStream), count, split: splitRows);
+  }
+
   /// The two Continue Watching halves, server-wide or scoped to [library]
   /// (whose rows are then stamped with it).
   Future<({List<MediaItem> resume, List<MediaItem> nextUp})> _continueWatchingRows({
@@ -2240,7 +2307,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   }) async {
     final parentId = library?.id;
     List<MediaItem> stamped(List<MediaItem> items, HomeProgressRole role) => [
-      for (final item in items)
+      for (final item in _rememberHomePlayDates(items))
         withHomeProgressRole(
           library == null ? item : item.copyWith(libraryId: library.id, libraryTitle: library.title),
           role,
@@ -2249,55 +2316,54 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
 
     if (!dialect.resumeReturnsOnlyStartedItems) {
       // Emby: both shelf halves ride the one hide-aware window request — see
-      // [_embyResumeWindowQuery].
+      // [_fetchEmbyProgressWindow].
       final split = _splitEmbyResumeRows(
-        await _fetchItemsArray(
-          paths.resumeItems,
-          _embyResumeWindowQuery(parentId: parentId),
+        await _fetchEmbyProgressWindow(
+          parentId: parentId,
+          count: count,
+          includeNextUp: library?.kind != MediaKind.movie,
+          previewFirstPage: library != null,
           retry: _continueWatchingRetry,
         ),
       );
       final resume = stamped(
-        _mapItems(split.resume),
+        rankHomeProgress(_mapItems(split.resume), 'resume'),
         HomeProgressRole.resume,
       ).allowedForProfile(continueWatching: true);
       onResume?.call(resume);
       return (
         resume: resume,
         nextUp: stamped(
-          _mapItems(await _stampEmbyNextUpRows(split.nextUp, parentId: parentId)),
+          rankHomeProgress(_mapItems(await _stampEmbyNextUpRows(split.nextUp, parentId: parentId)), 'nextUp'),
           HomeProgressRole.nextUp,
         ).allowedForProfile(continueWatching: true),
       );
     }
 
     final results = await Future.wait([
-      _fetchItemsArray(
+      _fetchProgressRows(
         paths.resumeItems,
         _resumeItemsQuery(limit: count, parentId: parentId),
-        retry: _continueWatchingRetry,
+        count: count,
       ).then((items) {
-        final resume = stamped(_mapItems(items), HomeProgressRole.resume).allowedForProfile(continueWatching: true);
+        final resume = stamped(
+          rankHomeProgress(_mapItems(items), 'resume'),
+          HomeProgressRole.resume,
+        ).allowedForProfile(continueWatching: true);
         if (resume.isNotEmpty) onResume?.call(resume);
         return resume;
       }),
-      (onResume == null
-              ? _safeFetchItemsArray(
-                  '/Shows/NextUp',
-                  _nextUpQuery(limit: count, parentId: parentId),
-                  retry: _continueWatchingRetry,
-                )
-              : _fetchItemsArray(
-                  '/Shows/NextUp',
-                  _nextUpQuery(limit: count, parentId: parentId),
-                  retry: _continueWatchingRetry,
-                ))
-          .then(
-            (items) async => stamped(
-              await _attachSeriesLastPlayed(_mapItems(items)),
-              HomeProgressRole.nextUp,
-            ).allowedForProfile(continueWatching: true),
-          ),
+      _fetchProgressRows(
+        '/Shows/NextUp',
+        _nextUpQuery(limit: count, parentId: parentId),
+        count: count,
+        bestEffort: onResume == null,
+      ).then(
+        (items) async => stamped(
+          rankHomeProgress(await _attachSeriesLastPlayed(_mapItems(items)), 'nextUp'),
+          HomeProgressRole.nextUp,
+        ).allowedForProfile(continueWatching: true),
+      ),
     ]);
 
     return (
@@ -2306,6 +2372,42 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
       // before the recency merge.
       nextUp: results[1],
     );
+  }
+
+  /// Fill a shelf with distinct, permitted series rather than counting raw
+  /// episodes. Explicit pages also prevent `count: null` from falling back to
+  /// the server's small default response size on the View All route.
+  Future<List<Map<String, dynamic>>> _fetchProgressRows(
+    String path,
+    Map<String, String> query, {
+    required int? count,
+    bool bestEffort = false,
+  }) async {
+    final pageSize = (count ?? 200).clamp(1, 200);
+    final result = <Map<String, dynamic>>[];
+    final seen = <String>{};
+    var start = 0;
+    while (true) {
+      final parameters = {...query, 'Limit': pageSize.toString(), if (start > 0) 'StartIndex': start.toString()};
+      final page = bestEffort
+          ? await _safeFetchItemsArray(path, parameters, retry: _continueWatchingRetry)
+          : await _fetchItemsArray(path, parameters, retry: _continueWatchingRetry);
+      if (page.isEmpty) break;
+      var added = 0;
+      for (final row in page) {
+        final id = row['Id']?.toString();
+        if (id != null && seen.add(id)) {
+          result.add(row);
+          added++;
+        }
+      }
+      if (added == 0) throw StateError('Progress endpoint did not advance pagination');
+      final visible = _mapItems(result).allowedForProfile(continueWatching: true).where(showHomeProgress);
+      final distinct = visible.map((item) => item.seriesGlobalKey ?? item.globalKey).toSet().length;
+      if ((count != null && distinct >= count) || page.length < pageSize) break;
+      start += page.length;
+    }
+    return result;
   }
 
   @override
@@ -2447,12 +2549,12 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
           : Future.value(const <Map<String, dynamic>>[]);
     } else {
       // Emby: one hide-aware window request feeds both playback shelves — see
-      // [_embyResumeWindowQuery].
-      final splitFuture = _safeFetchItemsArray(
-        paths.resumeItems,
-        _embyResumeWindowQuery(parentId: parentId),
+      // [_fetchEmbyProgressWindow].
+      final splitFuture = _fetchEmbyProgressWindow(
+        parentId: parentId,
+        count: limit,
+        includeNextUp: includeNextUp,
         retry: retry,
-        diagnostics: diagnostics,
       ).then(_splitEmbyResumeRows);
       resumeRowsFuture = splitFuture.then((split) => split.resume);
       nextUpRowsFuture = includeNextUp
@@ -2651,9 +2753,14 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
         );
       case 'continue':
         if (!dialect.resumeReturnsOnlyStartedItems) {
-          // Emby: page the hide-aware window in memory — see [_embyResumeWindowQuery].
+          // Fetch enough hide-aware pages to reach this half's requested offset.
           final resume = _splitEmbyResumeRows(
-            await _fetchItemsArray(paths.resumeItems, _embyResumeWindowQuery(parentId: parentId), abort: abort),
+            await _fetchEmbyProgressWindow(
+              parentId: parentId,
+              count: offset + pageSize + 1,
+              includeNextUp: false,
+              abort: abort,
+            ),
           ).resume;
           final window = resume.skip(offset).take(pageSize).toList(growable: false);
           return LibraryPage<MediaItem>(items: _mapItems(window), totalCount: resume.length, offset: offset);
@@ -2681,10 +2788,14 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
             abort: abort,
           );
         }
-        // Emby: the shelf is carved from the hide-aware window and paged in
-        // memory — see [_embyResumeWindowQuery].
+        // Emby: only its hide-aware route can establish shelf membership.
         final split = _splitEmbyResumeRows(
-          await _fetchItemsArray(paths.resumeItems, _embyResumeWindowQuery(parentId: parentId), abort: abort),
+          await _fetchEmbyProgressWindow(
+            parentId: parentId,
+            count: offset + pageSize + 1,
+            includeResume: false,
+            abort: abort,
+          ),
         );
         final rows = await _stampEmbyNextUpRows(split.nextUp, parentId: parentId, abort: abort);
         final window = rows.skip(offset).take(pageSize).toList(growable: false);
@@ -2811,9 +2922,8 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   /// already returns series in last-played-descending order, so the cap keeps the
   /// rows whose dates decide the top of the shelf while bounding total work for
   /// an uncapped `count: null` shelf, which can carry far more series than the
-  /// home preview. Rows past the cap keep a null date and degrade to their
-  /// `addedAt` in the sort — the same degradation the previous 200-row lookback
-  /// window applied to a series whose last play fell outside it.
+  /// home preview. Rows past the cap reuse a known series date or retain their
+  /// backend rank; library-added dates never stand in for viewing activity.
   ///
   /// The batches are sequential and [MediaServerHttpClient] applies a per-call
   /// `timeout` to the connect and receive phases *separately*, so a per-request
@@ -2884,13 +2994,77 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   /// removed row to the shelf forever. The response is split by
   /// [_splitEmbyResumeRows] instead: previews slice the halves and the see-all
   /// surfaces page them in memory.
-  Map<String, String> _embyResumeWindowQuery({String? parentId}) =>
-      _resumeItemsQuery(limit: _embyResumeWindowLimit, parentId: parentId);
+  /// Page only the hide-aware route. A fixed window is not a complete shelf:
+  /// one half can occupy the entire first page on a large account.
+  Future<List<Map<String, dynamic>>> _fetchEmbyProgressWindow({
+    String? parentId,
+    int? count,
+    bool includeResume = true,
+    bool includeNextUp = true,
+    bool previewFirstPage = false,
+    _HubRetryPolicy? retry,
+    AbortController? abort,
+  }) async {
+    final result = <Map<String, dynamic>>[];
+    final seen = <String>{};
+    final resumeSeries = <String>{};
+    final nextSeries = <String>{};
+    var start = 0;
+    while (true) {
+      // Home needs a preview from each visible library, not 300 full item
+      // DTOs from each one. Grow the next page if one half is sparse.
+      final compact = previewFirstPage && count != null && start == 0;
+      final pageSize = compact ? (count * (includeNextUp ? 2 : 1)).clamp(16, _embyResumeWindowLimit) : _embyResumeWindowLimit;
+      final response = await _getItemsResponse(
+        paths.resumeItems,
+        _resumeItemsQuery(
+          limit: pageSize,
+          parentId: parentId,
+          start: start == 0 ? null : start,
+          totalCount: true,
+        ),
+        retry,
+        abort: abort,
+      );
+      abort?.throwIfAborted();
+      throwIfHttpError(response);
+      final page = _itemsArray(response.data);
+      if (page.isEmpty) break;
+      var added = 0;
+      for (final row in page) {
+        final id = row['Id']?.toString();
+        if (id == null || !seen.add(id)) continue;
+        added++;
+        result.add(row);
+        final data = row['UserData'];
+        final position = jellyfinTicksToMs(data is Map<String, dynamic> ? data['PlaybackPositionTicks'] : null) ?? 0;
+        final identity = row['Type'] == 'Episode' ? row['SeriesId']?.toString() ?? id : id;
+        if (position > 0) {
+          if (_mapItem(row)?.hasMeaningfulProgress ?? false) resumeSeries.add(identity);
+        } else if (row['Type'] == 'Episode') {
+          nextSeries.add(identity);
+        }
+      }
+      // Some older servers ignore StartIndex. Never spin forever or commit a
+      // repeated page as proof that the rest of the user's shelf was removed.
+      if (added == 0) throw StateError('Resume endpoint did not advance pagination');
+      start += page.length;
+      final data = response.data;
+      final total = data is Map ? data['TotalRecordCount'] : null;
+      if (total is num ? start >= total : page.length < pageSize) break;
+      if (count != null &&
+          (!includeResume || resumeSeries.length >= count) &&
+          (!includeNextUp || nextSeries.difference(resumeSeries).length >= count)) {
+        break;
+      }
+    }
+    return result;
+  }
 
   String get _latestItemsPath => '/Users/${_segment(connection.userId)}/Items/Latest';
 
   /// Resume-route query behind the Continue Watching shelf, hub preview and
-  /// see-all page (and, via [_embyResumeWindowQuery], the Emby window).
+  /// see-all page (and, via [_fetchEmbyProgressWindow], Emby's paged shelf).
   /// [start]/[totalCount] are the see-all paging extras; [videoOnly] adds the
   /// `MediaTypes` filter.
   Map<String, String> _resumeItemsQuery({
@@ -2969,7 +3143,8 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   ) {
     final resume = <Map<String, dynamic>>[];
     final nextUp = <Map<String, dynamic>>[];
-    for (final row in rows) {
+    for (var index = 0; index < rows.length; index++) {
+      final row = {...rows[index], homeProgressRankKey: index, homeProgressStreamKey: embyLegacyResumeStream};
       final userData = row['UserData'];
       final positionMs = jellyfinTicksToMs(userData is Map<String, dynamic> ? userData['PlaybackPositionTicks'] : null);
       if (positionMs != null && positionMs > 0) {
@@ -2995,7 +3170,14 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
     AbortController? abort,
   }) async {
     if (rows.isEmpty) return rows;
-    final scannedSeries = await _fetchRecentlyPlayedSeriesIds(parentId: parentId, abort: abort);
+    final scannedSeries = await _fetchRecentlyPlayedSeriesIds(
+      parentId: parentId,
+      abort: abort,
+      wantedSeries: {
+        for (final row in rows)
+          if (row['SeriesId'] is String) row['SeriesId'] as String,
+      },
+    );
     // Emby's hide-aware resume response is authoritative. History enriches
     // sorting only; a Jellyfin-specific cutoff must never remove its rows.
     final lastPlayedBySeries = {for (final (seriesId, lastPlayed) in scannedSeries) seriesId: lastPlayed};
@@ -3017,8 +3199,8 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   }
 
   /// Distinct series ids behind the user's most recently played episodes, newest
-  /// first, capped at [_seriesLastPlayedLookupLimit], each paired with that
-  /// series' newest play date.
+  /// first, each paired with its newest play date. Page until the requested
+  /// series are dated, the history ends, or the shared deadline expires.
   ///
   /// `Filters=IsPlayed` + `SortBy=DatePlayed` is the only library-wide recency
   /// signal Emby exposes for series: a series dto carries neither a usable
@@ -3027,59 +3209,80 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   /// *is* that series' newest play, so this one request yields the
   /// timestamp each of [_stampEmbyNextUpRows]'s rows needs — no
   /// per-series enrichment round trip.
-  Future<List<(String, String?)>> _fetchRecentlyPlayedSeriesIds({String? parentId, AbortController? abort}) async {
-    final rows = await _safeFetchItemsArray(
-      '/Items',
-      {
-        'userId': connection.userId,
-        'ParentId': ?parentId,
-        'Recursive': 'true',
-        'IncludeItemTypes': 'Episode',
-        'Filters': 'IsPlayed',
-        'SortBy': 'DatePlayed',
-        'SortOrder': 'Descending',
-        // Eight played episodes per shelf slot: enough that a few binged series
-        // near the top do not starve the rest. A user who watched more than this
-        // window inside a single series gets a shorter shelf, never a wrong one —
-        // the series they were last watching still ranks first, which is the
-        // ordering the shelf exists to show.
-        'Limit': (_seriesLastPlayedLookupLimit * 8).toString(),
-        'Fields': 'SeriesId,UserDataLastPlayedDate',
-        'EnableImages': 'false',
-        'EnableTotalRecordCount': 'false',
-      },
-      timeout: _seriesLastPlayedRequestTimeout,
-      abort: abort,
-      // Best-effort shelf: a timeout or 5xx here must not move the client's
-      // active endpoint, which is what every other hub leg also avoids.
-      //
-      // This [timeout] bounds a single request phase, not the scan: like every
-      // per-call timeout it applies to connect and receive independently, so a
-      // stalled endpoint costs at most two phases before the Next Up half
-      // degrades to empty.
-      //
-      // Deliberately *not* the hub retry policy: `_getItemsResponse` ignores
-      // `timeout` on the retried path, which would leave this request bounded
-      // only by the 15s home / 20s library hub deadline.
-      allowEndpointFailover: false,
-    );
-
-    // Insertion-ordered map: preserves the server's recency ordering, and keeps
-    // each series' first (newest) play date rather than a later, older one.
+  Future<List<(String, String?)>> _fetchRecentlyPlayedSeriesIds({
+    String? parentId,
+    AbortController? abort,
+    required Set<String> wantedSeries,
+  }) async {
     final lastPlayedBySeries = <String, String?>{};
-    for (final row in rows) {
-      final seriesId = row['SeriesId'];
-      if (seriesId is! String || seriesId.isEmpty || lastPlayedBySeries.containsKey(seriesId)) continue;
-      final userData = row['UserData'];
-      lastPlayedBySeries[seriesId] = userData is Map ? userData['LastPlayedDate'] as String? : null;
-      if (lastPlayedBySeries.length >= _seriesLastPlayedLookupLimit) break;
+    final budgetAbort = AbortController();
+    if (abort != null) unawaited(abort.trigger.then((_) => budgetAbort.abort()));
+    final deadline = Timer(_seriesLastPlayedBudget, budgetAbort.abort);
+    var start = 0;
+    final seenEpisodes = <String>{};
+    try {
+      while (!budgetAbort.isAborted) {
+        final fetch = _safeFetchItemsArray(
+          '/Items',
+          {
+            'userId': connection.userId,
+            'ParentId': ?parentId,
+            'Recursive': 'true',
+            'IncludeItemTypes': 'Episode',
+            'Filters': 'IsPlayed',
+            'SortBy': 'DatePlayed',
+            'SortOrder': 'Descending',
+            'Limit': '192',
+            if (start > 0) 'StartIndex': start.toString(),
+            'Fields': 'SeriesId,UserDataLastPlayedDate',
+            'EnableImages': 'false',
+            'EnableTotalRecordCount': 'false',
+          },
+          timeout: _seriesLastPlayedRequestTimeout,
+          abort: budgetAbort,
+          // Best-effort shelf: a timeout or 5xx here must not move the client's
+          // active endpoint, which is what every other hub leg also avoids.
+          //
+          // This [timeout] bounds a single request phase, not the scan: like every
+          // per-call timeout it applies to connect and receive independently, so a
+          // shared deadline above also bounds the entire multi-page scan.
+          //
+          // Deliberately *not* the hub retry policy: `_getItemsResponse` ignores
+          // `timeout` on the retried path, which would leave this request bounded
+          // only by the 15s home / 20s library hub deadline.
+          allowEndpointFailover: false,
+        );
+        final rows = await Future.any([fetch, budgetAbort.trigger.then((_) => <Map<String, dynamic>>[])]);
+        fetch.ignore();
+        var added = 0;
+        for (final row in rows) {
+          final id = row['Id']?.toString();
+          if (id != null && seenEpisodes.add(id)) added++;
+          final seriesId = row['SeriesId'];
+          if (seriesId is! String || !wantedSeries.contains(seriesId) || lastPlayedBySeries.containsKey(seriesId)) {
+            continue;
+          }
+          final userData = row['UserData'];
+          final date = userData is Map ? userData['LastPlayedDate'] : null;
+          if (date is String) lastPlayedBySeries[seriesId] = date;
+        }
+        if (rows.length < 192 || added == 0 || wantedSeries.every(lastPlayedBySeries.containsKey)) break;
+        start += rows.length;
+      }
+    } on MediaServerHttpException {
+      // Keep dates already found when the shared enrichment budget expires.
+      abort?.throwIfAborted();
+    } finally {
+      deadline.cancel();
+      budgetAbort.abort();
     }
+    abort?.throwIfAborted();
     return [for (final entry in lastPlayedBySeries.entries) (entry.key, entry.value)];
   }
 
   /// Newest `LastPlayedDate` across [seriesId]'s episodes, or null when the
   /// series has never been played — or when the lookup failed, in which case the
-  /// row keeps a null date and degrades to its `addedAt` in the shelf sort.
+  /// caller reuses a known date or the backend rank rather than `addedAt`.
   ///
   /// Deliberately no `Filters=IsPlayed`: Jellyfin's own NextUp ranks series by
   /// MAX(LastPlayedDate) across every episode, and an episode can carry a
@@ -3123,7 +3326,7 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
   /// Merge Jellyfin's two continue-watching sources into one recency-ordered
   /// shelf. Resume items are deduped first so an in-progress episode wins over
   /// the same series' Next Up entry, then the combined list is ordered by
-  /// [MediaItem.recencySortKey] (matching `DataAggregationService`) before the
+  /// [orderHomeProgress] (matching `DataAggregationService`) before the
   /// limit is applied — so a recent Next Up episode is never starved by a long
   /// run of older resume items.
   List<MediaItem> _mergeContinueWatchingAndNextUp({
@@ -3140,21 +3343,19 @@ mixin _JellyfinBrowseMethods on _JellyfinClientInternals {
 
     // Resume first: first-wins dedup makes an in-progress episode beat the same
     // series' Next Up entry.
-    for (final item in [...resume, ...nextUp]) {
+    for (final item in [...resume, ...nextUp].where(showHomeProgress)) {
       if (!seenIds.add(item.id)) continue;
       final seriesId = item.kind == MediaKind.episode ? item.grandparentId : null;
       if (seriesId != null && !seenSeriesIds.add(seriesId)) continue;
       merged.add(item);
     }
 
-    // Stable sort by recency: Dart's List.sort isn't stable, so break ties on the
-    // insertion index to keep ordering deterministic across refreshes.
-    final ordered = [for (var i = 0; i < merged.length; i++) (item: merged[i], index: i)];
-    ordered.sort((a, b) {
-      final byRecency = b.item.recencySortKey.compareTo(a.item.recencySortKey);
-      return byRecency != 0 ? byRecency : a.index.compareTo(b.index);
-    });
-    final result = [for (final entry in ordered) entry.item];
+    final ranked = [...rankHomeProgress(resume, 'resume'), ...rankHomeProgress(nextUp, 'nextUp')];
+    final byId = <String, MediaItem>{};
+    for (final item in ranked) {
+      byId.putIfAbsent(item.id, () => item);
+    }
+    final result = orderHomeProgress(_rememberHomePlayDates([for (final item in merged) byId[item.id] ?? item]));
 
     return limitHomeProgressRows(result, limit, split: splitRows);
   }

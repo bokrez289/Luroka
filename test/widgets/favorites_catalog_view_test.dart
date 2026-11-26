@@ -101,7 +101,10 @@ void main() {
     addTearDown(data.dispose);
     await mount(tester, data: data);
     expect(find.text(t.animeFavorites.filter), findsNothing);
-    data.value = [items.first, MediaItem.plex(id: 'anime', kind: MediaKind.show, title: 'Anime show', labels: ['Anime'])];
+    data.value = [
+      items.first,
+      MediaItem.plex(id: 'anime', kind: MediaKind.show, title: 'Anime show', labels: ['Anime']),
+    ];
     await tester.pumpAndSettle();
     expect(find.text(t.animeFavorites.filter), findsOneWidget);
     await tester.tap(find.text(t.animeFavorites.filter));
@@ -128,21 +131,25 @@ void main() {
     expect(navigation, 1);
   });
 
-  testWidgets('TV posters grow on first-row entry and stay large until focus returns to controls', (tester) async {
+  testWidgets('TV posters retain their size as the hero collapses and expands', (tester) async {
     final key = await mount(tester);
     key.currentState!.focusContent();
     await tester.pumpAndSettle();
     final hero = find.byKey(const ValueKey('favorites_hero'));
     final expanded = tester.getSize(hero).height;
-    final smallPosterWidth = tester.getSize(find.byType(FocusableMediaCard).first).width;
+    final posterWidth = tester.getSize(find.byType(FocusableMediaCard).first).width;
+    expect(posterWidth, greaterThan(100));
     final badges = tester.widget<InlineRatingBadges>(find.byKey(const ValueKey('studio_preview_ratings')));
     expect(badges.ratings.single.source, 'imdb');
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 120));
+    expect(tester.getSize(find.byType(FocusableMediaCard).first).width, closeTo(posterWidth, 0.01));
     await tester.pumpAndSettle();
     expect(FocusManager.instance.primaryFocus?.debugLabel, 'favorites_item_0');
     final compact = tester.getSize(hero).height;
     expect(compact, lessThan(expanded));
-    expect(tester.getSize(find.byType(FocusableMediaCard).first).width, greaterThan(smallPosterWidth));
+    expect(tester.getSize(find.byType(FocusableMediaCard).first).width, closeTo(posterWidth, 0.01));
     expect(tester.widget<CustomScrollView>(find.byType(CustomScrollView)).controller!.offset, 0);
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
@@ -165,9 +172,13 @@ void main() {
     expect(FocusManager.instance.primaryFocus?.debugLabel, 'favorites_item_2');
     expect(tester.getSize(hero).height, compact);
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 120));
+    expect(tester.getSize(find.byType(FocusableMediaCard).first).width, closeTo(posterWidth, 0.01));
     await tester.pumpAndSettle();
     expect(FocusManager.instance.primaryFocus?.debugLabel, 'favorites_filter_0');
     expect(tester.getSize(hero).height, expanded);
+    expect(tester.getSize(find.byType(FocusableMediaCard).first).width, closeTo(posterWidth, 0.01));
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
     await tester.pumpAndSettle();
     expect(FocusManager.instance.primaryFocus?.debugLabel, 'favorites_item_0');
@@ -275,7 +286,9 @@ void main() {
   }
 
   testWidgets('TV remote reaches and selects the anime filter', (tester) async {
-    final data = ValueNotifier<List<MediaItem>>([items.first.copyWith(labels: ['Anime'])]);
+    final data = ValueNotifier<List<MediaItem>>([
+      items.first.copyWith(labels: ['Anime']),
+    ]);
     addTearDown(data.dispose);
     final key = await mount(tester, data: data);
     key.currentState!.focusContent();
@@ -360,7 +373,10 @@ void main() {
   }
 
   testWidgets('phone Favorites keeps every filter visible above its separate sort row', (tester) async {
-    final data = ValueNotifier<List<MediaItem>>([items.first.copyWith(labels: ['Anime']), ...items.skip(1)]);
+    final data = ValueNotifier<List<MediaItem>>([
+      items.first.copyWith(labels: ['Anime']),
+      ...items.skip(1),
+    ]);
     addTearDown(data.dispose);
     await mount(tester, size: const Size(360, 780), data: data);
     for (var index = 0; index < 4; index++) {

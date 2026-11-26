@@ -7,6 +7,7 @@ import '../media/home_spotlight.dart';
 import '../media/ids.dart';
 import '../media/media_hub.dart';
 import '../media/media_item.dart';
+import '../media/media_kind.dart';
 import '../media/media_item_types.dart';
 import '../providers/discover_provider.dart';
 import '../providers/home_layout_provider.dart';
@@ -34,6 +35,7 @@ class LiveHomePreview extends StatelessWidget {
     super.key,
     this.layout,
     this.showSpotlight,
+    this.phoneCinematic,
     this.posterDetails,
     this.episodeThumbnails,
     this.previewKey,
@@ -41,6 +43,7 @@ class LiveHomePreview extends StatelessWidget {
 
   final HomeLayout? layout;
   final bool? showSpotlight;
+  final bool? phoneCinematic;
   final bool? posterDetails;
   final bool? episodeThumbnails;
   final Key? previewKey;
@@ -119,6 +122,8 @@ class LiveHomePreview extends StatelessWidget {
         SettingsService.posterDetails,
         SettingsService.homeEpisodeThumbnails,
         SettingsService.homeHeroSize,
+        SettingsService.phoneCinematicSpotlight,
+        SettingsService.phoneSpotlightSize,
         SettingsService.homePosterSize,
         SettingsService.homeShelfItemCount,
         SettingsService.showExploreTab,
@@ -265,18 +270,22 @@ class LiveHomePreview extends StatelessWidget {
       HomeSpotlightSource.trending => t.homeLayout.spotlightTrending,
       HomeSpotlightSource.continueWatching => t.homeLayout.spotlightContinue,
     };
-    if (item != null) {
+    final cinematic = phoneCinematic ?? SettingsService.instance.read<bool>(SettingsService.phoneCinematicSpotlight);
+    if (item != null || cinematic) {
+      final sample = item ?? MediaItem.plex(id: 'preview', kind: MediaKind.movie, title: t.discover.movie);
       return LayoutBuilder(
         builder: (context, bounds) => SizedBox(
           key: const ValueKey('live-home-spotlight'),
           height: MobileHomeCarousel.heightFor(
             context,
             bounds.maxWidth,
+            cinematicOverride: cinematic,
             availableHeight: MediaQuery.sizeOf(context).height - 100,
           ),
           child: MobileHomeCarousel(
             key: const ValueKey('live-home-phone-spotlight'),
-            items: [item],
+            cinematicOverride: cinematic,
+            items: [sample],
             label: selectedLabel ?? label,
             resolveClient: (entry) =>
                 entry.serverId == null ? null : context.tryGetMediaClientForServer(ServerId(entry.serverId!)),

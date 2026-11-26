@@ -25,6 +25,14 @@ class ParentalControlsScreen extends StatefulWidget {
 
 class _ParentalControlsScreenState extends State<ParentalControlsScreen> {
   bool _restoring = false;
+  FamilyParentAccess? _familyAccess;
+
+  @override
+  void dispose() {
+    _familyAccess?.dispose();
+    super.dispose();
+  }
+
   Future<void> _restore() async {
     if (_restoring) return;
     setState(() => _restoring = true);
@@ -51,7 +59,7 @@ class _ParentalControlsScreenState extends State<ParentalControlsScreen> {
           title: Text(t.family.safety),
           children: [
             const SizedBox(height: 16),
-            if (service.hasKids && !service.hasParentPin)
+            if (service.hasKids && !service.hasParentPin && !service.parentPinOptedOut)
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -74,24 +82,40 @@ class _ParentalControlsScreenState extends State<ParentalControlsScreen> {
                 FocusableListTile(
                   leading: const Icon(Icons.lock_outline_rounded),
                   title: Text(t.kids.parentPin),
-                  subtitle: Text(service.hasParentPin ? t.family.parentPinOn : t.family.parentPinOff),
+                  subtitle: Text(
+                    service.parentPinOptedOut
+                        ? t.kids.pinDisabledWarning
+                        : service.hasParentPin
+                        ? t.family.parentPinOn
+                        : t.family.parentPinOff,
+                  ),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () => setUpParentPin(context),
                 ),
-                FocusableListTile(
-                  key: const ValueKey('kids-allow-profile-exit'),
-                  leading: const Icon(Icons.swap_horiz_rounded),
-                  title: Text(t.profileStartup.allowKidsExit),
-                  subtitle: Text(t.profileStartup.allowKidsExitHint),
-                  trailing: ExcludeFocus(
-                    child: Switch(
-                      value:
-                          SettingsService.instanceOrNull?.read(SettingsService.kidsAllowExitWithoutParentPin) ?? false,
-                      onChanged: (_) => _toggleKidsExit(),
-                    ),
+                if (service.hasParentPin)
+                  FocusableListTile(
+                    key: const ValueKey('disable-parent-pin'),
+                    leading: const Icon(Icons.lock_open_rounded),
+                    title: Text(t.kids.disableParentPin),
+                    subtitle: Text(t.kids.pinDisabledWarning),
+                    onTap: _disableParentPin,
                   ),
-                  onTap: _toggleKidsExit,
-                ),
+                if (!service.parentPinOptedOut)
+                  FocusableListTile(
+                    key: const ValueKey('kids-allow-profile-exit'),
+                    leading: const Icon(Icons.swap_horiz_rounded),
+                    title: Text(t.profileStartup.allowKidsExit),
+                    subtitle: Text(t.profileStartup.allowKidsExitHint),
+                    trailing: ExcludeFocus(
+                      child: Switch(
+                        value:
+                            SettingsService.instanceOrNull?.read(SettingsService.kidsAllowExitWithoutParentPin) ??
+                            false,
+                        onChanged: (_) => _toggleKidsExit(),
+                      ),
+                    ),
+                    onTap: _toggleKidsExit,
+                  ),
                 if (profile != null)
                   FocusableListTile(
                     leading: const Icon(Icons.visibility_off_outlined),
@@ -120,10 +144,13 @@ class _ParentalControlsScreenState extends State<ParentalControlsScreen> {
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () async {
-                      if (!await ensureParentAccess(context) || !context.mounted || service.isActiveKids) return;
-                      await Navigator.of(
-                        context,
-                      ).push(MaterialPageRoute(builder: (_) => KidsProfileScreen(profile: child)));
+                      final access = _familyAccess ??= FamilyParentAccess(active);
+                      if (!await access.ensure(context) || !context.mounted || service.isActiveKids) return;
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => KidsProfileScreen(profile: child, familyAccess: access),
+                        ),
+                      );
                     },
                   ),
                 FocusableListTile(
@@ -131,8 +158,11 @@ class _ParentalControlsScreenState extends State<ParentalControlsScreen> {
                   title: Text(t.family.addChild),
                   subtitle: Text(t.family.childHint),
                   onTap: () async {
-                    if (!await ensureParentAccess(context) || !context.mounted || service.isActiveKids) return;
-                    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const KidsProfileScreen()));
+                    final access = _familyAccess ??= FamilyParentAccess(active);
+                    if (!await access.ensure(context) || !context.mounted || service.isActiveKids) return;
+                    await Navigator.of(
+                      context,
+                    ).push(MaterialPageRoute(builder: (_) => KidsProfileScreen(familyAccess: access)));
                   },
                 ),
               ],
@@ -160,6 +190,28 @@ class _ParentalControlsScreenState extends State<ParentalControlsScreen> {
         );
       },
     );
+  }
+
+  Future<void> _disableParentPin() async {
+    final service = KidsProfileService.instance;
+    final owner = service.activeId;
+    if (!await showConfirmDialog(
+          context,
+          title: t.kids.disableParentPin,
+          message: t.kids.disableParentPinConfirm,
+          confirmText: t.kids.disableParentPin,
+        ) ||
+        !mounted) {
+      return;
+    }
+    if (await requestParentPin(context) == null || !mounted || service.isActiveKids || service.activeId != owner) {
+      return;
+    }
+    try {
+      await service.disableParentPin();
+    } catch (_) {
+      if (mounted) await showErrorDialog(context, t.kids.saveFailed);
+    }
   }
 
   Future<void> _toggleKidsExit() async {

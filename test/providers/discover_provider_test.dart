@@ -69,6 +69,18 @@ class _FakeAggregationService extends DataAggregationService {
   _FakeAggregationService(super.serverManager);
 
   int onDeckCalls = 0;
+  int mergeCalls = 0;
+
+  @override
+  Future<List<MediaItem>> mergeContinueWatching(
+    List<MediaItem> existing,
+    List<MediaItem> fresh, {
+    int? limit,
+    bool splitRows = false,
+  }) {
+    mergeCalls++;
+    return super.mergeContinueWatching(existing, fresh, limit: limit, splitRows: splitRows);
+  }
   int hubCalls = 0;
   int? lastOnDeckLimit;
   bool lastSplitRows = false;
@@ -307,6 +319,9 @@ void main() {
     expect(isHomeNextUp(provider.onDeck.single), isTrue);
     client.itemResult = _item('next').copyWith(viewOffsetMs: 5000);
     await provider.updateItem(next);
+    expect(homeProgressRole(provider.onDeck.single), HomeProgressRole.nextUp);
+    client.itemResult = _item('next').copyWith(viewOffsetMs: 30000);
+    await provider.updateItem(next);
     expect(homeProgressRole(provider.onDeck.single), HomeProgressRole.resume);
   });
 
@@ -423,7 +438,19 @@ void main() {
     expect(provider.hubs.map((hub) => hub.id), containsAll(['movies', 'recent-shows']));
   });
 
-  test('Continue Watching publishes fast libraries and retains failures until recovery', () async {
+  test('partial Continue Watching failure does not re-merge when no old rows need retaining', () async {
+    final fresh = _item('fresh').copyWith(libraryId: 'fast');
+    aggregation.onDeckFailedServerIds = {'server_1'};
+    aggregation.partialOnDeck = [
+      (serverId: 'server_1', libraryId: 'fast', items: [fresh], complete: false),
+    ];
+    aggregation.onDeckResult = () => [fresh];
+    await provider.load();
+    expect(provider.onDeck.map((item) => item.id), ['fresh']);
+    expect(aggregation.mergeCalls, 0);
+  });
+
+  test('warm Continue Watching commits once and retains failed libraries until recovery', () async {
     final oldFast = _item('old-fast').copyWith(libraryId: 'fast');
     final oldSlow = _item('old-slow').copyWith(libraryId: 'slow');
     final newFast = _item('new-fast').copyWith(libraryId: 'fast');
@@ -441,8 +468,7 @@ void main() {
     aggregation.onDeckResult = () => [newFast];
     final refresh = provider.refreshContinueWatching();
     await aggregation.onDeckStarted!.future;
-    expect(provider.onDeck.map((item) => item.id), containsAll(['new-fast', 'old-slow']));
-    expect(provider.onDeck.map((item) => item.id), isNot(contains('old-fast')));
+    expect(provider.onDeck.map((item) => item.id), ['old-fast', 'old-slow']);
     gate.complete();
     await refresh;
     expect(provider.onDeck.map((item) => item.id), containsAll(['new-fast', 'old-slow']));

@@ -59,6 +59,7 @@ class DownloadTreeView extends StatefulWidget {
   final void Function(List<String> globalKeys)? onRetryAll;
   final void Function(String globalKey)? onCancel;
   final void Function(String globalKey)? onDelete;
+  final void Function(MediaItem item)? onOpen;
   final VoidCallback? onNavigateLeft;
   final VoidCallback? onBack;
   final bool suppressAutoFocus;
@@ -77,6 +78,7 @@ class DownloadTreeView extends StatefulWidget {
     this.onRetryAll,
     this.onCancel,
     this.onDelete,
+    this.onOpen,
     this.onNavigateLeft,
     this.onBack,
     this.suppressAutoFocus = false,
@@ -448,6 +450,7 @@ class _DownloadTreeViewState extends State<DownloadTreeView> with UnsuppressFocu
       onRetry: widget.onRetry,
       onCancel: widget.onCancel,
       onDelete: widget.onDelete,
+      onOpen: widget.onOpen,
       onNavigateLeft: widget.onNavigateLeft,
       onBack: widget.onBack,
       rowFocusNode: isFirst ? firstItemFocusNode : null,
@@ -611,6 +614,7 @@ class _DownloadTreeItem extends StatefulWidget {
   final void Function(String globalKey)? onRetry;
   final void Function(String globalKey)? onCancel;
   final void Function(String globalKey)? onDelete;
+  final void Function(MediaItem item)? onOpen;
   final VoidCallback? onNavigateLeft;
   final VoidCallback? onBack;
   final FocusNode? rowFocusNode;
@@ -630,6 +634,7 @@ class _DownloadTreeItem extends StatefulWidget {
     this.onRetry,
     this.onCancel,
     this.onDelete,
+    this.onOpen,
     this.onNavigateLeft,
     this.onBack,
     this.rowFocusNode,
@@ -719,6 +724,16 @@ class _DownloadTreeItemState extends State<_DownloadTreeItem> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final canExpand = widget.node.hasChildren;
+    final item = widget.node.metadata;
+    final canOpen = !canExpand && widget.node.status == DownloadStatus.completed &&
+        item != null && (item.isMovie || item.isEpisode) && widget.onOpen != null;
+    void activate() {
+      if (canExpand) {
+        widget.onToggleExpansion();
+      } else if (canOpen) {
+        widget.onOpen!(item);
+      }
+    }
     final actions = _actions();
 
     return Padding(
@@ -726,7 +741,7 @@ class _DownloadTreeItemState extends State<_DownloadTreeItem> {
       child: FocusableWrapper(
         focusNode: _rowFocusNode,
         autofocus: widget.autofocus,
-        onSelect: canExpand ? widget.onToggleExpansion : null,
+        onSelect: canExpand || canOpen ? activate : null,
         onNavigateLeft: widget.onNavigateLeft,
         onNavigateRight: actions.isNotEmpty ? _focusFirstButton : null,
         onBack: widget.onBack,
@@ -735,7 +750,7 @@ class _DownloadTreeItemState extends State<_DownloadTreeItem> {
         useBackgroundFocus: false,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: canExpand ? widget.onToggleExpansion : null,
+          onTap: canExpand || canOpen ? activate : null,
           child: Container(
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerLow,

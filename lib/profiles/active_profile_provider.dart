@@ -399,6 +399,7 @@ class ActiveProfileProvider extends ChangeNotifier with DisposableChangeNotifier
     if (kids.hasKids &&
         !kids.isKids(profile.id) &&
         !bypassKidsExit &&
+        !kids.parentPinOptedOut &&
         (parentPin == null || !kids.verifyParentPin(parentPin))) {
       return false;
     }

@@ -728,8 +728,7 @@ extension _VideoPlayerOpenMethods on VideoPlayerScreenState {
       preferredSecondarySubtitleTrack: preferredSecondarySubtitleTrack,
       primarySubtitleIsServerRendered: primarySubtitleIsServerRendered,
       persistAutomaticSubtitleSelection: persistAutomaticSubtitleSelection,
-      showMessage: (message, {duration}) {
-      },
+      showMessage: (message, {duration}) {},
       playbackRateOwnedExternally: _watchTogetherOwnsPlaybackRate,
     );
   }
@@ -916,7 +915,7 @@ extension _VideoPlayerOpenMethods on VideoPlayerScreenState {
       onMediaAvailabilityChanged?.call(true);
       sidecarFallbackUsed = true;
       if (mounted && shouldContinue()) {
-        showErrorDialog(context, t.videoControls.subtitleUnavailableFallback);
+        unawaited(showErrorDialog(context, t.videoControls.subtitleUnavailableFallback));
       }
     }
 
@@ -1057,6 +1056,11 @@ extension _VideoPlayerOpenMethods on VideoPlayerScreenState {
     final shouldAutoStart = resolveShouldAutoStart(wtOwnsStart);
     var openSession = session;
     var openSubtitleSelection = subtitleSelection;
+    final extracted = <SubtitleTrack>{
+      if (result.isTranscoding)
+        for (final sidecar in [subtitleSelection.primarySidecar, subtitleSelection.secondarySidecar])
+          if (sidecar != null && _canExtractSubtitle(currentPlayer, metadata.backend, sidecar)) sidecar.track,
+    };
 
     // Open video through Player
     if (result.videoUrl != null) {
@@ -1100,7 +1104,9 @@ extension _VideoPlayerOpenMethods on VideoPlayerScreenState {
         outcome: outcome,
         headers: headers,
         play: deferAutomotiveStart ? shouldAutoPlay && !PlatformDetector.isAutomotive() : shouldAutoPlay,
-        externalSubtitlesAtOpen: openSubtitleSelection.sidecarsAtOpen,
+        externalSubtitlesAtOpen: openSubtitleSelection.sidecarsAtOpen
+            .where((track) => !extracted.contains(track))
+            .toList(),
         shouldContinue: isCurrent,
         onOpening: onOpening,
         onOpened: onOpened,
@@ -1110,6 +1116,7 @@ extension _VideoPlayerOpenMethods on VideoPlayerScreenState {
       // open failures throw to the caller instead.
       if (!openResult.didOpen || !isCurrent()) return false;
       if (openResult.sidecarFallbackUsed) {
+        extracted.clear();
         openSession = _commitSidecarFallbackSession(openSession);
         openSubtitleSelection = openSession.subtitleSelection;
       }
@@ -1150,7 +1157,23 @@ extension _VideoPlayerOpenMethods on VideoPlayerScreenState {
     );
     _trackManager = trackManager;
 
-    trackManager.applyTrackSelectionWhenReady();
+    if (extracted.isNotEmpty && currentPlayer is PlayerNative) {
+      unawaited(trackManager.applyTrackSelection());
+      unawaited(
+        trackManager.loadExtractedSubtitles(
+          tracks: extracted.toList(),
+          fileLoaded: outcome.fileLoaded,
+          attach: currentPlayer.attachDownloadedSubtitle,
+          onFailure: () {
+            if (mounted && identical(_trackManager, trackManager)) {
+              unawaited(showErrorDialog(context, t.videoControls.subtitleUnavailableFallback));
+            }
+          },
+        ),
+      );
+    } else {
+      trackManager.applyTrackSelectionWhenReady();
+    }
     if (staleGuard != null && !staleGuard()) return false;
 
     await _releaseFrameRateStartupGate(

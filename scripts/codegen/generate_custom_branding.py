@@ -145,9 +145,10 @@ def write(path, text):
 
 
 def apple_icons():
-    for platform in ['ios']:
-        folder = ROOT / platform / 'luroka.icon'
-        write(folder / 'Assets/luroka-symbol.svg', symbol_svg())
+    for platform in ['ios', 'macos']:
+        folder = ROOT / platform / ('luroka.icon' if platform == 'ios' else 'plezy.icon')
+        symbol_name = 'luroka-symbol.svg' if platform == 'ios' else 'lumora-symbol.svg'
+        write(folder / 'Assets' / symbol_name, symbol_svg())
         path = folder / 'icon.json'
         data = json.loads(path.read_text())
         data['fill'] = {'solid': 'srgb:0.06275,0.09412,0.16863,1.00000'}
@@ -155,7 +156,7 @@ def apple_icons():
             group['specular'] = False
             group['shadow'] = {'kind': 'neutral', 'opacity': 0.12}
             for layer in group['layers']:
-                layer['image-name'] = 'luroka-symbol.svg'
+                layer['image-name'] = symbol_name
                 layer['name'] = 'Luroka'
                 layer['glass'] = False
                 layer['position'] = {'scale': 1, 'translation-in-points': [0, 0]}
@@ -233,6 +234,7 @@ def generate_artwork():
         master.resize((216, 216), Image.Resampling.LANCZOS).save(previews / f'{name}.webp', quality=95)
 
     apple_icons()
+    master.save(ROOT / 'windows/runner/resources/app_icon.ico', sizes=[(size, size) for size in [16, 24, 32, 48, 64, 128, 256]])
 
 
 def check_artwork():
@@ -247,6 +249,8 @@ def check_artwork():
             assert image.size == (size, size), f'Wrong launcher dimensions: {density}'
     with Image.open(RES / 'drawable/tv_banner_custom.png') as banner:
         assert banner.size == (320, 180)
+    with Image.open(ROOT / 'windows/runner/resources/app_icon.ico') as icon:
+        assert {(16, 16), (32, 32), (48, 48), (256, 256)} <= icon.info['sizes']
 
     # Adaptive icons may be circular. The complete mark must fit Android's
     # 61%-diameter safe circle after the foreground's 0.8 inset transform.
@@ -262,14 +266,14 @@ def check_artwork():
     for name in ['lumora_icon_foreground', 'lumora_icon_monochrome', 'splash_icon_custom']:
         root = ET.parse(RES / f'drawable/{name}.xml').getroot()
         assert [node.attrib[f'{android_ns}pathData'] for node in root.iter('path')] == expected, f'Stale native vector: {name}'
-    for platform in ['ios']:
-        folder = ROOT / platform / 'luroka.icon'
+    for platform in ['ios', 'macos']:
+        folder = ROOT / platform / ('luroka.icon' if platform == 'ios' else 'plezy.icon')
         data = json.loads((folder / 'icon.json').read_text())
         for group in data['groups']:
             for layer in group['layers']:
                 assert (folder / 'Assets' / layer['image-name']).read_text() == symbol_svg()
                 assert layer['position']['scale'] == 1
-    print('Luroka artwork verified: vector consistency, adaptive safe area, opaque store export, launcher sizes, and Apple assets.')
+    print('Luroka artwork verified: vector consistency, adaptive safe area, opaque store export, launcher sizes, Apple assets, and Windows ICO.')
 
 
 def main():

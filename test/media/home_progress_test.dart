@@ -47,6 +47,7 @@ void main() {
   test('a Next Up item patched with playback progress moves to Continue Watching', () {
     final next = item('next', role: HomeProgressRole.nextUp);
     expect(isHomeNextUp(next), isTrue);
-    expect(isHomeNextUp(next.copyWith(viewOffsetMs: 5000)), isFalse);
+    expect(isHomeNextUp(next.copyWith(viewOffsetMs: 5000)), isTrue);
+    expect(isHomeNextUp(next.copyWith(viewOffsetMs: 30000)), isFalse);
   });
 }

@@ -143,6 +143,10 @@ class TranslationsDa extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$profileSetupGuide$da profileSetupGuide = _Translations$profileSetupGuide$da._(_root);
 	@override late final _Translations$animeFavorites$da animeFavorites = _Translations$animeFavorites$da._(_root);
 	@override late final _Translations$addServer$da addServer = _Translations$addServer$da._(_root);
+	@override late final _Translations$episodeDetails$da episodeDetails = _Translations$episodeDetails$da._(_root);
+	@override late final _Translations$tvEdgeMenu$da tvEdgeMenu = _Translations$tvEdgeMenu$da._(_root);
+	@override late final _Translations$showDetailLayout$da showDetailLayout = _Translations$showDetailLayout$da._(_root);
+	@override late final _Translations$iconStyles$da iconStyles = _Translations$iconStyles$da._(_root);
 }
 
 // Path: mobileLibrary
@@ -564,6 +568,7 @@ class _Translations$kidsShelf$da extends Translations$kidsShelf$en {
 	final TranslationsDa _root; // ignore: unused_field
 
 	// Translations
+	@override String get quietScenery => 'Roligt natlandskab';
 	@override String get movieShelf => 'Film tid';
 	@override String get showShelf => 'Find dit næste show';
 	@override String get aurora => 'Aurora - dyb krikand og lime';
@@ -925,6 +930,8 @@ class _Translations$lurokaDiscovery$da extends Translations$lurokaDiscovery$en {
 	@override String get noAvailable => 'Ingen matchende titler fundet i de kontrollerede biblioteker.';
 	@override String get sourceInfo => 'Ugentlige trends & udvalgte prisvindere · TMDb';
 	@override String get configure => 'Opdagelsesindstillinger';
+	@override String get filterOwned => 'I mine biblioteker';
+	@override String get statusRetry => 'Kunne ikke kontrollere Seerr · Prøv igen';
 }
 
 // Path: app
@@ -1472,6 +1479,10 @@ class _Translations$settings$da extends Translations$settings$en {
 	@override String get playerScopeTitle => 'Pr. serie eller film';
 	@override String get exportDialogTitle => 'Eksportér Luroka-indstillinger';
 	@override String get velvetHourTheme => 'Fløjls time';
+	@override String get backdropBrightness => 'Baggrundens lysstyrke';
+	@override String get backdropBrightnessDescription => 'Juster skyggen over baggrundsbilleder på startsiden og titelsider. Standardværdien er 100 %.';
+	@override String get showEarlyNextEpisode => 'Vis næste afsnit, før det aktuelle slutter';
+	@override String get showEarlyNextEpisodeDescription => 'Vis næste afsnit under rulleteksterne eller i de sidste 30 sekunder.';
 }
 
 // Path: themeEditor
@@ -1719,6 +1730,9 @@ class _Translations$lurokaThemes$da extends Translations$lurokaThemes$en {
 	final TranslationsDa _root; // ignore: unused_field
 
 	// Translations
+	@override String get patina => 'Patina · dyb blågrøn og kobber';
+	@override String get afterimage => 'Efterbillede · indigo og neonrosa';
+	@override String get letterpress => 'Bogtryk · papir og vinrødt blæk';
 	@override String get title => 'Luroka biografpaletter';
 	@override String get coral => 'Koral · midnatsblå & solnedgang';
 	@override String get ocean => 'Ocean · dyb blå & is';
@@ -1817,6 +1831,14 @@ class _Translations$homeLayout$da extends Translations$homeLayout$en {
 	@override String get resetDescription => 'Vil du gendanne den oprindelige rækkefølge og vise alle rækker for denne profil? Dine fastgjorte samlinger bevares.';
 	@override String get saveFailed => 'Dit hjemlayout kunne ikke gemmes. Prøv venligst igen.';
 	@override String get emptyHint => 'Rækker kan være skjulte. Åbn Tilpas hjem for at vise dem igen.';
+	@override String get upcomingEpisodes => 'Kommende afsnit';
+	@override String get upcomingFavorites => 'Favoritter';
+	@override String get upcomingWatched => 'Tidligere set';
+	@override String get upcomingBoth => 'Favoritter og tidligere set';
+	@override String get upcomingAll => 'Alle serier';
+	@override String get upcomingOff => 'Fra';
+	@override String airDate({required Object date}) => 'Udsendelsesdato: ${date}';
+	@override String get upcomingHint => 'Kommende udsendelsesdatoer kontrolleres kun i baggrunden, mens denne række er aktiveret. Resultaterne er begrænsede og er muligvis endnu ikke tilgængelige på din server.';
 }
 
 // Path: screenTime
@@ -1886,6 +1908,34 @@ class _Translations$activityStats$da extends Translations$activityStats$en {
 	@override String get emptyTitle => 'Intet her endnu';
 	@override String get emptyBody => 'Se noget, og din statistik vil bygge op her.';
 	@override String get noDataInPeriod => 'Der er ikke optaget nogen afspilning i denne periode.';
+	@override String get patternsTab => 'Mønstre';
+	@override String get moviesFilter => 'Film';
+	@override String get episodesFilter => 'Afsnit';
+	@override String get datesFilter => 'Datoer';
+	@override String titlesPlayed({required Object count}) => '${count} titler afspillet · afsnit tælles separat';
+	@override String get previousPeriod => 'Forrige periode';
+	@override String lifetimeSummary({required Object total, required Object average}) => 'I alt: ${total} · Dagligt gennemsnit: ${average}';
+	@override String get dailyAverage => 'Dagligt gennemsnit';
+	@override String get allKinds => 'Alle';
+	@override String get titlesPlayedLabel => 'Afspillede titler';
+	@override String get ledgerScope => 'Aktiviteten stammer fra denne profils lokale Luroka-afspilningslog. Serverens afspilningshistorik og afspilning i andre apps er ikke medregnet.';
+	@override String chartScale({required Object duration}) => 'Skala: 0 – ${duration}';
+	@override String get gettingStarted => 'Aktiviteten er lige begyndt. Visningsmønstre vises efter nogle aktive dage.';
+	@override String get history => 'Historik';
+	@override String get insufficientHistory => 'Ikke nok historik';
+	@override String get monthlyRecap => 'Månedlig oversigt';
+	@override String get noMatches => 'Ingen visninger matcher disse filtre.';
+	@override String get activeDays => 'Aktive dage';
+	@override String get measurementHint => 'Tiden afspejler registreret afspilning, ikke fuldførte titler.';
+	@override String get historyError => 'Kunne ikke indlæse historikken. Prøv igen.';
+	@override String get watchedPeriod => 'Set i denne periode';
+	@override String monthWatched({required Object duration}) => '${duration} set denne måned';
+	@override String get drillDown => 'Se aktivitet for disse datoer';
+	@override String get searchHistory => 'Søg i visningshistorik';
+	@override String get clearDates => 'Ryd datoer';
+	@override String get playedHint => 'Afsnit tælles separat. Afspilningstid angiver ikke, om en titel er fuldført.';
+	@override String get allHistory => 'Se al historik';
+	@override String get overview => 'Oversigt';
 }
 
 // Path: search
@@ -2094,6 +2144,7 @@ class _Translations$mediaMenu$da extends Translations$mediaMenu$en {
 	@override String get rate => 'Bedøm';
 	@override String get playFromBeginning => 'Afspil fra begyndelsen';
 	@override String get playVersion => 'Afspil version...';
+	@override String get removeFromNextUp => 'Fjern fra Næste';
 }
 
 // Path: rateSheet
@@ -2110,6 +2161,8 @@ class _Translations$rateSheet$da extends Translations$rateSheet$en {
 	@override String get saved => 'Gemt';
 	@override String get notAvailable => 'Intet match fundet';
 	@override String get noConnectedServices => 'Forbind en tjeneste under Indstillinger for at bedømme via den.';
+	@override String get addFavorite => 'Føj til favoritter';
+	@override String get removeFavorite => 'Fjern fra favoritter';
 }
 
 // Path: accessibility
@@ -2344,6 +2397,8 @@ class _Translations$messages$da extends Translations$messages$en {
 	@override String get streamSelectionFailed => 'Kunne ikke anvende de valgte streams';
 	@override String get trackSelectionNotRemembered => 'Dette sporvalg gælder kun for den aktuelle afspilning.';
 	@override String get serverUnavailableForProfile => 'Ingen server er tilgængelig for den aktive profil';
+	@override String get logSupportReference => 'Supportreference';
+	@override String get copyFullLogId => 'Kopiér fuldt log-id';
 }
 
 // Path: sourceLibraries
@@ -3917,6 +3972,68 @@ class _Translations$addServer$da extends Translations$addServer$en {
 	@override String redirectUnsupportedEnterFinal({required Object product}) => 'Serveren videresendte til en URL, der ikke understøttes. Indtast den endelige ${product}-URL direkte.';
 }
 
+// Path: episodeDetails
+class _Translations$episodeDetails$da extends Translations$episodeDetails$en {
+	_Translations$episodeDetails$da._(TranslationsDa root) : this._root = root, super.internal(root);
+
+	final TranslationsDa _root; // ignore: unused_field
+
+	// Translations
+	@override String get previous => 'Forrige afsnit';
+	@override String get next => 'Næste afsnit';
+}
+
+// Path: tvEdgeMenu
+class _Translations$tvEdgeMenu$da extends Translations$tvEdgeMenu$en {
+	_Translations$tvEdgeMenu$da._(TranslationsDa root) : this._root = root, super.internal(root);
+
+	final TranslationsDa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'TV-navigation';
+	@override String get top => 'Toplinje';
+	@override String get both => 'Toplinje og sidemenu';
+	@override String get hint => 'Tryk til venstre fra det første element i en række for at åbne sidemenuen. Tryk til højre eller Tilbage for at vende tilbage.';
+	@override String get tryMenu => 'Prøv navigation';
+	@override String get allLibraries => 'Alle biblioteker';
+	@override String get browse => 'Gennemse';
+	@override String get more => 'Mere';
+	@override String get closeHint => 'Tryk til højre eller Tilbage for at lukke';
+}
+
+// Path: showDetailLayout
+class _Translations$showDetailLayout$da extends Translations$showDetailLayout$en {
+	_Translations$showDetailLayout$da._(TranslationsDa root) : this._root = root, super.internal(root);
+
+	final TranslationsDa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Layout for seriedetaljer';
+	@override String get description => 'Vælg, hvordan serier og afsnit vises på TV.';
+	@override String get compact => 'Kompakt afsnitsliste';
+	@override String get cinematic => 'Filmisk';
+	@override String get seasons => 'Vælg en sæson';
+	@override String get episodes => 'Afsnit';
+	@override String get details => 'Detaljer';
+	@override String get cast => 'Medvirkende';
+	@override String get related => 'Lignende titler';
+}
+
+// Path: iconStyles
+class _Translations$iconStyles$da extends Translations$iconStyles$en {
+	_Translations$iconStyles$da._(TranslationsDa root) : this._root = root, super.internal(root);
+
+	final TranslationsDa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Ikonstil';
+	@override String get description => 'Vælg udseendet for appens knapper. Ændringer gælder denne profil.';
+	@override String get current => 'Luroka Bold';
+	@override String get lucide => 'Lucide';
+	@override String get lucideDescription => 'Enkle stregikoner med Material-ikoner som reserve.';
+	@override String get outline => 'Material Outline';
+}
+
 // Path: appIcon.names
 class _Translations$appIcon$names$da extends Translations$appIcon$names$en {
 	_Translations$appIcon$names$da._(TranslationsDa root) : this._root = root, super.internal(root);
@@ -5116,6 +5233,7 @@ extension on TranslationsDa {
 			'downloadsRedesign.downloaded' => 'Downloadet',
 			'downloadsRedesign.speed' => 'Download hastighed',
 			'downloadsRedesign.notificationProgress' => '{progress} · {networkSpeed} · {timeRemaining} tilbage',
+			'kidsShelf.quietScenery' => 'Roligt natlandskab',
 			'kidsShelf.movieShelf' => 'Film tid',
 			'kidsShelf.showShelf' => 'Find dit næste show',
 			'kidsShelf.aurora' => 'Aurora - dyb krikand og lime',
@@ -5365,9 +5483,9 @@ extension on TranslationsDa {
 			'kids.historyReset' => 'Børns visningsekskluderinger blev nulstillet',
 			'kids.blocked' => 'Denne titel er ikke tilgængelig i denne børneprofil.',
 			'kids.switchProfile' => 'Skift profil',
-			'kids.manageFromAdult' => 'Skift til en voksenprofil for at administrere indstillinger.',
 			_ => null,
 		} ?? switch (path) {
+			'kids.manageFromAdult' => 'Skift til en voksenprofil for at administrere indstillinger.',
 			'kids.noConnections' => 'Tilslut en server til din voksenprofil, før du tilføjer en børneprofil.',
 			'kids.created' => 'Børneprofil oprettet',
 			'kids.updated' => 'Børneprofilen er opdateret',
@@ -5407,6 +5525,8 @@ extension on TranslationsDa {
 			'lurokaDiscovery.noAvailable' => 'Ingen matchende titler fundet i de kontrollerede biblioteker.',
 			'lurokaDiscovery.sourceInfo' => 'Ugentlige trends & udvalgte prisvindere · TMDb',
 			'lurokaDiscovery.configure' => 'Opdagelsesindstillinger',
+			'lurokaDiscovery.filterOwned' => 'I mine biblioteker',
+			'lurokaDiscovery.statusRetry' => 'Kunne ikke kontrollere Seerr · Prøv igen',
 			'app.title' => 'Luroka',
 			'appIcon.title' => 'App-ikon',
 			'appIcon.defaultIcon' => 'Standard',
@@ -5877,11 +5997,11 @@ extension on TranslationsDa {
 			'settings.liveTvDefaultFavoritesDescription' => 'Vis kun favoritkanaler ved åbning af Live TV',
 			'settings.general' => 'Generelt',
 			'settings.generalDescription' => 'Sprog, opstart og vinduesadfærd',
+			_ => null,
+		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Sprog og region',
 			'settings.startup' => 'Opstart',
 			'settings.display' => 'Skærm',
-			_ => null,
-		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Bibliotek og kort',
 			'settings.homeScreen' => 'Startskærm',
 			'settings.navigation' => 'Navigation',
@@ -5916,6 +6036,10 @@ extension on TranslationsDa {
 			'settings.playerScopeTitle' => 'Pr. serie eller film',
 			'settings.exportDialogTitle' => 'Eksportér Luroka-indstillinger',
 			'settings.velvetHourTheme' => 'Fløjls time',
+			'settings.backdropBrightness' => 'Baggrundens lysstyrke',
+			'settings.backdropBrightnessDescription' => 'Juster skyggen over baggrundsbilleder på startsiden og titelsider. Standardværdien er 100 %.',
+			'settings.showEarlyNextEpisode' => 'Vis næste afsnit, før det aktuelle slutter',
+			'settings.showEarlyNextEpisodeDescription' => 'Vis næste afsnit under rulleteksterne eller i de sidste 30 sekunder.',
 			'themeEditor.builtIn' => 'Indbygget',
 			'themeEditor.presets' => 'Forudindstillinger',
 			'themeEditor.custom' => 'Brugerdefineret',
@@ -6057,6 +6181,9 @@ extension on TranslationsDa {
 			'referenceDetails.continuing' => 'Fortsætter',
 			'referenceDetails.upNext' => 'Næste',
 			'referenceDetails.episodesLeft' => ({required Object count}) => '${count} episoder tilbage',
+			'lurokaThemes.patina' => 'Patina · dyb blågrøn og kobber',
+			'lurokaThemes.afterimage' => 'Efterbillede · indigo og neonrosa',
+			'lurokaThemes.letterpress' => 'Bogtryk · papir og vinrødt blæk',
 			'lurokaThemes.title' => 'Luroka biografpaletter',
 			'lurokaThemes.coral' => 'Koral · midnatsblå & solnedgang',
 			'lurokaThemes.ocean' => 'Ocean · dyb blå & is',
@@ -6137,6 +6264,14 @@ extension on TranslationsDa {
 			'homeLayout.resetDescription' => 'Vil du gendanne den oprindelige rækkefølge og vise alle rækker for denne profil? Dine fastgjorte samlinger bevares.',
 			'homeLayout.saveFailed' => 'Dit hjemlayout kunne ikke gemmes. Prøv venligst igen.',
 			'homeLayout.emptyHint' => 'Rækker kan være skjulte. Åbn Tilpas hjem for at vise dem igen.',
+			'homeLayout.upcomingEpisodes' => 'Kommende afsnit',
+			'homeLayout.upcomingFavorites' => 'Favoritter',
+			'homeLayout.upcomingWatched' => 'Tidligere set',
+			'homeLayout.upcomingBoth' => 'Favoritter og tidligere set',
+			'homeLayout.upcomingAll' => 'Alle serier',
+			'homeLayout.upcomingOff' => 'Fra',
+			'homeLayout.airDate' => ({required Object date}) => 'Udsendelsesdato: ${date}',
+			'homeLayout.upcomingHint' => 'Kommende udsendelsesdatoer kontrolleres kun i baggrunden, mens denne række er aktiveret. Resultaterne er begrænsede og er muligvis endnu ikke tilgængelige på din server.',
 			'screenTime.title' => 'Skærmtid',
 			'screenTime.description' => 'Se tid brugt på at se video på denne profil',
 			'screenTime.today' => 'I dag',
@@ -6185,6 +6320,34 @@ extension on TranslationsDa {
 			'activityStats.emptyTitle' => 'Intet her endnu',
 			'activityStats.emptyBody' => 'Se noget, og din statistik vil bygge op her.',
 			'activityStats.noDataInPeriod' => 'Der er ikke optaget nogen afspilning i denne periode.',
+			'activityStats.patternsTab' => 'Mønstre',
+			'activityStats.moviesFilter' => 'Film',
+			'activityStats.episodesFilter' => 'Afsnit',
+			'activityStats.datesFilter' => 'Datoer',
+			'activityStats.titlesPlayed' => ({required Object count}) => '${count} titler afspillet · afsnit tælles separat',
+			'activityStats.previousPeriod' => 'Forrige periode',
+			'activityStats.lifetimeSummary' => ({required Object total, required Object average}) => 'I alt: ${total} · Dagligt gennemsnit: ${average}',
+			'activityStats.dailyAverage' => 'Dagligt gennemsnit',
+			'activityStats.allKinds' => 'Alle',
+			'activityStats.titlesPlayedLabel' => 'Afspillede titler',
+			'activityStats.ledgerScope' => 'Aktiviteten stammer fra denne profils lokale Luroka-afspilningslog. Serverens afspilningshistorik og afspilning i andre apps er ikke medregnet.',
+			'activityStats.chartScale' => ({required Object duration}) => 'Skala: 0 – ${duration}',
+			'activityStats.gettingStarted' => 'Aktiviteten er lige begyndt. Visningsmønstre vises efter nogle aktive dage.',
+			'activityStats.history' => 'Historik',
+			'activityStats.insufficientHistory' => 'Ikke nok historik',
+			'activityStats.monthlyRecap' => 'Månedlig oversigt',
+			'activityStats.noMatches' => 'Ingen visninger matcher disse filtre.',
+			'activityStats.activeDays' => 'Aktive dage',
+			'activityStats.measurementHint' => 'Tiden afspejler registreret afspilning, ikke fuldførte titler.',
+			'activityStats.historyError' => 'Kunne ikke indlæse historikken. Prøv igen.',
+			'activityStats.watchedPeriod' => 'Set i denne periode',
+			'activityStats.monthWatched' => ({required Object duration}) => '${duration} set denne måned',
+			'activityStats.drillDown' => 'Se aktivitet for disse datoer',
+			'activityStats.searchHistory' => 'Søg i visningshistorik',
+			'activityStats.clearDates' => 'Ryd datoer',
+			'activityStats.playedHint' => 'Afsnit tælles separat. Afspilningstid angiver ikke, om en titel er fuldført.',
+			'activityStats.allHistory' => 'Se al historik',
+			'activityStats.overview' => 'Oversigt',
 			'search.hint' => 'Søg film, serier, musik...',
 			'search.tryDifferentTerm' => 'Prøv en anden søgning',
 			'search.searchYourMedia' => 'Søg i dine medier',
@@ -6348,6 +6511,8 @@ extension on TranslationsDa {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Tilfældig afspilning er ikke tilgængelig offline',
 			'mediaMenu.fileInfo' => 'Filinfo',
 			'mediaMenu.deleteEpisodeFromServer' => 'Slet episode fra serveren',
+			_ => null,
+		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Slet sæson fra serveren',
 			'mediaMenu.deleteShowFromServer' => 'Slet TV-serie fra serveren',
 			'mediaMenu.deleteMovieFromServer' => 'Slet film fra serveren',
@@ -6372,6 +6537,7 @@ extension on TranslationsDa {
 			'mediaMenu.rate' => 'Bedøm',
 			'mediaMenu.playFromBeginning' => 'Afspil fra begyndelsen',
 			'mediaMenu.playVersion' => 'Afspil version...',
+			'mediaMenu.removeFromNextUp' => 'Fjern fra Næste',
 			'rateSheet.title' => 'Bedøm',
 			'rateSheet.server' => 'Server',
 			'rateSheet.favorite' => 'Favorit',
@@ -6379,6 +6545,8 @@ extension on TranslationsDa {
 			'rateSheet.saved' => 'Gemt',
 			'rateSheet.notAvailable' => 'Intet match fundet',
 			'rateSheet.noConnectedServices' => 'Forbind en tjeneste under Indstillinger for at bedømme via den.',
+			'rateSheet.addFavorite' => 'Føj til favoritter',
+			'rateSheet.removeFavorite' => 'Fjern fra favoritter',
 			'accessibility.mediaCardMovie' => ({required Object title}) => '${title}, film',
 			'accessibility.mediaCardShow' => ({required Object title}) => '${title}, TV-serie',
 			'accessibility.mediaCardEpisode' => ({required Object title, required Object episodeInfo}) => '${title}, ${episodeInfo}',
@@ -6394,8 +6562,6 @@ extension on TranslationsDa {
 			'accessibility.hue' => 'Farvetone',
 			'accessibility.saturation' => 'Mætning',
 			'accessibility.brightness' => 'Lysstyrke',
-			_ => null,
-		} ?? switch (path) {
 			'accessibility.hexColor' => 'Hexfarve',
 			'accessibility.expandText' => 'Udvid tekst',
 			'accessibility.collapseText' => 'Fold tekst sammen',
@@ -6574,6 +6740,8 @@ extension on TranslationsDa {
 			'messages.streamSelectionFailed' => 'Kunne ikke anvende de valgte streams',
 			'messages.trackSelectionNotRemembered' => 'Dette sporvalg gælder kun for den aktuelle afspilning.',
 			'messages.serverUnavailableForProfile' => 'Ingen server er tilgængelig for den aktive profil',
+			'messages.logSupportReference' => 'Supportreference',
+			'messages.copyFullLogId' => 'Kopiér fuldt log-id',
 			'sourceLibraries.title' => 'Dine servere og biblioteker',
 			'sourceLibraries.description' => 'Vælg de biblioteker, Luroka bruger til Hjem, søgning, Opdag tilgængelighed og Studios. Hjemmerækkefølgen tilpasses separat.',
 			'sourceLibraries.partial' => 'Nogle servere kunne ikke kontrolleres. Dine gemte valg for disse biblioteker bevares. Opdater for at prøve igen.',
@@ -6857,6 +7025,8 @@ extension on TranslationsDa {
 			'libraries.filters' => 'Filtre',
 			'libraries.confirmActionMessage' => 'Er du sikker på, at du vil udføre denne handling?',
 			'libraries.showLibrary' => 'Vis bibliotek',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Skjul bibliotek',
 			'libraries.libraryOptions' => 'Biblioteksindstillinger',
 			'libraries.content' => 'biblioteksindhold',
@@ -6908,8 +7078,6 @@ extension on TranslationsDa {
 			'libraries.sortLabels.dateShared' => 'Delt dato',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Seneste episodes premieredato',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Dato for senest tilføjede episode',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Downloadet dato',
 			'libraries.sortLabels.size' => 'Størrelse',
 			'libraries.sortLabels.library' => 'Bibliotek',
@@ -7371,6 +7539,8 @@ extension on TranslationsDa {
 			'watchTogether.qrShare' => 'Del QR-kode',
 			'watchTogether.qrHint' => 'Scan med Luroka-appen for at deltage i dette rum.',
 			'watchTogether.phasePlaying' => 'Spiller',
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Pause',
 			'watchTogether.phaseWaiting' => 'Venter på alle',
 			'watchTogether.inviteCopied' => 'Invitationen er kopieret. Indsæt det i en besked.',
@@ -7422,8 +7592,6 @@ extension on TranslationsDa {
 			'watchTogether.offsetPlusSecond' => '+1 s',
 			'watchTogether.participants' => 'Deltagere',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('da'))(n, one: '${n} deltager', other: '${n} deltagere', ), 
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'VÆRT',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (dig)',
 			'watchTogether.playerIdle' => 'Inaktiv',
@@ -7885,6 +8053,8 @@ extension on TranslationsDa {
 			'matchScreen.match' => 'Match...',
 			'matchScreen.fixMatch' => 'Ret match...',
 			'matchScreen.unmatch' => 'Fjern match',
+			_ => null,
+		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Ryd dette match? Plex behandler det som umatchet, indtil det matches igen.',
 			'matchScreen.unmatchSuccess' => 'Match fjernet',
 			'matchScreen.unmatchFailed' => 'Kunne ikke fjerne match',
@@ -7936,8 +8106,6 @@ extension on TranslationsDa {
 			'seerr.requestFailed' => ({required Object error}) => 'Anmodning mislykkedes: ${error}',
 			'seerr.requestsLoadFailed' => 'Kunne ikke indlæse anmodningsmuligheder',
 			'seerr.nothingToRequest' => 'Alt er allerede tilgængeligt eller anmodet.',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Tilgængelig',
 			'seerr.statusPartiallyAvailable' => 'Delvist tilgængelig',
 			'seerr.statusRequested' => 'Anmodet',
@@ -8116,6 +8284,32 @@ extension on TranslationsDa {
 			'addServer.redirectDifferentHost' => ({required Object product}) => 'Serveren videresendte til en anden vært. Indtast den endelige ${product}-URL direkte.',
 			'addServer.redirectInsecure' => 'Serveren videresendte fra HTTPS til en usikker URL',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'Serveren videresendte til en URL, der ikke understøttes. Indtast den endelige ${product}-URL direkte.',
+			'episodeDetails.previous' => 'Forrige afsnit',
+			'episodeDetails.next' => 'Næste afsnit',
+			'tvEdgeMenu.title' => 'TV-navigation',
+			'tvEdgeMenu.top' => 'Toplinje',
+			'tvEdgeMenu.both' => 'Toplinje og sidemenu',
+			'tvEdgeMenu.hint' => 'Tryk til venstre fra det første element i en række for at åbne sidemenuen. Tryk til højre eller Tilbage for at vende tilbage.',
+			'tvEdgeMenu.tryMenu' => 'Prøv navigation',
+			'tvEdgeMenu.allLibraries' => 'Alle biblioteker',
+			'tvEdgeMenu.browse' => 'Gennemse',
+			'tvEdgeMenu.more' => 'Mere',
+			'tvEdgeMenu.closeHint' => 'Tryk til højre eller Tilbage for at lukke',
+			'showDetailLayout.title' => 'Layout for seriedetaljer',
+			'showDetailLayout.description' => 'Vælg, hvordan serier og afsnit vises på TV.',
+			'showDetailLayout.compact' => 'Kompakt afsnitsliste',
+			'showDetailLayout.cinematic' => 'Filmisk',
+			'showDetailLayout.seasons' => 'Vælg en sæson',
+			'showDetailLayout.episodes' => 'Afsnit',
+			'showDetailLayout.details' => 'Detaljer',
+			'showDetailLayout.cast' => 'Medvirkende',
+			'showDetailLayout.related' => 'Lignende titler',
+			'iconStyles.title' => 'Ikonstil',
+			'iconStyles.description' => 'Vælg udseendet for appens knapper. Ændringer gælder denne profil.',
+			'iconStyles.current' => 'Luroka Bold',
+			'iconStyles.lucide' => 'Lucide',
+			'iconStyles.lucideDescription' => 'Enkle stregikoner med Material-ikoner som reserve.',
+			'iconStyles.outline' => 'Material Outline',
 			_ => null,
 		};
 	}

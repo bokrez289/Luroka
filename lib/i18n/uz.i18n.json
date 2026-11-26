@@ -300,6 +300,7 @@
     "notificationProgress": "{progress} · {networkSpeed} · {timeRemaining} qoldi"
   },
   "kidsShelf": {
+    "quietScenery": "Sokin tun manzarasi",
     "movieShelf": "Kino vaqti",
     "showShelf": "Keyingi ko'rsatuvingizni toping",
     "aurora": "Aurora - chuqur choy va ohak",
@@ -604,7 +605,9 @@
     "availabilityUnknown": "Ayrim kutubxonalarni tekshirib bo‘lmadi. Yangilashga harakat qiling.",
     "noAvailable": "Kutubxonalarda mos keladigan nomlar topilmadi.",
     "sourceInfo": "Haftalik tendentsiyalar va tanlangan mukofot g'oliblari · TMDb",
-    "configure": "Kashfiyot sozlamalari"
+    "configure": "Kashfiyot sozlamalari",
+    "filterOwned": "Mening kutubxonalarimda",
+    "statusRetry": "Seerr tekshirib bo‘lmadi · Qayta urinish"
   },
   "app": {
     "title": "Luroka"
@@ -1139,7 +1142,11 @@
     "playerScopeLibrary": "Kutubxona boʻyicha",
     "playerScopeTitle": "Serial yoki film boʻyicha",
     "exportDialogTitle": "Luroka sozlamalarini eksport qilish",
-    "velvetHourTheme": "Velvet soati"
+    "velvetHourTheme": "Velvet soati",
+    "backdropBrightness": "Fon yorqinligi",
+    "backdropBrightnessDescription": "Bosh sahifa va asar rasmlari ustidagi qoraytirishni sozlang. Standart qiymat 100%.",
+    "showEarlyNextEpisode": "Joriy qism tugashidan oldin keyingi qismni ko‘rsatish",
+    "showEarlyNextEpisodeDescription": "Keyingi qismni titrlar vaqtida yoki oxirgi 30 soniyada ko‘rsating."
   },
   "themeEditor": {
     "builtIn": "O'rnatilgan",
@@ -1311,6 +1318,9 @@
     "episodesLeft": "${count} qismlari qoldi"
   },
   "lurokaThemes": {
+    "patina": "Patina · to‘q moviy-yashil va mis",
+    "afterimage": "Qoldiq tasvir · indigo va neon pushti",
+    "letterpress": "Bosmaxona · qog‘oz va to‘q qizil siyoh",
     "title": "Luroka kino palitralari",
     "coral": "Marjon · yarim tunda ko'k va quyosh botishi",
     "ocean": "Okean · chuqur ko'k va muz",
@@ -1394,7 +1404,15 @@
     "reset": "Standart qatorlarni tiklang",
     "resetDescription": "Asl qatorlar tartibi tiklansinmi va ushbu profil uchun barcha qatorlar koʻrsatilsinmi? Qadalgan kollektsiyalaringiz saqlanadi.",
     "saveFailed": "Uyingiz tartibini saqlab bo‘lmadi. Iltimos, qayta urinib koʻring.",
-    "emptyHint": "Qatorlar yashirilishi mumkin. Ularni yana koʻrsatish uchun “Uyni shaxsiylashtirish”ni oching."
+    "emptyHint": "Qatorlar yashirilishi mumkin. Ularni yana koʻrsatish uchun “Uyni shaxsiylashtirish”ni oching.",
+    "upcomingEpisodes": "Kelgusi qismlar",
+    "upcomingFavorites": "Sevimlilar",
+    "upcomingWatched": "Avval ko‘rilganlar",
+    "upcomingBoth": "Sevimlilar va avval ko‘rilganlar",
+    "upcomingAll": "Barcha seriallar",
+    "upcomingOff": "O‘chiq",
+    "airDate": "Efirdagi sana: ${date}",
+    "upcomingHint": "Kelgusi efir sanalari faqat ushbu qator yoqilganda fonda tekshiriladi. Natijalar cheklangan va serveringizda hali mavjud bo‘lmasligi mumkin."
   },
   "screenTime": {
     "title": "Ekran vaqti",
@@ -1449,7 +1467,35 @@
     "sessionNoTitle": "Noma'lum ijro",
     "emptyTitle": "Bu yerda hali hech narsa",
     "emptyBody": "Biror narsani tomosha qiling va statistikangiz shu yerda to'planadi.",
-    "noDataInPeriod": "Bu davrda hech qanday ijro qayd etilmagan."
+    "noDataInPeriod": "Bu davrda hech qanday ijro qayd etilmagan.",
+    "patternsTab": "Tomosha odatlari",
+    "moviesFilter": "Filmlar",
+    "episodesFilter": "Qismlar",
+    "datesFilter": "Sanalar",
+    "titlesPlayed": "Ijro etilgan asarlar: ${count} · qismlar alohida hisoblanadi",
+    "previousPeriod": "Oldingi davr",
+    "lifetimeSummary": "Jami: ${total} · Kunlik o‘rtacha: ${average}",
+    "dailyAverage": "Kunlik o‘rtacha",
+    "allKinds": "Barchasi",
+    "titlesPlayedLabel": "Ijro etilgan asarlar",
+    "ledgerScope": "Faollik ushbu profilning mahalliy Luroka ijro jurnalidan olinadi. Server tomosha tarixi va boshqa ilovalardagi ijro hisobga olinmaydi.",
+    "chartScale": "Shkala: 0 – ${duration}",
+    "gettingStarted": "Faollik endigina to‘planmoqda. Tomosha odatlari bir necha faol kundan so‘ng ko‘rinadi.",
+    "history": "Tarix",
+    "insufficientHistory": "Tarix yetarli emas",
+    "monthlyRecap": "Oylik xulosa",
+    "noMatches": "Bu filtrlarga mos tomosha yozuvlari yo‘q.",
+    "activeDays": "Faol kunlar",
+    "measurementHint": "Vaqt tugatilgan asarlarni emas, qayd etilgan ijroni bildiradi.",
+    "historyError": "Tarixni yuklab bo‘lmadi. Qayta urinib ko‘ring.",
+    "watchedPeriod": "Shu davrda tomosha qilingan",
+    "monthWatched": "Shu oy ${duration} tomosha qilindi",
+    "drillDown": "Ushbu sanalardagi faollikni ko‘rish",
+    "searchHistory": "Tomosha tarixidan qidirish",
+    "clearDates": "Sanalarni tozalash",
+    "playedHint": "Qismlar alohida hisoblanadi. Ijro vaqti asar to‘liq ko‘rilganini bildirmaydi.",
+    "allHistory": "Barcha tarixni ko‘rish",
+    "overview": "Umumiy ko‘rinish"
   },
   "search": {
     "hint": "Filmlar, seriallar, musiqa qidirish...",
@@ -1655,7 +1701,8 @@
     "mediaFailedToDelete": "Media elementini oʻchirib boʻlmadi",
     "rate": "Baho berish",
     "playFromBeginning": "Boshidan ijro etish",
-    "playVersion": "Versiyani ijro etish..."
+    "playVersion": "Versiyani ijro etish...",
+    "removeFromNextUp": "Keyingilar ro‘yxatidan olib tashlash"
   },
   "rateSheet": {
     "title": "Baho berish",
@@ -1664,7 +1711,9 @@
     "favorited": "Tanlanganlarga qoʻshildi",
     "saved": "Saqlandi",
     "notAvailable": "Moslik topilmadi",
-    "noConnectedServices": "Baho berish uchun Sozlamalardan xizmatni ulang."
+    "noConnectedServices": "Baho berish uchun Sozlamalardan xizmatni ulang.",
+    "addFavorite": "Sevimlilarga qo‘shish",
+    "removeFavorite": "Sevimlilardan olib tashlash"
   },
   "accessibility": {
     "mediaCardMovie": "${title}, film",
@@ -1873,7 +1922,9 @@
     "streamSelectionUnavailable": "Bu manba uchun oqim tanlash imkoni yoʻq",
     "streamSelectionFailed": "Tanlangan oqimlarni qoʻllab boʻlmadi",
     "trackSelectionNotRemembered": "Bu trek tanlovi faqat joriy ijroga qoʻllanadi.",
-    "serverUnavailableForProfile": "Faol profil uchun hech qanday server mavjud emas"
+    "serverUnavailableForProfile": "Faol profil uchun hech qanday server mavjud emas",
+    "logSupportReference": "Yordam uchun murojaat raqami",
+    "copyFullLogId": "Jurnalning to‘liq ID raqamini nusxalash"
   },
   "sourceLibraries": {
     "title": "Sizning serverlaringiz va kutubxonalaringiz",
@@ -3596,5 +3647,39 @@
     "redirectDifferentHost": "Server boshqa xostga yoʻnaltirdi. Yakuniy ${product} URL-ini bevosita kiriting.",
     "redirectInsecure": "Server HTTPS manzilidan xavfsiz boʻlmagan URL-ga yoʻnaltirdi",
     "redirectUnsupportedEnterFinal": "Server qoʻllab-quvvatlanmaydigan URL-ga yoʻnaltirdi. Yakuniy ${product} URL-ini bevosita kiriting."
+  },
+  "episodeDetails": {
+    "previous": "Oldingi qism",
+    "next": "Keyingi qism"
+  },
+  "tvEdgeMenu": {
+    "title": "TV navigatsiyasi",
+    "top": "Yuqori panel",
+    "both": "Yuqori panel va yon menyu",
+    "hint": "Yon menyuni ochish uchun qatorning birinchi elementida chap tugmani bosing. Qaytish uchun o‘ng yoki Orqaga tugmasini bosing.",
+    "tryMenu": "Navigatsiyani sinab ko‘rish",
+    "allLibraries": "Barcha kutubxonalar",
+    "browse": "Ko‘rib chiqish",
+    "more": "Yana",
+    "closeHint": "Yopish uchun o‘ng yoki Orqaga tugmasini bosing"
+  },
+  "showDetailLayout": {
+    "title": "Serial tafsilotlari tartibi",
+    "description": "Serial va qismlarning televizorda ko‘rsatilish usulini tanlang.",
+    "compact": "Ixcham qismlar ro‘yxati",
+    "cinematic": "Kinouslub",
+    "seasons": "Mavsumni tanlang",
+    "episodes": "Qismlar",
+    "details": "Tafsilotlar",
+    "cast": "Aktyorlar",
+    "related": "O‘xshash asarlar"
+  },
+  "iconStyles": {
+    "title": "Belgi uslubi",
+    "description": "Ilova boshqaruv elementlarining ko‘rinishini tanlang. O‘zgarishlar ushbu profilga tatbiq etiladi.",
+    "current": "Luroka Bold",
+    "lucide": "Lucide",
+    "lucideDescription": "Sodda chiziqli belgilar; mavjud bo‘lmagan belgilar Material belgilari bilan almashtiriladi.",
+    "outline": "Material Outline"
   }
 }

@@ -304,6 +304,7 @@
     "notificationProgress": "Pozostało {progress} · {networkSpeed} · {timeRemaining}"
   },
   "kidsShelf": {
+    "quietScenery": "Spokojny nocny krajobraz",
     "movieShelf": "Czas na film",
     "showShelf": "Znajdź swój następny program",
     "aurora": "Aurora — głęboki turkus i limonka",
@@ -608,7 +609,9 @@
     "availabilityUnknown": "Niektórych bibliotek nie można było sprawdzić. Spróbuj odświeżenia.",
     "noAvailable": "W zaznaczonych bibliotekach nie znaleziono pasujących tytułów.",
     "sourceInfo": "Cotygodniowe trendy i wybrani zdobywcy nagród · TMDb",
-    "configure": "Ustawienia wykrywania"
+    "configure": "Ustawienia wykrywania",
+    "filterOwned": "W moich bibliotekach",
+    "statusRetry": "Nie udało się sprawdzić Seerr · Ponów"
   },
   "app": {
     "title": "Luroka"
@@ -1143,7 +1146,11 @@
     "playerScopeLibrary": "Na bibliotekę",
     "playerScopeTitle": "Na serial lub film",
     "exportDialogTitle": "Eksport ustawień Luroka",
-    "velvetHourTheme": "Aksamitna godzina"
+    "velvetHourTheme": "Aksamitna godzina",
+    "backdropBrightness": "Jasność tła",
+    "showEarlyNextEpisode": "Pokaż następny odcinek przed końcem odtwarzania",
+    "backdropBrightnessDescription": "Dostosuj przyciemnienie grafiki na ekranie głównym i stronach tytułów. Domyślnie: 100%.",
+    "showEarlyNextEpisodeDescription": "Pokazuj następny odcinek podczas napisów końcowych lub w ostatnich 30 sekundach."
   },
   "themeEditor": {
     "builtIn": "Wbudowany",
@@ -1315,6 +1322,9 @@
     "episodesLeft": "Pozostały odcinki ${count}"
   },
   "lurokaThemes": {
+    "patina": "Patyna · głęboki turkus i miedź",
+    "afterimage": "Powidok · indygo i neonowy róż",
+    "letterpress": "Druk typograficzny · papier i bordowy tusz",
     "title": "Palety kinowe Luroka",
     "coral": "Koral · błękit północy i zachód słońca",
     "ocean": "Ocean · głęboki błękit i lód",
@@ -1398,7 +1408,15 @@
     "reset": "Przywróć domyślne wiersze",
     "resetDescription": "Przywrócić pierwotną kolejność wierszy i wyświetlić wszystkie wiersze dla tego profilu? Twoje przypięte kolekcje zostaną zachowane.",
     "saveFailed": "Nie można zapisać układu domu. Spróbuj ponownie.",
-    "emptyHint": "Wiersze mogą być ukryte. Otwórz Personalizuj stronę główną, aby wyświetlić je ponownie."
+    "emptyHint": "Wiersze mogą być ukryte. Otwórz Personalizuj stronę główną, aby wyświetlić je ponownie.",
+    "upcomingEpisodes": "Nadchodzące odcinki",
+    "upcomingFavorites": "Ulubione",
+    "upcomingHint": "Daty emisji są sprawdzane w tle tylko wtedy, gdy ten wiersz jest włączony. Wyniki są ograniczone i mogą nie być jeszcze dostępne na serwerze.",
+    "upcomingWatched": "Obejrzane wcześniej",
+    "upcomingAll": "Wszystkie seriale",
+    "upcomingBoth": "Ulubione i obejrzane wcześniej",
+    "airDate": "Data emisji: ${date}",
+    "upcomingOff": "Wyłączone"
   },
   "screenTime": {
     "title": "Czas ekranowy",
@@ -1455,7 +1473,35 @@
     "sessionNoTitle": "Niezidentyfikowane odtwarzanie",
     "emptyTitle": "Jeszcze nic tu nie ma",
     "emptyBody": "Obejrzyj coś, a Twoje statystyki będą się tutaj gromadzić.",
-    "noDataInPeriod": "W tym okresie nie nagrano żadnego odtwarzania."
+    "noDataInPeriod": "W tym okresie nie nagrano żadnego odtwarzania.",
+    "patternsTab": "Statystyki",
+    "moviesFilter": "Filmy",
+    "episodesFilter": "Odcinki",
+    "titlesPlayed": "Odtworzono ${count} tytułów · odcinki liczone osobno",
+    "previousPeriod": "Poprzedni okres",
+    "datesFilter": "Daty",
+    "lifetimeSummary": "Łącznie: ${total} · Średnia dzienna: ${average}",
+    "dailyAverage": "Średnia dzienna",
+    "allKinds": "Wszystkie",
+    "titlesPlayedLabel": "Odtworzone tytuły",
+    "ledgerScope": "Aktywność pochodzi z lokalnego rejestru odtwarzania tego profilu w Luroka. Historia serwera i odtwarzanie w innych aplikacjach nie są uwzględniane.",
+    "chartScale": "Skala: 0 – ${duration}",
+    "gettingStarted": "Dane o aktywności są zbierane. Wzorce oglądania pojawią się po kilku aktywnych dniach.",
+    "history": "Historia",
+    "insufficientHistory": "Za mało danych",
+    "monthlyRecap": "Podsumowanie miesiąca",
+    "noMatches": "Brak aktywności pasującej do filtrów.",
+    "activeDays": "Aktywne dni",
+    "measurementHint": "Czas oznacza zarejestrowane odtwarzanie, a nie liczbę ukończonych tytułów.",
+    "historyError": "Nie udało się wczytać historii. Spróbuj ponownie.",
+    "watchedPeriod": "Obejrzano w tym okresie",
+    "monthWatched": "Obejrzano ${duration} w tym miesiącu",
+    "drillDown": "Zobacz aktywność w tych dniach",
+    "searchHistory": "Szukaj w historii oglądania",
+    "clearDates": "Wyczyść daty",
+    "playedHint": "Odcinki są liczone osobno. Czas odtwarzania nie oznacza ukończenia.",
+    "allHistory": "Zobacz całą historię",
+    "overview": "Przegląd"
   },
   "search": {
     "hint": "Szukaj filmów, seriali, muzyki...",
@@ -1667,7 +1713,8 @@
     "mediaFailedToDelete": "Nie udało się usunąć elementu multimedialnego",
     "rate": "Oceń",
     "playFromBeginning": "Odtwórz od początku",
-    "playVersion": "Odtwórz wersję..."
+    "playVersion": "Odtwórz wersję...",
+    "removeFromNextUp": "Usuń z następnych"
   },
   "rateSheet": {
     "title": "Oceń",
@@ -1676,7 +1723,9 @@
     "favorited": "Dodano do ulubionych",
     "saved": "Zapisano",
     "notAvailable": "Nie znaleziono dopasowania",
-    "noConnectedServices": "Połącz usługę w Ustawieniach, aby tam oceniać."
+    "noConnectedServices": "Połącz usługę w Ustawieniach, aby tam oceniać.",
+    "addFavorite": "Dodaj do ulubionych",
+    "removeFavorite": "Usuń z ulubionych"
   },
   "accessibility": {
     "mediaCardMovie": "${title}, film",
@@ -1887,7 +1936,9 @@
     "streamSelectionUnavailable": "Wybór strumieni nie jest dostępny dla tego źródła",
     "streamSelectionFailed": "Nie udało się zastosować wybranych strumieni",
     "trackSelectionNotRemembered": "Ten wybór ścieżki dotyczy tylko bieżącego odtwarzania.",
-    "serverUnavailableForProfile": "Brak dostępnego serwera dla aktywnego profilu"
+    "serverUnavailableForProfile": "Brak dostępnego serwera dla aktywnego profilu",
+    "logSupportReference": "Numer zgłoszenia",
+    "copyFullLogId": "Kopiuj pełny identyfikator dziennika"
   },
   "sourceLibraries": {
     "title": "Twoje serwery i biblioteki",
@@ -3626,5 +3677,39 @@
     "redirectDifferentHost": "Serwer przekierował do innego hosta. Wprowadź bezpośrednio docelowy adres URL serwera ${product}.",
     "redirectInsecure": "Serwer przekierował z HTTPS do niezabezpieczonego adresu URL",
     "redirectUnsupportedEnterFinal": "Serwer przekierował do nieobsługiwanego adresu URL. Wprowadź bezpośrednio docelowy adres URL serwera ${product}."
+  },
+  "showDetailLayout": {
+    "related": "Podobne tytuły",
+    "title": "Układ szczegółów serialu",
+    "seasons": "Wybierz sezon",
+    "details": "Szczegóły",
+    "compact": "Kompaktowa lista odcinków",
+    "cinematic": "Kinowy",
+    "episodes": "Odcinki",
+    "cast": "Obsada",
+    "description": "Wybierz sposób wyświetlania seriali i odcinków na telewizorze."
+  },
+  "tvEdgeMenu": {
+    "allLibraries": "Wszystkie biblioteki",
+    "closeHint": "W prawo lub Wstecz, aby zamknąć",
+    "top": "Górny pasek",
+    "title": "Nawigacja na telewizorze",
+    "browse": "Przeglądaj",
+    "more": "Więcej",
+    "hint": "Naciśnij w lewo na pierwszej pozycji w wierszu, aby otworzyć menu boczne. Naciśnij w prawo lub Wstecz, aby wrócić.",
+    "tryMenu": "Wypróbuj nawigację",
+    "both": "Górny pasek i menu boczne"
+  },
+  "iconStyles": {
+    "current": "Luroka Bold",
+    "lucideDescription": "Proste ikony liniowe z ikonami Material jako zamiennikami.",
+    "lucide": "Lucide",
+    "outline": "Material Outline",
+    "title": "Styl ikon",
+    "description": "Wybierz wygląd elementów sterujących. Zmiany dotyczą tego profilu."
+  },
+  "episodeDetails": {
+    "previous": "Poprzedni odcinek",
+    "next": "Następny odcinek"
   }
 }

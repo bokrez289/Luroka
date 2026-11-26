@@ -741,7 +741,8 @@ void main() {
             },
             'relatedVideos': [
               {'site': 'YouTube', 'key': 'clip', 'type': 'Clip'},
-              {'site': 'YouTube', 'key': 'm8e-FF8MsqU', 'type': 'Trailer'},
+              {'site': 'YouTube', 'key': 'abcdefghijk', 'type': 'Trailer', 'iso_639_1': 'de'},
+              {'site': 'YouTube', 'key': 'm8e-FF8MsqU', 'type': 'Trailer', 'iso_639_1': 'en'},
             ],
             'credits': {
               'crew': [
@@ -764,6 +765,7 @@ void main() {
       expect(detail.item.runtimeMinutes, 136);
       expect(detail.item.certification, 'R');
       expect(detail.item.trailerUrl, 'https://www.youtube.com/watch?v=m8e-FF8MsqU');
+      expect(detail.item.alternateTrailerUrls, ['https://www.youtube.com/watch?v=abcdefghijk']);
       expect(detail.item.airStatus, isNull);
       expect(detail.item.ids.imdb, 'tt0133093');
       expect(detail.item.isAdult, isTrue);

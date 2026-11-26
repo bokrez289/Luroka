@@ -62,6 +62,17 @@ class AppearanceSettingsScreen extends StatelessWidget {
         title: t.settings.display,
         children: [
           _themeSelector(),
+          if (PlatformDetector.isTV())
+            SettingSelectionTile<bool>(
+              pref: SettingsService.tvEdgeMenu,
+              icon: Symbols.dock_to_left_rounded,
+              title: t.tvEdgeMenu.title,
+              subtitleBuilder: (enabled) => enabled ? t.tvEdgeMenu.both : t.tvEdgeMenu.top,
+              options: [
+                DialogOption(value: false, title: t.tvEdgeMenu.top),
+                DialogOption(value: true, title: t.tvEdgeMenu.both),
+              ],
+            ),
           _backdropBrightnessSlider(),
           if (PlatformDetector.isTV())
             SettingSelectionTile<ShowDetailLayout>(
@@ -271,6 +282,29 @@ class AppearanceSettingsScreen extends StatelessWidget {
             subtitle: t.dashboard.showFeaturedDescription,
           ),
           if (!categoryWorkspace || !PlatformDetector.isMobile(context)) _homeHeroSizeSelector(),
+          if (PlatformDetector.isMobile(context))
+            SettingSelectionTile<PhoneSpotlightSize>(
+              pref: SettingsService.phoneSpotlightSize,
+              icon: Symbols.aspect_ratio_rounded,
+              title: 'Phone spotlight size',
+              subtitleBuilder: (value) => switch (value) {
+                PhoneSpotlightSize.compact => t.settings.compact,
+                PhoneSpotlightSize.standard => 'Standard',
+                PhoneSpotlightSize.large => t.settings.homeHeroSizeLarge,
+              },
+              options: [
+                DialogOption(value: PhoneSpotlightSize.compact, title: t.settings.compact),
+                const DialogOption(value: PhoneSpotlightSize.standard, title: 'Standard'),
+                DialogOption(value: PhoneSpotlightSize.large, title: t.settings.homeHeroSizeLarge),
+              ],
+            ),
+          if (PlatformDetector.isMobile(context) && MediaQuery.sizeOf(context).shortestSide < 600)
+            SettingSwitchTile(
+              pref: SettingsService.phoneCinematicSpotlight,
+              icon: Symbols.aspect_ratio_rounded,
+              title: 'Cinematic phone spotlight',
+              subtitle: 'Use landscape artwork instead of classic poster cards',
+            ),
           SettingStepperTile<int>(
             pref: SettingsService.homePosterSize,
             icon: Symbols.view_carousel_rounded,

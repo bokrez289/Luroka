@@ -37,7 +37,56 @@ void main() {
     kids.resetForTesting();
     TvDetectionService.debugSetAppleTVOverride(null);
   });
-  testWidgets('kids Home groups matching copies and lets a child choose a library', (tester) async {
+  testWidgets('phone shows the welcome and safe shelves before a featured title', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(false);
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final movie = testMediaItem(
+      id: 'm',
+      title: 'Friendly',
+      serverId: 'srv',
+      artPath: '/art',
+    ).copyWith(contentRating: 'G', viewOffsetMs: 1000, durationMs: 10000);
+    final forbidden = movie.copyWith(id: 'x', title: 'Forbidden', contentRating: 'R');
+    String? selected;
+    var played = false;
+    await tester.pumpWidget(
+      InputModeTracker(
+        child: MaterialApp(
+          home: KidsMovieShelf(
+            rows: [
+              MediaHub(id: 'm', title: 'Movies', type: 'mixed', items: [movie, forbidden]),
+            ],
+            onDeck: [movie, forbidden],
+            name: 'Emma',
+            toolbar: const SizedBox(),
+            showToolbar: false,
+            resolveClient: (_) => null,
+            onPlay: (_) => played = true,
+            onDetails: (item) => selected = item.id,
+            onResume: (_) => played = true,
+            onSidebar: () {},
+            onToolbar: () {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('kids-illustrated-header')), findsOneWidget);
+    expect(find.byType(KidsAvatar), findsOneWidget);
+    expect(find.text(t.kids.welcome(name: 'Emma')), findsOneWidget);
+    expect(find.text(t.kidsHome.keepWatching), findsOneWidget);
+    expect(find.text('Forbidden'), findsNothing);
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
+    final resume = find.byKey(const ValueKey('resume:srv:m'));
+    expect(tester.getTopLeft(resume).dy, lessThan(500));
+    await tester.tap(resume);
+    await tester.pump();
+    expect(selected, 'm');
+    expect(played, isFalse);
+  });
+  testWidgets('kids Home groups matching copies without asking the child to pick a library', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(false);
     final first = testMediaItem(
       id: 'a',
@@ -79,21 +128,321 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Luroka'), findsOneWidget);
+    expect(find.text(t.kids.welcome(name: 'Emma')), findsOneWidget);
     expect(find.text('Friendly movie'), findsOneWidget);
-    expect(find.byKey(const ValueKey('kids-copy-count')), findsOneWidget);
-    expect(
-      find.descendant(of: find.byKey(const ValueKey('kids-copy-count')), matching: find.text('2')),
-      findsOneWidget,
-    );
     await tester.ensureVisible(find.text('Friendly movie'));
     await tester.tap(find.text('Friendly movie'));
     await tester.pumpAndSettle();
-    expect(find.text('Movies'), findsWidgets);
-    expect(find.text('Family'), findsWidgets);
-    await tester.tap(find.text('Family').last);
+    expect(selected, anyOf('a', 'b'));
+    expect(find.text('Family'), findsNothing);
+  });
+  testWidgets('TV welcomes first, then previews the focused poster without moving the shelf', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    final movie = testMediaItem(
+      id: 'm',
+      title: 'Friendly',
+      serverId: 'srv',
+      summary: 'A gentle adventure.',
+      artPath: '/hero',
+    ).copyWith(contentRating: 'G');
+    final key = GlobalKey<KidsMovieShelfState>();
+    await tester.pumpWidget(
+      InputModeTracker(
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.lurokaKids),
+          home: KidsMovieShelf(
+            key: key,
+            rows: [
+              MediaHub(
+                id: 'm',
+                title: 'Movies',
+                type: 'mixed',
+                items: [
+                  movie,
+                  movie.copyWith(
+                    id: 's',
+                    kind: MediaKind.show,
+                    title: 'Tiny explorers',
+                    summary: 'Two friends set sail.',
+                  ),
+                  movie.copyWith(id: 'x', title: 'Forbidden', contentRating: 'R'),
+                ],
+              ),
+            ],
+            onDeck: const [],
+            name: 'Emma',
+            toolbar: const SizedBox(),
+            showToolbar: false,
+            resolveClient: (_) => null,
+            onPlay: (_) {},
+            onDetails: (_) {},
+            onResume: (_) {},
+            onSidebar: () {},
+            onToolbar: () {},
+          ),
+        ),
+      ),
+    );
     await tester.pumpAndSettle();
-    expect(selected, 'b');
+    expect(find.text(t.kids.welcome(name: 'Emma')), findsOneWidget);
+    expect(find.textContaining('A gentle adventure.'), findsNothing);
+    key.currentState!.requestContentFocus();
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pump();
+    final card = find.byKey(const ValueKey('movies:srv:m'));
+    final before = tester.getRect(card);
+    await tester.pump(const Duration(milliseconds: 450));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('kids-focused-preview')), findsNothing);
+    expect(find.byKey(const ValueKey('spotlight:srv:m')), findsOneWidget);
+    expect(tester.getRect(card), before);
+    expect(find.textContaining('A gentle adventure.'), findsOneWidget);
+    expect(find.text('Forbidden'), findsNothing);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 80));
+    expect(find.byKey(const ValueKey('spotlight:srv:m')), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.byKey(const ValueKey('spotlight:srv:s')), findsNothing);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.byKey(const ValueKey('spotlight:srv:s')), findsOneWidget);
+    expect(find.textContaining('Two friends set sail.'), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.byKey(const ValueKey('spotlight:srv:m')), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('spotlight:srv:m')), findsNothing);
+  });
+
+  for (final size in [const Size(960, 540), const Size(1280, 720)]) {
+    testWidgets('TV final shelf aligns below the preview at $size', (tester) async {
+      TvDetectionService.debugSetAppleTVOverride(true);
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final movie = testMediaItem(id: 'movie', title: 'Movie', serverId: 'srv').copyWith(contentRating: 'G');
+      final show = movie.copyWith(id: 'show', title: 'Show', kind: MediaKind.show);
+      final key = GlobalKey<KidsMovieShelfState>();
+      await tester.pumpWidget(
+        InputModeTracker(
+          child: MaterialApp(
+            home: KidsMovieShelf(
+              key: key,
+              rows: [
+                MediaHub(id: 'items', title: 'Items', type: 'mixed', items: [movie, show]),
+              ],
+              onDeck: const [],
+              name: 'Emma',
+              toolbar: const SizedBox(),
+              showToolbar: false,
+              resolveClient: (_) => null,
+              onPlay: (_) {},
+              onDetails: (_) {},
+              onResume: (_) {},
+              onSidebar: () {},
+              onToolbar: () {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      key.currentState!.requestContentFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      final viewportTop = tester.getTopLeft(find.byKey(const ValueKey('kids-movie-shelf'))).dy;
+      final previousBottom = tester
+          .getBottomLeft(find.byKey(const ValueKey('movies:srv:movie'), skipOffstage: false))
+          .dy;
+      final selectedHeading = tester.getTopLeft(find.text(t.kidsShelf.showShelf)).dy;
+      expect(previousBottom, lessThanOrEqualTo(viewportTop));
+      expect(selectedHeading, greaterThanOrEqualTo(viewportTop));
+      expect(selectedHeading - viewportTop, lessThan(20));
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(find.text(t.kidsShelf.movieShelf)).dy - viewportTop, lessThan(20));
+    });
+  }
+
+  for (final size in [const Size(320, 700), const Size(480, 850)]) {
+    testWidgets('phone shelf at $size opens permitted content details', (tester) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      TvDetectionService.debugSetAppleTVOverride(size.width > 700);
+      final safe = testMediaItem(
+        id: 'safe',
+        title: 'Adventure',
+        serverId: 'srv',
+        summary: 'A kind adventure.',
+        artPath: '/art',
+      ).copyWith(contentRating: 'G');
+      final adult = safe.copyWith(id: 'adult', title: 'Restricted', contentRating: 'R');
+      String? played, opened;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: monoTheme(MonoPalette.lurokaKids),
+          home: KidsMovieShelf(
+            rows: [
+              MediaHub(id: 'h', title: 'Movies', type: 'movie', items: [adult, safe]),
+            ],
+            onDeck: const [],
+            name: 'Emma',
+            toolbar: const SizedBox(),
+            showToolbar: false,
+            resolveClient: (_) => null,
+            onPlay: (item) => played = item.id,
+            onDetails: (item) => opened = item.id,
+            onResume: (_) {},
+            onSidebar: () {},
+            onToolbar: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('kids-illustrated-header')), findsOneWidget);
+      expect(find.byKey(const ValueKey('kids-cinematic-feature')), findsNothing);
+      expect(find.text('Restricted'), findsNothing);
+      await tester.tap(find.text('Adventure'));
+      expect(opened, 'safe');
+      expect(played, isNull);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('TV welcome keeps both shortcuts inside its bounds at large text sizes', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    tester.view.physicalSize = const Size(1280, 720);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final item = testMediaItem(
+      id: 'safe',
+      title: 'A very long title for a wonderful television adventure',
+      serverId: 'srv',
+      summary: 'A long and exciting adventure for the whole family.',
+      artPath: '/art',
+    ).copyWith(contentRating: 'G');
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: monoTheme(MonoPalette.lurokaKids),
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.6)),
+          child: child!,
+        ),
+        home: KidsMovieShelf(
+          rows: [
+            MediaHub(id: 'h', title: 'Movies', type: 'movie', items: [item]),
+          ],
+          onDeck: const [],
+          name: 'Emma',
+          toolbar: const SizedBox(),
+          showToolbar: false,
+          resolveClient: (_) => null,
+          onPlay: (_) {},
+          onDetails: (_) {},
+          onResume: (_) {},
+          onSidebar: () {},
+          onToolbar: () {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final hero = tester.getRect(find.byKey(const ValueKey('kids-illustrated-header')));
+    for (final finder in [
+      find.byKey(const ValueKey('kids-shelf-filter-0')),
+      find.byKey(const ValueKey('kids-shelf-filter-1')),
+    ]) {
+      final rect = tester.getRect(finder);
+      expect(hero.contains(rect.topLeft), isTrue);
+      expect(hero.contains(rect.bottomRight), isTrue);
+    }
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('holding remote OK removes a Keep watching item without resuming playback', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    final movie = testMediaItem(id: 'm', title: 'Friendly', serverId: 'srv').copyWith(contentRating: 'G');
+    var resumed = false;
+    final key = GlobalKey<KidsMovieShelfState>();
+    await tester.pumpWidget(
+      InputModeTracker(
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.lurokaKids),
+          home: KidsMovieShelf(
+            key: key,
+            rows: [],
+            onDeck: [movie],
+            name: 'Emma',
+            toolbar: const SizedBox(),
+            showToolbar: false,
+            resolveClient: (_) => null,
+            onPlay: (_) {},
+            onDetails: (_) {},
+            onResume: (_) => resumed = true,
+            onSidebar: () {},
+            onToolbar: () {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    key.currentState!.requestContentFocus();
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.select);
+    await tester.pump(const Duration(milliseconds: 550));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.select);
+    await tester.pumpAndSettle();
+    expect(find.text(t.mediaMenu.removeFromContinueWatching), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.select);
+    await tester.pumpAndSettle();
+    expect(resumed, isFalse);
+    expect(find.text(t.kidsHome.keepWatching), findsNothing);
+    expect(find.text(t.kids.emptyHint), findsOneWidget);
+  });
+
+  testWidgets('treehouse remains visible with reduced motion; quiet scenery is a separate choice', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: monoTheme(MonoPalette.lurokaKids),
+        builder: (context, child) =>
+            MediaQuery(data: MediaQuery.of(context).copyWith(disableAnimations: true), child: child!),
+        home: KidsMovieShelf(
+          rows: const [],
+          onDeck: const [],
+          name: 'Emma',
+          toolbar: const SizedBox(),
+          showToolbar: false,
+          resolveClient: (_) => null,
+          onPlay: (_) {},
+          onDetails: (_) {},
+          onResume: (_) {},
+          onSidebar: () {},
+          onToolbar: () {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    Finder image() => find.byWidgetPredicate(
+      (widget) =>
+          widget is Image &&
+          widget.image is AssetImage &&
+          (widget.image as AssetImage).assetName.startsWith('assets/branding/kids-world-'),
+    );
+    expect(image(), findsOneWidget);
+    await kids.setChild('child', parentId: 'adult', maxAge: 7, quietScenery: true);
+    await tester.pumpAndSettle();
+    expect(image(), findsNothing);
   });
   for (final size in [const Size(320, 700), const Size(960, 540), const Size(1920, 1080)]) {
     for (final scale in [1.0, 1.6]) {
@@ -111,6 +460,7 @@ void main() {
         final adult = show.copyWith(id: 'adult', title: 'Mature title', contentRating: 'TV-MA');
         final key = GlobalKey<KidsMovieShelfState>();
         String? selected;
+        MediaKind? destination;
         final boundary = GlobalKey();
         await tester.pumpWidget(
           InputModeTracker(
@@ -129,6 +479,7 @@ void main() {
                   ],
                   onDeck: [],
                   name: 'Emma',
+                  onBrowse: (kind) => destination = kind,
                   toolbar: const SizedBox(),
                   showToolbar: false,
                   resolveClient: (_) => null,
@@ -157,20 +508,22 @@ void main() {
             image.dispose();
           });
         }
-        expect(find.byType(KidsAvatar), findsNothing);
-        expect(find.text('Emma'), findsNothing);
+        expect(find.byType(KidsAvatar), findsOneWidget);
+        expect(find.text(t.kids.welcome(name: 'Emma')), findsOneWidget);
         expect(find.text(t.kids.featured), findsNothing);
         expect(find.text('Mature title'), findsNothing);
-        await tester.tap(find.byKey(const ValueKey('kids-shelf-filter-2')));
+        await tester.tap(find.byKey(const ValueKey('kids-shelf-filter-1')));
         await tester.pumpAndSettle();
-        expect(find.text('Friendly movie'), findsNothing);
-        expect(find.text('Friendly show'), findsOneWidget);
+        expect(destination, MediaKind.show);
+        expect(find.text('Friendly movie'), findsOneWidget);
         if (size.width > 700) {
           key.currentState!.requestContentFocus();
           await tester.pump();
           await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
           await tester.pumpAndSettle();
-          expect(FocusManager.instance.primaryFocus?.debugLabel, 'kids-shelf:shows:server:show');
+          expect(FocusManager.instance.primaryFocus?.debugLabel, 'kids-shelf:movies:server:movie');
+          await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+          await tester.pumpAndSettle();
           await tester.sendKeyEvent(LogicalKeyboardKey.enter);
         } else {
           await tester.scrollUntilVisible(find.text('Friendly show'), 180, scrollable: find.byType(Scrollable).first);

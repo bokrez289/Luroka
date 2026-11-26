@@ -14,12 +14,20 @@ import '../focus/key_event_utils.dart';
 import '../focus/input_mode_tracker.dart';
 import '../widgets/overlay_sheet.dart';
 import '../utils/app_logger.dart';
+import '../utils/trailer_urls.dart';
 
 /// A short-lived preview session: no server reporting, scrobbling, queue,
 /// next-episode automation or parent-title watched-state mutations.
 class TrailerPlayerScreen extends StatefulWidget {
-  const TrailerPlayerScreen({super.key, required this.url, required this.title, this.playerFactory});
+  const TrailerPlayerScreen({
+    super.key,
+    required this.url,
+    required this.title,
+    this.alternatives = const [],
+    this.playerFactory,
+  });
   final String url, title;
+  final List<String> alternatives;
 
   /// Allows lifecycle tests to exercise a real successful preview session.
   final Player Function()? playerFactory;
@@ -107,12 +115,12 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> with WidgetsB
         if (defaultTargetPlatform != TargetPlatform.android) {
           throw const FormatException('Unsupported preview resolver');
         }
-        final key = uri.host == 'youtu.be' ? uri.pathSegments.firstOrNull : uri.queryParameters['v'];
-        if (key == null || !RegExp(r'^[\w-]{11}$').hasMatch(key)) throw const FormatException('Invalid preview');
+        final key = youtubeTrailerKey(url);
+        if (key == null) throw const FormatException('Invalid preview');
         _youtubeKey = key;
         final resolved = await const MethodChannel(
           'com.luroka/trailers',
-        ).invokeMapMethod<String, dynamic>('resolve', {'key': key}).timeout(const Duration(seconds: 45));
+        ).invokeMapMethod<String, dynamic>('resolve', {'key': key}).timeout(const Duration(seconds: 10));
         url = resolved!['url'] as String;
         audioUrl = resolved['audioUrl'] as String?;
         headers = (resolved['headers'] as Map?)?.cast<String, String>();
@@ -167,16 +175,28 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> with WidgetsB
       }
       _openTimeout = Timer(const Duration(seconds: 30), _handlePlaybackFailure);
       stage = 'open';
+      if (youtube && player.playerType == 'mpv') {
+        await player.setProperty('alang', 'en,eng');
+        // On fallback HLS manifests, mpv otherwise selects the highest
+        // variant. A short preview doesn't need a UHD rendition.
+        await player.setProperty('hls-bitrate', '8000000');
+      }
       if (audioUrl != null) {
         // mpv's audio-files option attaches the extracted audio before loading
         // the video, so the first frame and audio start together.
-        await player.setProperty('audio-files', audioUrl);
+        // Android mpv treats ':' as a path-list separator (including
+        // the colon in https:// and any explicit port).
+        await player.setProperty('audio-files', audioUrl.replaceAll(':', r'\:'));
       }
       if (!_closed && !_switchingToEmbedded) await player.open(Media(url, headers: headers), play: _foreground);
     } catch (error) {
       // No URLs or exception messages: extracted URLs contain signed tokens.
       final code = error is PlatformException ? error.code : error.runtimeType.toString();
       appLogger.w('Trailer preview failed at $stage ($code)');
+      if (code == 'region_blocked' && _youtubeKey != null && mounted && !_closed) {
+        unawaited(_openEmbedded(skipBlocked: true));
+        return;
+      }
       _handlePlaybackFailure();
     }
   }
@@ -190,7 +210,7 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> with WidgetsB
     }
   }
 
-  Future<void> _openEmbedded() async {
+  Future<void> _openEmbedded({bool skipBlocked = false}) async {
     _embeddedAttempted = true;
     _switchingToEmbedded = true;
     _openTimeout?.cancel();
@@ -208,24 +228,30 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> with WidgetsB
       await _retireNative();
       if (!mounted || _closed || ModalRoute.of(context)?.isCurrent != true) return;
       appLogger.i('Trailer preview switching to embedded playback');
-      _embeddedOpen = true;
-      _updateScreenTime(true);
-      final played = await const MethodChannel('com.luroka/trailers').invokeMethod<bool>('openEmbedded', {
-        'key': _youtubeKey,
-        'title': widget.title,
-        'playLabel': t.common.play,
-        'pauseLabel': t.common.pause,
-        'closeLabel': t.common.close,
-        'accent': Theme.of(context).colorScheme.primary.toARGB32(),
-      });
-      _embeddedOpen = false;
-      _updateScreenTime(false);
-      if (!mounted || _closed) return;
-      if (played == true) {
-        Navigator.of(context).pop();
-      } else {
-        _fail();
+      final keys = <String>{_youtubeKey!, ...widget.alternatives.map(youtubeTrailerKey).whereType<String>()};
+      if (skipBlocked) keys.remove(_youtubeKey);
+      for (final key in keys.take(3)) {
+        _embeddedOpen = true;
+        _updateScreenTime(true);
+        final played = await const MethodChannel('com.luroka/trailers').invokeMethod<bool>('openEmbedded', {
+          'key': key,
+          'hasAlternate': key != keys.take(3).last,
+          'title': widget.title,
+          'playLabel': t.common.play,
+          'pauseLabel': t.common.pause,
+          'closeLabel': t.common.close,
+          'accent': Theme.of(context).colorScheme.primary.toARGB32(),
+        });
+        _embeddedOpen = false;
+        _updateScreenTime(false);
+        if (!mounted || _closed) return;
+        if (played == true) {
+          Navigator.of(context).pop();
+          return;
+        }
+        if (ModalRoute.of(context)?.isCurrent != true) break;
       }
+      _fail();
     } catch (error) {
       final code = error is PlatformException ? error.code : error.runtimeType.toString();
       appLogger.w('Trailer embedded playback failed ($code)');

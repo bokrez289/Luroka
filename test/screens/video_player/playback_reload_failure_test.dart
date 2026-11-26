@@ -155,8 +155,8 @@ void main() {
           await tester.pump();
         });
         await withMockPlayerChannels(
-          methodChannelName: 'com.plezy/mpv_player',
-          eventChannelName: 'com.plezy/mpv_player/events',
+          methodChannelName: 'com.luroka/mpv_player',
+          eventChannelName: 'com.luroka/mpv_player/events',
           testBody: () async {
             final key = GlobalKey<VideoPlayerScreenState>();
             await tester.pumpWidget(
@@ -359,8 +359,8 @@ void main() {
       );
       try {
         await withMockPlayerChannels(
-          methodChannelName: 'com.plezy/mpv_player',
-          eventChannelName: 'com.plezy/mpv_player/events',
+          methodChannelName: 'com.luroka/mpv_player',
+          eventChannelName: 'com.luroka/mpv_player/events',
           testBody: () async {
             final screen = await _pushExitScreen(tester, db: db, client: client, fakePlayer: fakePlayer);
             if (blocked == 'started') {
@@ -454,8 +454,8 @@ void main() {
       final (:watchTogether, :relay) = await hostRoom(tester, client);
       final oldPlayer = _ExitPlayer();
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.luroka/mpv_player',
+        eventChannelName: 'com.luroka/mpv_player/events',
         testBody: () async {
           final screen = await _pushExitScreen(
             tester,
@@ -530,8 +530,8 @@ void main() {
     addTearDown(timer.cancelTimer);
     final oldPlayer = _ExitPlayer();
     await withMockPlayerChannels(
-      methodChannelName: 'com.plezy/mpv_player',
-      eventChannelName: 'com.plezy/mpv_player/events',
+      methodChannelName: 'com.luroka/mpv_player',
+      eventChannelName: 'com.luroka/mpv_player/events',
       testBody: () async {
         final screen = await _pushExitScreen(tester, db: db, client: _ReloadClient(), fakePlayer: oldPlayer);
         timer.armEndOfVideo();
@@ -582,8 +582,8 @@ void main() {
         await joining;
         final fakePlayer = _ExitPlayer();
         await withMockPlayerChannels(
-          methodChannelName: 'com.plezy/mpv_player',
-          eventChannelName: 'com.plezy/mpv_player/events',
+          methodChannelName: 'com.luroka/mpv_player',
+          eventChannelName: 'com.luroka/mpv_player/events',
           testBody: () async {
             final screen = await _pushExitScreen(
               tester,
@@ -637,8 +637,8 @@ void main() {
     await joining;
     final fakePlayer = _ExitPlayer();
     await withMockPlayerChannels(
-      methodChannelName: 'com.plezy/mpv_player',
-      eventChannelName: 'com.plezy/mpv_player/events',
+      methodChannelName: 'com.luroka/mpv_player',
+      eventChannelName: 'com.luroka/mpv_player/events',
       testBody: () async {
         final screen = await _pushExitScreen(
           tester,
@@ -719,8 +719,8 @@ void main() {
   group('TV background suspend', () {
     testWidgets('early next prompt respects credits, dismissal, pause and setting', (tester) async {
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.luroka/mpv_player',
+        eventChannelName: 'com.luroka/mpv_player/events',
         testBody: () async {
           final screen = await pumpReloadScreen(tester, episode: true);
           final state = screen.key.currentState!;
@@ -766,8 +766,8 @@ void main() {
       TvDetectionService.debugSetAppleTVOverride(true);
       addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.luroka/mpv_player',
+        eventChannelName: 'com.luroka/mpv_player/events',
         testBody: () async {
           final screen = await pumpReloadScreen(tester);
           final state = screen.key.currentState!;
@@ -800,8 +800,8 @@ void main() {
       });
 
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.luroka/mpv_player',
+        eventChannelName: 'com.luroka/mpv_player/events',
         testBody: () async {
           final screen = await pumpReloadScreen(tester);
           final state = screen.key.currentState!;
@@ -882,8 +882,8 @@ void main() {
       final (:watchTogether, :relay) = await hostRoom(tester, client);
 
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.luroka/mpv_player',
+        eventChannelName: 'com.luroka/mpv_player/events',
         testBody: () async {
           final screen = await pumpReloadScreen(tester, watchTogether: watchTogether, client: client);
           final fakePlayer = screen.player;
@@ -922,8 +922,8 @@ void main() {
       final (:watchTogether, :relay) = await hostRoom(tester, client);
 
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.luroka/mpv_player',
+        eventChannelName: 'com.luroka/mpv_player/events',
         testBody: () async {
           final screen = await pumpReloadScreen(tester, watchTogether: watchTogether, client: client);
           final fakePlayer = screen.player;
@@ -981,8 +981,8 @@ void main() {
 
     testWidgets("a source reload during the hold owns the replacement's play state", (tester) async {
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.luroka/mpv_player',
+        eventChannelName: 'com.luroka/mpv_player/events',
         testBody: () async {
           final screen = await pumpReloadScreen(tester);
           final fakePlayer = screen.player;
@@ -1053,8 +1053,8 @@ void main() {
       });
 
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.luroka/mpv_player',
+        eventChannelName: 'com.luroka/mpv_player/events',
         testBody: () async {
           final key = GlobalKey<VideoPlayerScreenState>();
           await tester.pumpWidget(

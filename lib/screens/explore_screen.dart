@@ -120,7 +120,13 @@ class ExploreScreenState extends State<ExploreScreen>
     if (source == null) return const [];
     final items = await source.search(query);
     final media = [for (final item in items) item.toMediaItem()];
-    return _explore.availableOnly ? _explore.librarySearchResults(media) : media;
+    return _explore.matcher != null ? _explore.librarySearchResults(media) : media;
+  }
+
+  Future<void> _toggleLibraryFilter() async {
+    final update = _explore.setAvailableOnly(!_explore.availableOnly);
+    if (searchIsActive) await runSearch(searchController.text.trim());
+    await update;
   }
 
   @override
@@ -408,11 +414,11 @@ class ExploreScreenState extends State<ExploreScreen>
                 sources.activeSource?.id == CatalogSourceId.tmdb)
               _awardsAction(compact: PlatformDetector.isMobile(context)),
             if (explore.customizableShelves && MediaQuery.sizeOf(context).width >= 600) _customizeAction(),
-            if (!_explore.libraryOnly && _explore.matcher == null)
+            if (!_explore.libraryOnly && _explore.matcher != null)
               FocusableAction(
-                icon: Symbols.filter_alt_rounded,
-                tooltip: _explore.availableOnly ? t.lurokaDiscovery.allTitles : t.lurokaDiscovery.available,
-                onPressed: () => unawaited(_explore.setAvailableOnly(!_explore.availableOnly)),
+                icon: _explore.availableOnly ? Icons.filter_alt : Icons.filter_alt_outlined,
+                tooltip: _explore.availableOnly ? t.lurokaDiscovery.allTitles : t.lurokaDiscovery.filterOwned,
+                onPressed: _toggleLibraryFilter,
               ),
             FocusableAction(
               icon: Symbols.settings_rounded,
@@ -611,12 +617,12 @@ class ExploreScreenState extends State<ExploreScreen>
                     parentOwnsFocus: true,
                   ),
                 ),
-              if (!_explore.libraryOnly && _explore.matcher == null)
+              if (!_explore.libraryOnly && _explore.matcher != null)
                 FocusableAction(
-                  tooltip: _explore.availableOnly ? t.lurokaDiscovery.allTitles : t.lurokaDiscovery.available,
-                  onPressed: () => unawaited(_explore.setAvailableOnly(!_explore.availableOnly)),
+                  tooltip: _explore.availableOnly ? t.lurokaDiscovery.allTitles : t.lurokaDiscovery.filterOwned,
+                  onPressed: _toggleLibraryFilter,
                   child: Text(
-                    _explore.availableOnly ? t.lurokaDiscovery.available : t.lurokaDiscovery.allTitles,
+                    _explore.availableOnly ? t.lurokaDiscovery.filterOwned : t.lurokaDiscovery.allTitles,
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(color: foregroundColor),
                   ),
                 ),

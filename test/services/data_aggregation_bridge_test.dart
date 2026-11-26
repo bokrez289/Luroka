@@ -11,6 +11,7 @@ import 'package:luroka/connection/connection.dart';
 import 'package:luroka/database/app_database.dart';
 import 'package:luroka/exceptions/media_server_exceptions.dart';
 import 'package:luroka/media/media_backend.dart';
+import 'package:luroka/media/home_progress.dart';
 import 'package:luroka/media/media_kind.dart';
 import 'package:luroka/media/media_library.dart';
 import 'package:luroka/media/media_hub.dart';
@@ -239,6 +240,99 @@ void main() {
     await db.close();
   });
 
+  test('Emby Home keeps native membership and order for combined and split shelves', () async {
+    final requests = <Uri>[];
+    Map<String, Object?> row(String id, {bool next = false, String? played}) => {
+      'Id': id,
+      'Name': id,
+      'Type': 'Episode',
+      'SeriesId': id,
+      'UserData': {'PlaybackPositionTicks': next ? 0 : 600000000, 'LastPlayedDate': ?played},
+    };
+    final client = testEmbyClient(
+      handler: (request) async {
+        requests.add(request.url);
+        expect(request.url.path, '/Users/user-1/Sections/resume/Items');
+        return _json({
+          'Items': [
+            row('bass'),
+            row('heart'),
+            row('cia', played: '2026-11-19T00:00:00Z'),
+            row('fullmetal', next: true, played: '2020-01-01T00:00:00Z'),
+            row('stuart', next: true, played: '2019-01-01T00:00:00Z'),
+            row('black-clover', next: true, played: '2026-11-20T00:00:00Z'),
+            row('tokyo-revengers', next: true),
+          ],
+          'TotalRecordCount': 7,
+        });
+      },
+    );
+    manager.debugRegisterClientForTesting(client);
+    final combined = await service.getOnDeckFromAllServers(limit: 5);
+    expect(combined.items.map((item) => item.id), ['bass', 'heart', 'cia', 'fullmetal', 'stuart']);
+    final split = await service.getOnDeckFromAllServers(limit: 2, splitRows: true);
+    expect(split.items.where(isHomeNextUp).map((item) => item.id), ['fullmetal', 'stuart']);
+    expect(split.items.where((item) => !isHomeNextUp(item)).map((item) => item.id), ['bass', 'heart']);
+    expect(requests, hasLength(2));
+  });
+
+  test('Emby Home falls back only when the native section is unsupported', () async {
+    var sectionRequests = 0;
+    final client = testEmbyClient(
+      handler: (request) async {
+        if (request.url.path.endsWith('/Sections/resume/Items')) {
+          sectionRequests++;
+          return http.Response('', 404);
+        }
+        if (request.url.path.endsWith('/Views')) {
+          return _json({
+            'Items': [
+              {'Id': 'movies', 'Name': 'Movies', 'CollectionType': 'movies'},
+            ],
+          });
+        }
+        expect(request.url.path, '/Users/user-1/Items/Resume');
+        expect(request.url.queryParameters['ParentId'], 'movies');
+        return _json({
+          'Items': [
+            {
+              'Id': 'movie',
+              'Name': 'Movie',
+              'Type': 'Movie',
+              'UserData': {'PlaybackPositionTicks': 600000000},
+            },
+          ],
+        });
+      },
+    );
+    manager.debugRegisterClientForTesting(client);
+    for (var i = 0; i < 2; i++) {
+      final result = await service.getOnDeckFromAllServers(limit: 5);
+      expect(result.items.map((item) => item.id), ['movie']);
+    }
+    expect(sectionRequests, 1);
+  });
+
+  test('Emby Home does not replace an empty or temporarily failed native shelf with legacy rows', () async {
+    var status = 200;
+    final client = testEmbyClient(
+      handler: (request) async {
+        expect(request.url.path, '/Users/user-1/Sections/resume/Items');
+        return status == 200 ? _json({'Items': []}) : http.Response('', status);
+      },
+    );
+    manager.debugRegisterClientForTesting(client);
+    final empty = await service.getOnDeckFromAllServers(limit: 12);
+    expect(empty.items, isEmpty);
+    expect(empty.succeededServerIds, {'srv-1'});
+    status = 503;
+    final failed = await service.getOnDeckFromAllServers(limit: 12);
+    expect(failed.failedServerIds, {'srv-1'});
+    status = 200;
+    final recovered = await service.getOnDeckFromAllServers(limit: 12);
+    expect(recovered.succeededServerIds, {'srv-1'});
+  });
+
   /// Registers a Plex server whose `/hubs` answers a single Continue Watching
   /// hub built from [rows]; [metadata] answers `/library/metadata/<ratingKey>`
   /// for the keys it recognises. Any other request is an unexpected one.
@@ -286,6 +380,83 @@ void main() {
     manager.debugRegisterClientForTesting(client);
     return requests;
   }
+
+  test('Continue Watching refills after duplicate copies consume the first candidate window', () async {
+    final counts = <int>[];
+    final client = testPlexClient(
+      serverId: ServerId('plex-1'),
+      handler: (request) async {
+        if (request.url.path == '/hubs') {
+          final count = int.parse(request.url.queryParameters['count']!);
+          counts.add(count);
+          final rows = [
+            for (var i = 0; i < 6; i++)
+              {
+                'ratingKey': '$i',
+                'type': 'movie',
+                'title': i < 3 ? 'Duplicate' : 'Movie $i',
+                'guid': 'plex://movie/${i < 3 ? 'same' : i}',
+                'lastViewedAt': 100 - i,
+              },
+          ].take(count).toList();
+          return _json({
+            'MediaContainer': {
+              'Hub': [
+                {'hubIdentifier': 'home.continue', 'type': 'movie', 'size': rows.length, 'Metadata': rows},
+              ],
+            },
+          });
+        }
+        return _json({
+          'MediaContainer': {'Metadata': <Object>[]},
+        });
+      },
+    );
+    manager.debugRegisterClientForTesting(client);
+    final result = await service.getOnDeckFromAllServers(limit: 3);
+    expect(result.items.map((item) => item.id), ['0', '3', '4']);
+    expect(counts, [3, 6]);
+  });
+
+  test('Continue Watching refills Plex selected libraries even with no explicit hidden libraries', () async {
+    final client = testPlexClient(
+      serverId: ServerId('plex-1'),
+      handler: (request) async {
+        if (request.url.path == '/library/sections') {
+          return _json({
+            'MediaContainer': {
+              'Directory': [
+                {'key': '1', 'title': 'Excluded', 'type': 'movie'},
+                {'key': '2', 'title': 'Selected', 'type': 'movie'},
+              ],
+            },
+          });
+        }
+        if (request.url.path == '/hubs') {
+          final count = int.parse(request.url.queryParameters['count']!);
+          return _json({
+            'MediaContainer': {
+              'Hub': [
+                {
+                  'hubIdentifier': 'home.continue',
+                  'type': 'movie',
+                  'Metadata': [
+                    {'ratingKey': 'hidden', 'type': 'movie', 'title': 'Hidden', 'librarySectionID': 1},
+                    if (count > 1) {'ratingKey': 'visible', 'type': 'movie', 'title': 'Visible', 'librarySectionID': 2},
+                  ],
+                },
+              ],
+            },
+          });
+        }
+        return _json({'MediaContainer': {}});
+      },
+    );
+    manager.debugRegisterClientForTesting(client);
+    final result = await service.getOnDeckFromAllServers(limit: 1, selectedSourceLibraryKeys: {'plex-1:2'});
+    expect(result.failedServerIds, isEmpty);
+    expect(result.items.map((item) => item.id), ['visible']);
+  });
 
   for (final backend in ['plex', 'jellyfin', 'emby']) {
     test('$backend offline expected-server misses expire and reveal copies after recovery', () async {
@@ -823,13 +994,28 @@ void main() {
         handler: (request) async {
           if (request.url.path == '/library/search') {
             final people = request.url.queryParameters['searchTypes'] == 'people';
-            return _json({'MediaContainer': {'SearchResult': people ? [] : [
-              {'Metadata': {'ratingKey': 'movie-1', 'type': 'movie', 'title': 'Target'}},
-            ]}});
+            return _json({
+              'MediaContainer': {
+                'SearchResult': people
+                    ? []
+                    : [
+                        {
+                          'Metadata': {'ratingKey': 'movie-1', 'type': 'movie', 'title': 'Target'},
+                        },
+                      ],
+              },
+            });
           }
           if (request.url.path == '/library/metadata/movie-1') {
-            return _json({'MediaContainer': {'librarySectionID': 7, 'librarySectionTitle': 'Movies',
-              'Metadata': [{'ratingKey': 'movie-1', 'type': 'movie', 'title': 'Target'}]}});
+            return _json({
+              'MediaContainer': {
+                'librarySectionID': 7,
+                'librarySectionTitle': 'Movies',
+                'Metadata': [
+                  {'ratingKey': 'movie-1', 'type': 'movie', 'title': 'Target'},
+                ],
+              },
+            });
           }
           return http.Response('unexpected request', 500);
         },
@@ -846,7 +1032,11 @@ void main() {
       final client = _GatedStampClient(ServerId('a'), searchResults: [known, ...missing]);
       manager.debugRegisterClientForTesting(client);
       final updates = <SearchAggregationResult>[];
-      final search = service.searchAcrossServers('Target', selectedSourceLibraries: {'a:movies'}, onProgress: updates.add);
+      final search = service.searchAcrossServers(
+        'Target',
+        selectedSourceLibraries: {'a:movies'},
+        onProgress: updates.add,
+      );
       await Future<void>.delayed(Duration.zero);
       expect(updates, isNotEmpty);
       expect(_hitIds(updates.first), ['known']);
@@ -1130,6 +1320,7 @@ void main() {
     });
 
     test('getOnDeckFromAllServers hides duplicate show entries by stable show ids', () async {
+      var failIdentity = false;
       registerContinueWatchingPlex(
         [
           {
@@ -1154,6 +1345,7 @@ void main() {
           },
         ],
         metadata: (ratingKey) {
+          if (failIdentity) return null;
           if (ratingKey != 'old-show' && ratingKey != 'new-show') return null;
           return {
             'ratingKey': ratingKey,
@@ -1170,6 +1362,9 @@ void main() {
 
       expect(result.items.map((item) => item.id), ['new-episode']);
       expect(result.succeededServerIds, {'plex-1'});
+      failIdentity = true;
+      final refreshed = await service.getOnDeckFromAllServers(limit: 10);
+      expect(refreshed.items.map((item) => item.id), ['new-episode']);
     });
 
     test('getOnDeckFromAllServers prefers the locally last-played duplicate sibling', () async {
@@ -1357,7 +1552,7 @@ void main() {
       expect(captured.where((uri) => uri.path == '/UserItems/Resume' || uri.path == '/Shows/NextUp'), isEmpty);
       expect(
         captured.where((uri) => uri.path == '/Users/user-1/Items/Latest').map((uri) => uri.queryParameters['ParentId']),
-        ['lib-1', 'lib-2', 'lib-3', 'lib-4'],
+        ['lib-1', 'lib-3', 'lib-2', 'lib-4'],
       );
       expect(
         captured.where((uri) => uri.path == '/Users/user-1/Items/Latest').map((uri) => uri.queryParameters['Limit']),

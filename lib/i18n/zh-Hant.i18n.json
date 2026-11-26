@@ -300,6 +300,7 @@
     "notificationProgress": "{progress} · {networkSpeed} · {timeRemaining} 剩餘"
   },
   "kidsShelf": {
+    "quietScenery": "寧靜夜景",
     "movieShelf": "電影時間",
     "showShelf": "尋找您的下一場演出",
     "aurora": "Aurora — 深青色與青檸色",
@@ -604,7 +605,9 @@
     "availabilityUnknown": "有些庫無法檢查。嘗試清爽一下。",
     "noAvailable": "在檢查的庫中未找到匹配的標題。",
     "sourceInfo": "每週趨勢及獲獎者評選 · TMDb",
-    "configure": "發現設定"
+    "configure": "發現設定",
+    "filterOwned": "我的媒體庫中",
+    "statusRetry": "無法檢查 Seerr · 重試"
   },
   "app": {
     "title": "Luroka"
@@ -1139,7 +1142,11 @@
     "playerScopeLibrary": "依媒體庫",
     "playerScopeTitle": "依影集或電影",
     "exportDialogTitle": "匯出 Luroka 設定",
-    "velvetHourTheme": "天鵝絨時光"
+    "velvetHourTheme": "天鵝絨時光",
+    "backdropBrightness": "背景亮度",
+    "backdropBrightnessDescription": "調整首頁與作品圖片上的暗化程度。預設值為 100%。",
+    "showEarlyNextEpisode": "在目前集數結束前顯示下一集",
+    "showEarlyNextEpisodeDescription": "在片尾字幕期間或最後 30 秒顯示下一集。"
   },
   "themeEditor": {
     "builtIn": "內建",
@@ -1311,6 +1318,9 @@
     "episodesLeft": "${count} 還剩幾集"
   },
   "lurokaThemes": {
+    "patina": "銅鏽 · 深青與赤銅",
+    "afterimage": "殘像 · 靛藍與霓虹玫紅",
+    "letterpress": "活版印刷 · 暖紙與酒紅墨色",
     "title": "Luroka 戲院調色盤",
     "coral": "珊瑚·午夜藍&夕陽",
     "ocean": "海洋·深藍&冰",
@@ -1394,7 +1404,15 @@
     "reset": "恢復預設行",
     "resetDescription": "恢復原始行順序並顯示此設定檔的所有行？您固定的收藏將會保留。",
     "saveFailed": "無法儲存您的主頁佈局。請再試一次。",
-    "emptyHint": "行可能被隱藏。開啟個人化主頁以再次顯示它們。"
+    "emptyHint": "行可能被隱藏。開啟個人化主頁以再次顯示它們。",
+    "upcomingEpisodes": "即將播出的集數",
+    "upcomingFavorites": "最愛",
+    "upcomingWatched": "先前觀看過的作品",
+    "upcomingBoth": "最愛與先前觀看過的作品",
+    "upcomingAll": "所有影集",
+    "upcomingOff": "關閉",
+    "airDate": "播出日期：${date}",
+    "upcomingHint": "只有啟用此列時，才會在背景檢查即將到來的播出日期。結果數量有限，伺服器上可能尚未提供相關內容。"
   },
   "screenTime": {
     "title": "螢幕時間",
@@ -1449,7 +1467,35 @@
     "sessionNoTitle": "不明播放",
     "emptyTitle": "這裡還什麼都沒有",
     "emptyBody": "觀看一些內容，您的統計數據就會在這裡建立起來。",
-    "noDataInPeriod": "在此期間沒有播放記錄。"
+    "noDataInPeriod": "在此期間沒有播放記錄。",
+    "patternsTab": "觀看趨勢",
+    "moviesFilter": "電影",
+    "episodesFilter": "集數",
+    "datesFilter": "日期",
+    "titlesPlayed": "已播放 ${count} 個作品 · 集數分開計算",
+    "previousPeriod": "上一期間",
+    "lifetimeSummary": "全部時間：${total} · 每日平均：${average}",
+    "dailyAverage": "每日平均",
+    "allKinds": "全部",
+    "titlesPlayedLabel": "已播放作品",
+    "ledgerScope": "活動資料來自此個人檔案的本機 Luroka 播放紀錄，不包含伺服器觀看歷史或其他應用程式中的播放紀錄。",
+    "chartScale": "刻度：0 – ${duration}",
+    "gettingStarted": "觀看紀錄剛開始累積。使用幾天後就會顯示觀看趨勢。",
+    "history": "歷史紀錄",
+    "insufficientHistory": "歷史紀錄不足",
+    "monthlyRecap": "每月回顧",
+    "noMatches": "沒有符合這些篩選條件的觀看紀錄。",
+    "activeDays": "活躍天數",
+    "measurementHint": "時間反映的是記錄的播放時間，並不表示作品已看完。",
+    "historyError": "無法載入歷史紀錄，請再試一次。",
+    "watchedPeriod": "此期間觀看時間",
+    "monthWatched": "本月觀看 ${duration}",
+    "drillDown": "查看這些日期的活動",
+    "searchHistory": "搜尋觀看歷史",
+    "clearDates": "清除日期",
+    "playedHint": "集數分開計算。播放時間不代表已看完。",
+    "allHistory": "查看全部歷史紀錄",
+    "overview": "概覽"
   },
   "search": {
     "hint": "搜尋電影、影集、音樂…",
@@ -1655,7 +1701,8 @@
     "mediaFailedToDelete": "刪除媒體失敗",
     "rate": "評分",
     "playFromBeginning": "從頭播放",
-    "playVersion": "播放版本…"
+    "playVersion": "播放版本…",
+    "removeFromNextUp": "從接下來播放中移除"
   },
   "rateSheet": {
     "title": "評分",
@@ -1664,7 +1711,9 @@
     "favorited": "已加入最愛",
     "saved": "已儲存",
     "notAvailable": "找不到相符項目",
-    "noConnectedServices": "在設定中連結外部服務後，即可在此評分。"
+    "noConnectedServices": "在設定中連結外部服務後，即可在此評分。",
+    "addFavorite": "加入最愛",
+    "removeFavorite": "從最愛移除"
   },
   "accessibility": {
     "mediaCardMovie": "${title}, 電影",
@@ -1873,7 +1922,9 @@
     "streamSelectionUnavailable": "此來源不支援選擇串流",
     "streamSelectionFailed": "無法套用所選串流",
     "trackSelectionNotRemembered": "此軌道選擇僅套用於目前播放。",
-    "serverUnavailableForProfile": "使用中的使用者設定檔沒有可用的伺服器"
+    "serverUnavailableForProfile": "使用中的使用者設定檔沒有可用的伺服器",
+    "logSupportReference": "支援參考編號",
+    "copyFullLogId": "複製完整日誌 ID"
   },
   "sourceLibraries": {
     "title": "您的伺服器和庫",
@@ -3596,5 +3647,39 @@
     "redirectDifferentHost": "伺服器重新導向至不同的主機。請直接輸入最終的 ${product} URL。",
     "redirectInsecure": "伺服器從 HTTPS 重新導向至不安全的 URL",
     "redirectUnsupportedEnterFinal": "伺服器重新導向至不支援的 URL。請直接輸入最終的 ${product} URL。"
+  },
+  "episodeDetails": {
+    "previous": "上一集",
+    "next": "下一集"
+  },
+  "tvEdgeMenu": {
+    "title": "電視導覽",
+    "top": "頂端導覽列",
+    "both": "頂端導覽列與側邊選單",
+    "hint": "在一列的第一個項目按左鍵，即可開啟側邊選單。按右鍵或返回鍵即可返回。",
+    "tryMenu": "試用導覽",
+    "allLibraries": "所有媒體庫",
+    "browse": "瀏覽",
+    "more": "更多",
+    "closeHint": "按右鍵或返回鍵關閉"
+  },
+  "showDetailLayout": {
+    "title": "影集詳情版面",
+    "description": "選擇在電視上顯示影集與集數的方式。",
+    "compact": "精簡集數清單",
+    "cinematic": "電影風格",
+    "seasons": "選擇季數",
+    "episodes": "集數",
+    "details": "詳情",
+    "cast": "演員",
+    "related": "類似作品"
+  },
+  "iconStyles": {
+    "title": "圖示樣式",
+    "description": "選擇應用程式控制項的外觀。變更僅適用於此個人檔案。",
+    "current": "Luroka Bold",
+    "lucide": "Lucide",
+    "lucideDescription": "簡潔的線條圖示；無法使用的圖示將以 Material 圖示替代。",
+    "outline": "Material Outline"
   }
 }

@@ -73,6 +73,79 @@ void main() {
 
   double page(WidgetTester tester) => tester.widget<PageView>(find.byType(PageView)).controller!.page!;
 
+  testWidgets('phone spotlight size defaults compact and leaves tablet and kids sizing unchanged', (
+    tester,
+  ) async {
+    late BuildContext context;
+    tester.view.physicalSize = const Size(360, 780);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(MaterialApp(home: Builder(builder: (value) {
+      context = value;
+      return const SizedBox.shrink();
+    })));
+    expect(SettingsService.instance.read(SettingsService.phoneSpotlightSize), PhoneSpotlightSize.compact);
+    expect(SettingsService.instance.read(SettingsService.phoneCinematicSpotlight), isTrue);
+    double phone() => MobileHomeCarousel.heightFor(context, 360, availableHeight: 700);
+    final compact = phone();
+    final kids = MobileHomeCarousel.heightFor(context, 360, availableHeight: 700, kids: true);
+    await SettingsService.instance.write(SettingsService.phoneSpotlightSize, PhoneSpotlightSize.standard);
+    final standard = phone();
+    await SettingsService.instance.write(SettingsService.phoneSpotlightSize, PhoneSpotlightSize.large);
+    final large = phone();
+    expect(compact, lessThan(standard));
+    expect(standard, lessThan(large));
+    expect(MobileHomeCarousel.heightFor(context, 360, availableHeight: 700, kids: true), kids);
+    tester.view.physicalSize = const Size(768, 1024);
+    await tester.pump();
+    final tabletLarge = MobileHomeCarousel.heightFor(context, 768, availableHeight: 900);
+    await SettingsService.instance.write(SettingsService.phoneSpotlightSize, PhoneSpotlightSize.compact);
+    expect(MobileHomeCarousel.heightFor(context, 768, availableHeight: 900), tabletLarge);
+  });
+
+  for (final size in PhoneSpotlightSize.values) {
+    for (final scale in [1.0, 1.5, 2.0]) {
+      for (final cinematic in [false, true]) {
+      testWidgets('phone ${size.name} cinematic=$cinematic fits a long title at text scale $scale', (tester) async {
+        await SettingsService.instance.write(SettingsService.phoneCinematicSpotlight, cinematic);
+        await SettingsService.instance.write(SettingsService.phoneSpotlightSize, size);
+        tester.view.physicalSize = const Size(360, 780);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final item = items[1].copyWith(title: 'The Lord of the Rings: The Rings of Power');
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: monoTheme(MonoPalette.lurokaCoral),
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(scale)),
+              child: child!,
+            ),
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => SizedBox(
+                  height: MobileHomeCarousel.heightFor(context, 360, availableHeight: 700),
+                  child: MobileHomeCarousel(
+                    items: [item],
+                    label: 'Trending',
+                    active: true,
+                    resolveClient: (_) => null,
+                    onPlay: (_) {},
+                    onDetails: (_) {},
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byKey(ValueKey('cinematic_feature_${item.globalKey}')), cinematic ? findsOneWidget : findsNothing);
+        expect(find.byKey(ValueKey('mobile_feature_open_${item.globalKey}')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+      }
+    }
+  }
+
   testWidgets('swiping selects a new poster without playing; show and movie actions use their own target', (
     tester,
   ) async {
@@ -93,10 +166,13 @@ void main() {
   });
 
   testWidgets('auto rotation advances, pauses off-screen, resumes, and grants time after a swipe', (tester) async {
+    await SettingsService.instance.write(SettingsService.homeSpotlightInterval, 12);
     final active = ValueNotifier(true);
     addTearDown(active.dispose);
     await mount(tester, active: active);
-    await tester.pump(const Duration(seconds: 7));
+    await tester.pump(const Duration(seconds: 11));
+    expect(page(tester), 0);
+    await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
     expect(page(tester), 1);
     active.value = false;
@@ -108,9 +184,9 @@ void main() {
     await tester.drag(find.byType(PageView), const Offset(-320, 0));
     await tester.pumpAndSettle();
     expect(page(tester), 2);
-    await tester.pump(const Duration(seconds: 7));
-    expect(page(tester), 2, reason: 'a manual swipe gets a longer reading interval');
-    await tester.pump(const Duration(seconds: 6));
+    await tester.pump(const Duration(seconds: 11));
+    expect(page(tester), 2, reason: 'a manual swipe gets the configured reading interval');
+    await tester.pump(const Duration(seconds: 2));
     await tester.pumpAndSettle();
     expect(page(tester), 0, reason: 'rotation wraps around');
   });
@@ -126,6 +202,23 @@ void main() {
     expect(page(tester), 1);
   });
 
+  testWidgets('rotation setting changes apply while the carousel is open', (tester) async {
+    await SettingsService.instance.write(SettingsService.homeSpotlightInterval, 12);
+    await mount(tester);
+    await SettingsService.instance.write(SettingsService.homeSpotlightAutoRotate, false);
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 30));
+    expect(page(tester), 0);
+    await SettingsService.instance.write(SettingsService.homeSpotlightAutoRotate, true);
+    await SettingsService.instance.write(SettingsService.homeSpotlightInterval, 20);
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 19));
+    expect(page(tester), 0);
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(page(tester), 1);
+  });
+
   testWidgets('opening details pauses the carousel until the covering route closes', (tester) async {
     await mount(tester);
     final navigator = tester.state<NavigatorState>(find.byType(Navigator));
@@ -136,7 +229,7 @@ void main() {
     expect(hiddenPages.controller!.page, 0);
     navigator.pop();
     await tester.pumpAndSettle();
-    await tester.pump(const Duration(seconds: 7));
+    await tester.pump(const Duration(seconds: 15));
     await tester.pumpAndSettle();
     expect(page(tester), 1);
   });
@@ -153,6 +246,7 @@ void main() {
     testWidgets('${kids ? 'kids' : 'adult'} hero shows uncropped poster above a separate caption panel', (
       tester,
     ) async {
+      if (!kids) await SettingsService.instance.write(SettingsService.phoneCinematicSpotlight, false);
       await mount(tester, kidsStyle: kids ? const KidsStyle(maxAge: 7) : null);
       final poster = find.descendant(of: find.byType(PageView), matching: find.byType(OptimizedMediaImage)).first;
       expect(tester.widget<OptimizedMediaImage>(poster).fit, BoxFit.contain);

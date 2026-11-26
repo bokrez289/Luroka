@@ -239,6 +239,34 @@ class PlaybackInitializationService {
     return _discoverSidecarSubtitles(videoPath, metadata: metadata, mediaInfo: mediaInfo);
   }
 
+  /// Local-only detail picker for an already ownership-checked download.
+  Future<({MediaSourceInfo? source, Map<int, SubtitleTrack> files})> downloadedDetailTracks(
+    MediaItem item, DownloadedMediaItem row, int index,
+  ) async {
+    final cached = await CachedPlaybackMetadataService.fetchMediaSourceInfo(
+      backend: item.backend, cacheServerId: row.clientScopeId ?? row.serverId,
+      itemId: item.id, mediaIndex: index,
+    );
+    final local = await resolveDownloadedVideoSource(row, allowAnyDownloadedVersion: true);
+    final sidecars = local == null ? <PlaybackSubtitleSidecar>[] :
+        await _discoverSidecarSubtitles(local.path, metadata: item, mediaInfo: cached);
+    final subtitles = [for (final s in cached?.subtitleTracks ?? <MediaSubtitleTrack>[])
+      if (!s.isExternalFile || sidecars.any((file) => file.sourceStreamId == s.id)) s];
+    final files = <int, SubtitleTrack>{};
+    var synthetic = -2;
+    for (final file in sidecars) {
+      final id = file.sourceStreamId ?? synthetic--;
+      files[id] = file.track;
+      if (!subtitles.any((s) => s.id == id)) {
+        subtitles.add(MediaSubtitleTrack(id: id, title: file.track.title, languageCode: file.track.language,
+          selected: file.track.isDefault, forced: file.track.isForced, external: true));
+      }
+    }
+    final source = cached?.copyWith(audioTracks: cached.audioTracks.where((t) => !t.external).toList(), subtitleTracks: subtitles)
+        ?? (files.isEmpty ? null : MediaSourceInfo(videoUrl: '', audioTracks: [], subtitleTracks: subtitles, chapters: []));
+    return (source: source, files: files);
+  }
+
   Future<MediaSourceInfo?> _cachedMediaInfo(MediaItem metadata, int mediaIndex, {Duration? position}) async {
     try {
       final cacheServerId = await _resolveCacheServerId(metadata);

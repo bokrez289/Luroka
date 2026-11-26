@@ -189,15 +189,23 @@ class _KidsTimeLimitGateState extends State<KidsTimeLimitGate> with WidgetsBindi
                                     style: Theme.of(context).textTheme.headlineSmall,
                                   ),
                                   const SizedBox(height: 12),
-                                  Text(t.kids.timeLimitParentHint, textAlign: TextAlign.center),
-                                  const SizedBox(height: 24),
-                                  FilledButton(
-                                    focusNode: _unlockFocus,
-                                    onPressed: _unlock,
-                                    child: Text(t.kids.parentUnlock),
+                                  Text(
+                                    KidsProfileService.instance.parentPinOptedOut
+                                        ? t.kids.timeLimitNoPinHint
+                                        : t.kids.timeLimitParentHint,
+                                    textAlign: TextAlign.center,
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 24),
+                                  if (!KidsProfileService.instance.parentPinOptedOut) ...[
+                                    FilledButton(
+                                      focusNode: _unlockFocus,
+                                      onPressed: _unlock,
+                                      child: Text(t.kids.parentUnlock),
+                                    ),
+                                    const SizedBox(height: 8),
+                                  ],
                                   TextButton(
+                                    focusNode: KidsProfileService.instance.parentPinOptedOut ? _unlockFocus : null,
                                     onPressed: () => Navigator.of(
                                       context,
                                       rootNavigator: true,

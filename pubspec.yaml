@@ -1,7 +1,7 @@
 name: luroka
 description: "Luroka, a cinematic media client for Plex, Jellyfin, and Emby"
 publish_to: "none"
-version: 1.1.4+2068
+version: 1.1.9+2099
 
 environment:
   # Dart floor stays 3.12: freezed 3.x emits `final` constructor parameters,
@@ -201,6 +201,8 @@ flutter:
     # assets/app_icons/source, which stays out of the bundle.
     - assets/app_icons/previews/
     - assets/branding/kids-treehouse.webp
+    - assets/branding/kids-world-phone.webp
+    - assets/branding/kids-world-tv.webp
   # Registered as UI font families so the Linux build, whose fontconfig may
   # lack CJK fonts, can fall back to the bundled subtitle fonts (mono_theme).
   fonts:

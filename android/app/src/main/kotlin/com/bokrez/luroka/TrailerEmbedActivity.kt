@@ -57,7 +57,7 @@ class TrailerEmbedActivity : Activity() {
   }
   private val timeout = Runnable {
     if (!started && !isFinishing) {
-      if (!watchPage) openWatchPage() else fail(0)
+      if (!watchPage && !intent.getBooleanExtra("hasAlternate", false)) openWatchPage() else fail(0)
     }
   }
 
@@ -148,7 +148,7 @@ class TrailerEmbedActivity : Activity() {
       setInterval(function(){if(player&&player.getCurrentTime){LumoraPreview.progress(player.getCurrentTime(),player.getDuration());}},500);
       </script></body></html>"""
     web.loadDataWithBaseURL(origin, html, "text/html", "UTF-8", null)
-    handler.postDelayed(timeout, 45000)
+    handler.postDelayed(timeout, 18000)
     play.requestFocus()
   }
 
@@ -178,7 +178,7 @@ class TrailerEmbedActivity : Activity() {
     // iframe and otherwise receives YouTube's unsupported-WebView response.
     web.settings.userAgentString = web.settings.userAgentString
       .replace("; wv", "").replace("Version/4.0 ", "")
-    handler.removeCallbacks(timeout); handler.postDelayed(timeout, 60000)
+    handler.removeCallbacks(timeout); handler.postDelayed(timeout, 25000)
     android.util.Log.i("LumoraTrailers", "Opening in-app YouTube watch page")
     web.loadUrl("https://m.youtube.com/watch?v=$videoKey")
   }
@@ -304,7 +304,7 @@ class TrailerEmbedActivity : Activity() {
     } }
     @JavascriptInterface fun error(code: Int) { handler.post {
       if (destroyed) return@post
-      if (!watchPage) openWatchPage() else fail(code)
+      if (!watchPage && !intent.getBooleanExtra("hasAlternate", false)) openWatchPage() else fail(code)
     } }
   }
 }

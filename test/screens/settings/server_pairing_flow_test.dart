@@ -87,8 +87,14 @@ void main() {
           expect(request.followRedirects, isFalse);
           if (request.url.path == '/System/Info/Public') {
             expect(request.headers.containsKey('Authorization'), isFalse);
-            return http.Response(jsonEncode({'Id': 'server-id', 'ServerName': 'Private home',
-              'ProductName': chooseEmby ? 'Emby Server' : 'Jellyfin Server'}), 200);
+            return http.Response(
+              jsonEncode({
+                'Id': 'server-id',
+                'ServerName': 'Private home',
+                'ProductName': chooseEmby ? 'Emby Server' : 'Jellyfin Server',
+              }),
+              200,
+            );
           }
           if (request.url.path == '/Users/AuthenticateByName') {
             expect(jsonDecode(request.body), {'Username': 'Alice', 'Pw': 'private-password'});
@@ -164,6 +170,14 @@ void main() {
         expect(find.text('Server type'), findsOneWidget);
         expect(find.text('Emby'), findsOneWidget);
         expect(find.text('Jellyfin'), findsOneWidget);
+        final urlField = find.widgetWithText(TextField, 'Server URL');
+        final usernameField = find.widgetWithText(TextField, 'Username');
+        final passwordField = find.widgetWithText(TextField, 'Password');
+        await tester.ensureVisible(passwordField);
+        await tester.pump();
+        expect(tester.getTopLeft(usernameField).dy - tester.getBottomLeft(urlField).dy, greaterThanOrEqualTo(20));
+        expect(tester.getTopLeft(passwordField).dy - tester.getBottomLeft(usernameField).dy, greaterThanOrEqualTo(20));
+        expect(find.textContaining('Default: https://'), findsNothing);
         if (chooseEmby) {
           await tester.tap(find.text('Emby'));
           await tester.pump();

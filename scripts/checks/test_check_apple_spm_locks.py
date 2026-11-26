@@ -44,7 +44,7 @@ class AppleSpmLockCheckerTest(unittest.TestCase):
 
     def _write_manifests(self, version: str) -> None:
         source = f'.package(url: "https://github.com/getsentry/sentry-cocoa", exact: "{version}")\n'
-        for platform in ("ios",):
+        for platform in ("ios", "macos"):
             path = self.root / f"packages/sentry_flutter/{platform}/sentry_flutter/Package.swift"
             path.parent.mkdir(parents=True)
             path.write_text(source, encoding="utf-8")
@@ -103,15 +103,15 @@ class AppleSpmLockCheckerTest(unittest.TestCase):
 
         errors = CHECKER.validate(self.root)
 
-        self.assertEqual(2, sum("manifest requires exactly 8.58.3" in error for error in errors))
+        self.assertEqual(4, sum("manifest requires exactly 8.58.3" in error for error in errors))
 
     def test_reports_same_version_with_different_revision(self) -> None:
-        workspace = CHECKER.LOCK_PAIRS["iOS"][1]
+        workspace = CHECKER.LOCK_PAIRS["macOS"][1]
         self._write_lock(workspace, GOOD_VERSION, "different")
 
         errors = CHECKER.validate(self.root)
 
-        self.assertTrue(any("iOS SwiftPM locks differ" in error and "sentry-cocoa" in error for error in errors))
+        self.assertTrue(any("macOS SwiftPM locks differ" in error and "sentry-cocoa" in error for error in errors))
         self.assertTrue(any("state differs" in error for error in errors))
 
     def test_reports_missing_resolved_package_inputs(self) -> None:

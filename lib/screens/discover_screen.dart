@@ -76,7 +76,8 @@ import 'studios_screen.dart';
 import 'video_player_screen.dart' show VideoPlayerScreenState;
 
 class DiscoverScreen extends StatefulWidget {
-  const DiscoverScreen({super.key});
+  const DiscoverScreen({super.key, this.onKidsBrowse});
+  final ValueChanged<MediaKind>? onKidsBrowse;
 
   @override
   State<DiscoverScreen> createState() => _DiscoverScreenState();
@@ -1267,6 +1268,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
               ? KidsStyle(maxAge: KidsProfileService.instance.ageFor(KidsProfileService.instance.activeId!))
               : null,
           kidsName: context.read<ActiveProfileProvider>().active?.displayName,
+          onKidsBrowse: widget.onKidsBrowse,
           active: _isTabVisible,
           rows: _rows,
           onStudioTap: _openStudio,

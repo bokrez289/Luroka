@@ -94,14 +94,57 @@ void main() {
     }
   });
 
-  testWidgets('right from the last tab (Music) focuses and opens Sync Rules action', (tester) async {
+  testWidgets('All is the default offline poster grid and music appears only when present', (tester) async {
+    final movie = _downloadedMovie(0);
+    downloadProvider.debugSeedState(
+      downloads: {movie.globalKey: DownloadProgress(globalKey: movie.globalKey, status: DownloadStatus.completed)},
+      metadata: {movie.globalKey: movie},
+    );
+    final key = GlobalKey<DownloadsScreenState>();
+    await _pumpScreen(tester, db, downloadProvider, multiServerProvider, screenKey: key);
+    expect(key.currentState!.tabController.index, 0);
+    expect(find.byType(FocusableMediaCard), findsWidgets);
+    expect(find.text('Music'), findsNothing);
+    final track = testMediaItem(id: 'song', kind: MediaKind.track, title: 'Song', serverId: 'server');
+    downloadProvider.debugSeedState(
+      downloads: {
+        movie.globalKey: DownloadProgress(globalKey: movie.globalKey, status: DownloadStatus.completed),
+        track.globalKey: DownloadProgress(globalKey: track.globalKey, status: DownloadStatus.completed),
+      },
+      metadata: {movie.globalKey: movie, track.globalKey: track},
+    );
+    // debugSeedState mutates the fake without emitting a provider notification.
+    key.currentState!.tabController.index = 1;
+    await tester.pumpAndSettle();
+    expect(find.text('Music'), findsOneWidget);
+  });
+
+  testWidgets('remote skips an absent Music tab and Manage signals transfers', (tester) async {
+    final movie = _downloadedMovie(0);
+    downloadProvider.debugSeedState(
+      downloads: {movie.globalKey: DownloadProgress(globalKey: movie.globalKey, status: DownloadStatus.downloading)},
+      metadata: {movie.globalKey: movie},
+    );
+    final key = GlobalKey<DownloadsScreenState>();
+    await _pumpScreen(tester, db, downloadProvider, multiServerProvider, screenKey: key);
+    expect(find.text('Manage •'), findsOneWidget);
+    key.currentState!.tabController.index = 2;
+    key.currentState!.getTabChipFocusNode(2).requestFocus();
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+    expect(key.currentState!.tabController.index, 4);
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'tab_chip_queue');
+  });
+
+  testWidgets('right from the last tab (Manage) focuses and opens Sync Rules action', (tester) async {
     final screenKey = GlobalKey<DownloadsScreenState>();
 
     await _pumpScreen(tester, db, downloadProvider, multiServerProvider, screenKey: screenKey);
 
     final state = screenKey.currentState!;
-    state.tabController.index = 3;
-    state.getTabChipFocusNode(3).requestFocus();
+    state.tabController.index = 4;
+    state.getTabChipFocusNode(4).requestFocus();
     await tester.pumpAndSettle();
 
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
@@ -201,8 +244,8 @@ void main() {
     expect(find.byTooltip('Retry failed downloads'), findsOneWidget);
 
     final state = screenKey.currentState!;
-    state.tabController.index = 3;
-    state.getTabChipFocusNode(3).requestFocus();
+    state.tabController.index = 4;
+    state.getTabChipFocusNode(4).requestFocus();
     await tester.pumpAndSettle();
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
     await tester.pumpAndSettle();

@@ -575,7 +575,8 @@ class StudiosProvider extends ChangeNotifier with DisposableChangeNotifierMixin 
 /// comparing their heads keeps the chosen order correct across libraries, not
 /// merely within each downloaded page. A failed batch is fully retryable.
 class StudioItemsCursor {
-  StudioItemsCursor(this.sources, {required this.isVisible, this.sort = StudioSort.titleAscending, this.fetchPage});
+  StudioItemsCursor(List<StudioSource> sources, {required this.isVisible, this.sort = StudioSort.titleAscending, this.fetchPage})
+      : sources = List.of(sources);
   final List<StudioSource> sources;
   final bool Function(StudioSource) isVisible;
   final StudioSort sort;

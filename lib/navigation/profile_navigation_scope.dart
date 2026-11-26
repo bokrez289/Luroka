@@ -10,9 +10,20 @@ import 'package:flutter/material.dart';
 class ProfileNavigationRegistry {
   GlobalKey<NavigatorState>? _navigatorKey;
   GlobalKey<ScaffoldMessengerState>? _mainScaffoldMessengerKey;
+  VoidCallback? _showHome;
 
   NavigatorState? get navigator => _navigatorKey?.currentState;
   ScaffoldMessengerState? get mainScaffoldMessenger => _mainScaffoldMessengerKey?.currentState;
+
+  void attachHome(VoidCallback callback) => _showHome = callback;
+  void detachHome(VoidCallback callback) {
+    if (_showHome == callback) _showHome = null;
+  }
+
+  void showHome() {
+    navigator?.popUntil((route) => route.isFirst);
+    _showHome?.call();
+  }
 
   void attachNavigator(GlobalKey<NavigatorState> key) {
     _navigatorKey = key;

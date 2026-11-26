@@ -300,6 +300,7 @@
     "notificationProgress": "{progress} · {networkSpeed} · {timeRemaining} qalan"
   },
   "kidsShelf": {
+    "quietScenery": "Sakit gecə mənzərəsi",
     "movieShelf": "Kino vaxtı",
     "showShelf": "Növbəti verilişinizi tapın",
     "aurora": "Aurora - dərin çay və əhəng",
@@ -604,7 +605,9 @@
     "availabilityUnknown": "Bəzi kitabxanaları yoxlamaq mümkün olmadı. Təravətləndirməyə çalışın.",
     "noAvailable": "Yoxlanılan kitabxanalarda heç bir uyğun başlıq tapılmadı.",
     "sourceInfo": "Həftəlik trendlər və seçilmiş mükafat qalibləri · TMDb",
-    "configure": "Kəşf parametrləri"
+    "configure": "Kəşf parametrləri",
+    "filterOwned": "Kitabxanalarımda",
+    "statusRetry": "Seerr yoxlanmadı · Yenidən cəhd edin"
   },
   "app": {
     "title": "Luroka"
@@ -1139,7 +1142,11 @@
     "playerScopeLibrary": "Kitabxana üzrə",
     "playerScopeTitle": "Serial və ya film üzrə",
     "exportDialogTitle": "Luroka tənzimləmələrini ixrac et",
-    "velvetHourTheme": "Məxmər Saat"
+    "velvetHourTheme": "Məxmər Saat",
+    "backdropBrightness": "Fonun parlaqlığı",
+    "backdropBrightnessDescription": "Ana səhifə və məzmun şəkillərinin üzərindəki qaraltmanı tənzimləyin. Standart dəyər 100%-dir.",
+    "showEarlyNextEpisode": "Bölüm bitməzdən əvvəl növbəti bölümü göstər",
+    "showEarlyNextEpisodeDescription": "Növbəti bölümü titrlər zamanı və ya son 30 saniyədə göstərin."
   },
   "themeEditor": {
     "builtIn": "Daxili",
@@ -1311,6 +1318,9 @@
     "episodesLeft": "${count} epizodları qalıb"
   },
   "lurokaThemes": {
+    "patina": "Patina · tünd firuzəyi və mis",
+    "afterimage": "Afterimage · indiqo və neon çəhrayı",
+    "letterpress": "Letterpress · kağız və tünd qırmızı mürəkkəb",
     "title": "Luroka kinoteatr palitraları",
     "coral": "Mərcan · gecə yarısı mavi və gün batımı",
     "ocean": "Okean · dərin mavi və buz",
@@ -1394,7 +1404,15 @@
     "reset": "Defolt sıraları bərpa edin",
     "resetDescription": "Orijinal sıra sırası bərpa edilsin və bu profil üçün bütün sıralar göstərilsin? Bağlanmış kolleksiyalarınız saxlanılacaq.",
     "saveFailed": "Ev tərtibatınızı saxlamaq mümkün olmadı. Yenidən cəhd edin.",
-    "emptyHint": "Sətirlər gizlədilə bilər. Onları yenidən göstərmək üçün Fərdiləşdirin Əsas səhifəni açın."
+    "emptyHint": "Sətirlər gizlədilə bilər. Onları yenidən göstərmək üçün Fərdiləşdirin Əsas səhifəni açın.",
+    "upcomingEpisodes": "Yaxınlaşan bölümlər",
+    "upcomingFavorites": "Sevimlilər",
+    "upcomingWatched": "Əvvəllər izlənənlər",
+    "upcomingBoth": "Sevimlilər və əvvəllər izlənənlər",
+    "upcomingAll": "Bütün seriallar",
+    "upcomingOff": "Söndürülü",
+    "airDate": "Yayım tarixi: ${date}",
+    "upcomingHint": "Yaxınlaşan yayım tarixləri yalnız bu sıra aktiv olduqda arxa planda yoxlanılır. Nəticələr məhduddur və serverinizdə hələ mövcud olmaya bilər."
   },
   "screenTime": {
     "title": "Ekran vaxtı",
@@ -1449,7 +1467,35 @@
     "sessionNoTitle": "Naməlum oxutma",
     "emptyTitle": "Burada hələ heç nə yoxdur",
     "emptyBody": "Bir şeyə baxın və statistikanız burada qurulacaq.",
-    "noDataInPeriod": "Bu müddətdə heç bir oxutma qeydə alınmayıb."
+    "noDataInPeriod": "Bu müddətdə heç bir oxutma qeydə alınmayıb.",
+    "patternsTab": "İzləmə vərdişləri",
+    "moviesFilter": "Filmlər",
+    "episodesFilter": "Bölümlər",
+    "datesFilter": "Tarixlər",
+    "titlesPlayed": "${count} məzmun başladılıb · bölümlər ayrıca sayılır",
+    "previousPeriod": "Əvvəlki dövr",
+    "lifetimeSummary": "Bütün dövr: ${total} · Gündəlik orta: ${average}",
+    "dailyAverage": "Gündəlik orta",
+    "allKinds": "Hamısı",
+    "titlesPlayedLabel": "Oynadılmış məzmun",
+    "ledgerScope": "Fəaliyyət bu profilin yerli Luroka oxutma jurnalından götürülür. Serverin izləmə tarixçəsi və digər tətbiqlərdə oxutma daxil deyil.",
+    "chartScale": "Şkala: 0 – ${duration}",
+    "gettingStarted": "Fəaliyyət yenicə başlayır. İzləmə vərdişləri bir neçə aktiv gündən sonra görünəcək.",
+    "history": "Tarixçə",
+    "insufficientHistory": "Tarixçə kifayət deyil",
+    "monthlyRecap": "Aylıq xülasə",
+    "noMatches": "Bu filtrlərə uyğun izləmə yoxdur.",
+    "activeDays": "Aktiv günlər",
+    "measurementHint": "Vaxt tamamlanmış məzmunu deyil, qeydə alınmış oxutmanı göstərir.",
+    "historyError": "Tarixçə yüklənmədi. Yenidən cəhd edin.",
+    "watchedPeriod": "Bu dövrdə izlənən",
+    "monthWatched": "Bu ay ${duration} izlənib",
+    "drillDown": "Bu tarixlər üçün fəaliyyətə bax",
+    "searchHistory": "İzləmə tarixçəsində axtar",
+    "clearDates": "Tarixləri təmizlə",
+    "playedHint": "Bölümlər ayrıca sayılır. Oxutma vaxtı məzmunun tamamlandığını göstərmir.",
+    "allHistory": "Bütün tarixçəyə bax",
+    "overview": "Ümumi baxış"
   },
   "search": {
     "hint": "Kino, serial, musiqi axtar...",
@@ -1655,7 +1701,8 @@
     "mediaFailedToDelete": "Media elementi silinə bilmədi",
     "rate": "Qiymətləndir",
     "playFromBeginning": "Əvvəldən oynat",
-    "playVersion": "Versiyanı oynat..."
+    "playVersion": "Versiyanı oynat...",
+    "removeFromNextUp": "Növbəti siyahısından çıxar"
   },
   "rateSheet": {
     "title": "Qiymətləndir",
@@ -1664,7 +1711,9 @@
     "favorited": "Sevimlilərə əlavə edildi",
     "saved": "Yadda saxlanıldı",
     "notAvailable": "Uyğunluq tapılmadı",
-    "noConnectedServices": "Orada qiymətləndirmək üçün Tənzimləmələrdən xidmət qoşun."
+    "noConnectedServices": "Orada qiymətləndirmək üçün Tənzimləmələrdən xidmət qoşun.",
+    "addFavorite": "Sevimlilərə əlavə et",
+    "removeFavorite": "Sevimlilərdən çıxar"
   },
   "accessibility": {
     "mediaCardMovie": "${title}, kino",
@@ -1873,7 +1922,9 @@
     "streamSelectionUnavailable": "Bu mənbə üçün yayım seçimi mövcud deyil",
     "streamSelectionFailed": "Seçilmiş yayımları tətbiq etmək olmadı",
     "trackSelectionNotRemembered": "Bu trek seçimi yalnız cari oynatmaya tətbiq olunur.",
-    "serverUnavailableForProfile": "Aktiv profil üçün heç bir server mövcud deyil"
+    "serverUnavailableForProfile": "Aktiv profil üçün heç bir server mövcud deyil",
+    "logSupportReference": "Dəstək istinadı",
+    "copyFullLogId": "Tam jurnal ID-sini kopyala"
   },
   "sourceLibraries": {
     "title": "Serverləriniz və kitabxanalarınız",
@@ -3596,5 +3647,39 @@
     "redirectDifferentHost": "Server başqa hosta yönləndirdi. Son ${product} URL-ni birbaşa daxil edin.",
     "redirectInsecure": "Server HTTPS-dən təhlükəsiz olmayan URL-ə yönləndirdi",
     "redirectUnsupportedEnterFinal": "Server dəstəklənməyən URL-ə yönləndirdi. Son ${product} URL-ni birbaşa daxil edin."
+  },
+  "episodeDetails": {
+    "previous": "Əvvəlki bölüm",
+    "next": "Növbəti bölüm"
+  },
+  "tvEdgeMenu": {
+    "title": "TV naviqasiyası",
+    "top": "Üst panel",
+    "both": "Üst panel və yan menyu",
+    "hint": "Yan menyunu açmaq üçün sıranın ilk elementində sola basın. Qayıtmaq üçün sağa və ya Geri düyməsinə basın.",
+    "tryMenu": "Naviqasiyanı sınayın",
+    "allLibraries": "Bütün kitabxanalar",
+    "browse": "Gözdən keçir",
+    "more": "Daha çox",
+    "closeHint": "Bağlamaq üçün sağa və ya Geri basın"
+  },
+  "showDetailLayout": {
+    "title": "Serial təfərrüatlarının düzülüşü",
+    "description": "Serial və bölümlərin televizorda necə göstəriləcəyini seçin.",
+    "compact": "Yığcam bölüm siyahısı",
+    "cinematic": "Kino üslubu",
+    "seasons": "Mövsüm seçin",
+    "episodes": "Bölümlər",
+    "details": "Təfərrüatlar",
+    "cast": "Aktyor heyəti",
+    "related": "Oxşar filmlər və seriallar"
+  },
+  "iconStyles": {
+    "title": "Nişan üslubu",
+    "description": "Tətbiq idarəetmələrinin görünüşünü seçin. Dəyişikliklər bu profilə tətbiq edilir.",
+    "current": "Luroka Bold",
+    "lucide": "Lucide",
+    "lucideDescription": "Sadə xətti nişanlar; mövcud olmayan nişanlar Material nişanları ilə əvəz edilir.",
+    "outline": "Material Outline"
   }
 }

@@ -1395,6 +1395,14 @@ void main() {
       expect(first.first.serverId, 'server');
       expect(first.first.libraryId, 'movies');
       expect(client.contentCalls.map((query) => query.offset), [0, 40, 80]);
+      final newSource = StudioSource(
+        library: studioLibrary('additional'), client: StudioTestClient('server'),
+        kind: MediaKind.movie, studio: const MediaStudio(id: '99', name: 'Studio'),
+      );
+      cursor.sources.add(newSource);
+      expect(cursor.hasMore, true);
+      await cursor.next(abort);
+      expect(client.contentCalls.map((query) => query.offset), [0, 40, 80]);
       expect(
         client.contentCalls.every(
           (query) => query.filters.single.values.single == '42' && query.kind == MediaKind.movie,

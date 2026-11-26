@@ -467,7 +467,7 @@ class _ProfileSwitchScreenState extends State<ProfileSwitchScreen> with MountedS
                   ? () => menuFocusNode.requestFocus()
                   : null,
               onNavigateLeft: index > 0 ? () => _profileFocusNode(profiles[index - 1]).requestFocus() : null,
-              onSelect: _switching || (isActive && !widget.requireSelection) ? null : () => _switchTo(profile),
+              onSelect: _switching ? null : () => _switchTo(profile),
               child: _ProfileTile(
                 borderRadius: tileRadii,
                 cinematic: true,
@@ -525,9 +525,17 @@ class _ProfileSwitchScreenState extends State<ProfileSwitchScreen> with MountedS
   }
 
   Future<void> _manageProfile(Profile profile) async {
-    if (!await _verifyPinForProfileAction(profile)) return;
-    if (!mounted) return;
-    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => ProfileDetailScreen(profile: profile)));
+    final access = FamilyParentAccess(context.read<ActiveProfileProvider>());
+    try {
+      if (!await ensureProfileManagementAccess(context, profile, familyAccess: access) || !mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ProfileDetailScreen(profile: profile, familyAccess: access),
+        ),
+      );
+    } finally {
+      access.dispose();
+    }
   }
 
   Future<void> _manageIntegrations(Profile profile) async {
@@ -650,9 +658,9 @@ class _ProfileSwitchScreenState extends State<ProfileSwitchScreen> with MountedS
     if (!await ensureParentAccess(context) || !mounted) return;
     final active = context.read<ActiveProfileProvider>();
     final previousId = active.activeId;
-    final created = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(builder: (_) => const AddLocalProfileScreen(offerSwitchAfterCreate: true)),
-    );
+    final created = await Navigator.of(
+      context,
+    ).push<bool>(MaterialPageRoute(builder: (_) => const AddLocalProfileScreen(offerSwitchAfterCreate: true)));
     if (!mounted || created != true || active.activeId == previousId || active.activeId == null) return;
     if (widget.requireSelection) setState(() => _allowPop = true);
     final route = ModalRoute.of(context);
@@ -665,6 +673,13 @@ class _ProfileSwitchScreenState extends State<ProfileSwitchScreen> with MountedS
     try {
       final route = ModalRoute.of(context);
       final navigator = Navigator.of(context, rootNavigator: true);
+      if (!widget.requireSelection && context.read<ActiveProfileProvider>().activeId == profile.id) {
+        if (route != null && route.isCurrent) {
+          navigator.pop(true);
+          profileNavigationRegistry.showHome();
+        }
+        return;
+      }
       final switched = await switchProfileFromUi(context, profile);
       if (!mounted || !switched) return;
       if (widget.requireSelection) {
@@ -727,7 +742,7 @@ class _ProfileTile extends StatelessWidget {
       final family = KidsProfileService.instance.useKidsTheme;
       return InkWell(
         canRequestFocus: false,
-        onTap: isActive ? null : onTap,
+        onTap: onTap,
         onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -829,7 +844,7 @@ class _ProfileTile extends StatelessWidget {
     }
     return InkWell(
       canRequestFocus: false,
-      onTap: isActive ? null : onTap,
+      onTap: onTap,
       onLongPress: onLongPress,
       borderRadius: borderRadius,
       child: Padding(

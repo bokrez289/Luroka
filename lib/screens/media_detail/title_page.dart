@@ -218,7 +218,7 @@ extension _TitlePagePresentation on _MediaDetailScreenState {
                               focusNode: _tvDetailInfoFocusNode,
                               onSelect: openDetails,
                               onNavigateUp: _backButtonFocusNode.requestFocus,
-                              onNavigateDown: !widget.isOffline && _playbackTargetItem(item) != null
+                              onNavigateDown: _playbackTargetItem(item) != null
                                   ? _detailAudioFocus.requestFocus
                                   : _focusTvDetailActionRow,
                               onBack: _popMediaDetailIfBackNotSuppressed,
@@ -403,7 +403,7 @@ extension _TitlePagePresentation on _MediaDetailScreenState {
                 ),
               ),
             ),
-            if (!widget.isOffline && _playbackTargetItem(item) != null) ...[
+            if (_playbackTargetItem(item) != null) ...[
               SizedBox(height: 8 * scale),
               SizedBox(width: textWidth, child: _buildTitlePlaybackPanel(context, item, scale)),
             ],

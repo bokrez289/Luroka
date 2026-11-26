@@ -145,6 +145,7 @@ class WatchNextProvider internal constructor(
 
   private val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
   private val artwork = SystemShelfArtworkStore(context.cacheDir)
+  private val previewChannel = PreviewChannelPublisher(context)
   private data class CommittedPublication(
     val ownerId: String,
     val generation: Long,
@@ -260,7 +261,7 @@ class WatchNextProvider internal constructor(
           artwork.delete(publishedFiles)
           return@whileCurrent false
         }
-        if (session.isExpired() || !replaceRows(preparedItems)) {
+        if (session.isExpired() || !replaceRows(ownerId, preparedItems)) {
           val rollback = prefs.edit()
             .putStringSet(GRANTED_URIS, oldUris.mapTo(LinkedHashSet(), Uri::toString))
             .putStringSet(GRANTED_PACKAGES, oldPackages)
@@ -479,14 +480,18 @@ class WatchNextProvider internal constructor(
   private fun removeItemOwned(ownerId: String, contentId: String): Boolean {
     return try {
       val rows = queryCommittedRows() ?: return false
-      val target = rows.firstOrNull { it.contentId == contentId } ?: return false
-      val deleteUri = ContentUris.withAppendedId(
-        TvContractCompat.WatchNextPrograms.CONTENT_URI,
-        target.id
-      )
-      if (context.contentResolver.delete(deleteUri, null, null) <= 0) return false
+      val target = rows.firstOrNull { it.contentId == contentId }
+      val operations = ArrayList<ContentProviderOperation>()
+      val pending = previewChannel.appendRemove(ownerId, contentId, operations)
+      if (target != null) {
+        val deleteUri = ContentUris.withAppendedId(TvContractCompat.WatchNextPrograms.CONTENT_URI, target.id)
+        operations.add(ContentProviderOperation.newDelete(deleteUri).withExpectedCount(1).build())
+      }
+      if (operations.isEmpty()) return false
+      context.contentResolver.applyBatch(TvContractCompat.AUTHORITY, operations)
+      previewChannel.commit(pending)
 
-      val poster = target.posterUri ?: return true
+      val poster = target?.posterUri ?: return true
       if (rows.any { it.id != target.id && it.posterUri == poster }) return true
       revokeReadAccess(setOf(poster))
       val remaining = prefs.getStringSet(GRANTED_URIS, emptySet()).orEmpty() - poster.toString()
@@ -499,8 +504,9 @@ class WatchNextProvider internal constructor(
     }
   }
 
-  private fun replaceRows(items: List<PreparedWatchNextItem>): Boolean = try {
+  private fun replaceRows(ownerId: String, items: List<PreparedWatchNextItem>): Boolean = try {
     val operations = ArrayList<ContentProviderOperation>(items.size + 1)
+    val pending = previewChannel.appendSync(ownerId, items, operations) { buildProgram(it).toContentValues() }
     operations += ContentProviderOperation.newDelete(TvContractCompat.WatchNextPrograms.CONTENT_URI).build()
     items.forEach { item ->
       val values = buildProgram(item).toContentValues().apply {
@@ -514,6 +520,7 @@ class WatchNextProvider internal constructor(
         .build()
     }
     context.contentResolver.applyBatch(TvContractCompat.AUTHORITY, operations)
+    previewChannel.commit(pending)
     true
   } catch (_: Exception) {
     Log.e(TAG, "Failed to sync Watch Next programs")
@@ -559,7 +566,7 @@ class WatchNextProvider internal constructor(
     // Grants are reboot-volatile even if the persisted consumer set has not changed.
     if (!grantReadAccess(publication.uris, packages)) return@whileCurrent false
     if (!isOperationActive() || session.isExpired()) return@whileCurrent false
-    if (!updateProgressRows(items, rows)) return@whileCurrent false
+    if (!updateProgressRows(ownerId, items, rows)) return@whileCurrent false
     lastPublication = publication
     true
   }
@@ -574,8 +581,10 @@ class WatchNextProvider internal constructor(
     previous.seasonNumber == current.seasonNumber &&
     previous.episodeNumber == current.episodeNumber
 
-  private fun updateProgressRows(items: List<WatchNextItem>, rows: List<CommittedRow>): Boolean = try {
+  private fun updateProgressRows(ownerId: String, items: List<WatchNextItem>, rows: List<CommittedRow>): Boolean = try {
     val operations = ArrayList<ContentProviderOperation>(items.size)
+    val prepared = items.mapIndexed { index, item -> PreparedWatchNextItem(item, rows[index].posterUri) }
+    val pending = previewChannel.appendSync(ownerId, prepared, operations) { buildProgram(it).toContentValues() }
     items.forEachIndexed { index, item ->
       val values = ContentValues(4).apply {
         put(
@@ -601,6 +610,7 @@ class WatchNextProvider internal constructor(
       ).withValues(values).withExpectedCount(1).build()
     }
     context.contentResolver.applyBatch(TvContractCompat.AUTHORITY, operations)
+    previewChannel.commit(pending)
     true
   } catch (_: Exception) {
     Log.e(TAG, "Failed to update Watch Next progress")
@@ -608,7 +618,11 @@ class WatchNextProvider internal constructor(
   }
 
   private fun deleteRows(): Boolean = try {
-    context.contentResolver.delete(TvContractCompat.WatchNextPrograms.CONTENT_URI, null, null)
+    val operations = ArrayList<ContentProviderOperation>()
+    val pending = previewChannel.appendClear(operations)
+    operations.add(ContentProviderOperation.newDelete(TvContractCompat.WatchNextPrograms.CONTENT_URI).build())
+    context.contentResolver.applyBatch(TvContractCompat.AUTHORITY, operations)
+    previewChannel.commit(pending)
     true
   } catch (_: Exception) {
     Log.e(TAG, "Failed to clear Watch Next entries")

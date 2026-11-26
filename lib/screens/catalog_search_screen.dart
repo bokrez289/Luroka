@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/explore_provider.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../i18n/strings.g.dart';
@@ -42,8 +44,10 @@ class _CatalogSearchScreenState extends State<CatalogSearchScreen>
 
   @override
   Future<List<MediaItem>> performSearchQuery(String query) async {
+    final explore = context.read<ExploreProvider?>();
     final items = await widget.source.search(query);
-    return [for (final item in items) item.toMediaItem()];
+    final media = [for (final item in items) item.toMediaItem()];
+    return explore?.matcher == null ? media : explore!.librarySearchResults(media);
   }
 
   @override

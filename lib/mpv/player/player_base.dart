@@ -851,7 +851,7 @@ abstract class PlayerBase with PlayerStreamControllersMixin implements Player {
             isForced: matchedMetadata?.isForced ?? (track['forced'] == true),
             isExternal: track['external'] == true,
             isContainer: isContainer,
-            uri: externalFilename,
+            uri: matchedMetadata?.uri ?? externalFilename,
           ),
         );
       }
@@ -921,6 +921,14 @@ abstract class PlayerBase with PlayerStreamControllersMixin implements Player {
   @protected
   void resumeTrackListAdoption() {
     _deferringTrackList = false;
+  }
+
+  @protected
+  void registerDownloadedSubtitle(String filename, SubtitleTrack original) {
+    _externalSubtitleMetadataByUri = {
+      ..._externalSubtitleMetadataByUri,
+      filename: [original],
+    };
   }
 
   @protected

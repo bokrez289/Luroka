@@ -395,7 +395,7 @@ extension _VideoPlayerPlaybackServiceMethods on VideoPlayerScreenState {
 
     if (progressTracker != null) {
       try {
-        await TrackerCoordinator.instance.stopPlayback();
+        await Future.wait<void>([TrackerCoordinator.instance.stopPlayback()]);
       } catch (e, st) {
         appLogger.w('Failed to stop scrobblers during initialization rollback', error: e, stackTrace: st);
       }
@@ -658,6 +658,7 @@ extension _VideoPlayerPlaybackServiceMethods on VideoPlayerScreenState {
       }),
     );
 
+    if (!widget.isLive) {}
 
     _mediaControlSubscriptions.add(
       currentPlayer.streams.seekable.listen((_) {

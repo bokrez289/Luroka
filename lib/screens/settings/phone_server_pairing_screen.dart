@@ -501,16 +501,17 @@ class _PhoneServerPairingScreenState extends State<PhoneServerPairingScreen> {
                       decoration: InputDecoration(
                         labelText: 'Server URL',
                         hintText: 'media.example.com',
-                        helperText: 'Default: $_scheme://',
                         border: const OutlineInputBorder(),
                       ),
                     ),
+                    const SizedBox(height: 20),
                     TextField(
                       controller: _username,
                       autocorrect: false,
                       enableSuggestions: false,
                       decoration: const InputDecoration(labelText: 'Username'),
                     ),
+                    const SizedBox(height: 20),
                     TextField(
                       controller: _password,
                       obscureText: true,

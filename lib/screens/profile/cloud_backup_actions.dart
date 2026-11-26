@@ -64,7 +64,7 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
   final _selected = <String>{};
   final _kids = KidsProfileService.instance;
   int _policyRevision = 0;
-  bool _includeCredentials = false;
+  bool _includeCredentials = true;
   bool _busy = false;
   String? _progress;
   CloudBackupRecoveryCode? _recoveryCode;
@@ -297,7 +297,10 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
                       const SizedBox(height: 16),
                       const LinearProgressIndicator(),
                       const SizedBox(height: 8),
-                      const Text('Your data stays encrypted. This can take a moment on a TV. Please keep Luroka open.', textAlign: TextAlign.center),
+                      const Text(
+                        'Your data stays encrypted. This can take a moment on a TV. Please keep Luroka open.',
+                        textAlign: TextAlign.center,
+                      ),
                     ],
                   )
                 : Column(
@@ -329,7 +332,7 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
                       FocusableListTile(
                         title: const Text('Include saved server and integration logins'),
                         subtitle: const Text(
-                          'Helps reconnect after restoring. Anyone with the recovery code may be able to use these logins.',
+                          'Includes linked Plex accounts and other saved logins to help reconnect. Anyone with the recovery code may be able to use them.',
                         ),
                         selected: _includeCredentials,
                         trailing: Icon(_includeCredentials ? Icons.check_box : Icons.check_box_outline_blank),
@@ -337,6 +340,8 @@ class _CloudBackupCreationState extends State<_CloudBackupCreation> {
                             ? null
                             : () => setState(() => _includeCredentials = !_includeCredentials),
                       ),
+                      if (!_includeCredentials)
+                        const Text('Without saved logins, you will need to reconnect servers after restoring.'),
                       const Text('Downloads are not included.'),
                     ],
                   ),
@@ -605,7 +610,11 @@ class _SaveRecoveryCodeDialogState extends State<_SaveRecoveryCodeDialog> {
 
 /// Restores only after a preview and an explicit confirmation. This is intended
 /// for the sign-in screen, before any profile/database content exists.
-Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? client, ServerPairingClient? pairingClient}) async {
+Future<bool> showCloudBackupRestore(
+  BuildContext context, {
+  CloudBackupClient? client,
+  ServerPairingClient? pairingClient,
+}) async {
   final db = context.read<AppDatabase>();
   if ((await db.select(db.profiles).get()).isNotEmpty || (await db.select(db.connections).get()).isNotEmpty) {
     if (context.mounted) {
@@ -636,24 +645,26 @@ Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? cl
   var applying = false;
   ScopedLoadingDialogController? progress;
   Future<void> showProgress(String message) async {
-    progress = ScopedLoadingDialogController()..show(
-      context,
-      builder: (_) => PopScope(
-        canPop: false,
-        child: AlertDialog(
-          content: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(width: 24),
-              Flexible(child: Text(message)),
-            ],
+    progress = ScopedLoadingDialogController()
+      ..show(
+        context,
+        builder: (_) => PopScope(
+          canPop: false,
+          child: AlertDialog(
+            content: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(width: 24),
+                Flexible(child: Text(message)),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
     await progress!.ready;
   }
+
   try {
     final parsed = CloudBackupRecoveryCode.parse(code);
     await showProgress('Finding and opening your encrypted backup…');
@@ -688,8 +699,7 @@ Future<bool> showCloudBackupRestore(BuildContext context, {CloudBackupClient? cl
     if (applying) {
       try {
         await LurokaBackupSnapshot.recoverInterruptedRestore(db);
-        if ((await db.select(db.profiles).get()).isNotEmpty ||
-            (await db.select(db.connections).get()).isNotEmpty) {
+        if ((await db.select(db.profiles).get()).isNotEmpty || (await db.select(db.connections).get()).isNotEmpty) {
           return true;
         }
       } catch (_) {
@@ -804,9 +814,11 @@ class _TvRecoveryCodeDialogState extends State<_TvRecoveryCodeDialog> {
     if (attempt == null) {
       if (widget.relay == null) _relay.close();
     } else {
-      unawaited(attempt.cancel().catchError((Object _) {}).whenComplete(() {
-        if (widget.relay == null) _relay.close();
-      }));
+      unawaited(
+        attempt.cancel().catchError((Object _) {}).whenComplete(() {
+          if (widget.relay == null) _relay.close();
+        }),
+      );
     }
     super.dispose();
   }
@@ -851,8 +863,11 @@ class _TvRecoveryCodeDialogState extends State<_TvRecoveryCodeDialog> {
                           const Text('Waiting for your phone to connect…')
                         else ...[
                           const Text('Compare this code with your phone:'),
-                          Text(code, key: const ValueKey('tv-restore-check-code'),
-                              style: Theme.of(context).textTheme.headlineMedium),
+                          Text(
+                            code,
+                            key: const ValueKey('tv-restore-check-code'),
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
                         ],
                       ],
                     ),

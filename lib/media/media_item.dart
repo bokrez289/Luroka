@@ -383,6 +383,16 @@ sealed class MediaItem with _$MediaItem {
     return viewOffsetMs! > 0 && viewOffsetMs! < durationMs!;
   }
 
+  /// Presentation-only grace period. Short clips use 10% of their duration,
+  /// capped at 30 seconds, so their genuine progress is not hidden entirely.
+  /// This never changes the server's saved watch state.
+  bool get hasMeaningfulProgress {
+    final position = viewOffsetMs ?? 0;
+    if (position <= 0 || (durationMs != null && durationMs! > 0 && position >= durationMs!)) return false;
+    final threshold = durationMs != null && durationMs! > 0 ? (durationMs! ~/ 10).clamp(1000, 30000) : 30000;
+    return position >= threshold;
+  }
+
   /// Whether this item still counts toward an "unwatched only" selection:
   /// not fully watched, or watched-but-resumable (has active progress). The
   /// shared predicate behind every `unwatchedOnly` filter (downloads, sync

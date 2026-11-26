@@ -81,9 +81,14 @@ enum ThemeMode {
   lurokaNocturne,
   lurokaSunrise,
   lurokaCoastal,
-  lurokaLatte;
+  lurokaLatte,
+  lurokaPatina,
+  lurokaAfterimage,
+  lurokaLetterpress;
 
   static const cinemaDark = [
+    lurokaPatina,
+    lurokaAfterimage,
     lurokaAurora,
     lurokaMarquee,
     lurokaElectric,
@@ -100,6 +105,7 @@ enum ThemeMode {
     velvetHour,
   ];
   static const cinemaLight = [
+    lurokaLetterpress,
     lurokaSunrise,
     lurokaCoastal,
     lurokaLatte,
@@ -110,8 +116,8 @@ enum ThemeMode {
   ];
 
   /// A concise, varied first page. Other current themes stay in More themes.
-  static const featuredDark = [lurokaCoral, lurokaObsidian, lurokaElectric, lurokaOcean, lurokaJade, lurokaAmethyst];
-  static const featuredLight = [lurokaSunrise, lurokaCoastal, lurokaLatte];
+  static const featuredDark = [lurokaCoral, lurokaObsidian, lurokaElectric, lurokaPatina, lurokaAfterimage, lurokaOcean];
+  static const featuredLight = [lurokaSunrise, lurokaLetterpress, lurokaCoastal];
 
   /// Kept as persisted IDs for existing installations, but retired from the picker.
   bool get isLegacy => const {system, light, dark, oled, ember, glacier, forest, plum, paper}.contains(this);
@@ -143,6 +149,9 @@ enum ThemeMode {
     lurokaSunrise ||
     lurokaCoastal ||
     lurokaLatte ||
+    lurokaPatina ||
+    lurokaAfterimage ||
+    lurokaLetterpress ||
     velvetHour => false,
     ember || glacier || forest || plum || paper || custom => true,
   };
@@ -165,6 +174,8 @@ class LibraryDensity {
 enum GridSpacing { tight, normal, spacious }
 
 enum HomeHeroSize { compact, small, medium, large }
+
+enum PhoneSpotlightSize { compact, standard, large }
 
 HomeHeroSize _homeHeroSizeDefault() => PlatformDetector.isTV() ? HomeHeroSize.small : HomeHeroSize.medium;
 
@@ -1017,6 +1028,12 @@ class SettingsService extends BaseSharedPreferencesService {
   static const mobileSettingsAdvancedMode = BoolPref('luroka_mobile_settings_advanced', defaultValue: false);
   static const homeSpotlightAutoRotate = BoolPref('luroka_home_spotlight_auto_rotate', defaultValue: true);
   static const homeSpotlightInterval = IntPref('luroka_home_spotlight_interval', defaultValue: 15);
+  static const phoneSpotlightSize = EnumPref<PhoneSpotlightSize>(
+    'luroka_phone_spotlight_size',
+    values: PhoneSpotlightSize.values,
+    defaultValue: PhoneSpotlightSize.compact,
+  );
+  static const phoneCinematicSpotlight = BoolPref('luroka_phone_cinematic_spotlight', defaultValue: true);
   static const alwaysKeepSidebarOpen = BoolPref('always_keep_sidebar_open');
 
   /// Sidebar Libraries section expansion. Persisted so a collapsed section
@@ -1031,6 +1048,8 @@ class SettingsService extends BaseSharedPreferencesService {
   static const showSeasonPostersOnTabs = BoolPref('show_season_posters_on_tabs');
   static const hideSpoilers = BoolPref('hide_spoilers');
   static const showNavBarLabels = BoolPref('show_nav_bar_labels', defaultValue: true);
+  static const tvEdgeMenu = BoolPref('tv_edge_navigation_menu', defaultValue: false);
+  static const discoverAvailableOnly = BoolPref('discover_available_only', defaultValue: false);
   static const globalShaderPreset = StringPref('global_shader_preset', defaultValue: 'none');
   static const requireProfileSelectionOnOpen = BoolPref('require_profile_selection_on_open');
   static const autoLoginLastProfile = BoolPref('luroka_auto_login_last_profile');
@@ -1296,6 +1315,8 @@ class SettingsService extends BaseSharedPreferencesService {
     compactTvLibraryNavigation.key,
     homeSpotlightAutoRotate.key,
     homeSpotlightInterval.key,
+    phoneSpotlightSize.key,
+    phoneCinematicSpotlight.key,
     alwaysKeepSidebarOpen.key,
     librariesSectionExpanded.key,
     showUnwatchedCount.key,
@@ -1304,6 +1325,8 @@ class SettingsService extends BaseSharedPreferencesService {
     showSeasonPostersOnTabs.key,
     hideSpoilers.key,
     showNavBarLabels.key,
+    tvEdgeMenu.key,
+    discoverAvailableOnly.key,
     libraryDensity.key,
     gridSpacing.key,
     tvCornerSpotlightBackdrop.key,
@@ -1501,8 +1524,10 @@ class SettingsService extends BaseSharedPreferencesService {
     ThemeMode? theme,
     AppIconStyle? iconStyleChoice,
     bool? showPosterDetails,
+    bool? useTvEdgeMenu,
     bool? playThemeMusic,
     bool? showSpotlight,
+    bool? cinematicSpotlight,
     bool? showEpisodeThumbnails,
     ShowDetailLayout? showLayout,
   }) async {
@@ -1513,8 +1538,10 @@ class SettingsService extends BaseSharedPreferencesService {
       if (theme != null) themeMode.key: theme.name,
       if (iconStyleChoice != null) iconStyle.key: iconStyleChoice.name,
       posterDetails.key: ?showPosterDetails,
+      tvEdgeMenu.key: ?useTvEdgeMenu,
       showThemeMusic.key: ?playThemeMusic,
       showHeroSection.key: ?showSpotlight,
+      phoneCinematicSpotlight.key: ?cinematicSpotlight,
       homeEpisodeThumbnails.key: ?showEpisodeThumbnails,
       if (showLayout != null) showDetailLayout.key: showLayout.name,
     };
@@ -1998,6 +2025,8 @@ class SettingsService extends BaseSharedPreferencesService {
     homeShelfItemCount,
     homeSpotlightAutoRotate,
     homeSpotlightInterval,
+    phoneSpotlightSize,
+    phoneCinematicSpotlight,
     alwaysKeepSidebarOpen,
     librariesSectionExpanded,
     showUnwatchedCount,
@@ -2006,6 +2035,8 @@ class SettingsService extends BaseSharedPreferencesService {
     showSeasonPostersOnTabs,
     hideSpoilers,
     showNavBarLabels,
+    tvEdgeMenu,
+    discoverAvailableOnly,
     globalShaderPreset,
     requireProfileSelectionOnOpen,
     autoLoginLastProfile,

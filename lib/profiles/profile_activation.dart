@@ -49,7 +49,7 @@ Future<_ProfileActivationResult> _activateProfileWithPin(BuildContext context, P
   final bypassKidsExit =
       kids.isActiveKids &&
       (SettingsService.instanceOrNull?.read(SettingsService.kidsAllowExitWithoutParentPin) ?? false);
-  if (kids.hasKids && !kids.isKids(profile.id) && !bypassKidsExit) {
+  if (kids.hasKids && !kids.isKids(profile.id) && !bypassKidsExit && !kids.parentPinOptedOut) {
     parentPin = await requestParentPin(context);
     if (!context.mounted || parentPin == null) {
       return const _ProfileActivationResult(ProfileActivationOutcome.cancelled);

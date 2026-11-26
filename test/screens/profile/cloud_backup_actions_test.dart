@@ -21,6 +21,7 @@ import 'package:luroka/services/settings_service.dart';
 import 'package:luroka/services/secure_server_pairing_client.dart';
 import 'package:luroka/utils/platform_detector.dart';
 import 'package:luroka/widgets/dialog_action_button.dart';
+import 'package:luroka/widgets/focusable_list_tile.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -98,13 +99,21 @@ void main() {
       client: MockClient((_) => gate.future),
       endpoint: Uri.https('backup.invalid', '/v1/backups'),
     );
-    await tester.pumpWidget(Provider<AppDatabase>.value(
-      value: db,
-      child: MaterialApp(home: Scaffold(body: Builder(builder: (context) => TextButton(
-        onPressed: () => unawaited(showCloudBackupRestore(context, client: client)),
-        child: const Text('Start restore'),
-      )))),
-    ));
+    await tester.pumpWidget(
+      Provider<AppDatabase>.value(
+        value: db,
+        child: MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () => unawaited(showCloudBackupRestore(context, client: client)),
+                child: const Text('Start restore'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
     await tester.tap(find.text('Start restore'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), CloudBackupRecoveryCode.generate().reveal());
@@ -125,17 +134,33 @@ void main() {
     final db = AppDatabase.forTesting(NativeDatabase.memory());
     addTearDown(db.close);
     final relay = ServerPairingClient.forTesting(
-      client: MockClient((request) async => http.Response(request.method == 'GET' ? '{}' : '',
-          request.method == 'POST' ? 201 : request.method == 'GET' ? 200 : 204)),
+      client: MockClient(
+        (request) async => http.Response(
+          request.method == 'GET' ? '{}' : '',
+          request.method == 'POST'
+              ? 201
+              : request.method == 'GET'
+              ? 200
+              : 204,
+        ),
+      ),
       base: Uri.https('connect.invalid'),
     );
-    await tester.pumpWidget(Provider<AppDatabase>.value(
-      value: db,
-      child: MaterialApp(home: Scaffold(body: Builder(builder: (context) => TextButton(
-        onPressed: () => unawaited(showCloudBackupRestore(context, pairingClient: relay)),
-        child: const Text('Start restore'),
-      )))),
-    ));
+    await tester.pumpWidget(
+      Provider<AppDatabase>.value(
+        value: db,
+        child: MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () => unawaited(showCloudBackupRestore(context, pairingClient: relay)),
+                child: const Text('Start restore'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
     await tester.tap(find.text('Start restore'));
     await _waitForWidget(tester, find.byKey(const ValueKey('tv-restore-transfer-qr')));
     final qr = tester.getRect(find.byKey(const ValueKey('tv-restore-transfer-qr')));
@@ -181,14 +206,25 @@ void main() {
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
     expect(find.text('Alice'), findsOneWidget);
+    final credentials = find.ancestor(
+      of: find.text('Include saved server and integration logins'),
+      matching: find.byType(FocusableListTile),
+    );
+    expect(find.descendant(of: credentials, matching: find.byIcon(Icons.check_box)), findsOneWidget);
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
     expect(find.text('Authorize encrypted backup?'), findsOneWidget);
     await tester.tap(find.text('Authorize'));
     await tester.pumpAndSettle();
+    expect(find.text('Include saved credentials?'), findsOneWidget);
+    await tester.tap(find.text('Include credentials'));
+    await tester.pumpAndSettle();
     expect(find.text('Step 2 of 3: Save your recovery code'), findsOneWidget);
     expect(find.textContaining('If you lose it'), findsOneWidget);
-    expect(find.text('Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.'), findsOneWidget);
+    expect(
+      find.text('Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.'),
+      findsOneWidget,
+    );
     expect(uploads, 0);
     await tester.tap(find.text('Cancel').last);
     await tester.pumpAndSettle();
@@ -304,7 +340,12 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Authorize'));
     await tester.pumpAndSettle();
-    expect(find.text('Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.'), findsOneWidget);
+    await tester.tap(find.text('Include credentials'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Not uploaded yet. Continue through step 3 and wait for Cloud backup created before restoring.'),
+      findsOneWidget,
+    );
     expect(find.byType(QrImageView), findsNothing);
     await tester.ensureVisible(find.text('Show QR code'));
     await tester.tap(find.text('Show QR code'));
@@ -361,7 +402,14 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Authorize'));
     await tester.pumpAndSettle();
-    expect(find.text('Keep a private copy of this code. To restore on your phone, open Luroka’s cloud backup restore option and choose Scan recovery code.'), findsOneWidget);
+    await tester.tap(find.text('Include credentials'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text(
+        'Keep a private copy of this code. To restore on your phone, open Luroka’s cloud backup restore option and choose Scan recovery code.',
+      ),
+      findsOneWidget,
+    );
     expect(find.byType(QrImageView), findsOneWidget);
     final qr = tester.getRect(find.byKey(const ValueKey('tv-backup-recovery-qr')));
     final dialog = tester.getRect(find.byType(AlertDialog).last);
@@ -442,6 +490,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Authorize'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Include credentials'));
+    await tester.pumpAndSettle();
     final firstCode = tester.widget<SelectableText>(find.byType(SelectableText)).data!;
     await tester.tap(find.text('I saved my code — continue'));
     await _waitForWidget(tester, find.text('Step 3 of 3: Upload backup'));
@@ -464,6 +514,8 @@ void main() {
     await tester.tap(find.text('Retry upload'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Authorize'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Include credentials'));
     await tester.pumpAndSettle();
     expect(tester.widget<SelectableText>(find.byType(SelectableText)).data, firstCode);
     expect(find.textContaining('previous upload may have completed'), findsOneWidget);

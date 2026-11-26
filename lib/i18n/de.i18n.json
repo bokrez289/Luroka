@@ -300,6 +300,7 @@
     "notificationProgress": "{progress} · {networkSpeed} · {timeRemaining} verbleiben"
   },
   "kidsShelf": {
+    "quietScenery": "Ruhige Nachtlandschaft",
     "movieShelf": "Filmzeit",
     "showShelf": "Finde deine nächste Serie",
     "aurora": "Aurora — tiefes Petrol & Limette",
@@ -604,7 +605,9 @@
     "availabilityUnknown": "Einige Bibliotheken konnten nicht geprüft werden. Versuche eine Aktualisierung.",
     "noAvailable": "Keine passenden Titel in den geprüften Bibliotheken gefunden.",
     "sourceInfo": "Wochentrends & ausgewählte Auszeichnungsgewinner · TMDb",
-    "configure": "Entdeckungseinstellungen"
+    "configure": "Entdeckungseinstellungen",
+    "filterOwned": "In meinen Bibliotheken",
+    "statusRetry": "Seerr konnte nicht überprüft werden · Erneut versuchen"
   },
   "app": {
     "title": "Luroka"
@@ -1139,7 +1142,11 @@
     "playerScopeLibrary": "Pro Bibliothek",
     "playerScopeTitle": "Pro Serie oder Film",
     "exportDialogTitle": "Luroka-Einstellungen exportieren",
-    "velvetHourTheme": "Velvet Hour"
+    "velvetHourTheme": "Velvet Hour",
+    "backdropBrightness": "Hintergrundhelligkeit",
+    "backdropBrightnessDescription": "Passen Sie die Abschattung über der Startseite und dem Titelbild an. 100 % ist die Standardeinstellung.",
+    "showEarlyNextEpisode": "„Als Nächstes“ vor dem Ende einer Folge anzeigen",
+    "showEarlyNextEpisodeDescription": "Nächste Folge während des Abspanns oder in den letzten 30 Sekunden anzeigen."
   },
   "themeEditor": {
     "builtIn": "Integriert",
@@ -1311,6 +1318,9 @@
     "episodesLeft": "${count} Folgen verbleiben"
   },
   "lurokaThemes": {
+    "patina": "Patina · dunkles Petrol und Kupfer",
+    "afterimage": "Nachbild · Indigo und Neonrosa",
+    "letterpress": "Buchdruck · Papier und burgunderrote Tinte",
     "title": "Luroka-Kino-Paletten",
     "coral": "Coral · Mitternachtsblau & Sonnenuntergang",
     "ocean": "Ocean · tiefes Blau & Eis",
@@ -1394,7 +1404,15 @@
     "reset": "Standardreihen wiederherstellen",
     "resetDescription": "Originalreihenfolge wiederherstellen und alle Reihen für dieses Profil anzeigen? Deine angehefteten Sammlungen bleiben erhalten.",
     "saveFailed": "Dein Startseite-Layout konnte nicht gespeichert werden. Bitte versuche es erneut.",
-    "emptyHint": "Reihen könnten ausgeblendet sein. Öffne Startseite anpassen, um sie wieder einzublenden."
+    "emptyHint": "Reihen könnten ausgeblendet sein. Öffne Startseite anpassen, um sie wieder einzublenden.",
+    "upcomingEpisodes": "Bevorstehende Folgen",
+    "upcomingOff": "Aus",
+    "upcomingFavorites": "Favoriten",
+    "upcomingWatched": "Zuvor angesehen",
+    "upcomingAll": "Alle Sendungen",
+    "upcomingBoth": "Favoriten und zuvor angesehen",
+    "upcomingHint": "Bevorstehende Ausstrahlungsdaten werden nur im Hintergrund überprüft, solange diese Zeile aktiviert ist. Die Ergebnisse sind begrenzt und sind auf Ihrem Server möglicherweise noch nicht verfügbar.",
+    "airDate": "Sendedatum: ${date}"
   },
   "screenTime": {
     "title": "Sehzeit",
@@ -1449,7 +1467,35 @@
     "sessionNoTitle": "Nicht identifizierte Wiedergabe",
     "emptyTitle": "Noch nichts hier",
     "emptyBody": "Schau etwas und deine Statistiken bauen sich hier auf.",
-    "noDataInPeriod": "Keine Wiedergabe in diesem Zeitraum aufgezeichnet."
+    "noDataInPeriod": "Keine Wiedergabe in diesem Zeitraum aufgezeichnet.",
+    "overview": "Übersicht",
+    "history": "Verlauf",
+    "patternsTab": "Muster",
+    "gettingStarted": "Die Aktivität hat gerade erst begonnen. Anzeigemuster werden nach einigen aktiven Tagen angezeigt.",
+    "monthlyRecap": "Monatliche Zusammenfassung",
+    "measurementHint": "Die Zeit bezieht sich auf die aufgezeichnete Wiedergabe, nicht auf die abgeschlossenen Titel.",
+    "ledgerScope": "Die Aktivität stammt aus dem lokalen Luroka-Wiedergabebuch dieses Profils. Der Wiedergabeverlauf des Servers und die Wiedergabe in anderen Apps sind nicht enthalten.",
+    "watchedPeriod": "In diesem Zeitraum angesehen",
+    "activeDays": "Aktive Tage",
+    "dailyAverage": "Tagesdurchschnitt",
+    "previousPeriod": "Vorheriger Zeitraum",
+    "insufficientHistory": "Nicht genügend Verlauf",
+    "drillDown": "Aktivität für diese Daten anzeigen",
+    "searchHistory": "Suchverlauf durchsuchen",
+    "allKinds": "Alle",
+    "moviesFilter": "Filme",
+    "episodesFilter": "Folgen",
+    "datesFilter": "Daten",
+    "clearDates": "Daten löschen",
+    "noMatches": "Es gibt keine Wiedergabe, die diesen Filtern entspricht.",
+    "allHistory": "Gesamten Verlauf anzeigen",
+    "historyError": "Der Verlauf konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "titlesPlayed": "${count} abgespielte Titel · Folgen werden separat gezählt",
+    "monthWatched": "${duration} diesen Monat angesehen",
+    "lifetimeSummary": "Insgesamt: ${total} · Tagesdurchschnitt: ${average}",
+    "chartScale": "Skala: 0 – ${duration}",
+    "titlesPlayedLabel": "Abgespielte Titel",
+    "playedHint": "Episoden werden separat gezählt. Die Wiedergabezeit gibt nicht an, ob eine Episode vollständig angesehen wurde."
   },
   "search": {
     "hint": "Filme, Serien und Musik suchen …",
@@ -1655,7 +1701,8 @@
     "mediaFailedToDelete": "Medienelement konnte nicht gelöscht werden",
     "rate": "Bewerten",
     "playFromBeginning": "Von Anfang an abspielen",
-    "playVersion": "Version abspielen …"
+    "playVersion": "Version abspielen …",
+    "removeFromNextUp": "Aus „Als Nächstes“ entfernen"
   },
   "rateSheet": {
     "title": "Bewerten",
@@ -1664,7 +1711,9 @@
     "favorited": "Favorisiert",
     "saved": "Gespeichert",
     "notAvailable": "Keine Übereinstimmung gefunden",
-    "noConnectedServices": "Verbinde einen Dienst in den Einstellungen, um dort zu bewerten."
+    "noConnectedServices": "Verbinde einen Dienst in den Einstellungen, um dort zu bewerten.",
+    "addFavorite": "Zu Favoriten hinzufügen",
+    "removeFavorite": "Aus Favoriten entfernen"
   },
   "accessibility": {
     "mediaCardMovie": "${title}, Film",
@@ -1873,7 +1922,9 @@
     "streamSelectionUnavailable": "Die Streamauswahl ist für diese Quelle nicht verfügbar",
     "streamSelectionFailed": "Die ausgewählten Streams konnten nicht angewendet werden",
     "trackSelectionNotRemembered": "Diese Spurauswahl gilt nur für die aktuelle Wiedergabe.",
-    "serverUnavailableForProfile": "Für das aktive Profil ist kein Server verfügbar"
+    "serverUnavailableForProfile": "Für das aktive Profil ist kein Server verfügbar",
+    "logSupportReference": "Support-Referenz",
+    "copyFullLogId": "Vollständige Protokoll-ID kopieren"
   },
   "sourceLibraries": {
     "title": "Deine Server & Bibliotheken",
@@ -3615,5 +3666,20 @@
     "redirectDifferentHost": "Der Server hat zu einem anderen Host weitergeleitet. Gib die endgültige ${product}-URL direkt ein.",
     "redirectInsecure": "Der Server hat von HTTPS zu einer unsicheren URL weitergeleitet",
     "redirectUnsupportedEnterFinal": "Der Server hat zu einer nicht unterstützten URL weitergeleitet. Gib die endgültige ${product}-URL direkt ein."
+  },
+  "episodeDetails": {
+    "previous": "Vorherige Folge",
+    "next": "Nächste Folge"
+  },
+  "tvEdgeMenu": {
+    "title": "TV-Navigation",
+    "top": "Obere Leiste",
+    "both": "Obere Leiste + Seitenmenü",
+    "hint": "Drücken Sie vom ersten Element in einer Reihe aus die Taste „Links“, um das Seitenmenü zu öffnen. Drücken Sie „Rechts“ oder „Zurück“, um zurückzukehren.",
+    "browse": "Durchsuchen",
+    "more": "Mehr",
+    "closeHint": "Rechts oder Zurück, um zu schließen",
+    "tryMenu": "Navigation ausprobieren",
+    "allLibraries": "Alle Bibliotheken"
   }
 }

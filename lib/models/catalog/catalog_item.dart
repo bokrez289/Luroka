@@ -182,6 +182,7 @@ class CatalogItem {
   final List<String>? genres;
   final String? certification;
   final String? trailerUrl;
+  final List<String> alternateTrailerUrls;
   final CatalogAirStatus? airStatus;
 
   /// Aired episodes (Trakt) or total episodes (MAL); shows only.
@@ -340,6 +341,7 @@ class CatalogItem {
     this.genres,
     this.certification,
     this.trailerUrl,
+    this.alternateTrailerUrls = const [],
     this.airStatus,
     this.episodeCount,
     this.network,
@@ -406,6 +408,7 @@ class CatalogItem {
     genres: detail.genres ?? genres,
     certification: detail.certification ?? certification,
     trailerUrl: detail.trailerUrl ?? trailerUrl,
+    alternateTrailerUrls: detail.trailerUrl != null ? detail.alternateTrailerUrls : alternateTrailerUrls,
     airStatus: detail.airStatus ?? airStatus,
     episodeCount: detail.episodeCount ?? episodeCount,
     network: detail.network ?? network,
@@ -515,6 +518,7 @@ class CatalogItem {
     if (genres != null) 'genres': genres,
     if (certification != null) 'certification': certification,
     if (trailerUrl != null) 'trailerUrl': trailerUrl,
+    if (alternateTrailerUrls.isNotEmpty) 'alternateTrailerUrls': alternateTrailerUrls,
     if (airStatus != null) 'airStatus': airStatus!.name,
     if (episodeCount != null) 'episodeCount': episodeCount,
     if (network != null) 'network': network,
@@ -583,6 +587,7 @@ class CatalogItem {
     genres: (json['genres'] as List?)?.cast<String>(),
     certification: json['certification'] as String?,
     trailerUrl: json['trailerUrl'] as String?,
+    alternateTrailerUrls: (json['alternateTrailerUrls'] as List?)?.whereType<String>().toList() ?? const [],
     airStatus: CatalogAirStatus.values.asNameMap()[json['airStatus']],
     episodeCount: json['episodeCount'] as int?,
     network: json['network'] as String?,

@@ -50,6 +50,9 @@ String themeModeLabel(settings.ThemeMode mode) => switch (mode) {
   settings.ThemeMode.lurokaElectric => t.kidsShelf.electric,
   settings.ThemeMode.lurokaMidnight => t.kidsShelf.midnight,
   settings.ThemeMode.lurokaNocturne => t.lurokaThemes.nocturne,
+  settings.ThemeMode.lurokaPatina => t.lurokaThemes.patina,
+  settings.ThemeMode.lurokaAfterimage => t.lurokaThemes.afterimage,
+  settings.ThemeMode.lurokaLetterpress => t.lurokaThemes.letterpress,
   settings.ThemeMode.custom => t.themeEditor.custom,
 };
 

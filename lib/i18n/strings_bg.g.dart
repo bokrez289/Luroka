@@ -143,6 +143,10 @@ class TranslationsBg extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$profileSetupGuide$bg profileSetupGuide = _Translations$profileSetupGuide$bg._(_root);
 	@override late final _Translations$animeFavorites$bg animeFavorites = _Translations$animeFavorites$bg._(_root);
 	@override late final _Translations$addServer$bg addServer = _Translations$addServer$bg._(_root);
+	@override late final _Translations$episodeDetails$bg episodeDetails = _Translations$episodeDetails$bg._(_root);
+	@override late final _Translations$tvEdgeMenu$bg tvEdgeMenu = _Translations$tvEdgeMenu$bg._(_root);
+	@override late final _Translations$showDetailLayout$bg showDetailLayout = _Translations$showDetailLayout$bg._(_root);
+	@override late final _Translations$iconStyles$bg iconStyles = _Translations$iconStyles$bg._(_root);
 }
 
 // Path: mobileLibrary
@@ -564,6 +568,7 @@ class _Translations$kidsShelf$bg extends Translations$kidsShelf$en {
 	final TranslationsBg _root; // ignore: unused_field
 
 	// Translations
+	@override String get quietScenery => 'Спокоен нощен пейзаж';
 	@override String get movieShelf => 'Време за филм';
 	@override String get showShelf => 'Намерете следващото си шоу';
 	@override String get aurora => 'Aurora — наситено синьо-зелено и лайм';
@@ -925,6 +930,8 @@ class _Translations$lurokaDiscovery$bg extends Translations$lurokaDiscovery$en {
 	@override String get noAvailable => 'Няма намерени съвпадащи заглавия в проверените библиотеки.';
 	@override String get sourceInfo => 'Седмични тенденции и избрани победители · TMDb';
 	@override String get configure => 'Настройки за откриване';
+	@override String get filterOwned => 'В моите библиотеки';
+	@override String get statusRetry => 'Неуспешна проверка на Seerr · Опитайте отново';
 }
 
 // Path: app
@@ -1472,6 +1479,10 @@ class _Translations$settings$bg extends Translations$settings$en {
 	@override String get playerScopeTitle => 'По сериал или филм';
 	@override String get exportDialogTitle => 'Експортиране на настройките на Luroka';
 	@override String get velvetHourTheme => 'Кадифен час';
+	@override String get backdropBrightness => 'Яркост на фона';
+	@override String get backdropBrightnessDescription => 'Настройте затъмняването върху изображенията на началния екран и страниците на заглавията. По подразбиране е 100%.';
+	@override String get showEarlyNextEpisode => 'Показване на следващия епизод преди края';
+	@override String get showEarlyNextEpisodeDescription => 'Показване на следващия епизод по време на надписите или през последните 30 секунди.';
 }
 
 // Path: themeEditor
@@ -1719,6 +1730,9 @@ class _Translations$lurokaThemes$bg extends Translations$lurokaThemes$en {
 	final TranslationsBg _root; // ignore: unused_field
 
 	// Translations
+	@override String get patina => 'Патина · тъмен тюркоаз и мед';
+	@override String get afterimage => 'Остатъчен образ · индиго и неоново розово';
+	@override String get letterpress => 'Висок печат · хартия и виненочервено мастило';
 	@override String get title => 'Luroka палитри за кино';
 	@override String get coral => 'Корал · среднощно синьо и залез';
 	@override String get ocean => 'Океан · наситено синьо и лед';
@@ -1817,6 +1831,14 @@ class _Translations$homeLayout$bg extends Translations$homeLayout$en {
 	@override String get resetDescription => 'Възстановяване на оригиналния ред на редовете и показване на всички редове за този профил? Вашите фиксирани колекции ще бъдат запазени.';
 	@override String get saveFailed => 'Оформлението на дома ви не можа да бъде запазено. Моля, опитайте отново.';
 	@override String get emptyHint => 'Редовете може да са скрити. Отворете Personalize Начало, за да ги покажете отново.';
+	@override String get upcomingEpisodes => 'Предстоящи епизоди';
+	@override String get upcomingFavorites => 'Любими';
+	@override String get upcomingWatched => 'Гледани преди';
+	@override String get upcomingBoth => 'Любими и гледани преди';
+	@override String get upcomingAll => 'Всички сериали';
+	@override String get upcomingOff => 'Изключено';
+	@override String airDate({required Object date}) => 'Дата на излъчване: ${date}';
+	@override String get upcomingHint => 'Предстоящите дати се проверяват във фонов режим само когато този ред е включен. Резултатите са ограничени и може още да не са налични на сървъра.';
 }
 
 // Path: screenTime
@@ -1886,6 +1908,34 @@ class _Translations$activityStats$bg extends Translations$activityStats$en {
 	@override String get emptyTitle => 'Тук още няма нищо';
 	@override String get emptyBody => 'Гледайте нещо и вашата статистика ще се натрупа тук.';
 	@override String get noDataInPeriod => 'През този период не е записано възпроизвеждане.';
+	@override String get patternsTab => 'Навици';
+	@override String get moviesFilter => 'Филми';
+	@override String get episodesFilter => 'Епизоди';
+	@override String get datesFilter => 'Дати';
+	@override String titlesPlayed({required Object count}) => 'Пуснати заглавия: ${count} · епизодите се броят отделно';
+	@override String get previousPeriod => 'Предишен период';
+	@override String lifetimeSummary({required Object total, required Object average}) => 'Общо: ${total} · Средно на ден: ${average}';
+	@override String get dailyAverage => 'Средно на ден';
+	@override String get allKinds => 'Всички';
+	@override String get titlesPlayedLabel => 'Пуснати заглавия';
+	@override String get ledgerScope => 'Активността се взема от локалния журнал за възпроизвеждане на този профил в Luroka. Историята на сървъра и възпроизвеждането в други приложения не са включени.';
+	@override String chartScale({required Object duration}) => 'Скала: 0 – ${duration}';
+	@override String get gettingStarted => 'Активността тепърва започва. Навиците за гледане ще се покажат след няколко активни дни.';
+	@override String get history => 'История';
+	@override String get insufficientHistory => 'Недостатъчно история';
+	@override String get monthlyRecap => 'Месечен преглед';
+	@override String get noMatches => 'Няма гледания, съответстващи на тези филтри.';
+	@override String get activeDays => 'Активни дни';
+	@override String get measurementHint => 'Времето отразява записаното възпроизвеждане, а не завършените заглавия.';
+	@override String get historyError => 'Историята не можа да бъде заредена. Опитайте отново.';
+	@override String get watchedPeriod => 'Гледано през периода';
+	@override String monthWatched({required Object duration}) => 'Гледано този месец: ${duration}';
+	@override String get drillDown => 'Преглед на активността за тези дати';
+	@override String get searchHistory => 'Търсене в историята на гледане';
+	@override String get clearDates => 'Изчистване на датите';
+	@override String get playedHint => 'Епизодите се броят отделно. Времето на възпроизвеждане не показва дали заглавието е завършено.';
+	@override String get allHistory => 'Преглед на цялата история';
+	@override String get overview => 'Общ преглед';
 }
 
 // Path: search
@@ -2094,6 +2144,7 @@ class _Translations$mediaMenu$bg extends Translations$mediaMenu$en {
 	@override String get rate => 'Оцени';
 	@override String get playFromBeginning => 'Пусни от началото';
 	@override String get playVersion => 'Пусни версия...';
+	@override String get removeFromNextUp => 'Премахване от следващите';
 }
 
 // Path: rateSheet
@@ -2110,6 +2161,8 @@ class _Translations$rateSheet$bg extends Translations$rateSheet$en {
 	@override String get saved => 'Запазено';
 	@override String get notAvailable => 'Няма намерено съвпадение';
 	@override String get noConnectedServices => 'Свържи услуга от настройките, за да оценяваш и в нея.';
+	@override String get addFavorite => 'Добавяне в любими';
+	@override String get removeFavorite => 'Премахване от любими';
 }
 
 // Path: accessibility
@@ -2344,6 +2397,8 @@ class _Translations$messages$bg extends Translations$messages$en {
 	@override String get streamSelectionFailed => 'Избраните потоци не можаха да бъдат приложени';
 	@override String get trackSelectionNotRemembered => 'Този избор на пътечка важи само за текущото възпроизвеждане.';
 	@override String get serverUnavailableForProfile => 'Няма наличен сървър за активния профил';
+	@override String get logSupportReference => 'Референтен номер за поддръжка';
+	@override String get copyFullLogId => 'Копиране на пълния идентификатор на журнала';
 }
 
 // Path: sourceLibraries
@@ -3917,6 +3972,68 @@ class _Translations$addServer$bg extends Translations$addServer$en {
 	@override String redirectUnsupportedEnterFinal({required Object product}) => 'Сървърът пренасочи към неподдържан URL. Въведете директно крайния URL на ${product}.';
 }
 
+// Path: episodeDetails
+class _Translations$episodeDetails$bg extends Translations$episodeDetails$en {
+	_Translations$episodeDetails$bg._(TranslationsBg root) : this._root = root, super.internal(root);
+
+	final TranslationsBg _root; // ignore: unused_field
+
+	// Translations
+	@override String get previous => 'Предишен епизод';
+	@override String get next => 'Следващ епизод';
+}
+
+// Path: tvEdgeMenu
+class _Translations$tvEdgeMenu$bg extends Translations$tvEdgeMenu$en {
+	_Translations$tvEdgeMenu$bg._(TranslationsBg root) : this._root = root, super.internal(root);
+
+	final TranslationsBg _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Навигация на телевизора';
+	@override String get top => 'Горна лента';
+	@override String get both => 'Горна лента и странично меню';
+	@override String get hint => 'Натиснете наляво от първия елемент на реда, за да отворите страничното меню. Натиснете надясно или Назад, за да се върнете.';
+	@override String get tryMenu => 'Изпробвайте навигацията';
+	@override String get allLibraries => 'Всички библиотеки';
+	@override String get browse => 'Разглеждане';
+	@override String get more => 'Още';
+	@override String get closeHint => 'Надясно или Назад за затваряне';
+}
+
+// Path: showDetailLayout
+class _Translations$showDetailLayout$bg extends Translations$showDetailLayout$en {
+	_Translations$showDetailLayout$bg._(TranslationsBg root) : this._root = root, super.internal(root);
+
+	final TranslationsBg _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Оформление на подробностите за сериала';
+	@override String get description => 'Изберете как да се показват сериалите и епизодите на телевизора.';
+	@override String get compact => 'Компактен списък с епизоди';
+	@override String get cinematic => 'Кино стил';
+	@override String get seasons => 'Изберете сезон';
+	@override String get episodes => 'Епизоди';
+	@override String get details => 'Подробности';
+	@override String get cast => 'Актьорски състав';
+	@override String get related => 'Подобни заглавия';
+}
+
+// Path: iconStyles
+class _Translations$iconStyles$bg extends Translations$iconStyles$en {
+	_Translations$iconStyles$bg._(TranslationsBg root) : this._root = root, super.internal(root);
+
+	final TranslationsBg _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Стил на иконите';
+	@override String get description => 'Изберете изгледа на бутоните в приложението. Промените важат за този профил.';
+	@override String get current => 'Luroka Bold';
+	@override String get lucide => 'Lucide';
+	@override String get lucideDescription => 'Изчистени линейни икони с резервни икони Material при липсващи символи.';
+	@override String get outline => 'Material Outline';
+}
+
 // Path: appIcon.names
 class _Translations$appIcon$names$bg extends Translations$appIcon$names$en {
 	_Translations$appIcon$names$bg._(TranslationsBg root) : this._root = root, super.internal(root);
@@ -5116,6 +5233,7 @@ extension on TranslationsBg {
 			'downloadsRedesign.downloaded' => 'Изтеглено',
 			'downloadsRedesign.speed' => 'Скорост на изтегляне',
 			'downloadsRedesign.notificationProgress' => '{progress} · {networkSpeed} · {timeRemaining} Остават',
+			'kidsShelf.quietScenery' => 'Спокоен нощен пейзаж',
 			'kidsShelf.movieShelf' => 'Време за филм',
 			'kidsShelf.showShelf' => 'Намерете следващото си шоу',
 			'kidsShelf.aurora' => 'Aurora — наситено синьо-зелено и лайм',
@@ -5365,9 +5483,9 @@ extension on TranslationsBg {
 			'kids.historyReset' => 'Нулиране на изключенията за гледане на деца',
 			'kids.blocked' => 'Това заглавие не е налично в този детски профил.',
 			'kids.switchProfile' => 'Превключване на профил',
-			'kids.manageFromAdult' => 'Превключете към профил за възрастни, за да управлявате настройките.',
 			_ => null,
 		} ?? switch (path) {
+			'kids.manageFromAdult' => 'Превключете към профил за възрастни, за да управлявате настройките.',
 			'kids.noConnections' => 'Свържете сървър към вашия профил за възрастни, преди да добавите профил за деца.',
 			'kids.created' => 'Създаден детски профил',
 			'kids.updated' => 'Детският профил е актуализиран',
@@ -5407,6 +5525,8 @@ extension on TranslationsBg {
 			'lurokaDiscovery.noAvailable' => 'Няма намерени съвпадащи заглавия в проверените библиотеки.',
 			'lurokaDiscovery.sourceInfo' => 'Седмични тенденции и избрани победители · TMDb',
 			'lurokaDiscovery.configure' => 'Настройки за откриване',
+			'lurokaDiscovery.filterOwned' => 'В моите библиотеки',
+			'lurokaDiscovery.statusRetry' => 'Неуспешна проверка на Seerr · Опитайте отново',
 			'app.title' => 'Luroka',
 			'appIcon.title' => 'Икона на приложението',
 			'appIcon.defaultIcon' => 'По подразбиране',
@@ -5877,11 +5997,11 @@ extension on TranslationsBg {
 			'settings.liveTvDefaultFavoritesDescription' => 'Показвай само любими канали при отваряне на телевизия на живо',
 			'settings.general' => 'Общи',
 			'settings.generalDescription' => 'Език, стартиране и поведение на прозореца',
+			_ => null,
+		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Език и регион',
 			'settings.startup' => 'Стартиране',
 			'settings.display' => 'Дисплей',
-			_ => null,
-		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Библиотека и карти',
 			'settings.homeScreen' => 'Начален екран',
 			'settings.navigation' => 'Навигация',
@@ -5916,6 +6036,10 @@ extension on TranslationsBg {
 			'settings.playerScopeTitle' => 'По сериал или филм',
 			'settings.exportDialogTitle' => 'Експортиране на настройките на Luroka',
 			'settings.velvetHourTheme' => 'Кадифен час',
+			'settings.backdropBrightness' => 'Яркост на фона',
+			'settings.backdropBrightnessDescription' => 'Настройте затъмняването върху изображенията на началния екран и страниците на заглавията. По подразбиране е 100%.',
+			'settings.showEarlyNextEpisode' => 'Показване на следващия епизод преди края',
+			'settings.showEarlyNextEpisodeDescription' => 'Показване на следващия епизод по време на надписите или през последните 30 секунди.',
 			'themeEditor.builtIn' => 'Вградена',
 			'themeEditor.presets' => 'Предварителни настройки',
 			'themeEditor.custom' => 'По поръчка',
@@ -6057,6 +6181,9 @@ extension on TranslationsBg {
 			'referenceDetails.continuing' => 'Продължава',
 			'referenceDetails.upNext' => 'Следва',
 			'referenceDetails.episodesLeft' => ({required Object count}) => '${count} остават епизоди',
+			'lurokaThemes.patina' => 'Патина · тъмен тюркоаз и мед',
+			'lurokaThemes.afterimage' => 'Остатъчен образ · индиго и неоново розово',
+			'lurokaThemes.letterpress' => 'Висок печат · хартия и виненочервено мастило',
 			'lurokaThemes.title' => 'Luroka палитри за кино',
 			'lurokaThemes.coral' => 'Корал · среднощно синьо и залез',
 			'lurokaThemes.ocean' => 'Океан · наситено синьо и лед',
@@ -6137,6 +6264,14 @@ extension on TranslationsBg {
 			'homeLayout.resetDescription' => 'Възстановяване на оригиналния ред на редовете и показване на всички редове за този профил? Вашите фиксирани колекции ще бъдат запазени.',
 			'homeLayout.saveFailed' => 'Оформлението на дома ви не можа да бъде запазено. Моля, опитайте отново.',
 			'homeLayout.emptyHint' => 'Редовете може да са скрити. Отворете Personalize Начало, за да ги покажете отново.',
+			'homeLayout.upcomingEpisodes' => 'Предстоящи епизоди',
+			'homeLayout.upcomingFavorites' => 'Любими',
+			'homeLayout.upcomingWatched' => 'Гледани преди',
+			'homeLayout.upcomingBoth' => 'Любими и гледани преди',
+			'homeLayout.upcomingAll' => 'Всички сериали',
+			'homeLayout.upcomingOff' => 'Изключено',
+			'homeLayout.airDate' => ({required Object date}) => 'Дата на излъчване: ${date}',
+			'homeLayout.upcomingHint' => 'Предстоящите дати се проверяват във фонов режим само когато този ред е включен. Резултатите са ограничени и може още да не са налични на сървъра.',
 			'screenTime.title' => 'Време на екрана',
 			'screenTime.description' => 'Вижте времето, прекарано в гледане на видео в този профил',
 			'screenTime.today' => 'Днес',
@@ -6185,6 +6320,34 @@ extension on TranslationsBg {
 			'activityStats.emptyTitle' => 'Тук още няма нищо',
 			'activityStats.emptyBody' => 'Гледайте нещо и вашата статистика ще се натрупа тук.',
 			'activityStats.noDataInPeriod' => 'През този период не е записано възпроизвеждане.',
+			'activityStats.patternsTab' => 'Навици',
+			'activityStats.moviesFilter' => 'Филми',
+			'activityStats.episodesFilter' => 'Епизоди',
+			'activityStats.datesFilter' => 'Дати',
+			'activityStats.titlesPlayed' => ({required Object count}) => 'Пуснати заглавия: ${count} · епизодите се броят отделно',
+			'activityStats.previousPeriod' => 'Предишен период',
+			'activityStats.lifetimeSummary' => ({required Object total, required Object average}) => 'Общо: ${total} · Средно на ден: ${average}',
+			'activityStats.dailyAverage' => 'Средно на ден',
+			'activityStats.allKinds' => 'Всички',
+			'activityStats.titlesPlayedLabel' => 'Пуснати заглавия',
+			'activityStats.ledgerScope' => 'Активността се взема от локалния журнал за възпроизвеждане на този профил в Luroka. Историята на сървъра и възпроизвеждането в други приложения не са включени.',
+			'activityStats.chartScale' => ({required Object duration}) => 'Скала: 0 – ${duration}',
+			'activityStats.gettingStarted' => 'Активността тепърва започва. Навиците за гледане ще се покажат след няколко активни дни.',
+			'activityStats.history' => 'История',
+			'activityStats.insufficientHistory' => 'Недостатъчно история',
+			'activityStats.monthlyRecap' => 'Месечен преглед',
+			'activityStats.noMatches' => 'Няма гледания, съответстващи на тези филтри.',
+			'activityStats.activeDays' => 'Активни дни',
+			'activityStats.measurementHint' => 'Времето отразява записаното възпроизвеждане, а не завършените заглавия.',
+			'activityStats.historyError' => 'Историята не можа да бъде заредена. Опитайте отново.',
+			'activityStats.watchedPeriod' => 'Гледано през периода',
+			'activityStats.monthWatched' => ({required Object duration}) => 'Гледано този месец: ${duration}',
+			'activityStats.drillDown' => 'Преглед на активността за тези дати',
+			'activityStats.searchHistory' => 'Търсене в историята на гледане',
+			'activityStats.clearDates' => 'Изчистване на датите',
+			'activityStats.playedHint' => 'Епизодите се броят отделно. Времето на възпроизвеждане не показва дали заглавието е завършено.',
+			'activityStats.allHistory' => 'Преглед на цялата история',
+			'activityStats.overview' => 'Общ преглед',
 			'search.hint' => 'Търсене на филми, сериали, музика...',
 			'search.tryDifferentTerm' => 'Опитайте с различна дума за търсене',
 			'search.searchYourMedia' => 'Търсете в медийното си съдържание',
@@ -6348,6 +6511,8 @@ extension on TranslationsBg {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Разбърканото възпроизвеждане не е налично офлайн',
 			'mediaMenu.fileInfo' => 'Информация за файла',
 			'mediaMenu.deleteEpisodeFromServer' => 'Изтрий епизода от сървъра',
+			_ => null,
+		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Изтрий сезона от сървъра',
 			'mediaMenu.deleteShowFromServer' => 'Изтрий сериала от сървъра',
 			'mediaMenu.deleteMovieFromServer' => 'Изтрий филма от сървъра',
@@ -6372,6 +6537,7 @@ extension on TranslationsBg {
 			'mediaMenu.rate' => 'Оцени',
 			'mediaMenu.playFromBeginning' => 'Пусни от началото',
 			'mediaMenu.playVersion' => 'Пусни версия...',
+			'mediaMenu.removeFromNextUp' => 'Премахване от следващите',
 			'rateSheet.title' => 'Оцени',
 			'rateSheet.server' => 'Сървър',
 			'rateSheet.favorite' => 'Добави в любими',
@@ -6379,6 +6545,8 @@ extension on TranslationsBg {
 			'rateSheet.saved' => 'Запазено',
 			'rateSheet.notAvailable' => 'Няма намерено съвпадение',
 			'rateSheet.noConnectedServices' => 'Свържи услуга от настройките, за да оценяваш и в нея.',
+			'rateSheet.addFavorite' => 'Добавяне в любими',
+			'rateSheet.removeFavorite' => 'Премахване от любими',
 			'accessibility.mediaCardMovie' => ({required Object title}) => '${title}, филм',
 			'accessibility.mediaCardShow' => ({required Object title}) => '${title}, ТВ сериал',
 			'accessibility.mediaCardEpisode' => ({required Object title, required Object episodeInfo}) => '${title}, ${episodeInfo}',
@@ -6394,8 +6562,6 @@ extension on TranslationsBg {
 			'accessibility.hue' => 'Нюанс',
 			'accessibility.saturation' => 'Наситеност',
 			'accessibility.brightness' => 'Яркост',
-			_ => null,
-		} ?? switch (path) {
 			'accessibility.hexColor' => 'Шестнадесетичен цвят',
 			'accessibility.expandText' => 'Разгъни текста',
 			'accessibility.collapseText' => 'Свий текста',
@@ -6574,6 +6740,8 @@ extension on TranslationsBg {
 			'messages.streamSelectionFailed' => 'Избраните потоци не можаха да бъдат приложени',
 			'messages.trackSelectionNotRemembered' => 'Този избор на пътечка важи само за текущото възпроизвеждане.',
 			'messages.serverUnavailableForProfile' => 'Няма наличен сървър за активния профил',
+			'messages.logSupportReference' => 'Референтен номер за поддръжка',
+			'messages.copyFullLogId' => 'Копиране на пълния идентификатор на журнала',
 			'sourceLibraries.title' => 'Вашите сървъри и библиотеки',
 			'sourceLibraries.description' => 'Изберете библиотеките, които Luroka използва за Начало, търсене, наличност на Открий и Studios. Редът на началния ред се персонализира отделно.',
 			'sourceLibraries.partial' => 'Някои сървъри не можаха да бъдат проверени. Вашите запазени избори за тези библиотеки се запазват. Опреснете, за да опитате отново.',
@@ -6857,6 +7025,8 @@ extension on TranslationsBg {
 			'libraries.filters' => 'Филтри',
 			'libraries.confirmActionMessage' => 'Сигурни ли сте, че искате да извършите това действие?',
 			'libraries.showLibrary' => 'Покажи библиотеката',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Скрий библиотеката',
 			'libraries.libraryOptions' => 'Опции на библиотеката',
 			'libraries.content' => 'съдържание на библиотеката',
@@ -6908,8 +7078,6 @@ extension on TranslationsBg {
 			'libraries.sortLabels.dateShared' => 'Дата на споделяне',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Дата на излъчване на последния епизод',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Дата на добавяне на последния епизод',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Дата на изтегляне',
 			'libraries.sortLabels.size' => 'Размер',
 			'libraries.sortLabels.library' => 'Библиотека',
@@ -7371,6 +7539,8 @@ extension on TranslationsBg {
 			'watchTogether.qrShare' => 'Споделяне на QR код',
 			'watchTogether.qrHint' => 'Сканирайте с приложението Luroka, за да се присъедините към тази стая.',
 			'watchTogether.phasePlaying' => 'Играя',
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'На пауза',
 			'watchTogether.phaseWaiting' => 'В очакване на всички',
 			'watchTogether.inviteCopied' => 'Поканата е копирана. Поставете го в съобщение.',
@@ -7422,8 +7592,6 @@ extension on TranslationsBg {
 			'watchTogether.offsetPlusSecond' => '+1 сек',
 			'watchTogether.participants' => 'Участници',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('bg'))(n, one: '${n} участник', other: '${n} участници', ), 
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'ОРГАНИЗАТОР',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (Вие)',
 			'watchTogether.playerIdle' => 'празен ход',
@@ -7885,6 +8053,8 @@ extension on TranslationsBg {
 			'matchScreen.match' => 'Съпостави...',
 			'matchScreen.fixMatch' => 'Поправи съвпадение...',
 			'matchScreen.unmatch' => 'Премахни съвпадение',
+			_ => null,
+		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Да се изчисти ли това съвпадение? Plex ще го третира като несъпоставено, докато не бъде съпоставено отново.',
 			'matchScreen.unmatchSuccess' => 'Съвпадението на елемента е премахнато',
 			'matchScreen.unmatchFailed' => 'Неуспешно премахване на съвпадението на елемента',
@@ -7936,8 +8106,6 @@ extension on TranslationsBg {
 			'seerr.requestFailed' => ({required Object error}) => 'Заявката се провали: ${error}',
 			'seerr.requestsLoadFailed' => 'Неуспешно зареждане на опциите за заявка',
 			'seerr.nothingToRequest' => 'Всичко вече е налично или заявено.',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Налично',
 			'seerr.statusPartiallyAvailable' => 'Частично налично',
 			'seerr.statusRequested' => 'Заявено',
@@ -8116,6 +8284,32 @@ extension on TranslationsBg {
 			'addServer.redirectDifferentHost' => ({required Object product}) => 'Сървърът пренасочи към друг хост. Въведете директно крайния URL на ${product}.',
 			'addServer.redirectInsecure' => 'Сървърът пренасочи от HTTPS към незащитен URL',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'Сървърът пренасочи към неподдържан URL. Въведете директно крайния URL на ${product}.',
+			'episodeDetails.previous' => 'Предишен епизод',
+			'episodeDetails.next' => 'Следващ епизод',
+			'tvEdgeMenu.title' => 'Навигация на телевизора',
+			'tvEdgeMenu.top' => 'Горна лента',
+			'tvEdgeMenu.both' => 'Горна лента и странично меню',
+			'tvEdgeMenu.hint' => 'Натиснете наляво от първия елемент на реда, за да отворите страничното меню. Натиснете надясно или Назад, за да се върнете.',
+			'tvEdgeMenu.tryMenu' => 'Изпробвайте навигацията',
+			'tvEdgeMenu.allLibraries' => 'Всички библиотеки',
+			'tvEdgeMenu.browse' => 'Разглеждане',
+			'tvEdgeMenu.more' => 'Още',
+			'tvEdgeMenu.closeHint' => 'Надясно или Назад за затваряне',
+			'showDetailLayout.title' => 'Оформление на подробностите за сериала',
+			'showDetailLayout.description' => 'Изберете как да се показват сериалите и епизодите на телевизора.',
+			'showDetailLayout.compact' => 'Компактен списък с епизоди',
+			'showDetailLayout.cinematic' => 'Кино стил',
+			'showDetailLayout.seasons' => 'Изберете сезон',
+			'showDetailLayout.episodes' => 'Епизоди',
+			'showDetailLayout.details' => 'Подробности',
+			'showDetailLayout.cast' => 'Актьорски състав',
+			'showDetailLayout.related' => 'Подобни заглавия',
+			'iconStyles.title' => 'Стил на иконите',
+			'iconStyles.description' => 'Изберете изгледа на бутоните в приложението. Промените важат за този профил.',
+			'iconStyles.current' => 'Luroka Bold',
+			'iconStyles.lucide' => 'Lucide',
+			'iconStyles.lucideDescription' => 'Изчистени линейни икони с резервни икони Material при липсващи символи.',
+			'iconStyles.outline' => 'Material Outline',
 			_ => null,
 		};
 	}

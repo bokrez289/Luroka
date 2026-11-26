@@ -823,6 +823,17 @@ class PlayerNative extends PlayerBase {
     await setProperty('aid', track.id);
   }
 
+  /// Only load a completed local extraction here: a remote sub-add can
+  /// block mpv while the media server scans the file. TrackManager selects
+  /// the native track by its original sidecar URI after discovery.
+  Future<void> attachDownloadedSubtitle(String filename, SubtitleTrack original) async {
+    if (_nativeCoreUnavailable) return;
+    registerDownloadedSubtitle(filename, original);
+    await invoke('command', {
+      'args': ['sub-add', filename, 'auto', original.title ?? '', original.language ?? ''],
+    });
+  }
+
   @override
   Future<void> selectSubtitleTrack(SubtitleTrack track) async {
     if (_nativeCoreUnavailable) return;

@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import '../media/artist_discography.dart';
 import '../media/download_resolution.dart';
 import '../media/episode_collection.dart';
+import '../media/home_progress.dart';
 import '../media/library_filter_result.dart';
 import '../media/library_first_character.dart';
 import '../media/library_query.dart';
@@ -1722,11 +1723,13 @@ class PlexClient
         // `targetLibrarySectionID` forms. Without a section id the item cannot
         // be matched against the user's hidden libraries.
         final wrapper = Map<String, dynamic>.from(result);
-        results.add(_createTaggedMetadataWithLibrary(
-          metadata,
-          librarySectionID: _librarySectionIdFromJson(wrapper),
-          librarySectionTitle: _librarySectionTitleFromJson(wrapper),
-        ));
+        results.add(
+          _createTaggedMetadataWithLibrary(
+            metadata,
+            librarySectionID: _librarySectionIdFromJson(wrapper),
+            librarySectionTitle: _librarySectionTitleFromJson(wrapper),
+          ),
+        );
       } catch (e) {
         appLogger.w('Failed to parse search result', error: e);
       }
@@ -1739,7 +1742,7 @@ class PlexClient
   /// Prefer the provider's dedicated Continue Watching feature key when
   /// advertised; fall back to Plex Web's legacy hubs query. Both respect the
   /// server's OnDeckWindow preference (unlike /library/onDeck).
-  Future<List<PlexMetadataDto>> _getContinueWatching({int? count = 20}) async {
+  Future<List<PlexMetadataDto>> _getContinueWatching({int? count = 20, void Function(bool)? onHasMore}) async {
     final continueWatchingHubKey = _providerContinueWatchingHubKey;
     final queryParameters = <String, dynamic>{'count': ?count, 'includeGuids': 1};
     if (continueWatchingHubKey == null) {
@@ -1761,6 +1764,7 @@ class PlexClient
     final sname = serverName;
     final data = response.data as Map<String, dynamic>;
     final hubs = await tryIsolateRun(() => _processHubResponse(data, sid, sname));
+    onHasMore?.call(count != null && hubs.any((hub) => hub.items.length >= count));
     // Deduplicate across home.continue and home.ondeck hubs.
     // Like plex-web, episodes from the same show (same grandparentRatingKey)
     // are deduplicated, preferring the in-progress item (has viewOffset).
@@ -4582,7 +4586,12 @@ class PlexClient
     final filters = const PlexLibraryQueryTranslator().toQueryParameters(query);
     filters['includeCollections'] = '1';
     final result = await fetchLibraryPage(
-      libraryId, start: query.offset, size: query.limit, filters: filters, abort: abort, onRawCount: onRawCount,
+      libraryId,
+      start: query.offset,
+      size: query.limit,
+      filters: filters,
+      abort: abort,
+      onRawCount: onRawCount,
     );
     return LibraryPage(items: result.items, totalCount: result.totalSize, offset: query.offset);
   }
@@ -4645,13 +4654,38 @@ class PlexClient
     return people.values.toList();
   }
 
-  /// [excludedLibraryIds] is unused: every row carries its `librarySectionID`,
-  /// so the caller filters hidden libraries out of the mapped results.
+  final _homeProgressDates = HomeProgressDates();
+
+  /// Refill after filtering instead of allowing hidden libraries to consume
+  /// the entire preview. Grow only the server's shelf, never scan its library.
   @override
   Future<List<MediaItem>> fetchContinueWatching({int? count = 20, Set<String> excludedLibraryIds = const {}}) async {
-    final items = await _getContinueWatching(count: KidsProfileService.instance.continueWatchingFetchCount(count));
-    final visible = items.map((m) => PlexMappers.mediaItem(m)).allowedForProfile(continueWatching: true);
-    return count == null ? visible : visible.take(count).toList();
+    if (count != null && count <= 0) return const [];
+    var requested = KidsProfileService.instance.continueWatchingFetchCount(count) ?? 200;
+    Set<String>? previousKeys;
+    while (true) {
+      var hasMore = false;
+      final items = await _getContinueWatching(count: requested, onHasMore: (value) => hasMore = value);
+      final mapped = _homeProgressDates.restore(items.map((m) => PlexMappers.mediaItem(m)).toList());
+      final keys = mapped.map((item) => item.globalKey).toSet();
+      final visible = orderHomeProgress(
+        rankHomeProgress(
+          mapped
+              .where((item) => !excludedLibraryIds.contains(item.libraryId))
+              .allowedForProfile(continueWatching: true)
+              .where(showHomeProgress)
+              .toList(),
+          'plexContinue',
+        ),
+      );
+      if ((count != null && visible.length >= count) ||
+          !hasMore ||
+          (previousKeys != null && keys.length == previousKeys.length && keys.containsAll(previousKeys))) {
+        return count == null ? visible : visible.take(count).toList();
+      }
+      previousKeys = keys;
+      requested *= 2;
+    }
   }
 
   @override

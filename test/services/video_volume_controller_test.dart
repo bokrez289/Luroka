@@ -319,8 +319,8 @@ void main() {
   for (final adapter in <({String name, String methodChannel, String eventChannel, Player Function() create})>[
     (
       name: 'PlayerNative',
-      methodChannel: 'com.plezy/mpv_player',
-      eventChannel: 'com.plezy/mpv_player/events',
+      methodChannel: 'com.luroka/mpv_player',
+      eventChannel: 'com.luroka/mpv_player/events',
       create: PlayerNative.new,
     ),
     (

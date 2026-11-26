@@ -102,7 +102,9 @@ void main() {
                 ],
               });
             }
-            if (request.url.path.endsWith('/Items/Resume') || request.url.path == '/UserItems/Resume') {
+            if (request.url.path.endsWith('/Items/Resume') ||
+                request.url.path.endsWith('/Sections/resume/Items') ||
+                request.url.path == '/UserItems/Resume') {
               return jsonResponse({
                 'Items': [...resume, if (emby) next],
               });
@@ -356,7 +358,7 @@ void main() {
         'Fields': 'Overview,DateCreated,ProductionYear,OfficialRating,PremiereDate,UserDataLastPlayedDate',
         'MediaTypes': 'Video',
         'Recursive': 'true',
-        'EnableTotalRecordCount': 'false',
+        'EnableTotalRecordCount': 'true',
         'EnableImageTypes': 'Primary,Backdrop,Logo',
         'ImageTypeLimit': '3',
       });

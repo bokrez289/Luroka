@@ -3727,8 +3727,8 @@ MIME type information from file-4.26.tar.gz (http://www.darwinsys.com/file/)
     SUCH DAMAGE.
 
 
-IPTC Photo Metadata descriptions are taken from the IPTC Photo Metadata
-Standard, July 2010, Copyright 2010 International Press Telecommunications
+IPTC Photo Metadata descriptions are taken from the IPTC Photo Metadata 
+Standard, July 2010, Copyright 2010 International Press Telecommunications 
 Council.
 
   1. The Specifications and Materials are licensed for use only on the condition that you agree to be bound by the terms of this license. Subject to this and other licensing requirements contained herein, you may, on a non-exclusive basis, use the Specifications and Materials.

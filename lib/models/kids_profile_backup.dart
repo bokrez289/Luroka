@@ -12,6 +12,7 @@ class KidsProfileBackup {
     required this.name,
     required this.maxAge,
     required this.theme,
+    this.quietScenery,
     required this.avatar,
     required Set<String>? libraries,
     required this.animationOnly,
@@ -29,6 +30,7 @@ class KidsProfileBackup {
   final String name;
   final int maxAge;
   final bool theme;
+  final bool? quietScenery;
   final KidsAvatarKind avatar;
   final Set<String>? libraries;
   final bool animationOnly;
@@ -45,6 +47,7 @@ class KidsProfileBackup {
       'name': name,
       'maxAge': maxAge,
       'theme': theme,
+      if (quietScenery != null) 'quietScenery': quietScenery,
       'avatar': avatar.name,
       'libraries': libraries?.toList(),
       'animationOnly': animationOnly,
@@ -80,6 +83,7 @@ class KidsProfileBackup {
         age is! int ||
         !const [0, 7, 12, 16].contains(age) ||
         profile['theme'] is! bool ||
+        (profile['quietScenery'] != null && profile['quietScenery'] is! bool) ||
         profile['animationOnly'] is! bool ||
         profile['allowUnrated'] is! bool ||
         !KidsAvatarKind.values.any((value) => value.name == avatar) ||
@@ -104,6 +108,7 @@ class KidsProfileBackup {
       name: name.trim(),
       maxAge: age,
       theme: profile['theme'] as bool,
+      quietScenery: profile['quietScenery'] as bool?,
       avatar: KidsAvatarKind.fromId(avatar as String),
       libraries: profile['libraries'] == null ? null : strings(profile['libraries'], 2000).toSet(),
       animationOnly: profile['animationOnly'] as bool,

@@ -124,6 +124,7 @@ abstract final class LurokaBackupSnapshot {
     }
     final bindingProfileIds = <String>{};
     final connectionIds = <String>{};
+    final homeUsersByConnection = <String, Set<String>>{};
     for (final row in bindings) {
       final profileId = row['profileId'];
       final connectionId = row['connectionId'];
@@ -132,6 +133,10 @@ abstract final class LurokaBackupSnapshot {
       }
       bindingProfileIds.add(profileId);
       connectionIds.add(connectionId);
+      final userId = row['userIdentifier'];
+      if (userId is String && userId.isNotEmpty) {
+        homeUsersByConnection.putIfAbsent(connectionId, () => {}).add(userId);
+      }
     }
     // A virtual Plex Home profile has no database profile row, but it does
     // have a binding. Every selected id must occur in one or the other.
@@ -184,6 +189,16 @@ abstract final class LurokaBackupSnapshot {
         throw const FormatException('Backup selection changed');
       }
       if (key == _kidsKey) _validateScopedKidsPreference(entry.value, expectedProfileIds);
+      if (key.startsWith('plex_home_users_')) {
+        final connectionId = key.substring('plex_home_users_'.length);
+        final allowed = homeUsersByConnection[connectionId] ?? const <String>{};
+        if (entry.value is! String ||
+            decodePlexHomeUsersCache(
+              entry.value as String,
+            ).any((user) => user.uuid.isEmpty || !allowed.contains(user.uuid))) {
+          throw const FormatException('Invalid Plex Home cache');
+        }
+      }
     }
   }
 
@@ -343,11 +358,27 @@ abstract final class LurokaBackupSnapshot {
       }
     }
     final preferences = <String, Object?>{};
-    for (final connectionId in virtuals.values.map((p) => p.parentConnectionId!).toSet()) {
+    for (final connection in connectionRows.where((row) => row.kind == 'plex')) {
+      final connectionId = connection.id;
       final users = <PlexHomeUser>[];
+      // Local Luroka profiles can be bound to individual Plex Home users.
+      // Preserve only identities referenced by the selected profiles, not
+      // the complete household cache or any other person's local data.
+      if (selectedProfileIds != null) {
+        final allowed = joinRows
+            .where((row) => row.connectionId == connectionId)
+            .map((row) => row.userIdentifier)
+            .where((id) => id.isNotEmpty)
+            .toSet();
+        final cached = prefs.getString('plex_home_users_$connectionId');
+        if (cached != null && allowed.isNotEmpty) {
+          users.addAll(decodePlexHomeUsersCache(cached).where((user) => allowed.contains(user.uuid)));
+        }
+      }
       for (final profile in virtuals.values.where(
         (p) => selectedProfileIds!.contains(p.id) && p.parentConnectionId == connectionId,
       )) {
+        if (users.any((user) => user.uuid == profile.plexHomeUserUuid)) continue;
         users.add(
           PlexHomeUser(
             id: 0,
@@ -363,7 +394,9 @@ abstract final class LurokaBackupSnapshot {
           ),
         );
       }
-      if (users.isNotEmpty) preferences['plex_home_users_$connectionId'] = encodePlexHomeUsersCacheJson(users);
+      if (selectedProfileIds != null && users.isNotEmpty) {
+        preferences['plex_home_users_$connectionId'] = encodePlexHomeUsersCacheJson(users);
+      }
     }
     if (selectedProfileIds != null) {
       final selectedScopes = selectedProfileIds.map(profileUserScope).toSet();
@@ -608,6 +641,7 @@ abstract final class LurokaBackupSnapshot {
         return true;
       }
     }
+
     if (conflictsWithPolicy(existingPolicy)) {
       // Never silently replace existing parental policy, even when the identity
       // database is empty. Recovery must be resolved explicitly by the owner.

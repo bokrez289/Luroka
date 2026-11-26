@@ -23,7 +23,7 @@ class MobileHomeCarousel extends StatefulWidget {
 
   /// Keep the full poster and caption, but budget against the actual body
   /// viewport (after navigation/status bars), leaving a peek of the shelves.
-  static double heightFor(BuildContext context, double width, {double? availableHeight}) {
+  static double heightFor(BuildContext context, double width, {double? availableHeight, bool kids = false, bool? cinematicOverride}) {
     final scale = MediaQuery.textScalerOf(context).scale(16) / 16;
     if (MediaQuery.sizeOf(context).shortestSide >= 600) {
       final natural = (width * .42).clamp(300.0, 460.0) + (scale - 1).clamp(0, 2) * 100;
@@ -32,7 +32,20 @@ class MobileHomeCarousel extends StatefulWidget {
       return natural.clamp(240.0, maximum).toDouble();
     }
     final posterWidth = (width * pageFraction - 12).clamp(120.0, 360.0);
-    final natural = posterWidth * 1.5 + 72 + 178 * scale;
+    final size = kids
+        ? PhoneSpotlightSize.large
+        : SettingsService.instanceOrNull?.read(SettingsService.phoneSpotlightSize) ?? PhoneSpotlightSize.compact;
+    final posterFactor = switch (size) {
+      PhoneSpotlightSize.compact => .65,
+      PhoneSpotlightSize.standard => 1.0,
+      PhoneSpotlightSize.large => 1.5,
+    };
+    if (!kids && (cinematicOverride ?? SettingsService.instanceOrNull?.read(SettingsService.phoneCinematicSpotlight) ?? true)) {
+      final minimum = 288.0 + (scale - 1).clamp(0, 2) * 140;
+      final natural = minimum + width * (posterFactor - .65) * .36;
+      return availableHeight == null ? natural : natural.clamp(minimum, (availableHeight - 72).clamp(minimum, double.infinity)).toDouble();
+    }
+    final natural = posterWidth * posterFactor + 72 + (kids ? 178 : 185) * scale;
     if (availableHeight == null) return natural;
     final minimum = 300 + (scale - 1).clamp(0, 2) * 140;
     return natural.clamp(minimum, (availableHeight - 72).clamp(minimum, double.infinity)).toDouble();
@@ -48,6 +61,7 @@ class MobileHomeCarousel extends StatefulWidget {
     required this.onDetails,
     required this.active,
     this.kidsStyle,
+    this.cinematicOverride,
   });
 
   final List<MediaItem> items;
@@ -57,6 +71,7 @@ class MobileHomeCarousel extends StatefulWidget {
   final ValueChanged<MediaItem> onPlay, onDetails;
   final bool active;
   final KidsStyle? kidsStyle;
+  final bool? cinematicOverride;
 
   @override
   State<MobileHomeCarousel> createState() => _MobileHomeCarouselState();
@@ -66,10 +81,13 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
   final _phonePages = PageController(viewportFraction: MobileHomeCarousel.pageFraction);
   final _tabletPages = PageController(viewportFraction: .94);
   bool _tablet = false;
-  PageController get _pages => _tablet ? _tabletPages : _phonePages;
+  bool get _cinematic => widget.kidsStyle == null && !_tablet &&
+      (widget.cinematicOverride ?? SettingsService.instanceOrNull?.read(SettingsService.phoneCinematicSpotlight) ?? true);
+  PageController get _pages => _tablet || _cinematic ? _tabletPages : _phonePages;
   late final HomePreviewController _preview;
   ValueListenable<TickerModeData>? _ticker;
   Timer? _timer;
+  Listenable? _rotationPreferences;
   int _index = 0;
   bool _foreground = true, _touching = false, _dragging = false;
   bool _reduceMotion = false;
@@ -82,6 +100,7 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
       !_touching &&
       !_dragging &&
       !_reduceMotion &&
+      (SettingsService.instanceOrNull?.read(SettingsService.homeSpotlightAutoRotate) ?? true) &&
       (_ticker?.value.enabled ?? true) &&
       widget.items.length > 1 &&
       (ModalRoute.of(context)?.isCurrent ?? true);
@@ -90,6 +109,13 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    final settings = SettingsService.instanceOrNull;
+    if (settings != null) {
+      _rotationPreferences = Listenable.merge([
+        settings.listenable(SettingsService.homeSpotlightAutoRotate),
+        settings.listenable(SettingsService.homeSpotlightInterval),
+      ])..addListener(_schedule);
+    }
     _preview = HomePreviewController(
       includeRatings: true,
       resolveClient: (item) => widget.resolveClient(item),
@@ -157,7 +183,8 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
   void _schedule({bool interacted = false}) {
     _timer?.cancel();
     if (!_canRotate) return;
-    _timer = Timer(Duration(seconds: interacted ? 12 : 7), () {
+    final interval = (SettingsService.instanceOrNull?.read(SettingsService.homeSpotlightInterval) ?? 15).clamp(10, 60);
+    _timer = Timer(Duration(seconds: interval), () {
       if (!_canRotate || !_pages.hasClients) return;
       _pages.animateToPage(
         (_index + 1) % widget.items.length,
@@ -176,6 +203,7 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
   @override
   void dispose() {
     _timer?.cancel();
+    _rotationPreferences?.removeListener(_schedule);
     _ticker?.removeListener(_visibilityChanged);
     WidgetsBinding.instance.removeObserver(this);
     _preview.dispose();
@@ -245,7 +273,7 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
                     final original = widget.items[index];
                     final item = preview?.item.globalKey == original.globalKey ? preview!.item : original;
                     if (!KidsProfileService.instance.allows(item)) return const SizedBox.shrink();
-                    return _tablet ? _tabletSpotlight(context, item) : _poster(context, item);
+                    return _tablet ? _tabletSpotlight(context, item) : _cinematic ? _landscape(context, item) : _poster(context, item);
                   },
                 ),
               ),
@@ -465,6 +493,56 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
     );
   }
 
+  Widget _landscape(BuildContext context, MediaItem item) {
+    final backdrop = item.isEpisode ? item.grandparentArtPath : item.artPath;
+    final poster = item.isEpisode ? item.grandparentThumbPath ?? item.parentThumbPath : item.thumbPath;
+    final playable = item.isMovie || item.isEpisode;
+    void details() {
+      _schedule(interacted: true);
+      widget.onDetails(item);
+    }
+    return ClipRRect(
+      key: ValueKey('cinematic_feature_${item.globalKey}'),
+      borderRadius: BorderRadius.circular(20),
+      child: Stack(fit: StackFit.expand, children: [
+        const ColoredBox(color: Color(0xff172238)),
+        if (backdrop != null || poster != null)
+          GestureDetector(onTap: details, child: OptimizedMediaImage(
+            client: widget.resolveClient(item), imagePath: backdrop ?? poster,
+            imageType: backdrop == null ? ImageType.poster : ImageType.art,
+            fit: backdrop == null ? BoxFit.contain : BoxFit.cover,
+            alignment: Alignment.centerRight,
+          )),
+        const IgnorePointer(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
+          begin: Alignment.topRight, end: Alignment.bottomLeft,
+          colors: [Colors.transparent, Color(0x55000000), Color(0xee000000)],
+          stops: [.12, .54, .95],
+        )))),
+        Align(alignment: AlignmentDirectional.bottomStart, child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(_safeTitle(item), maxLines: 3, overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white, fontSize: 22, height: 1.1, fontWeight: FontWeight.w800)),
+            Text([item.isMovie ? t.discover.movie : t.discover.tvShow, if (item.year != null) '${item.year}'].join(' · '),
+              style: const TextStyle(color: Colors.white, fontSize: 13)),
+            const SizedBox(height: 6),
+            Row(children: [
+              Flexible(child: FilledButton.icon(
+                key: ValueKey('mobile_feature_open_${item.globalKey}'),
+                onPressed: playable ? () { _schedule(interacted: true); widget.onPlay(item); } : details,
+                icon: Icon(playable ? Icons.play_arrow_rounded : Icons.info_outline_rounded),
+                label: Text(playable ? (item.hasActiveProgress || ((item.viewOffsetMs ?? 0) > 0 && item.durationMs == null)
+                    ? t.common.resume : t.common.play) : t.mediaMenu.viewDetails, maxLines: 1, overflow: TextOverflow.ellipsis),
+              )),
+              if (playable) IconButton(onPressed: details, tooltip: t.mediaMenu.viewDetails,
+                icon: const Icon(Icons.info_outline_rounded, color: Colors.white)),
+            ]),
+          ]),
+        )),
+      ]),
+    );
+  }
+
   Widget _poster(BuildContext context, MediaItem item) {
     void details() {
       _schedule(interacted: true);
@@ -510,9 +588,14 @@ class _MobileHomeCarouselState extends State<MobileHomeCarousel> with WidgetsBin
                   Text(
                     _safeTitle(item),
                     key: ValueKey('mobile_feature_title_${item.globalKey}'),
-                    maxLines: 2,
+                    maxLines: kids == null ? 3 : 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: colors.onSurface, fontSize: 22, fontWeight: FontWeight.w800, height: 1.1),
+                    style: TextStyle(
+                      color: colors.onSurface,
+                      fontSize: kids == null ? 19 : 22,
+                      fontWeight: FontWeight.w800,
+                      height: 1.1,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(

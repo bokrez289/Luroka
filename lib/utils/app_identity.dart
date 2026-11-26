@@ -1,9 +1,9 @@
-/// App identity and links shared across the interface.
+/// Fork identity kept separate from translated upstream product copy.
 abstract final class AppIdentity {
   static const name = 'Luroka';
   static const logoAsset = 'assets/luroka.png';
   static const markAsset = 'assets/luroka-mark.svg';
-  static const sourceUrl = 'https://github.com/bokrez289/Luroka';
+  static const sourceUrl = 'https://github.com/bokrez289/luroka';
   static const androidUpdateFeedUrl = '';
   static const upstreamUrl = 'https://github.com/edde746/plezy';
   static const upstreamWebsiteUrl = 'https://github.com/edde746/plezy';

@@ -300,6 +300,7 @@
     "notificationProgress": "{progress} · {networkSpeed} · {timeRemaining} resterend"
   },
   "kidsShelf": {
+    "quietScenery": "Rustig nachtlandschap",
     "movieShelf": "Film tijd",
     "showShelf": "Vind je volgende show",
     "aurora": "Aurora – diep wintertaling en limoen",
@@ -604,7 +605,9 @@
     "availabilityUnknown": "Sommige bibliotheken konden niet worden gecontroleerd. Probeer te vernieuwen.",
     "noAvailable": "Er zijn geen overeenkomende titels gevonden in de aangevinkte bibliotheken.",
     "sourceInfo": "Wekelijkse trends en geselecteerde prijswinnaars · TMDb",
-    "configure": "Ontdekkingsinstellingen"
+    "configure": "Ontdekkingsinstellingen",
+    "filterOwned": "In mijn bibliotheken",
+    "statusRetry": "Kon Seerr niet controleren · Opnieuw proberen"
   },
   "app": {
     "title": "Luroka"
@@ -1139,7 +1142,11 @@
     "playerScopeLibrary": "Per bibliotheek",
     "playerScopeTitle": "Per serie of film",
     "exportDialogTitle": "Luroka-instellingen exporteren",
-    "velvetHourTheme": "Fluwelen uur"
+    "velvetHourTheme": "Fluwelen uur",
+    "backdropBrightness": "Helderheid van achtergrond",
+    "backdropBrightnessDescription": "Pas de schaduw over Startpagina en titelafbeeldingen aan. 100% is de standaardinstelling.",
+    "showEarlyNextEpisode": "Toon Volgende voordat een aflevering eindigt",
+    "showEarlyNextEpisodeDescription": "Toon de volgende aflevering tijdens de aftiteling of in de laatste 30 seconden."
   },
   "themeEditor": {
     "builtIn": "Ingebouwd",
@@ -1311,6 +1318,9 @@
     "episodesLeft": "${count} afleveringen over"
   },
   "lurokaThemes": {
+    "patina": "Patina · diep blauwgroen en koper",
+    "afterimage": "Nabeeld · indigo en neonroze",
+    "letterpress": "Boekdruk · papier en bordeauxrode inkt",
     "title": "Luroka bioscooppaletten",
     "coral": "Koraal · middernachtblauw en zonsondergang",
     "ocean": "Oceaan · diepblauw en ijs",
@@ -1394,7 +1404,15 @@
     "reset": "Standaardrijen herstellen",
     "resetDescription": "De oorspronkelijke rijvolgorde herstellen en alle rijen voor dit profiel weergeven? Uw vastgezette collecties blijven behouden.",
     "saveFailed": "Kan uw woningindeling niet opslaan. Probeer het opnieuw.",
-    "emptyHint": "Rijen zijn mogelijk verborgen. Open Personaliseer Startpagina om ze opnieuw te tonen."
+    "emptyHint": "Rijen zijn mogelijk verborgen. Open Personaliseer Startpagina om ze opnieuw te tonen.",
+    "upcomingEpisodes": "Aankomende afleveringen",
+    "upcomingOff": "Uit",
+    "upcomingFavorites": "Favorieten",
+    "upcomingWatched": "Eerder bekeken",
+    "upcomingAll": "Alle programma's",
+    "upcomingBoth": "Favorieten en eerder bekeken",
+    "upcomingHint": "Aankomende uitzenddatums worden alleen op de achtergrond gecontroleerd wanneer deze rij is ingeschakeld. De resultaten zijn beperkt en zijn mogelijk nog niet beschikbaar op je server.",
+    "airDate": "Uitzenddatum: ${date}"
   },
   "screenTime": {
     "title": "Schermtijd",
@@ -1449,7 +1467,35 @@
     "sessionNoTitle": "Ongeïdentificeerd afspelen",
     "emptyTitle": "Hier nog niets",
     "emptyBody": "Kijk iets en je statistieken worden hier opgebouwd.",
-    "noDataInPeriod": "Geen weergave opgenomen in deze periode."
+    "noDataInPeriod": "Geen weergave opgenomen in deze periode.",
+    "overview": "Overzicht",
+    "history": "Geschiedenis",
+    "patternsTab": "Patronen",
+    "gettingStarted": "De activiteit is net begonnen. Kijkpatronen worden na een paar actieve dagen weergegeven.",
+    "monthlyRecap": "Maandelijks overzicht",
+    "measurementHint": "De tijd geeft het geregistreerde afspelen weer, niet de voltooide titels.",
+    "ledgerScope": "De activiteit is afkomstig uit het lokale Luroka-afspeelregister van dit profiel. De kijkgeschiedenis van de server en het afspelen in andere apps zijn niet inbegrepen.",
+    "watchedPeriod": "Bekeken in deze periode",
+    "activeDays": "Actieve dagen",
+    "dailyAverage": "Daggemiddelde",
+    "previousPeriod": "Vorige periode",
+    "insufficientHistory": "Onvoldoende geschiedenis",
+    "drillDown": "Activiteit voor deze datums bekijken",
+    "searchHistory": "Kijkgeschiedenis doorzoeken",
+    "allKinds": "Alles",
+    "moviesFilter": "Films",
+    "episodesFilter": "Afleveringen",
+    "datesFilter": "Datums",
+    "clearDates": "Datums wissen",
+    "noMatches": "Er zijn geen weergaven die aan deze filters voldoen.",
+    "allHistory": "Bekijk alle geschiedenis",
+    "historyError": "Kon de geschiedenis niet laden. Probeer het opnieuw.",
+    "titlesPlayed": "${count} afgespeelde titels · afleveringen afzonderlijk geteld",
+    "monthWatched": "${duration} deze maand bekeken",
+    "lifetimeSummary": "Totaal: ${total} · Dagelijks gemiddelde: ${average}",
+    "chartScale": "Schaal: 0 – ${duration}",
+    "titlesPlayedLabel": "Afgespeelde titels",
+    "playedHint": "Afleveringen tellen afzonderlijk. De afspeeltijd geeft niet aan of de aflevering is voltooid."
   },
   "search": {
     "hint": "Zoek films, series, muziek...",
@@ -1655,7 +1701,8 @@
     "mediaFailedToDelete": "Verwijderen van media-item mislukt",
     "rate": "Beoordelen",
     "playFromBeginning": "Afspelen vanaf het begin",
-    "playVersion": "Versie afspelen..."
+    "playVersion": "Versie afspelen...",
+    "removeFromNextUp": "Verwijderen uit Volgende"
   },
   "rateSheet": {
     "title": "Beoordelen",
@@ -1664,7 +1711,9 @@
     "favorited": "Toegevoegd aan favorieten",
     "saved": "Opgeslagen",
     "notAvailable": "Geen overeenkomst gevonden",
-    "noConnectedServices": "Koppel een dienst in Instellingen om daar een beoordeling te geven."
+    "noConnectedServices": "Koppel een dienst in Instellingen om daar een beoordeling te geven.",
+    "addFavorite": "Aan favorieten toevoegen",
+    "removeFavorite": "Verwijderen uit favorieten"
   },
   "accessibility": {
     "mediaCardMovie": "${title}, film",
@@ -1873,7 +1922,9 @@
     "streamSelectionUnavailable": "Streamselectie is niet beschikbaar voor deze bron",
     "streamSelectionFailed": "Kon de geselecteerde streams niet toepassen",
     "trackSelectionNotRemembered": "Deze trackkeuze geldt alleen voor het huidige afspelen.",
-    "serverUnavailableForProfile": "Er is geen server beschikbaar voor het actieve profiel"
+    "serverUnavailableForProfile": "Er is geen server beschikbaar voor het actieve profiel",
+    "logSupportReference": "Supportreferentie",
+    "copyFullLogId": "Volledige log-ID kopiëren"
   },
   "sourceLibraries": {
     "title": "Uw servers en bibliotheken",
@@ -3596,5 +3647,39 @@
     "redirectDifferentHost": "De server heeft doorgestuurd naar een andere host. Voer de uiteindelijke ${product}-URL rechtstreeks in.",
     "redirectInsecure": "De server heeft van HTTPS doorgestuurd naar een onbeveiligde URL",
     "redirectUnsupportedEnterFinal": "De server heeft doorgestuurd naar een niet-ondersteunde URL. Voer de uiteindelijke ${product}-URL rechtstreeks in."
+  },
+  "episodeDetails": {
+    "previous": "Vorige aflevering",
+    "next": "Volgende aflevering"
+  },
+  "tvEdgeMenu": {
+    "title": "Tv-navigatie",
+    "top": "Bovenste balk",
+    "both": "Bovenste balk + zijmenu",
+    "hint": "Druk op Links vanaf het eerste item in een rij om het zijmenu te openen. Druk op Rechts of Terug om terug te keren.",
+    "browse": "Bladeren",
+    "more": "Meer",
+    "closeHint": "Rechts of Terug om te sluiten",
+    "tryMenu": "Navigatie proberen",
+    "allLibraries": "Alle bibliotheken"
+  },
+  "showDetailLayout": {
+    "title": "Indeling van details weergeven",
+    "description": "Kies hoe tv-programma's en -afleveringen op televisie worden weergegeven.",
+    "cinematic": "Cinematisch",
+    "compact": "Compacte afleveringenlijst",
+    "seasons": "Kies een seizoen",
+    "episodes": "Afleveringen",
+    "details": "Details",
+    "cast": "Cast",
+    "related": "Meer zoals dit"
+  },
+  "iconStyles": {
+    "title": "Pictogramstijl",
+    "description": "Kies hoe de bedieningselementen van de app eruitzien. Wijzigingen zijn van toepassing op dit profiel.",
+    "current": "Luroka Bold",
+    "outline": "Material Outline",
+    "lucide": "Lucide",
+    "lucideDescription": "Strakke lijnpictogrammen met Material-alternatieven voor niet-beschikbare symbolen."
   }
 }

@@ -143,6 +143,10 @@ class TranslationsKk extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$profileSetupGuide$kk profileSetupGuide = _Translations$profileSetupGuide$kk._(_root);
 	@override late final _Translations$animeFavorites$kk animeFavorites = _Translations$animeFavorites$kk._(_root);
 	@override late final _Translations$addServer$kk addServer = _Translations$addServer$kk._(_root);
+	@override late final _Translations$episodeDetails$kk episodeDetails = _Translations$episodeDetails$kk._(_root);
+	@override late final _Translations$tvEdgeMenu$kk tvEdgeMenu = _Translations$tvEdgeMenu$kk._(_root);
+	@override late final _Translations$showDetailLayout$kk showDetailLayout = _Translations$showDetailLayout$kk._(_root);
+	@override late final _Translations$iconStyles$kk iconStyles = _Translations$iconStyles$kk._(_root);
 }
 
 // Path: mobileLibrary
@@ -564,6 +568,7 @@ class _Translations$kidsShelf$kk extends Translations$kidsShelf$en {
 	final TranslationsKk _root; // ignore: unused_field
 
 	// Translations
+	@override String get quietScenery => 'Тыныш түнгі көрініс';
 	@override String get movieShelf => 'Кино уақыты';
 	@override String get showShelf => 'Келесі шоуыңызды табыңыз';
 	@override String get aurora => 'Аврора - терең көк және әк';
@@ -925,6 +930,8 @@ class _Translations$lurokaDiscovery$kk extends Translations$lurokaDiscovery$en {
 	@override String get noAvailable => 'Тексерілген кітапханалардан сәйкес атаулар табылмады.';
 	@override String get sourceInfo => 'Апталық трендтер және таңдалған марапат жеңімпаздары · TMDb';
 	@override String get configure => 'Ашу параметрлері';
+	@override String get filterOwned => 'Менің кітапханаларымда';
+	@override String get statusRetry => 'Seerr тексерілмеді · Қайталау';
 }
 
 // Path: app
@@ -1472,6 +1479,10 @@ class _Translations$settings$kk extends Translations$settings$en {
 	@override String get playerScopeTitle => 'Сериал немесе фильм бойынша';
 	@override String get exportDialogTitle => 'Luroka параметрлерін экспорттау';
 	@override String get velvetHourTheme => 'Барқыт сағаты';
+	@override String get backdropBrightness => 'Фон жарықтығы';
+	@override String get backdropBrightnessDescription => 'Басты бет пен туынды суреттерінің күңгірттігін реттеңіз. Әдепкі мәні — 100%.';
+	@override String get showEarlyNextEpisode => 'Келесі бөлімді ағымдағысы аяқталмай тұрып көрсету';
+	@override String get showEarlyNextEpisodeDescription => 'Келесі бөлімді титрлер кезінде немесе соңғы 30 секундта көрсету.';
 }
 
 // Path: themeEditor
@@ -1719,6 +1730,9 @@ class _Translations$lurokaThemes$kk extends Translations$lurokaThemes$en {
 	final TranslationsKk _root; // ignore: unused_field
 
 	// Translations
+	@override String get patina => 'Патина · қою көкшіл жасыл және мыс';
+	@override String get afterimage => 'Қалдық бейне · индиго және неон қызғылт';
+	@override String get letterpress => 'Баспахана · қағаз бен қою қызыл сия';
 	@override String get title => 'Luroka кинотеатр палитралары';
 	@override String get coral => 'Маржан · түн ортасы көк және күн батуы';
 	@override String get ocean => 'Мұхит · терең көк және мұз';
@@ -1817,6 +1831,14 @@ class _Translations$homeLayout$kk extends Translations$homeLayout$en {
 	@override String get resetDescription => 'Бастапқы жол ретін қалпына келтіру және осы профиль үшін барлық жолдарды көрсету керек пе? Бекітілген жинақтар сақталады.';
 	@override String get saveFailed => 'Үй макетін сақтау мүмкін болмады. Қайталап көріңіз.';
 	@override String get emptyHint => 'Жолдар жасырылуы мүмкін. Оларды қайта көрсету үшін Жекелендіру үйін ашыңыз.';
+	@override String get upcomingEpisodes => 'Алдағы бөлімдер';
+	@override String get upcomingFavorites => 'Таңдаулылар';
+	@override String get upcomingWatched => 'Бұрын көрілгендер';
+	@override String get upcomingBoth => 'Таңдаулылар және бұрын көрілгендер';
+	@override String get upcomingAll => 'Барлық сериалдар';
+	@override String get upcomingOff => 'Өшірулі';
+	@override String airDate({required Object date}) => 'Көрсету күні: ${date}';
+	@override String get upcomingHint => 'Алдағы көрсету күндері тек осы қатар қосулы кезде фондық режимде тексеріледі. Нәтижелер шектеулі және серверіңізде әлі қолжетімсіз болуы мүмкін.';
 }
 
 // Path: screenTime
@@ -1886,6 +1908,34 @@ class _Translations$activityStats$kk extends Translations$activityStats$en {
 	@override String get emptyTitle => 'Мұнда әлі ештеңе жоқ';
 	@override String get emptyBody => 'Бір нәрсені бақылаңыз және сіздің статистикаңыз осында жиналады.';
 	@override String get noDataInPeriod => 'Бұл кезеңде ойнату жазылмады.';
+	@override String get patternsTab => 'Көру әдеттері';
+	@override String get moviesFilter => 'Фильмдер';
+	@override String get episodesFilter => 'Бөлімдер';
+	@override String get datesFilter => 'Күндер';
+	@override String titlesPlayed({required Object count}) => 'Ойнатылған туындылар: ${count} · бөлімдер бөлек саналады';
+	@override String get previousPeriod => 'Алдыңғы кезең';
+	@override String lifetimeSummary({required Object total, required Object average}) => 'Барлық уақытта: ${total} · Күндік орташа: ${average}';
+	@override String get dailyAverage => 'Күндік орташа';
+	@override String get allKinds => 'Барлығы';
+	@override String get titlesPlayedLabel => 'Ойнатылған туындылар';
+	@override String get ledgerScope => 'Әрекет осы профильдің жергілікті Luroka ойнату журналынан алынады. Сервердің көру тарихы мен басқа қолданбалардағы ойнату кірмейді.';
+	@override String chartScale({required Object duration}) => 'Масштаб: 0 – ${duration}';
+	@override String get gettingStarted => 'Әрекет енді жинала бастады. Көру әдеттері бірнеше белсенді күннен кейін көрсетіледі.';
+	@override String get history => 'Тарих';
+	@override String get insufficientHistory => 'Тарих жеткіліксіз';
+	@override String get monthlyRecap => 'Айлық қорытынды';
+	@override String get noMatches => 'Бұл сүзгілерге сәйкес көру жазбалары жоқ.';
+	@override String get activeDays => 'Белсенді күндер';
+	@override String get measurementHint => 'Уақыт аяқталған туындыларды емес, тіркелген ойнатуды көрсетеді.';
+	@override String get historyError => 'Тарихты жүктеу мүмкін болмады. Қайталап көріңіз.';
+	@override String get watchedPeriod => 'Осы кезеңде көрілген';
+	@override String monthWatched({required Object duration}) => 'Осы айда ${duration} көрілді';
+	@override String get drillDown => 'Осы күндердегі әрекетті көру';
+	@override String get searchHistory => 'Көру тарихынан іздеу';
+	@override String get clearDates => 'Күндерді тазалау';
+	@override String get playedHint => 'Бөлімдер бөлек саналады. Ойнату уақыты туындының аяқталғанын білдірмейді.';
+	@override String get allHistory => 'Барлық тарихты көру';
+	@override String get overview => 'Шолу';
 }
 
 // Path: search
@@ -2094,6 +2144,7 @@ class _Translations$mediaMenu$kk extends Translations$mediaMenu$en {
 	@override String get rate => 'Бағалау';
 	@override String get playFromBeginning => 'Басынан бастап ойнату';
 	@override String get playVersion => 'Нұсқаны ойнату...';
+	@override String get removeFromNextUp => 'Келесі тізімінен алып тастау';
 }
 
 // Path: rateSheet
@@ -2110,6 +2161,8 @@ class _Translations$rateSheet$kk extends Translations$rateSheet$en {
 	@override String get saved => 'Сақталды';
 	@override String get notAvailable => 'Сәйкестік табылмады';
 	@override String get noConnectedServices => 'Бағалау үшін Баптаулардан қызметті қосыңыз.';
+	@override String get addFavorite => 'Таңдаулыларға қосу';
+	@override String get removeFavorite => 'Таңдаулылардан алып тастау';
 }
 
 // Path: accessibility
@@ -2344,6 +2397,8 @@ class _Translations$messages$kk extends Translations$messages$en {
 	@override String get streamSelectionFailed => 'Таңдалған ағындарды қолдану мүмкін болмады';
 	@override String get trackSelectionNotRemembered => 'Бұл жол таңдауы тек ағымдағы ойнатуға қолданылады.';
 	@override String get serverUnavailableForProfile => 'Белсенді профиль үшін қолжетімді сервер жоқ';
+	@override String get logSupportReference => 'Қолдау қызметіне арналған сілтеме';
+	@override String get copyFullLogId => 'Журналдың толық ID-сін көшіру';
 }
 
 // Path: sourceLibraries
@@ -3917,6 +3972,68 @@ class _Translations$addServer$kk extends Translations$addServer$en {
 	@override String redirectUnsupportedEnterFinal({required Object product}) => 'Сервер қолдау көрсетілмейтін URL-ге қайта бағыттады. Соңғы ${product} URL-ін тікелей енгізіңіз.';
 }
 
+// Path: episodeDetails
+class _Translations$episodeDetails$kk extends Translations$episodeDetails$en {
+	_Translations$episodeDetails$kk._(TranslationsKk root) : this._root = root, super.internal(root);
+
+	final TranslationsKk _root; // ignore: unused_field
+
+	// Translations
+	@override String get previous => 'Алдыңғы бөлім';
+	@override String get next => 'Келесі бөлім';
+}
+
+// Path: tvEdgeMenu
+class _Translations$tvEdgeMenu$kk extends Translations$tvEdgeMenu$en {
+	_Translations$tvEdgeMenu$kk._(TranslationsKk root) : this._root = root, super.internal(root);
+
+	final TranslationsKk _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Теледидардағы навигация';
+	@override String get top => 'Жоғарғы жолақ';
+	@override String get both => 'Жоғарғы жолақ және бүйірлік мәзір';
+	@override String get hint => 'Бүйірлік мәзірді ашу үшін қатардың бірінші элементінде солға басыңыз. Қайту үшін оңға немесе Артқа түймесін басыңыз.';
+	@override String get tryMenu => 'Навигацияны сынап көру';
+	@override String get allLibraries => 'Барлық кітапханалар';
+	@override String get browse => 'Шолу';
+	@override String get more => 'Қосымша';
+	@override String get closeHint => 'Жабу үшін оңға немесе Артқа басыңыз';
+}
+
+// Path: showDetailLayout
+class _Translations$showDetailLayout$kk extends Translations$showDetailLayout$en {
+	_Translations$showDetailLayout$kk._(TranslationsKk root) : this._root = root, super.internal(root);
+
+	final TranslationsKk _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Сериал мәліметтерінің орналасуы';
+	@override String get description => 'Теледидарда сериалдар мен бөлімдердің көрсетілу жолын таңдаңыз.';
+	@override String get compact => 'Бөлімдердің ықшам тізімі';
+	@override String get cinematic => 'Кинематографиялық';
+	@override String get seasons => 'Маусымды таңдаңыз';
+	@override String get episodes => 'Бөлімдер';
+	@override String get details => 'Мәліметтер';
+	@override String get cast => 'Актерлер';
+	@override String get related => 'Ұқсас туындылар';
+}
+
+// Path: iconStyles
+class _Translations$iconStyles$kk extends Translations$iconStyles$en {
+	_Translations$iconStyles$kk._(TranslationsKk root) : this._root = root, super.internal(root);
+
+	final TranslationsKk _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Белгіше стилі';
+	@override String get description => 'Қолданба басқару элементтерінің көрінісін таңдаңыз. Өзгерістер осы профильге қолданылады.';
+	@override String get current => 'Luroka Bold';
+	@override String get lucide => 'Lucide';
+	@override String get lucideDescription => 'Қарапайым сызықтық белгішелер; қолжетімсіз белгішелер Material белгішелерімен ауыстырылады.';
+	@override String get outline => 'Material Outline';
+}
+
 // Path: appIcon.names
 class _Translations$appIcon$names$kk extends Translations$appIcon$names$en {
 	_Translations$appIcon$names$kk._(TranslationsKk root) : this._root = root, super.internal(root);
@@ -5116,6 +5233,7 @@ extension on TranslationsKk {
 			'downloadsRedesign.downloaded' => 'Жүктеп алынды',
 			'downloadsRedesign.speed' => 'Жүктеп алу жылдамдығы',
 			'downloadsRedesign.notificationProgress' => '{progress} · {networkSpeed} · {timeRemaining} қалды',
+			'kidsShelf.quietScenery' => 'Тыныш түнгі көрініс',
 			'kidsShelf.movieShelf' => 'Кино уақыты',
 			'kidsShelf.showShelf' => 'Келесі шоуыңызды табыңыз',
 			'kidsShelf.aurora' => 'Аврора - терең көк және әк',
@@ -5365,9 +5483,9 @@ extension on TranslationsKk {
 			'kids.historyReset' => 'Балалардың көру ерекшеліктері қалпына келтірілді',
 			'kids.blocked' => 'Бұл атау осы балалар профилінде қолжетімді емес.',
 			'kids.switchProfile' => 'Профильді ауыстыру',
-			'kids.manageFromAdult' => 'Параметрлерді басқару үшін ересектерге арналған профильге ауысыңыз.',
 			_ => null,
 		} ?? switch (path) {
+			'kids.manageFromAdult' => 'Параметрлерді басқару үшін ересектерге арналған профильге ауысыңыз.',
 			'kids.noConnections' => 'Балалар профилін қоспас бұрын серверді ересек профиліңізге қосыңыз.',
 			'kids.created' => 'Балалар профилі жасалды',
 			'kids.updated' => 'Балалар профилі жаңартылды',
@@ -5407,6 +5525,8 @@ extension on TranslationsKk {
 			'lurokaDiscovery.noAvailable' => 'Тексерілген кітапханалардан сәйкес атаулар табылмады.',
 			'lurokaDiscovery.sourceInfo' => 'Апталық трендтер және таңдалған марапат жеңімпаздары · TMDb',
 			'lurokaDiscovery.configure' => 'Ашу параметрлері',
+			'lurokaDiscovery.filterOwned' => 'Менің кітапханаларымда',
+			'lurokaDiscovery.statusRetry' => 'Seerr тексерілмеді · Қайталау',
 			'app.title' => 'Luroka',
 			'appIcon.title' => 'Қолданба белгішесі',
 			'appIcon.defaultIcon' => 'Әдепкі',
@@ -5877,11 +5997,11 @@ extension on TranslationsKk {
 			'settings.liveTvDefaultFavoritesDescription' => 'Тікелей TV ашылғанда тек таңдаулы арналарды көрсету',
 			'settings.general' => 'Жалпы',
 			'settings.generalDescription' => 'Тіл, іске қосу және терезе мінез-құлқы',
+			_ => null,
+		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Тіл және аймақ',
 			'settings.startup' => 'Іске қосу',
 			'settings.display' => 'Дисплей',
-			_ => null,
-		} ?? switch (path) {
 			'settings.libraryAndCards' => 'Кітапхана және карточкалар',
 			'settings.homeScreen' => 'Басты экран',
 			'settings.navigation' => 'Навигация',
@@ -5916,6 +6036,10 @@ extension on TranslationsKk {
 			'settings.playerScopeTitle' => 'Сериал немесе фильм бойынша',
 			'settings.exportDialogTitle' => 'Luroka параметрлерін экспорттау',
 			'settings.velvetHourTheme' => 'Барқыт сағаты',
+			'settings.backdropBrightness' => 'Фон жарықтығы',
+			'settings.backdropBrightnessDescription' => 'Басты бет пен туынды суреттерінің күңгірттігін реттеңіз. Әдепкі мәні — 100%.',
+			'settings.showEarlyNextEpisode' => 'Келесі бөлімді ағымдағысы аяқталмай тұрып көрсету',
+			'settings.showEarlyNextEpisodeDescription' => 'Келесі бөлімді титрлер кезінде немесе соңғы 30 секундта көрсету.',
 			'themeEditor.builtIn' => 'Кірістірілген',
 			'themeEditor.presets' => 'Алдын ала баптаулар',
 			'themeEditor.custom' => 'Арнаулы',
@@ -6057,6 +6181,9 @@ extension on TranslationsKk {
 			'referenceDetails.continuing' => 'Жалғастыруда',
 			'referenceDetails.upNext' => 'Келесі',
 			'referenceDetails.episodesLeft' => ({required Object count}) => '${count} эпизодтары қалды',
+			'lurokaThemes.patina' => 'Патина · қою көкшіл жасыл және мыс',
+			'lurokaThemes.afterimage' => 'Қалдық бейне · индиго және неон қызғылт',
+			'lurokaThemes.letterpress' => 'Баспахана · қағаз бен қою қызыл сия',
 			'lurokaThemes.title' => 'Luroka кинотеатр палитралары',
 			'lurokaThemes.coral' => 'Маржан · түн ортасы көк және күн батуы',
 			'lurokaThemes.ocean' => 'Мұхит · терең көк және мұз',
@@ -6137,6 +6264,14 @@ extension on TranslationsKk {
 			'homeLayout.resetDescription' => 'Бастапқы жол ретін қалпына келтіру және осы профиль үшін барлық жолдарды көрсету керек пе? Бекітілген жинақтар сақталады.',
 			'homeLayout.saveFailed' => 'Үй макетін сақтау мүмкін болмады. Қайталап көріңіз.',
 			'homeLayout.emptyHint' => 'Жолдар жасырылуы мүмкін. Оларды қайта көрсету үшін Жекелендіру үйін ашыңыз.',
+			'homeLayout.upcomingEpisodes' => 'Алдағы бөлімдер',
+			'homeLayout.upcomingFavorites' => 'Таңдаулылар',
+			'homeLayout.upcomingWatched' => 'Бұрын көрілгендер',
+			'homeLayout.upcomingBoth' => 'Таңдаулылар және бұрын көрілгендер',
+			'homeLayout.upcomingAll' => 'Барлық сериалдар',
+			'homeLayout.upcomingOff' => 'Өшірулі',
+			'homeLayout.airDate' => ({required Object date}) => 'Көрсету күні: ${date}',
+			'homeLayout.upcomingHint' => 'Алдағы көрсету күндері тек осы қатар қосулы кезде фондық режимде тексеріледі. Нәтижелер шектеулі және серверіңізде әлі қолжетімсіз болуы мүмкін.',
 			'screenTime.title' => 'Экран уақыты',
 			'screenTime.description' => 'Осы профильдегі бейнені көруге жұмсалған уақытты қараңыз',
 			'screenTime.today' => 'Бүгін',
@@ -6185,6 +6320,34 @@ extension on TranslationsKk {
 			'activityStats.emptyTitle' => 'Мұнда әлі ештеңе жоқ',
 			'activityStats.emptyBody' => 'Бір нәрсені бақылаңыз және сіздің статистикаңыз осында жиналады.',
 			'activityStats.noDataInPeriod' => 'Бұл кезеңде ойнату жазылмады.',
+			'activityStats.patternsTab' => 'Көру әдеттері',
+			'activityStats.moviesFilter' => 'Фильмдер',
+			'activityStats.episodesFilter' => 'Бөлімдер',
+			'activityStats.datesFilter' => 'Күндер',
+			'activityStats.titlesPlayed' => ({required Object count}) => 'Ойнатылған туындылар: ${count} · бөлімдер бөлек саналады',
+			'activityStats.previousPeriod' => 'Алдыңғы кезең',
+			'activityStats.lifetimeSummary' => ({required Object total, required Object average}) => 'Барлық уақытта: ${total} · Күндік орташа: ${average}',
+			'activityStats.dailyAverage' => 'Күндік орташа',
+			'activityStats.allKinds' => 'Барлығы',
+			'activityStats.titlesPlayedLabel' => 'Ойнатылған туындылар',
+			'activityStats.ledgerScope' => 'Әрекет осы профильдің жергілікті Luroka ойнату журналынан алынады. Сервердің көру тарихы мен басқа қолданбалардағы ойнату кірмейді.',
+			'activityStats.chartScale' => ({required Object duration}) => 'Масштаб: 0 – ${duration}',
+			'activityStats.gettingStarted' => 'Әрекет енді жинала бастады. Көру әдеттері бірнеше белсенді күннен кейін көрсетіледі.',
+			'activityStats.history' => 'Тарих',
+			'activityStats.insufficientHistory' => 'Тарих жеткіліксіз',
+			'activityStats.monthlyRecap' => 'Айлық қорытынды',
+			'activityStats.noMatches' => 'Бұл сүзгілерге сәйкес көру жазбалары жоқ.',
+			'activityStats.activeDays' => 'Белсенді күндер',
+			'activityStats.measurementHint' => 'Уақыт аяқталған туындыларды емес, тіркелген ойнатуды көрсетеді.',
+			'activityStats.historyError' => 'Тарихты жүктеу мүмкін болмады. Қайталап көріңіз.',
+			'activityStats.watchedPeriod' => 'Осы кезеңде көрілген',
+			'activityStats.monthWatched' => ({required Object duration}) => 'Осы айда ${duration} көрілді',
+			'activityStats.drillDown' => 'Осы күндердегі әрекетті көру',
+			'activityStats.searchHistory' => 'Көру тарихынан іздеу',
+			'activityStats.clearDates' => 'Күндерді тазалау',
+			'activityStats.playedHint' => 'Бөлімдер бөлек саналады. Ойнату уақыты туындының аяқталғанын білдірмейді.',
+			'activityStats.allHistory' => 'Барлық тарихты көру',
+			'activityStats.overview' => 'Шолу',
 			'search.hint' => 'Фильмдер, сериалдар, музыка іздеу...',
 			'search.tryDifferentTerm' => 'Басқа іздеу сөзін байқап көріңіз',
 			'search.searchYourMedia' => 'Медиафайлдардан іздеу',
@@ -6348,6 +6511,8 @@ extension on TranslationsKk {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Араластырып ойнату офлайн режимде қолжетімсіз',
 			'mediaMenu.fileInfo' => 'Файл туралы ақпарат',
 			'mediaMenu.deleteEpisodeFromServer' => 'Бөлімді серверден өшіру',
+			_ => null,
+		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Маусымды серверден өшіру',
 			'mediaMenu.deleteShowFromServer' => 'Сериалды серверден өшіру',
 			'mediaMenu.deleteMovieFromServer' => 'Фильмді серверден өшіру',
@@ -6372,6 +6537,7 @@ extension on TranslationsKk {
 			'mediaMenu.rate' => 'Бағалау',
 			'mediaMenu.playFromBeginning' => 'Басынан бастап ойнату',
 			'mediaMenu.playVersion' => 'Нұсқаны ойнату...',
+			'mediaMenu.removeFromNextUp' => 'Келесі тізімінен алып тастау',
 			'rateSheet.title' => 'Бағалау',
 			'rateSheet.server' => 'Сервер',
 			'rateSheet.favorite' => 'Таңдаулы',
@@ -6379,6 +6545,8 @@ extension on TranslationsKk {
 			'rateSheet.saved' => 'Сақталды',
 			'rateSheet.notAvailable' => 'Сәйкестік табылмады',
 			'rateSheet.noConnectedServices' => 'Бағалау үшін Баптаулардан қызметті қосыңыз.',
+			'rateSheet.addFavorite' => 'Таңдаулыларға қосу',
+			'rateSheet.removeFavorite' => 'Таңдаулылардан алып тастау',
 			'accessibility.mediaCardMovie' => ({required Object title}) => '${title}, фильм',
 			'accessibility.mediaCardShow' => ({required Object title}) => '${title}, TV шоу',
 			'accessibility.mediaCardEpisode' => ({required Object title, required Object episodeInfo}) => '${title}, ${episodeInfo}',
@@ -6394,8 +6562,6 @@ extension on TranslationsKk {
 			'accessibility.hue' => 'Түс реңкі',
 			'accessibility.saturation' => 'Қанықтылық',
 			'accessibility.brightness' => 'Жарықтық',
-			_ => null,
-		} ?? switch (path) {
 			'accessibility.hexColor' => 'Hex түсі',
 			'accessibility.expandText' => 'Мәтінді жаю',
 			'accessibility.collapseText' => 'Мәтінді жинау',
@@ -6574,6 +6740,8 @@ extension on TranslationsKk {
 			'messages.streamSelectionFailed' => 'Таңдалған ағындарды қолдану мүмкін болмады',
 			'messages.trackSelectionNotRemembered' => 'Бұл жол таңдауы тек ағымдағы ойнатуға қолданылады.',
 			'messages.serverUnavailableForProfile' => 'Белсенді профиль үшін қолжетімді сервер жоқ',
+			'messages.logSupportReference' => 'Қолдау қызметіне арналған сілтеме',
+			'messages.copyFullLogId' => 'Журналдың толық ID-сін көшіру',
 			'sourceLibraries.title' => 'Серверлеріңіз бен кітапханаларыңыз',
 			'sourceLibraries.description' => 'Luroka Басты бет, іздеу, Ашу қолжетімділігі және Studios үшін пайдаланатын кітапханаларды таңдаңыз. Негізгі жолдың реті бөлек теңшелген.',
 			'sourceLibraries.partial' => 'Кейбір серверлерді тексеру мүмкін болмады. Сол кітапханалар үшін сақталған таңдауларыңыз сақталады. Қайталап көру үшін жаңартыңыз.',
@@ -6857,6 +7025,8 @@ extension on TranslationsKk {
 			'libraries.filters' => 'Фильтрлер',
 			'libraries.confirmActionMessage' => 'Осы әрекетті орындағыңыз келе ме?',
 			'libraries.showLibrary' => 'Кітапхананы көрсету',
+			_ => null,
+		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Кітапхананы жасыру',
 			'libraries.libraryOptions' => 'Кітапхана параметрлері',
 			'libraries.content' => 'кітапхана мазмұны',
@@ -6908,8 +7078,6 @@ extension on TranslationsKk {
 			'libraries.sortLabels.dateShared' => 'Бөлісілген күні',
 			'libraries.sortLabels.latestEpisodeAirDate' => 'Соңғы бөлімнің шыққан күні',
 			'libraries.sortLabels.lastEpisodeDateAdded' => 'Соңғы қосылған бөлім күні',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.sortLabels.dateDownloaded' => 'Жүктелген күні',
 			'libraries.sortLabels.size' => 'Көлемі',
 			'libraries.sortLabels.library' => 'Кітапхана',
@@ -7371,6 +7539,8 @@ extension on TranslationsKk {
 			'watchTogether.qrShare' => 'QR кодын бөлісіңіз',
 			'watchTogether.qrHint' => 'Осы бөлмеге қосылу үшін Luroka қолданбасымен сканерлеңіз.',
 			'watchTogether.phasePlaying' => 'Ойнап жатыр',
+			_ => null,
+		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Кідіртілді',
 			'watchTogether.phaseWaiting' => 'Барлығын күту',
 			'watchTogether.inviteCopied' => 'Шақыру көшірілді. Оны хабарламаға қойыңыз.',
@@ -7422,8 +7592,6 @@ extension on TranslationsKk {
 			'watchTogether.offsetPlusSecond' => '+1 с',
 			'watchTogether.participants' => 'Қатысушылар',
 			'watchTogether.participantCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('kk'))(n, one: '${n} қатысушысы', other: '${n} қатысушылары', ), 
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.hostBadge' => 'ҰЙЫМДАСТЫРУШЫ',
 			'watchTogether.nameYou' => ({required Object name}) => '${name} (сіз)',
 			'watchTogether.playerIdle' => 'Бос',
@@ -7885,6 +8053,8 @@ extension on TranslationsKk {
 			'matchScreen.match' => 'Сәйкестендіру...',
 			'matchScreen.fixMatch' => 'Сәйкестікті түзету...',
 			'matchScreen.unmatch' => 'Сәйкестікті жою',
+			_ => null,
+		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Бұл сәйкестік жойылсын ба? Қайта сәйкестендірілгенше Plex оны сәйкестендірілмеген деп есептейді.',
 			'matchScreen.unmatchSuccess' => 'Сәйкестік жойылды',
 			'matchScreen.unmatchFailed' => 'Сәйкестікті жою мүмкін болмады',
@@ -7936,8 +8106,6 @@ extension on TranslationsKk {
 			'seerr.requestFailed' => ({required Object error}) => 'Сұрау қатесі: ${error}',
 			'seerr.requestsLoadFailed' => 'Параметрлерді жүктеу мүмкін болмады',
 			'seerr.nothingToRequest' => 'Барлығы бұрыннан бар немесе сұралған.',
-			_ => null,
-		} ?? switch (path) {
 			'seerr.statusAvailable' => 'Қолжетімді',
 			'seerr.statusPartiallyAvailable' => 'Жартылай қолжетімді',
 			'seerr.statusRequested' => 'Сұралды',
@@ -8116,6 +8284,32 @@ extension on TranslationsKk {
 			'addServer.redirectDifferentHost' => ({required Object product}) => 'Сервер басқа хостқа қайта бағыттады. Соңғы ${product} URL-ін тікелей енгізіңіз.',
 			'addServer.redirectInsecure' => 'Сервер HTTPS мекенжайынан қауіпсіз емес URL-ге қайта бағыттады',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'Сервер қолдау көрсетілмейтін URL-ге қайта бағыттады. Соңғы ${product} URL-ін тікелей енгізіңіз.',
+			'episodeDetails.previous' => 'Алдыңғы бөлім',
+			'episodeDetails.next' => 'Келесі бөлім',
+			'tvEdgeMenu.title' => 'Теледидардағы навигация',
+			'tvEdgeMenu.top' => 'Жоғарғы жолақ',
+			'tvEdgeMenu.both' => 'Жоғарғы жолақ және бүйірлік мәзір',
+			'tvEdgeMenu.hint' => 'Бүйірлік мәзірді ашу үшін қатардың бірінші элементінде солға басыңыз. Қайту үшін оңға немесе Артқа түймесін басыңыз.',
+			'tvEdgeMenu.tryMenu' => 'Навигацияны сынап көру',
+			'tvEdgeMenu.allLibraries' => 'Барлық кітапханалар',
+			'tvEdgeMenu.browse' => 'Шолу',
+			'tvEdgeMenu.more' => 'Қосымша',
+			'tvEdgeMenu.closeHint' => 'Жабу үшін оңға немесе Артқа басыңыз',
+			'showDetailLayout.title' => 'Сериал мәліметтерінің орналасуы',
+			'showDetailLayout.description' => 'Теледидарда сериалдар мен бөлімдердің көрсетілу жолын таңдаңыз.',
+			'showDetailLayout.compact' => 'Бөлімдердің ықшам тізімі',
+			'showDetailLayout.cinematic' => 'Кинематографиялық',
+			'showDetailLayout.seasons' => 'Маусымды таңдаңыз',
+			'showDetailLayout.episodes' => 'Бөлімдер',
+			'showDetailLayout.details' => 'Мәліметтер',
+			'showDetailLayout.cast' => 'Актерлер',
+			'showDetailLayout.related' => 'Ұқсас туындылар',
+			'iconStyles.title' => 'Белгіше стилі',
+			'iconStyles.description' => 'Қолданба басқару элементтерінің көрінісін таңдаңыз. Өзгерістер осы профильге қолданылады.',
+			'iconStyles.current' => 'Luroka Bold',
+			'iconStyles.lucide' => 'Lucide',
+			'iconStyles.lucideDescription' => 'Қарапайым сызықтық белгішелер; қолжетімсіз белгішелер Material белгішелерімен ауыстырылады.',
+			'iconStyles.outline' => 'Material Outline',
 			_ => null,
 		};
 	}

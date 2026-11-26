@@ -300,6 +300,7 @@
     "notificationProgress": "{progress} · {networkSpeed} · {timeRemaining} maradt"
   },
   "kidsShelf": {
+    "quietScenery": "Nyugodt éjszakai táj",
     "movieShelf": "Filmidő",
     "showShelf": "Találja meg a következő műsorát",
     "aurora": "Aurora – mély kékeszöld és lime",
@@ -604,7 +605,9 @@
     "availabilityUnknown": "Egyes könyvtárakat nem lehetett ellenőrizni. Próbálja meg frissíteni.",
     "noAvailable": "Az ellenőrzött könyvtárakban nem található egyező cím.",
     "sourceInfo": "Heti trendek és kiválasztott díjnyertesek · TMDb",
-    "configure": "Felfedezési beállítások"
+    "configure": "Felfedezési beállítások",
+    "filterOwned": "A könyvtáraimban",
+    "statusRetry": "A Seerr ellenőrzése sikertelen · Újra"
   },
   "app": {
     "title": "Luroka"
@@ -1139,7 +1142,11 @@
     "playerScopeLibrary": "Könyvtáronként",
     "playerScopeTitle": "Sorozatonként vagy filmenként",
     "exportDialogTitle": "Luroka-beállítások exportálása",
-    "velvetHourTheme": "Bársony óra"
+    "velvetHourTheme": "Bársony óra",
+    "backdropBrightness": "Háttér fényereje",
+    "backdropBrightnessDescription": "Állítsa be a kezdőlap és a címek képeinek sötétítését. Az alapértelmezett érték 100%.",
+    "showEarlyNextEpisode": "Következő epizód megjelenítése az aktuális vége előtt",
+    "showEarlyNextEpisodeDescription": "A következő epizód megjelenítése a stáblista alatt vagy az utolsó 30 másodpercben."
   },
   "themeEditor": {
     "builtIn": "Beépített",
@@ -1311,6 +1318,9 @@
     "episodesLeft": "${count} epizód maradt"
   },
   "lurokaThemes": {
+    "patina": "Patina · mély türkiz és réz",
+    "afterimage": "Utókép · indigó és neonrózsaszín",
+    "letterpress": "Magasnyomás · papír és bordó tinta",
     "title": "Luroka mozi paletták",
     "coral": "Korall · éjkék és naplemente",
     "ocean": "Óceán · mélykék és jég",
@@ -1394,7 +1404,15 @@
     "reset": "Az alapértelmezett sorok visszaállítása",
     "resetDescription": "Visszaállítja az eredeti sorsorrendet, és megjeleníti az összes sort ehhez a profilhoz? A rögzített gyűjteményeit megőrizzük.",
     "saveFailed": "Nem sikerült menteni az otthoni elrendezést. Kérjük, próbálja újra.",
-    "emptyHint": "A sorok rejtve lehetnek. Nyissa meg a Személyre szabás kezdőlapját, hogy újra megjelenjen."
+    "emptyHint": "A sorok rejtve lehetnek. Nyissa meg a Személyre szabás kezdőlapját, hogy újra megjelenjen.",
+    "upcomingEpisodes": "Közelgő epizódok",
+    "upcomingFavorites": "Kedvencek",
+    "upcomingWatched": "Korábban megtekintett",
+    "upcomingBoth": "Kedvencek és korábban megtekintett",
+    "upcomingAll": "Összes sorozat",
+    "upcomingOff": "Ki",
+    "airDate": "Vetítés dátuma: ${date}",
+    "upcomingHint": "A közelgő vetítési dátumok ellenőrzése csak a sor bekapcsolt állapotában fut a háttérben. Az eredmények száma korlátozott, és előfordulhat, hogy még nem érhetők el a kiszolgálón."
   },
   "screenTime": {
     "title": "Képernyőidő",
@@ -1449,7 +1467,35 @@
     "sessionNoTitle": "Azonosítatlan lejátszás",
     "emptyTitle": "Itt még semmi",
     "emptyBody": "Nézzen valamit, és a statisztikái itt gyűlnek össze.",
-    "noDataInPeriod": "Ebben az időszakban nincs lejátszás."
+    "noDataInPeriod": "Ebben az időszakban nincs lejátszás.",
+    "patternsTab": "Szokások",
+    "moviesFilter": "Filmek",
+    "episodesFilter": "Epizódok",
+    "datesFilter": "Dátumok",
+    "titlesPlayed": "Lejátszott címek: ${count} · az epizódok külön számítanak",
+    "previousPeriod": "Előző időszak",
+    "lifetimeSummary": "Összesen: ${total} · Napi átlag: ${average}",
+    "dailyAverage": "Napi átlag",
+    "allKinds": "Összes",
+    "titlesPlayedLabel": "Lejátszott címek",
+    "ledgerScope": "A tevékenység e profil helyi Luroka-lejátszási naplójából származik. A kiszolgáló megtekintési előzményei és más alkalmazások lejátszásai nem szerepelnek benne.",
+    "chartScale": "Skála: 0 – ${duration}",
+    "gettingStarted": "A tevékenység gyűjtése most kezdődött. A megtekintési szokások néhány aktív nap után jelennek meg.",
+    "history": "Előzmények",
+    "insufficientHistory": "Nincs elég előzmény",
+    "monthlyRecap": "Havi összegzés",
+    "noMatches": "Nincs a szűrőknek megfelelő megtekintés.",
+    "activeDays": "Aktív napok",
+    "measurementHint": "Az idő a rögzített lejátszást mutatja, nem a befejezett címeket.",
+    "historyError": "Az előzmények nem tölthetők be. Próbálja újra.",
+    "watchedPeriod": "Megtekintés ebben az időszakban",
+    "monthWatched": "Ebben a hónapban megtekintve: ${duration}",
+    "drillDown": "Tevékenység megtekintése ezeken a napokon",
+    "searchHistory": "Keresés a megtekintési előzményekben",
+    "clearDates": "Dátumok törlése",
+    "playedHint": "Az epizódok külön számítanak. A lejátszási idő nem jelenti a cím befejezését.",
+    "allHistory": "Összes előzmény megtekintése",
+    "overview": "Áttekintés"
   },
   "search": {
     "hint": "Keresés filmek, sorozatok és zenék között...",
@@ -1655,7 +1701,8 @@
     "mediaFailedToDelete": "Nem sikerült a médiaelem törlése",
     "rate": "Értékelés",
     "playFromBeginning": "Lejátszás az elejétől",
-    "playVersion": "Verzió lejátszása..."
+    "playVersion": "Verzió lejátszása...",
+    "removeFromNextUp": "Eltávolítás a következők közül"
   },
   "rateSheet": {
     "title": "Értékelés",
@@ -1664,7 +1711,9 @@
     "favorited": "Kedvencekhez hozzáadva",
     "saved": "Mentve",
     "notAvailable": "Nincs találat",
-    "noConnectedServices": "Az értékeléshez csatlakoztass egy szolgáltatást a Beállításokban."
+    "noConnectedServices": "Az értékeléshez csatlakoztass egy szolgáltatást a Beállításokban.",
+    "addFavorite": "Hozzáadás a kedvencekhez",
+    "removeFavorite": "Eltávolítás a kedvencekből"
   },
   "accessibility": {
     "mediaCardMovie": "${title}, film",
@@ -1873,7 +1922,9 @@
     "streamSelectionUnavailable": "Ehhez a forráshoz nem érhető el a streamek kiválasztása",
     "streamSelectionFailed": "Nem sikerült alkalmazni a kiválasztott streameket",
     "trackSelectionNotRemembered": "Ez a sávválasztás csak az aktuális lejátszásra érvényes.",
-    "serverUnavailableForProfile": "Az aktív profilhoz nem érhető el szerver"
+    "serverUnavailableForProfile": "Az aktív profilhoz nem érhető el szerver",
+    "logSupportReference": "Támogatási hivatkozás",
+    "copyFullLogId": "Teljes naplóazonosító másolása"
   },
   "sourceLibraries": {
     "title": "Az Ön szerverei és könyvtárai",
@@ -3596,5 +3647,39 @@
     "redirectDifferentHost": "A szerver egy másik gazdagépre irányított át. Add meg közvetlenül a végleges ${product} URL-t.",
     "redirectInsecure": "A szerver HTTPS-ről nem biztonságos URL-re irányított át",
     "redirectUnsupportedEnterFinal": "A szerver nem támogatott URL-re irányított át. Add meg közvetlenül a végleges ${product} URL-t."
+  },
+  "episodeDetails": {
+    "previous": "Előző epizód",
+    "next": "Következő epizód"
+  },
+  "tvEdgeMenu": {
+    "title": "TV-navigáció",
+    "top": "Felső sáv",
+    "both": "Felső sáv és oldalsó menü",
+    "hint": "Az oldalsó menü megnyitásához nyomjon balra egy sor első elemén. A visszatéréshez nyomjon jobbra vagy használja a Vissza gombot.",
+    "tryMenu": "Navigáció kipróbálása",
+    "allLibraries": "Összes könyvtár",
+    "browse": "Böngészés",
+    "more": "Továbbiak",
+    "closeHint": "Jobbra vagy Vissza a bezáráshoz"
+  },
+  "showDetailLayout": {
+    "title": "Sorozatrészletek elrendezése",
+    "description": "Válassza ki, hogyan jelenjenek meg a sorozatok és epizódok a televízión.",
+    "compact": "Tömör epizódlista",
+    "cinematic": "Moziszerű",
+    "seasons": "Válasszon évadot",
+    "episodes": "Epizódok",
+    "details": "Részletek",
+    "cast": "Szereplők",
+    "related": "Hasonló címek"
+  },
+  "iconStyles": {
+    "title": "Ikonstílus",
+    "description": "Válassza ki az alkalmazás vezérlőinek megjelenését. A módosítások erre a profilra érvényesek.",
+    "current": "Luroka Bold",
+    "lucide": "Lucide",
+    "lucideDescription": "Letisztult vonalas ikonok, a hiányzó ikonok helyett Material ikonokkal.",
+    "outline": "Material Outline"
   }
 }

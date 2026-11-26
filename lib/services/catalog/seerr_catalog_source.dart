@@ -172,6 +172,12 @@ class SeerrCatalogSource implements CatalogSource {
     }
   }
 
+  Future<({CatalogServerState? state, bool blocked})> requestStatus(MediaKind kind, int tmdbId) async {
+    final details = kind == MediaKind.movie ? await client.getMovie(tmdbId) : await client.getTv(tmdbId);
+    final info = details.mediaInfo;
+    return (state: _serverState(info), blocked: info?.status(client.session.product) == SeerrMediaStatus.blocklisted);
+  }
+
   Future<SeerrPage<SeerrMedia>?> _fetchRecommendations(MediaKind kind, int tmdbId) async {
     try {
       return kind == MediaKind.movie
@@ -196,44 +202,48 @@ class SeerrCatalogSource implements CatalogSource {
     }
   }
 
-  CatalogItem _toDetailCatalogItem(SeerrDetails details, MediaKind kind, String imageOrigin) => CatalogItem(
-    source: CatalogSourceId.seerr,
-    kind: kind,
-    title: details.displayTitle,
-    year: _year(details.date),
-    overview: _nonEmpty(details.overview),
-    runtimeMinutes: _positive(details.runtime) ?? _firstPositive(details.episodeRunTime),
-    rating: details.voteAverage,
-    votes: details.voteCount,
-    genres: _names(details.genres),
-    certification: _certification(details, kind),
-    trailerUrl: kind == MediaKind.movie ? _trailerUrl(details.relatedVideos) : null,
-    airStatus: _airStatus(details.status, kind),
-    episodeCount: kind == MediaKind.show ? _episodeCount(details) : null,
-    network: kind == MediaKind.show ? _firstName(details.networks) : null,
-    ids: CatalogItemIds(
-      tmdb: _positive(details.id),
-      imdb: _nonEmpty(details.imdbId) ?? _nonEmpty(details.externalIds?.imdbId),
-      tvdb: _positive(details.externalIds?.tvdbId),
-    ),
-    posterUrl: _tmdbImageUrl(imageOrigin, details.posterPath, 'w600_and_h900_bestv2'),
-    backdropUrl: _tmdbImageUrl(imageOrigin, details.backdropPath, 'w1920_and_h800_multi_faces'),
-    posterVariants: _tmdbPosterVariants(imageOrigin, details.posterPath),
-    backdropVariants: _tmdbBackdropVariants(imageOrigin, details.backdropPath),
-    serverState: _serverState(details.mediaInfo),
-    releaseDate: _date(details.date),
-    originalTitle: _originalTitle(details.displayOriginalTitle, details.displayTitle),
-    tagline: _nonEmpty(details.tagline),
-    endDate: _endDate(details, kind),
-    studios: _names(details.productionCompanies),
-    countries: _detailCountries(details),
-    languages: _detailLanguages(details),
-    credits: _credits(details),
-    tags: _tags(details.keywords),
-    budget: _positive(details.budget),
-    revenue: _positive(details.revenue),
-    isAdult: kind == MediaKind.movie ? details.adult : null,
-  );
+  CatalogItem _toDetailCatalogItem(SeerrDetails details, MediaKind kind, String imageOrigin) {
+    final trailers = _trailerUrls(details.relatedVideos, details.originalLanguage);
+    return CatalogItem(
+      source: CatalogSourceId.seerr,
+      kind: kind,
+      title: details.displayTitle,
+      year: _year(details.date),
+      overview: _nonEmpty(details.overview),
+      runtimeMinutes: _positive(details.runtime) ?? _firstPositive(details.episodeRunTime),
+      rating: details.voteAverage,
+      votes: details.voteCount,
+      genres: _names(details.genres),
+      certification: _certification(details, kind),
+      trailerUrl: trailers.firstOrNull,
+      alternateTrailerUrls: trailers.skip(1).toList(),
+      airStatus: _airStatus(details.status, kind),
+      episodeCount: kind == MediaKind.show ? _episodeCount(details) : null,
+      network: kind == MediaKind.show ? _firstName(details.networks) : null,
+      ids: CatalogItemIds(
+        tmdb: _positive(details.id),
+        imdb: _nonEmpty(details.imdbId) ?? _nonEmpty(details.externalIds?.imdbId),
+        tvdb: _positive(details.externalIds?.tvdbId),
+      ),
+      posterUrl: _tmdbImageUrl(imageOrigin, details.posterPath, 'w600_and_h900_bestv2'),
+      backdropUrl: _tmdbImageUrl(imageOrigin, details.backdropPath, 'w1920_and_h800_multi_faces'),
+      posterVariants: _tmdbPosterVariants(imageOrigin, details.posterPath),
+      backdropVariants: _tmdbBackdropVariants(imageOrigin, details.backdropPath),
+      serverState: _serverState(details.mediaInfo),
+      releaseDate: _date(details.date),
+      originalTitle: _originalTitle(details.displayOriginalTitle, details.displayTitle),
+      tagline: _nonEmpty(details.tagline),
+      endDate: _endDate(details, kind),
+      studios: _names(details.productionCompanies),
+      countries: _detailCountries(details),
+      languages: _detailLanguages(details),
+      credits: _credits(details),
+      tags: _tags(details.keywords),
+      budget: _positive(details.budget),
+      revenue: _positive(details.revenue),
+      isAdult: kind == MediaKind.movie ? details.adult : null,
+    );
+  }
 
   List<CatalogCastMember> _toCast(SeerrDetails details, int limit, String imageOrigin) => [
     for (final member in (details.credits?.cast ?? const <SeerrCastMember>[]).take(limit))
@@ -366,16 +376,22 @@ class SeerrCatalogSource implements CatalogSource {
     return null;
   }
 
-  static String? _trailerUrl(List<SeerrRelatedVideo>? videos) {
-    if (videos == null) return null;
-    for (final video in videos) {
+  static List<String> _trailerUrls(List<SeerrRelatedVideo>? videos, String? original) {
+    final groups = [<String>[], <String>[], <String>[]];
+    for (final video in videos ?? const <SeerrRelatedVideo>[]) {
       if (video.type?.toLowerCase() != 'trailer') continue;
-      if (_nonEmpty(video.url) case final String url) return url;
-      if (_nonEmpty(video.key) case final String key when video.site?.toLowerCase() == 'youtube') {
-        return youTubeTrailerUrl(key);
-      }
+      final url =
+          _nonEmpty(video.url) ?? (video.site?.toLowerCase() == 'youtube' ? youTubeTrailerUrl(video.key) : null);
+      if (url == null) continue;
+      final lang = video.language?.toLowerCase();
+      groups[lang == 'en'
+              ? 0
+              : lang != null && lang == original?.toLowerCase()
+              ? 1
+              : 2]
+          .add(url);
     }
-    return null;
+    return groups.expand((group) => group).toSet().toList();
   }
 
   static CatalogAirStatus? _airStatus(String? raw, MediaKind kind) {

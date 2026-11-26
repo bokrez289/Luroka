@@ -57,6 +57,7 @@ Future<void> showDialogAt(BuildContext routeContext, String message, BuildContex
         content: Text(current ?? message),
         actions: [
           TextButton(
+            autofocus: true,
             onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(t.common.ok),
           ),

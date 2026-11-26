@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# Adds the MpvPlayer Swift sources and the native mpv Swift Package
+# Adds the Plezy MpvPlayer Swift sources and the native mpv Swift Package
 # dependency to tvos/Runner.xcodeproj so it matches the iOS project's
 # linkage. Idempotent: re-running skips already-added entries.
 

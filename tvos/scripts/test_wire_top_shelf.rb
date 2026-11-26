@@ -28,7 +28,7 @@ class WireTopShelfTest < Minitest::Test
       else
         configuration.build_settings['DEVELOPMENT_TEAM'] = "TEAM-#{suffix}"
       end
-      configuration.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = "dev.luroka.#{suffix}"
+      configuration.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = "dev.plezy.#{suffix}"
     end
     %w[RunnerTests TopShelfExtension].each do |name|
       target(project, name).build_configurations.each do |configuration|

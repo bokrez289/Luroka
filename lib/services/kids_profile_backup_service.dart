@@ -21,6 +21,7 @@ class KidsProfileBackupService {
       name: profile.displayName,
       maxAge: kids.ageFor(profile.id),
       theme: kids.themeFor(profile.id),
+      quietScenery: kids.quietSceneryFor(profile.id),
       avatar: kids.avatarFor(profile.id),
       libraries: kids.librariesFor(profile.id),
       animationOnly: kids.animationOnlyFor(profile.id),

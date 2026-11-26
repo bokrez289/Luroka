@@ -2,6 +2,8 @@ import 'dart:async';
 import '../../providers/discover_provider.dart';
 import '../../providers/multi_server_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../../widgets/tv_edge_menu.dart';
 import 'package:provider/provider.dart';
 
 import '../../focus/focusable_button.dart';
@@ -62,10 +64,13 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
   late bool _themeMusic;
   late bool _showSpotlight;
   late HomeSpotlightSource _spotlight;
+  late bool _cinematic, _initialCinematic;
   late bool _split;
   late bool _episodeThumbnails;
   late ShowDetailLayout _showLayout;
   bool _previewShowLayout = false;
+  late bool _edgeMenu, _initialEdgeMenu;
+  bool _previewEdgeMenu = false;
   MediaItem? _previewShow;
   bool _loadingPreviewShow = false;
   bool _initialized = false;
@@ -88,6 +93,7 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
     setState(() {
       _page = page;
       _previewShowLayout = false;
+      _previewEdgeMenu = false;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -106,6 +112,7 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
     _home = context.read<HomeLayoutProvider>();
     _ownerGeneration = _active.committedIdentityGeneration;
     _theme = _initialTheme = _settings.readForProfile(widget.profileId, settings.SettingsService.themeMode);
+    _edgeMenu = _initialEdgeMenu = _settings.readForProfile(widget.profileId, settings.SettingsService.tvEdgeMenu);
     _posterDetails = _initialPosterDetails = _settings.readForProfile(
       widget.profileId,
       settings.SettingsService.posterDetails,
@@ -119,6 +126,7 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
       settings.SettingsService.showHeroSection,
     );
     _spotlight = _initialSpotlight = _home.layout.spotlightSource;
+    _cinematic = _initialCinematic = _settings.readForProfile(widget.profileId, settings.SettingsService.phoneCinematicSpotlight);
     _split = _initialSplit = _home.layout.splitContinueWatching;
     _episodeThumbnails = _initialEpisodeThumbnails = _settings.readForProfile(
       widget.profileId,
@@ -160,10 +168,12 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
         }
         await _settings.saveProfileAppearanceChoices(
           profileId: widget.profileId,
+          useTvEdgeMenu: _edgeMenu != _initialEdgeMenu ? _edgeMenu : null,
           theme: _theme != _initialTheme ? _theme : null,
           showPosterDetails: _posterDetails != _initialPosterDetails ? _posterDetails : null,
           playThemeMusic: _themeMusic != _initialThemeMusic ? _themeMusic : null,
           showSpotlight: _showSpotlight != _initialShowSpotlight ? _showSpotlight : null,
+          cinematicSpotlight: _cinematic != _initialCinematic ? _cinematic : null,
           showEpisodeThumbnails: _episodeThumbnails != _initialEpisodeThumbnails ? _episodeThumbnails : null,
           showLayout: _showLayout != _initialShowLayout ? _showLayout : null,
         );
@@ -188,6 +198,7 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
   }
 
   void _selectShowLayout(ShowDetailLayout layout) {
+    _previewEdgeMenu = false;
     setState(() {
       _showLayout = layout;
       _previewShowLayout = true;
@@ -477,6 +488,20 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
         ),
         const SizedBox(height: 16),
         if (PlatformDetector.isTV()) ...[
+          FocusableSwitchListTile(
+            title: Text(t.tvEdgeMenu.title),
+            subtitle: Text(_edgeMenu ? t.tvEdgeMenu.both : t.tvEdgeMenu.top),
+            value: _edgeMenu,
+            onChanged: _busy ? null : (value) => setState(() {
+              _edgeMenu = value;
+              _previewEdgeMenu = value;
+              _previewShowLayout = false;
+            }),
+          ),
+          if (_edgeMenu) ...[
+            Text(t.tvEdgeMenu.hint),
+            _button(label: t.tvEdgeMenu.tryMenu, key: const ValueKey('try-edge-menu'), onPressed: _tryEdgeMenu),
+          ],
           Text(t.showDetailLayout.title, style: Theme.of(context).textTheme.titleMedium),
           Text(t.showDetailLayout.description),
           const SizedBox(height: 8),
@@ -532,6 +557,16 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
           onChanged: _busy ? null : (value) => setState(() => _showSpotlight = value),
         ),
         Text(t.profileSetupGuide.spotlightHeading, style: Theme.of(context).textTheme.titleMedium),
+        if (_showSpotlight && PlatformDetector.isMobile(context) && MediaQuery.sizeOf(context).shortestSide < 600)
+          FocusableSwitchListTile(
+            title: const Text('Cinematic phone spotlight'),
+            subtitle: Text(_cinematic ? 'Landscape artwork with the title overlaid' : 'Classic poster card'),
+            value: _cinematic,
+            onChanged: _busy ? null : (value) => setState(() {
+              _cinematic = value;
+              _previewShowLayout = false;
+            }),
+          ),
         for (final source in HomeSpotlightSource.values)
           FocusableListTile(
             key: ValueKey('profile-guide-spotlight-${source.name}'),
@@ -643,18 +678,52 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
               Theme(
                 data: monoTheme(palette).copyWith(platform: Theme.of(context).platform),
                 child: DevicePreviewFrame(
-                  child: _previewShowLayout ? _showPreview() : LiveHomePreview(
+                  child: _previewShowLayout ? _showPreview() : Stack(children: [LiveHomePreview(
                     layout: _studioDraft.copyWith(spotlightSource: _spotlight, splitContinueWatching: _split),
                     showSpotlight: _showSpotlight,
+                    phoneCinematic: _cinematic,
                     posterDetails: _posterDetails,
                     episodeThumbnails: _episodeThumbnails,
-                  ),
+                  ), if (_previewEdgeMenu) Positioned.fill(child: IgnorePointer(child: _sampleMenu(() {})))]),
                 ),
               ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _sampleMenu(VoidCallback close) => TvEdgeMenu(
+    current: 'home', libraryLabel: t.navigation.libraries, libraryEntries: const [],
+    entries: [
+      (id: 'home', label: t.common.home, icon: Icons.home),
+      (id: 'search', label: t.common.search, icon: Icons.search),
+      (id: 'studios', label: t.studios.title, icon: Icons.movie_filter_outlined),
+    ], onClose: close, onChoose: (_) => close(), autofocus: false,
+  );
+
+  Future<void> _tryEdgeMenu() async {
+    var open = false;
+    await showDialog<void>(context: context, builder: (dialog) => StatefulBuilder(
+      builder: (_, update) => PopScope(
+        canPop: !open,
+        onPopInvokedWithResult: (popped, _) { if (!popped && open) update(() => open = false); },
+        child: Dialog(child: Focus(autofocus: true, onKeyEvent: (_, event) {
+          if (event is! KeyDownEvent) return KeyEventResult.ignored;
+          if (event.logicalKey == LogicalKeyboardKey.arrowLeft || event.logicalKey == LogicalKeyboardKey.arrowRight) {
+            update(() => open = event.logicalKey == LogicalKeyboardKey.arrowLeft);
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
+        }, child: SizedBox(width: 680, height: 360, child: Stack(children: [
+          Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.movie, size: 64), Text(t.tvEdgeMenu.hint),
+            TextButton(onPressed: () => Navigator.pop(dialog), child: Text(t.common.close)),
+          ])),
+          if (open) Positioned.fill(child: _sampleMenu(() => update(() => open = false))),
+        ])))),
+      ),
+    ));
   }
 
   Widget _showPreview() {

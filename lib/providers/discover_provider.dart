@@ -307,10 +307,10 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
 
   List<MediaItem> get onDeck {
     if (!_hiddenLibraries.hasSourceSelection && _hiddenLibraries.hiddenLibraryKeys.isEmpty) {
-      return _onDeck.allowedForProfile(continueWatching: true);
+      return _onDeck.allowedForProfile(continueWatching: true).where(showHomeProgress).toList();
     }
     _syncSourceContent();
-    return _sourceOnDeck.allowedForProfile(continueWatching: true);
+    return _sourceOnDeck.allowedForProfile(continueWatching: true).where(showHomeProgress).toList();
   }
 
   List<MediaHub> get hubs {
@@ -534,6 +534,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
       final freshnessScope = _continueWatchingScope();
       final partialOwner = KidsProfileService.instance.activeId;
       final completedOnDeckLibraries = <String>{};
+      final partialOnDeckCandidates = <String, MediaItem>{};
       final onDeckFuture = aggregation.getOnDeckFromAllServers(
         limit: _continueWatchingProbeLimit,
         splitRows: _splitHomeProgress,
@@ -551,7 +552,9 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
           if (result.complete) {
             completedOnDeckLibraries.add(buildGlobalKey(ServerId(result.serverId), result.libraryId));
           }
-          if (!_publishPartialOnDeck(result)) return;
+          // A warm shelf commits once after reconciliation. Publishing every
+          // network leg makes the focused card jump while the user browses.
+          if (previousOnDeck.isNotEmpty || !_publishPartialOnDeck(result, partialOnDeckCandidates)) return;
           ++expectedCommitRevision;
           replacedOnDeck = true;
           _onDeckState = DiscoverLoadState.loaded;
@@ -809,6 +812,8 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
       final revision = _contentRevision;
       final owner = KidsProfileService.instance.activeId;
       var acceptingOnDeckPartial = true;
+      final hadOnDeck = _onDeck.isNotEmpty;
+      final partialOnDeckCandidates = <String, MediaItem>{};
       final Future<OnDeckAggregationResult?> onDeckFuture = onDeckIds.isEmpty
           ? Future<OnDeckAggregationResult?>.value()
           : aggregation.getOnDeckFromAllServers(
@@ -825,7 +830,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
                     owner != KidsProfileService.instance.activeId) {
                   return;
                 }
-                if (_publishPartialOnDeck(result)) safeNotifyListeners();
+                if (!hadOnDeck && _publishPartialOnDeck(result, partialOnDeckCandidates)) safeNotifyListeners();
               },
             );
       final Future<HubAggregationResult?> hubsFuture = hubIds.isEmpty
@@ -1053,6 +1058,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
       final observation = _beginObservation();
       final completedLibraries = <String>{};
       final previousOnDeck = List<MediaItem>.of(_onDeck);
+      final partialOnDeckCandidates = <String, MediaItem>{};
       final owner = KidsProfileService.instance.activeId;
       var acceptingPartial = true;
       final fetched = await _multiServer.aggregationService.getOnDeckFromAllServers(
@@ -1069,7 +1075,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
             return;
           }
           if (result.complete) completedLibraries.add(buildGlobalKey(ServerId(result.serverId), result.libraryId));
-          if (_publishPartialOnDeck(result)) safeNotifyListeners();
+          if (previousOnDeck.isEmpty && _publishPartialOnDeck(result, partialOnDeckCandidates)) safeNotifyListeners();
         },
       );
       acceptingPartial = false;
@@ -1117,19 +1123,21 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     }
   }
 
-  bool _publishPartialOnDeck(OnDeckLibraryResult result) {
+  bool _publishPartialOnDeck(OnDeckLibraryResult result, Map<String, MediaItem> candidates) {
     final libraryKey = buildGlobalKey(ServerId(result.serverId), result.libraryId);
     final selected = _hiddenLibraries.selectedSourceLibraries;
     if (_hiddenLibraries.hiddenLibraryKeys.contains(libraryKey) ||
         (selected != null && !selected.contains(libraryKey))) {
       return false;
     }
-    final rows = <String, MediaItem>{
-      for (final item in _onDeck)
-        if (!result.complete || item.serverId != result.serverId || item.libraryId != result.libraryId)
-          item.globalKey: item,
-      for (final item in result.items) item.globalKey: item,
-    }.values.toList()..sort((a, b) => b.recencySortKey.compareTo(a.recencySortKey));
+    if (result.complete) {
+      candidates.removeWhere((_, item) => item.serverId == result.serverId && item.libraryId == result.libraryId);
+    }
+    for (final item in result.items) {
+      candidates[item.globalKey] = item;
+    }
+    // Keep the candidate pool independent of the trimmed, rendered preview.
+    final rows = orderHomeProgress(candidates.values.where(showHomeProgress).toList());
     final hadMore = _hasMoreContinueWatching;
     final hadMoreNext = _hasMoreNextUp;
     _applyOnDeck(rows);
@@ -1159,6 +1167,12 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
       final library = item.libraryGlobalKey;
       return library == null || !completedLibraries.contains(library);
     }).toList();
+    // The fetch already applied ordering, deduplication, and limits. If a
+    // partial failure left no additional old items to retain, merging it with
+    // itself repeats identity lookups (and their timeout) without changing
+    // the result.
+    final fetchedKeys = {for (final item in fetched.items) item.globalKey};
+    if (retained.every((item) => fetchedKeys.contains(item.globalKey))) return fetched.items;
     return aggregation.mergeContinueWatching(fetched.items, retained, limit: limit, splitRows: _splitHomeProgress);
   }
 
@@ -1179,7 +1193,8 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     // "View All" renders through the same overlay as the row it expands, so
     // it has to reconcile too or the stale patch simply reappears there.
     _recordObservations(observation, fetched.observedItems, fetched.succeededServerIds);
-    return _retainFailedOnDeckLibraries(_multiServer.aggregationService, fetched, completedLibraries);
+    final items = await _retainFailedOnDeckLibraries(_multiServer.aggregationService, fetched, completedLibraries);
+    return items.where(showHomeProgress).toList();
   }
 
   /// Refetch a single item (post-edit refresh from a hub row) through its
@@ -1219,11 +1234,14 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     final onDeckIndex = _onDeck.indexWhere((item) => item.globalKey == sourceGlobalKey);
     if (onDeckIndex != -1) {
       final previous = _onDeck[onDeckIndex];
-      final rawRole = previous.raw?[homeProgressRoleKey];
       final refreshed = preserveShelfContext(previous);
-      final preserved = rawRole == null
+      final progressMetadata = {
+        for (final key in [homeProgressRoleKey, homeProgressRankKey, homeProgressStreamKey])
+          if (previous.raw?[key] case final value?) key: value,
+      };
+      final preserved = progressMetadata.isEmpty
           ? refreshed
-          : refreshed.copyWith(raw: {...?refreshed.raw, homeProgressRoleKey: rawRole});
+          : refreshed.copyWith(raw: {...?refreshed.raw, ...progressMetadata});
       _replaceOnDeck(List.of(_onDeck)..[onDeckIndex] = preserved, hasMore: _hasMoreContinueWatching);
     }
 
@@ -1392,7 +1410,7 @@ class DiscoverProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     onDeck = _withoutHiddenLibraries(
       onDeck,
       _hiddenLibraries.hiddenLibraryKeys,
-    ).allowedForProfile(continueWatching: true);
+    ).allowedForProfile(continueWatching: true).where(showHomeProgress).toList();
     if (isDisposed) return;
     final owner = profileId;
     if (owner == null) return;

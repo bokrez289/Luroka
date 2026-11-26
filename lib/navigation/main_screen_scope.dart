@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../widgets/tv_edge_menu.dart';
 import '../widgets/side_navigation_rail.dart';
 
 abstract interface class HomeOptionsTab {
@@ -64,6 +66,8 @@ class MainScreenFocusScope extends InheritedModel<MainScreenScopeAspect> {
 
   /// Focuses the sidebar without registering an inherited dependency.
   static void focusSidebarOf(BuildContext context) {
+    if (HardwareKeyboard.instance.logicalKeysPressed.contains(LogicalKeyboardKey.arrowLeft) &&
+        TvEdgeMenuHost.open(context)) return;
     of(context, listen: false)?.focusSidebar();
   }
 

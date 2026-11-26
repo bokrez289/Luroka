@@ -15,6 +15,10 @@ LOCK_PAIRS = {
         Path("ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"),
         Path("ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved"),
     ),
+    "macOS": (
+        Path("macos/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"),
+        Path("macos/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved"),
+    ),
 }
 SENTRY_IDENTITY = "sentry-cocoa"
 EXACT_REQUIREMENT = re.compile(
@@ -113,12 +117,12 @@ def validate(root: Path) -> list[str]:
     sentry_root = _resolved_sentry_root(root, errors)
     required_versions: list[str] = []
     if sentry_root is not None:
-        for platform in ("ios",):
+        for platform in ("ios", "macos"):
             version = _manifest_requirement(sentry_root / platform / "sentry_flutter/Package.swift", errors)
             if version is not None:
                 required_versions.append(version)
     if len(set(required_versions)) > 1:
-        errors.append("Sentry manifests require different sentry-cocoa versions")
+        errors.append("iOS and macOS sentry_flutter manifests require different sentry-cocoa versions")
 
     required_version = required_versions[0] if required_versions and len(set(required_versions)) == 1 else None
     sentry_pins: list[tuple[Path, dict]] = []

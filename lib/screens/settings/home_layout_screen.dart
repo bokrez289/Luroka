@@ -313,6 +313,29 @@ class _HomeLayoutScreenState extends State<HomeLayoutScreen> {
                     DialogOption(value: HomeHeroSize.large, title: t.settings.homeHeroSizeLarge),
                   ],
                 ),
+              if (PlatformDetector.isMobile(context))
+                SettingSelectionTile<PhoneSpotlightSize>(
+                  pref: SettingsService.phoneSpotlightSize,
+                  icon: Symbols.aspect_ratio_rounded,
+                  title: 'Phone spotlight size',
+                  subtitleBuilder: (value) => switch (value) {
+                    PhoneSpotlightSize.compact => t.settings.compact,
+                    PhoneSpotlightSize.standard => 'Standard',
+                    PhoneSpotlightSize.large => t.settings.homeHeroSizeLarge,
+                  },
+                  options: [
+                    DialogOption(value: PhoneSpotlightSize.compact, title: t.settings.compact),
+                    const DialogOption(value: PhoneSpotlightSize.standard, title: 'Standard'),
+                    DialogOption(value: PhoneSpotlightSize.large, title: t.settings.homeHeroSizeLarge),
+                  ],
+                ),
+              if (PlatformDetector.isMobile(context) && MediaQuery.sizeOf(context).shortestSide < 600)
+                SettingSwitchTile(
+                  pref: SettingsService.phoneCinematicSpotlight,
+                  icon: Symbols.aspect_ratio_rounded,
+                  title: 'Cinematic phone spotlight',
+                  subtitle: 'Use landscape artwork instead of classic poster cards',
+                ),
               SettingSwitchTile(
                 pref: SettingsService.showHeroSection,
                 icon: Symbols.view_carousel_rounded,

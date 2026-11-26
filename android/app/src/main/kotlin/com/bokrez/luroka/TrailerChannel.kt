@@ -43,6 +43,7 @@ class TrailerChannel(private val activity: Activity) {
           try {
             activity.startActivityForResult(Intent(activity, TrailerEmbedActivity::class.java).apply {
               putExtra("key", key)
+              putExtra("hasAlternate", call.argument<Boolean>("hasAlternate") == true)
               putExtra("title", call.argument<String>("title"))
               putExtra("playLabel", call.argument<String>("playLabel"))
               putExtra("pauseLabel", call.argument<String>("pauseLabel"))
@@ -68,6 +69,7 @@ class TrailerChannel(private val activity: Activity) {
               val info = try {
                 StreamInfo.getInfo(NewPipe.getService(0), "https://www.youtube.com/watch?v=$key")
               } catch (error: Exception) {
+                if (regionBlocked(error)) throw error
                 // Extractor 0.26.5 aborts on its initial Android response,
                 // before trying the other clients it already supports.
                 resolveAlternateManifest(key)?.let { return@withContext it }
@@ -80,17 +82,18 @@ class TrailerChannel(private val activity: Activity) {
               }.maxByOrNull { it.height }
               val manifest = info.hlsUrl?.takeIf { it.isNotBlank() }
                 ?: info.dashMpdUrl?.takeIf { it.isNotBlank() }
-              when {
-                manifest != null -> mapOf("url" to manifest)
-                combined != null -> mapOf("url" to combined.url)
-                else -> {
-                  val video = info.videoOnlyStreams.orEmpty().filter {
-                    it.isUrl && !it.url.isNullOrBlank() && it.height <= 1080
-                  }.maxByOrNull { it.height } ?: throw IllegalStateException("No trailer video")
-                  val audio = info.audioStreams.orEmpty().filter { it.isUrl && !it.url.isNullOrBlank() }
-                    .maxByOrNull { it.averageBitrate } ?: throw IllegalStateException("No trailer audio")
-                  mapOf("url" to video.url, "audioUrl" to audio.url)
-                }
+              val video = info.videoOnlyStreams.orEmpty().filter {
+                it.isUrl && !it.url.isNullOrBlank() && it.height in 1..1080
+              }.maxByOrNull { it.height }
+              val audio = info.audioStreams.orEmpty().filter { it.isUrl && !it.url.isNullOrBlank() }
+                    .maxWithOrNull(compareBy({ it.audioTrackType != org.schabi.newpipe.extractor.stream.AudioTrackType.DESCRIPTIVE },
+                      { it.audioLocale?.language == "en" }, { it.audioTrackType == org.schabi.newpipe.extractor.stream.AudioTrackType.ORIGINAL },
+                      { it.averageBitrate }))
+              when (chooseTrailerStream(combined?.height, manifest != null, video?.height?.takeIf { audio != null })) {
+                TrailerStreamKind.COMBINED -> mapOf("url" to combined!!.url)
+                TrailerStreamKind.MANIFEST -> mapOf("url" to manifest!!)
+                TrailerStreamKind.SEPARATE -> mapOf("url" to video!!.url, "audioUrl" to audio!!.url)
+                TrailerStreamKind.UNAVAILABLE -> throw IllegalStateException("No trailer video")
               }
             }
             result.success(stream)
@@ -101,7 +104,7 @@ class TrailerChannel(private val activity: Activity) {
             val kinds = generateSequence<Throwable>(error) { it.cause }.take(4)
               .joinToString(" -> ") { it.javaClass.simpleName }
             Log.w("LumoraTrailers", "Resolution failed: $kinds")
-            result.error("unavailable", "Trailer is unavailable", null)
+            result.error(if (regionBlocked(error)) "region_blocked" else "unavailable", "Trailer is unavailable", null)
           }
         }
       }
@@ -125,11 +128,14 @@ class TrailerChannel(private val activity: Activity) {
   }
 
   companion object {
+    private fun regionBlocked(error: Throwable) = generateSequence(error) { it.cause }.take(8)
+      .any { it is org.schabi.newpipe.extractor.exceptions.GeographicRestrictionException }
     private const val EMBED_REQUEST = 5821
     private var ready = false
     private fun resolveAlternateManifest(key: String): Map<String, Any>? {
-      val locale = Localization("en", "US")
-      val country = ContentCountry("US")
+      val region = java.util.Locale.getDefault().country.ifBlank { "US" }
+      val locale = Localization("en", region)
+      val country = ContentCountry(region)
       for (vision in listOf(true, false)) {
         try {
           val nonce = YoutubeParsingHelper.generateContentPlaybackNonce()
@@ -149,6 +155,7 @@ class TrailerChannel(private val activity: Activity) {
     }
     @Synchronized private fun initialize() {
       if (ready) return
+      val region = java.util.Locale.getDefault().country.ifBlank { "US" }
       NewPipe.init(object : Downloader() {
         private val client = OkHttpClient.Builder().connectTimeout(15, TimeUnit.SECONDS)
           .readTimeout(20, TimeUnit.SECONDS).callTimeout(30, TimeUnit.SECONDS).build()
@@ -164,7 +171,7 @@ class TrailerChannel(private val activity: Activity) {
             Response(it.code, it.message, it.headers.toMultimap(), it.body?.string().orEmpty(), it.request.url.toString())
           }
         }
-      })
+      }, Localization("en", region), ContentCountry(region))
       ready = true
     }
   }

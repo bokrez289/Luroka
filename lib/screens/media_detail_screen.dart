@@ -29,6 +29,7 @@ import '../widgets/file_info_bottom_sheet.dart';
 import '../widgets/app_menu.dart';
 import '../mpv/mpv.dart' show AudioTrack, SubtitleTrack;
 import '../services/playback_subtitle_resolver.dart';
+import '../services/playback_initialization_service.dart' show PlaybackInitializationService;
 
 import '../focus/dpad_navigator.dart';
 import '../focus/focusable_action_bar.dart';
@@ -325,7 +326,9 @@ class MediaDetailScreen extends StatefulWidget {
   final bool isOffline;
   final bool showLibrarySource;
   final List<MediaItem> catalogCopies;
+  final List<MediaItem>? episodeDetailOrder;
   final bool catalogPreviewOnly;
+
   /// Renders the real TV details page inside a non-interactive settings preview.
   final ShowDetailLayout? previewShowLayout;
 
@@ -341,6 +344,7 @@ class MediaDetailScreen extends StatefulWidget {
     this.isOffline = false,
     this.showLibrarySource = false,
     this.catalogCopies = const [],
+    this.episodeDetailOrder,
     this.catalogPreviewOnly = false,
     this.previewShowLayout,
     this.initialSeasonIndex,
@@ -357,6 +361,7 @@ PageRoute<bool> mediaDetailRoute({
   bool isOffline = false,
   bool showLibrarySource = false,
   List<MediaItem> catalogCopies = const [],
+  List<MediaItem>? episodeDetailOrder,
   bool catalogPreviewOnly = false,
   int? initialSeasonIndex,
   String? initialSeasonId,
@@ -367,6 +372,7 @@ PageRoute<bool> mediaDetailRoute({
     isOffline: isOffline,
     showLibrarySource: showLibrarySource,
     catalogCopies: catalogCopies,
+    episodeDetailOrder: episodeDetailOrder,
     catalogPreviewOnly: catalogPreviewOnly,
     initialSeasonIndex: initialSeasonIndex,
     initialSeasonId: initialSeasonId,
@@ -406,6 +412,8 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
   /// Public input alias — used as the live source of truth until the detail
   /// fetch returns. Holds backend-neutral [MediaItem] data.
   MediaItem get _metadata => _fullMetadata ?? widget.metadata;
+  Future<List<MediaItem>>? _episodeDetailOrder;
+  bool _changingEpisodeDetail = false;
   List<MediaItem> _seasons = [];
   bool _isLoadingSeasons = false;
   bool _seasonsLoadFailed = false; // the seasons fetch threw (vs. a genuinely empty show)
@@ -568,6 +576,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
 
   late final FocusNode _playButtonFocusNode;
   final Map<String, AudioTrack> _detailAudioChoices = {};
+  final _offlineSubtitleFiles = <String, Map<int, SubtitleTrack>>{};
   final _detailTracksActionBarKey = GlobalKey<FocusableActionBarState>();
   final _detailAudioFocus = FocusNode(debugLabel: 'detail_audio_selector');
   final _detailSubtitleFocus = FocusNode(debugLabel: 'detail_subtitle_selector');
@@ -1561,7 +1570,8 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
     // against the budget so dropping other chips actually makes room for it.
     Widget? userRatingChip;
     var userRatingChipWidth = 0.0;
-    if (!scoresOnly && !widget.isOffline &&
+    if (!scoresOnly &&
+        !widget.isOffline &&
         canRateMediaItem(_getMediaClientForMetadata(context), context.watch<TrackersProvider?>())) {
       userRatingChip = _buildUserRatingChip(metadata);
       userRatingChipWidth =
@@ -2763,7 +2773,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
     if (PlatformDetector.isTV()) {
       // The hero information block sits directly above the action row and is
       // the D-pad path to the full details sheet.
-      if (!widget.isOffline && _playbackTargetItem(_metadata) != null) {
+      if (_playbackTargetItem(_metadata) != null) {
         _detailSubtitleFocus.requestFocus();
       } else {
         _tvDetailInfoFocusNode.requestFocus();
@@ -2778,7 +2788,9 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
     final metadata = _metadata;
 
     if (PlatformDetector.isTV()) {
-      if (metadata.isShow && (widget.previewShowLayout ?? SettingsService.instance.read(SettingsService.showDetailLayout)) == ShowDetailLayout.compact) {
+      if (metadata.isShow &&
+          (widget.previewShowLayout ?? SettingsService.instance.read(SettingsService.showDetailLayout)) ==
+              ShowDetailLayout.compact) {
         _compactEpisodesTabFocus.requestFocus();
         return;
       }
@@ -3637,6 +3649,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
           await navigateToVideoPlayerWithRefresh(
             context,
             metadata: episodeWithServerId,
+            restartBriefProgress: true,
             isOffline: widget.isOffline,
             onRefresh: _refreshWatchState,
             isLaunchCurrent: () => _canUseDetail,
@@ -4158,7 +4171,9 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
     MediaItem metadata,
     KeyEventResult Function(FocusNode, KeyEvent) handleBack,
   ) {
-    if (metadata.isShow && (widget.previewShowLayout ?? SettingsService.instance.read(SettingsService.showDetailLayout)) == ShowDetailLayout.compact) {
+    if (metadata.isShow &&
+        (widget.previewShowLayout ?? SettingsService.instance.read(SettingsService.showDetailLayout)) ==
+            ShowDetailLayout.compact) {
       return _buildCompactShowScreen(context, metadata, handleBack);
     }
     if (_restoreSeasonAfterPop) {
@@ -5527,7 +5542,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
 
         // Use the same format for both play and resume
         // (icon will indicate the difference)
-        return (_fresh(episode).viewOffsetMs ?? 0) > 0
+        return _fresh(episode).hasMeaningfulProgress
             ? t.titlePage.continueEpisode(season: seasonNum.toString(), episode: episodeNum.toString())
             : t.discover.playEpisode(season: seasonNum.toString(), episode: episodeNum.toString());
       } else {
@@ -5536,7 +5551,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
       }
     }
 
-    return (metadata.viewOffsetMs ?? 0) > 0 ? t.common.resume : t.common.play;
+    return metadata.hasMeaningfulProgress ? t.common.resume : t.common.play;
   }
 
   IconData _getPlayButtonIcon(MediaItem metadata) {
@@ -5546,13 +5561,13 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
       if (episode != null) {
         final fresh = _fresh(episode);
         // Check if episode has been partially watched
-        if (fresh.viewOffsetMs != null && fresh.viewOffsetMs! > 0) {
+        if (fresh.hasMeaningfulProgress) {
           return Symbols.resume_rounded; // Resume icon
         }
       }
     } else {
       // For movies or episodes
-      if (metadata.viewOffsetMs != null && metadata.viewOffsetMs! > 0) {
+      if (metadata.hasMeaningfulProgress) {
         return Symbols.resume_rounded; // Resume icon
       }
     }

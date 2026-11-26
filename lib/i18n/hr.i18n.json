@@ -302,6 +302,7 @@
     "notificationProgress": "{progress} · {networkSpeed} · preostalo {timeRemaining}"
   },
   "kidsShelf": {
+    "quietScenery": "Mirni noćni krajolik",
     "movieShelf": "Vrijeme za film",
     "showShelf": "Pronađi sljedeću seriju",
     "aurora": "Aurora — tamnozelena i limeta",
@@ -606,7 +607,9 @@
     "availabilityUnknown": "Nije moguće provjeriti neke biblioteke. Pokušajte osvježiti.",
     "noAvailable": "U provjerenim bibliotekama nema odgovarajućih naslova.",
     "sourceInfo": "Tjedni trendovi i odabrani dobitnici nagrada · TMDb",
-    "configure": "Postavke odjeljka Otkrijte"
+    "configure": "Postavke odjeljka Otkrijte",
+    "filterOwned": "U mojim bibliotekama",
+    "statusRetry": "Nije uspjela provjera Seerra · Pokušajte ponovno"
   },
   "app": {
     "title": "Luroka"
@@ -1141,7 +1144,11 @@
     "playerScopeLibrary": "Po biblioteci",
     "playerScopeTitle": "Za svaku seriju ili film",
     "exportDialogTitle": "Izvezite postavke Luroka",
-    "velvetHourTheme": "Baršunasti sat"
+    "velvetHourTheme": "Baršunasti sat",
+    "backdropBrightness": "Svjetlina pozadine",
+    "backdropBrightnessDescription": "Prilagodite zasjenjenje na početnoj stranici i slici naslova. Zadana je vrijednost 100 %.",
+    "showEarlyNextEpisode": "Prikaži sljedeće prije završetka epizode",
+    "showEarlyNextEpisodeDescription": "Prikaži sljedeću epizodu tijekom odjavne špice ili u posljednjih 30 sekundi."
   },
   "themeEditor": {
     "builtIn": "Ugrađeni",
@@ -1313,6 +1320,9 @@
     "episodesLeft": "Preostalo epizoda: ${count}"
   },
   "lurokaThemes": {
+    "patina": "Patina · tamna plavozelena i bakar",
+    "afterimage": "Zaostala slika · indigo i neonska ružičasta",
+    "letterpress": "Knjigotisak · papir i bordo tinta",
     "title": "Palete boja Luroke",
     "coral": "Koralj · ponoćno plava i zalazak sunca",
     "ocean": "Ocean · tamnoplava i ledenoplava",
@@ -1396,7 +1406,15 @@
     "reset": "Vrati zadane retke",
     "resetDescription": "Želite li vratiti izvorni redoslijed redaka i prikazati ih sve za ovaj profil? Prikvačene zbirke ostat će sačuvane.",
     "saveFailed": "Nije moguće spremiti raspored početne stranice. Pokušajte ponovno.",
-    "emptyHint": "Neki retci možda su skriveni. Otvorite Prilagodi početnu stranicu da biste ih ponovno prikazali."
+    "emptyHint": "Neki retci možda su skriveni. Otvorite Prilagodi početnu stranicu da biste ih ponovno prikazali.",
+    "upcomingEpisodes": "Predstojeće epizode",
+    "upcomingOff": "Isključeno",
+    "upcomingFavorites": "Omiljeno",
+    "upcomingWatched": "Prethodno gledano",
+    "upcomingAll": "Sve emisije",
+    "upcomingBoth": "Omiljeno i prethodno gledano",
+    "upcomingHint": "Predstojeći datumi emitiranja provjeravaju se u pozadini samo dok je ovaj redak omogućen. Rezultati su ograničeni i možda još nisu dostupni na vašem poslužitelju.",
+    "airDate": "Datum emitiranja: ${date}"
   },
   "screenTime": {
     "title": "Vrijeme gledanja",
@@ -1452,7 +1470,35 @@
     "sessionNoTitle": "Nepoznat naslov",
     "emptyTitle": "Još nema podataka",
     "emptyBody": "Pogledajte nešto i ovdje će se prikazati vaša statistika.",
-    "noDataInPeriod": "U ovom razdoblju nije snimljena reprodukcija."
+    "noDataInPeriod": "U ovom razdoblju nije snimljena reprodukcija.",
+    "overview": "Pregled",
+    "history": "Povijest",
+    "patternsTab": "Uzorci",
+    "gettingStarted": "Aktivnost tek počinje. Uzorci gledanja prikazat će se nakon nekoliko dana aktivnosti.",
+    "monthlyRecap": "Mjesečni sažetak",
+    "measurementHint": "Vrijeme odražava snimljenu reprodukciju, a ne dovršene naslove.",
+    "ledgerScope": "Aktivnost dolazi iz lokalne evidencije reprodukcija na platformi Luroka za ovaj profil. Povijest gledanja na poslužitelju i reprodukcija u drugim aplikacijama nisu uključeni.",
+    "watchedPeriod": "Pogledano u ovom razdoblju",
+    "activeDays": "Aktivni dani",
+    "dailyAverage": "Dnevni prosjek",
+    "previousPeriod": "Prethodno razdoblje",
+    "insufficientHistory": "Nema dovoljno podataka u povijesti",
+    "drillDown": "Prikaži aktivnost za ove datume",
+    "searchHistory": "Pretraživanje povijesti gledanja",
+    "allKinds": "Sve",
+    "moviesFilter": "Filmovi",
+    "episodesFilter": "Epizode",
+    "datesFilter": "Datumi",
+    "clearDates": "Izbriši datume",
+    "noMatches": "Nijedan prikaz ne odgovara ovim filtrima.",
+    "allHistory": "Prikaži cijelu povijest",
+    "historyError": "Nije moguće učitati povijest. Pokušajte ponovno.",
+    "titlesPlayed": "Reproducirani naslovi: ${count} · epizode se računaju zasebno",
+    "monthWatched": "${duration} pogledano ovaj mjesec",
+    "lifetimeSummary": "Ukupno: ${total} · Dnevni prosjek: ${average}",
+    "chartScale": "Ljestvica: 0 – ${duration}",
+    "titlesPlayedLabel": "Reproducirani naslovi",
+    "playedHint": "Epizode se računaju zasebno. Vrijeme reprodukcije ne označava dovršenost."
   },
   "search": {
     "hint": "Pretražite filmove, serije i glazbu...",
@@ -1661,7 +1707,8 @@
     "mediaFailedToDelete": "Brisanje medijske stavke nije uspjelo",
     "rate": "Ocijeni",
     "playFromBeginning": "Reproduciraj od početka",
-    "playVersion": "Reproduciraj verziju..."
+    "playVersion": "Reproduciraj verziju...",
+    "removeFromNextUp": "Ukloni iz rubrike Sljedeće na redu"
   },
   "rateSheet": {
     "title": "Ocijenite",
@@ -1670,7 +1717,9 @@
     "favorited": "Dodano među favorite",
     "saved": "Spremljeno",
     "notAvailable": "Nije pronađeno podudaranje",
-    "noConnectedServices": "Povežite uslugu u Postavkama da biste mogli ocjenjivati sadržaj."
+    "noConnectedServices": "Povežite uslugu u Postavkama da biste mogli ocjenjivati sadržaj.",
+    "addFavorite": "Dodaj u favorite",
+    "removeFavorite": "Ukloni iz omiljenih"
   },
   "accessibility": {
     "mediaCardMovie": "${title}, film",
@@ -1880,7 +1929,9 @@
     "streamSelectionUnavailable": "Odabir toka nije dostupan za ovaj izvor.",
     "streamSelectionFailed": "Nije moguće primijeniti odabrane tokove.",
     "trackSelectionNotRemembered": "Ovaj odabir zapisa vrijedi samo za trenutačnu reprodukciju.",
-    "serverUnavailableForProfile": "Nijedan poslužitelj nije dostupan za aktivni profil"
+    "serverUnavailableForProfile": "Nijedan poslužitelj nije dostupan za aktivni profil",
+    "logSupportReference": "Referentni broj za podršku",
+    "copyFullLogId": "Kopiraj ID cijelog zapisnika"
   },
   "sourceLibraries": {
     "title": "Vaši poslužitelji i biblioteke",
@@ -3630,5 +3681,20 @@
     "redirectDifferentHost": "Poslužitelj je preusmjeren na drugi poslužitelj. Izravno unesite konačnu adresu za ${product}.",
     "redirectInsecure": "Poslužitelj je preusmjerio s HTTPS-a na nesiguran URL",
     "redirectUnsupportedEnterFinal": "Poslužitelj je preusmjeren na nepodržani URL. Izravno unesite konačni ${product} URL."
+  },
+  "episodeDetails": {
+    "previous": "Prethodna epizoda",
+    "next": "Sljedeća epizoda"
+  },
+  "tvEdgeMenu": {
+    "title": "TV navigacija",
+    "top": "Gornja traka",
+    "both": "Gornja traka + bočni izbornik",
+    "hint": "Pritisnite Lijevo s prve stavke u retku da biste otvorili bočni izbornik. Pritisnite Desno ili Natrag za povratak.",
+    "browse": "Pregledavanje",
+    "more": "Više",
+    "closeHint": "Pritisnite Desno ili Natrag za zatvaranje",
+    "tryMenu": "Isprobajte navigaciju",
+    "allLibraries": "Sve biblioteke"
   }
 }

@@ -297,7 +297,7 @@ class OptimizedMediaImage extends StatelessWidget {
     return explicit;
   }
 
-  Widget _buildCachedImage(BuildContext context, double effectiveWidth, double effectiveHeight) {
+  (String, ImageProvider?) resolveNetworkImage(BuildContext context, double effectiveWidth, double effectiveHeight) {
     final pixelRatio = MediaImageHelper.artworkPixelRatio(context, imageType: imageType);
 
     final imageUrl = MediaImageHelper.getOptimizedImageUrl(
@@ -309,16 +309,7 @@ class OptimizedMediaImage extends StatelessWidget {
       imageType: imageType,
     );
 
-    if (imageUrl.isEmpty) {
-      // An unresolvable URL (no client, offline, suppressed transcode) is a
-      // load failure from the caller's point of view, so honour its own
-      // failure UI rather than the generic broken-image tile.
-      if (errorWidget != null) {
-        return errorWidget!(context, imagePath ?? '', UnresolvedImageUrl(imagePath ?? ''));
-      }
-      return _buildFallback(context);
-    }
-
+    if (imageUrl.isEmpty) return (imageUrl, null);
     final scaledWidth = effectiveWidth * pixelRatio;
     final scaledHeight = effectiveHeight * pixelRatio;
     final (memWidth, memHeight) = MediaImageHelper.getMemCacheDimensions(
@@ -334,6 +325,21 @@ class OptimizedMediaImage extends StatelessWidget {
       logoToneTarget: logoToneTarget,
       logoToneRemapMixed: logoToneRemapMixed,
     );
+
+    return (imageUrl, resizedProvider);
+  }
+
+  Widget _buildCachedImage(BuildContext context, double effectiveWidth, double effectiveHeight) {
+    final (imageUrl, resizedProvider) = resolveNetworkImage(context, effectiveWidth, effectiveHeight);
+    if (resizedProvider == null) {
+      // An unresolvable URL (no client, offline, suppressed transcode) is a
+      // load failure from the caller's point of view, so honour its own
+      // failure UI rather than the generic broken-image tile.
+      if (errorWidget != null) {
+        return errorWidget!(context, imagePath ?? '', UnresolvedImageUrl(imagePath ?? ''));
+      }
+      return _buildFallback(context);
+    }
 
     // Reduced tier: swap in directly, no fade machinery at all.
     if (DevicePerformance.isReduced) {

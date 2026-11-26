@@ -90,6 +90,12 @@ void main() {
     expect(result.isOffline, isTrue);
     expect(result.videoUrl, 'content://offline/movie-1');
     expect(result.mediaInfo?.audioTracks.single.languageCode, 'eng');
+    final row = await db.select(db.downloadedMedia).getSingle();
+    final picker = await PlaybackInitializationService().downloadedDetailTracks(
+      testMediaItem(id: row.ratingKey, backend: MediaBackend.plex, kind: MediaKind.movie, serverId: ServerId(row.serverId)),
+      row, row.mediaIndex,
+    );
+    expect(picker.source?.audioTracks.single.id, result.mediaInfo!.audioTracks.single.id);
   });
 
   group('a download of a stacked item', () {

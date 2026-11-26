@@ -17,11 +17,79 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
   Widget _buildActionButtons(MediaItem metadata) {
     // Tie asynchronous playback prompts to the actionable subtree, not the
     // route's State: a deleted first-route detail intentionally stays mounted.
-    return Builder(builder: (context) => _buildAvailableActionButtons(context, metadata));
+    if (!metadata.isEpisode ||
+        metadata.grandparentId == null ||
+        metadata.serverId == null ||
+        widget.catalogPreviewOnly) {
+      return Builder(builder: (context) => _buildAvailableActionButtons(context, metadata));
+    }
+    final known = widget.episodeDetailOrder;
+    if (known != null) return _buildAvailableActionButtons(context, metadata, order: known);
+    return FutureBuilder<List<MediaItem>>(
+      future: _episodeDetailOrder ??= _loadEpisodeDetailOrder(metadata),
+      builder: (context, snapshot) => _buildAvailableActionButtons(context, metadata, order: snapshot.data),
+    );
   }
 
-  Widget _buildAvailableActionButtons(BuildContext context, MediaItem metadata) {
+  Future<List<MediaItem>> _loadEpisodeDetailOrder(MediaItem episode) async {
+    if (widget.isOffline) {
+      final items = [...context.read<DownloadProvider>().getDownloadedEpisodesForShow(episode.seriesGlobalKey!)];
+      items.sort((a, b) {
+        final season = (a.parentIndex ?? 0).compareTo(b.parentIndex ?? 0);
+        return season != 0 ? season : (a.index ?? 0).compareTo(b.index ?? 0);
+      });
+      return items;
+    }
+    final client = _getMediaClientForMetadata(context);
+    return await client?.fetchClientSideEpisodeQueue(episode.grandparentId!) ?? const [];
+  }
+
+  Widget _buildAvailableActionButtons(BuildContext context, MediaItem metadata, {List<MediaItem>? order}) {
     final isTv = PlatformDetector.isTV();
+    final siblings = order
+        ?.where(
+          (item) =>
+              item.isEpisode &&
+              item.serverId == metadata.serverId &&
+              item.grandparentId == metadata.grandparentId &&
+              KidsProfileService.instance.allows(item),
+        )
+        .toList();
+    final position = siblings?.indexWhere((item) => item.id == metadata.id) ?? -1;
+    final adjacent = <FocusableAction>[];
+    if (position >= 0 && siblings != null) {
+      for (final step in [-1, 1]) {
+        final index = position + step;
+        if (index < 0 || index >= siblings.length) continue;
+        final next = siblings[index];
+        void open() {
+          if (!_canUseDetail ||
+              _changingEpisodeDetail ||
+              ModalRoute.of(context)?.isCurrent != true ||
+              !KidsProfileService.instance.allows(next))
+            return;
+          _changingEpisodeDetail = true;
+          Navigator.of(context).pushReplacement<bool, bool>(
+            mediaDetailRoute(
+              metadata: next,
+              isOffline: widget.isOffline,
+              showLibrarySource: widget.showLibrarySource,
+              episodeDetailOrder: siblings,
+            ),
+            result: true,
+          );
+        }
+
+        adjacent.add(
+          FocusableAction(
+            debugLabel: step < 0 ? 'detail_previous_episode' : 'detail_next_episode',
+            tooltip: '${step < 0 ? t.episodeDetails.previous : t.episodeDetails.next}: ${next.displayTitle}',
+            icon: step < 0 ? Icons.chevron_left_rounded : Icons.chevron_right_rounded,
+            onPressed: open,
+          ),
+        );
+      }
+    }
     if (widget.catalogPreviewOnly) {
       return FocusableActionBar(
         key: _detailTracksActionBarKey,
@@ -123,6 +191,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
           await navigateToVideoPlayerWithRefresh(
             context,
             metadata: episode,
+            restartBriefProgress: true,
             preferredAudioTrack: _detailAudioChoices[episode.globalKey],
             preferredSubtitleTrack: _detailSubtitleChoices[episode.globalKey],
             isOffline: widget.isOffline,
@@ -138,6 +207,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
           await navigateToVideoPlayerWithRefresh(
             context,
             metadata: _episodes.first,
+            restartBriefProgress: true,
             preferredAudioTrack: _detailAudioChoices[_episodes.first.globalKey],
             preferredSubtitleTrack: _detailSubtitleChoices[_episodes.first.globalKey],
             isOffline: widget.isOffline,
@@ -153,6 +223,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
         await navigateToVideoPlayerWithRefresh(
           context,
           metadata: metadata,
+          restartBriefProgress: true,
           preferredAudioTrack: _detailAudioChoices[metadata.globalKey],
           preferredSubtitleTrack: _detailSubtitleChoices[metadata.globalKey],
           isOffline: widget.isOffline,
@@ -230,7 +301,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
               unawaited(navigateToVideoPlayer(context, metadata: primaryTrailer, isLaunchCurrent: () => _canUseDetail))
         : _remoteTrailerUrl == null
         ? null
-        : () => unawaited(_openOnlinePreview(_remoteTrailerUrl!, t.detailComposition.trailer));
+        : () => unawaited(_openOnlinePreview(_remoteTrailerUrl!, t.detailComposition.trailer, chooseTrailer: true));
 
     final subtitleServerId = serverIdOrNull(metadata.serverId);
     final canSearchSubtitles =
@@ -417,7 +488,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
       if (_canUseDetail) await _refreshWatchState();
     }
 
-    final restartAction = isTv && target?.hasActiveProgress == true
+    final restartAction = isTv && target?.hasMeaningfulProgress == true
         ? FocusableAction(
             debugLabel: 'detail_restart',
             onPressed: restart,
@@ -574,7 +645,9 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
         : watchlistStates.contains(false)
         ? false
         : null;
-    final plexFavorite = _watchlistCandidates.where((candidate) => candidate.source.id == CatalogSourceId.plex).firstOrNull;
+    final plexFavorite = _watchlistCandidates
+        .where((candidate) => candidate.source.id == CatalogSourceId.plex)
+        .firstOrNull;
     if (isTv && !widget.isOffline && metadata.backend == MediaBackend.plex && plexFavorite != null) {
       final selected = plexFavorite.source.isOnWatchlist(metadata.kind, plexFavorite.ids);
       void togglePlexFavorite() {
@@ -584,6 +657,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
           unawaited(_toggleWatchlistOn(metadata, plexFavorite));
         }
       }
+
       favoriteAction = FocusableAction(
         debugLabel: 'detail_favorite',
         onPressed: togglePlexFavorite,
@@ -637,6 +711,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
     if (PlatformDetector.isMobile(context)) {
       Widget secondary({required Widget icon, required String label}) => Column(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           icon,
           Text(
@@ -652,16 +727,24 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
         key: const ValueKey('mobile_title_actions'),
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          MobilePlaybackActions(
-            label: playActionLabel,
-            contextLabel: metadata.isShow ? playButtonLabel : null,
-            icon: playButtonIcon,
-            onPlay: () => unawaited(onPlayPressed()),
-            onRestart: target?.hasActiveProgress == true ? () => unawaited(restart()) : null,
-            playFocus: _playButtonFocusNode,
-            onNavigateDown: _focusBelowActionRow,
+          Row(
+            children: [
+              Expanded(
+                child: MobilePlaybackActions(
+                  label: playActionLabel,
+                  contextLabel: metadata.isShow ? playButtonLabel : null,
+                  icon: playButtonIcon,
+                  onPlay: () => unawaited(onPlayPressed()),
+                  onRestart: target?.hasMeaningfulProgress == true ? () => unawaited(restart()) : null,
+                  playFocus: _playButtonFocusNode,
+                  onNavigateDown: _focusBelowActionRow,
+                ),
+              ),
+              for (final action in adjacent)
+                IconButton.filledTonal(tooltip: action.tooltip, icon: Icon(action.icon), onPressed: action.onPressed),
+            ],
           ),
-          if (target?.hasActiveProgress == true && (target?.durationMs ?? 0) > 0) ...[
+          if (target?.hasMeaningfulProgress == true && (target?.durationMs ?? 0) > 0) ...[
             const SizedBox(height: 8),
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
@@ -692,7 +775,9 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
                           tooltip: spec.tooltip,
                           style: actionButtonStyle(foregroundColor: spec.foregroundColor, showFocus: false),
                         ),
-                        label: t.downloads.downloadNow,
+                        label: downloads.isDownloaded(metadata.globalKey)
+                            ? t.downloadsRedesign.downloaded
+                            : t.downloads.downloadNow,
                       );
                     },
                   ),
@@ -743,8 +828,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
                     ),
                     label: t.settings.quality,
                   ),
-                if (!widget.isOffline &&
-                    target != null &&
+                if (target != null &&
                     !metadata.isShow &&
                     !metadata.isSeason &&
                     !metadata.isEpisode)
@@ -768,10 +852,17 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
                     ),
                     label: t.titlePage.more,
                   ),
-              ].map((action) => SizedBox(width: (constraints.maxWidth - 16) / 5, child: action)).toList(),
+              ]
+                  .map(
+                    (action) => ConstrainedBox(
+                      constraints: BoxConstraints(minWidth: (constraints.maxWidth - 16).clamp(0, double.infinity) / 5),
+                      child: action,
+                    ),
+                  )
+                  .toList(),
             ),
           ),
-          if (metadata.isEpisode && !widget.isOffline) ...[
+          if (metadata.isEpisode) ...[
             const SizedBox(height: 16),
             _buildMobileEpisodeTracks(context, metadata),
           ] else if (target != null && !metadata.isShow && !metadata.isSeason) ...[
@@ -784,6 +875,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
 
     final allActions = <FocusableAction>[
       playAction,
+      ...adjacent,
       ?libraryCopiesAction,
       ?versionAction,
       ?trailerAction,
@@ -794,7 +886,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
       ?watchlistAction,
       ?moreActionsAction,
     ];
-    final tracksAction = !widget.isOffline && _playbackTargetItem(metadata) != null
+    final tracksAction = _playbackTargetItem(metadata) != null
         ? FocusableAction(
             debugLabel: 'detail_tracks',
             onPressed: () =>
@@ -966,9 +1058,10 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
         final List<FocusableAction> actions;
         if (isTv) {
           actions = widget.isOffline
-              ? [playAction, ?restartAction, ?episodesAction, watchedAction]
+              ? [playAction, ...adjacent, ?restartAction, ?episodesAction, watchedAction]
               : [
                   playAction,
+                  ...adjacent,
                   ?libraryCopiesAction,
                   ?restartAction,
                   ?versionAction,
@@ -1152,13 +1245,13 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
       onRefresh: (source) => unawaited(_refreshItemInPlace(source)),
       onPlayTrailer: PlatformDetector.isMobile(context) ? null : onPlayTrailer,
       hiddenActionValues: {
-              if (hideFavoriteAction) 'toggle_favorite',
-              if (PlatformDetector.isMobile(context)) ...{
-              if (!widget.isOffline) 'download',
-              if (_playbackTargetItem(metadata)?.hasActiveProgress == true) 'play_from_beginning',
-              if (metadata.isMovie || metadata.isEpisode) 'play_version',
-              },
-            },
+        if (hideFavoriteAction) 'toggle_favorite',
+        if (PlatformDetector.isMobile(context)) ...{
+          if (!widget.isOffline) 'download',
+          if (_playbackTargetItem(metadata)?.hasMeaningfulProgress == true) 'play_from_beginning',
+          if (metadata.isMovie || metadata.isEpisode) 'play_version',
+        },
+      },
       extraEntries: [
         if (metadata.isShow)
           MediaMenuExtraEntry(
@@ -1530,9 +1623,9 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
       // Shows/seasons may have more episodes to fetch; movies/episodes don't.
       final canDownloadMore = metadata.isShow || metadata.isSeason;
       return _DownloadButtonSpec(
-        icon: const AppIcon(Symbols.download_rounded, fill: 1),
+        icon: const AppIcon(Symbols.check_circle_rounded, fill: 1),
         tooltip: canDownloadMore ? t.downloads.manage : t.downloads.deleteDownload,
-        foregroundColor: Colors.orange,
+        foregroundColor: Colors.green,
       );
     }
 

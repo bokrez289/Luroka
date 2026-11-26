@@ -149,6 +149,31 @@ class MonoPalette {
     accent: Color(0xffe2c388),
   );
 
+  static const lurokaPatina = MonoPalette(
+    bg: Color(0xff091a19),
+    surface: Color(0xff19312e),
+    outline: Color(0xff536e62),
+    text: Color(0xfff6efdf),
+    textMuted: Color(0xffb8c8ba),
+    accent: Color(0xffefa978),
+  );
+  static const lurokaAfterimage = MonoPalette(
+    bg: Color(0xff100f24),
+    surface: Color(0xff26213e),
+    outline: Color(0xff615474),
+    text: Color(0xfffff3fc),
+    textMuted: Color(0xffc7bedc),
+    accent: Color(0xffff93be),
+  );
+  static const lurokaLetterpress = MonoPalette(
+    bg: Color(0xffefe9dc),
+    surface: Color(0xfffffbf2),
+    outline: Color(0xffab9c89),
+    text: Color(0xff2c2421),
+    textMuted: Color(0xff685952),
+    accent: Color(0xff802c40),
+  );
+
   static const lurokaKids = MonoPalette(
     bg: Color(0xff071529),
     surface: Color(0xff14263f),
@@ -439,6 +464,7 @@ ThemeData monoThemeUncached(MonoPalette palette) => _buildMonoTheme(palette, pla
 ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
   final brightness = c.brightness;
   final onAccent = c.onAccent;
+  final editorial = c == MonoPalette.lurokaLetterpress;
   final clickableCursor = WidgetStateProperty.resolveWith<MouseCursor>(
     (states) => states.contains(WidgetState.disabled) ? MouseCursor.defer : SystemMouseCursors.click,
   );
@@ -541,7 +567,7 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
       centerTitle: false,
       foregroundColor: c.text,
       titleTextStyle: TextStyle(
-        fontFamily: 'Inter',
+        fontFamily: editorial ? 'serif' : 'Inter',
         color: c.text,
         fontSize: 18,
         fontWeight: .w700,
@@ -627,7 +653,18 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
     ),
   );
 
+  final type = base.textTheme;
+  TextStyle? inkHeading(TextStyle? style) => style?.copyWith(fontFamily: 'serif', letterSpacing: -0.3);
   return base.copyWith(
+    textTheme: editorial ? type.copyWith(
+      displayLarge: inkHeading(type.displayLarge),
+      displayMedium: inkHeading(type.displayMedium),
+      displaySmall: inkHeading(type.displaySmall),
+      headlineLarge: inkHeading(type.headlineLarge),
+      headlineMedium: inkHeading(type.headlineMedium),
+      headlineSmall: inkHeading(type.headlineSmall),
+      titleLarge: inkHeading(type.titleLarge),
+    ) : type,
     extensions: [
       MonoTokens(
         radiusSm: 8,

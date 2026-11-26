@@ -300,6 +300,7 @@
     "notificationProgress": "{progress} · {networkSpeed} · {timeRemaining} rimanenti"
   },
   "kidsShelf": {
+    "quietScenery": "Paesaggio notturno tranquillo",
     "movieShelf": "Tempo di film",
     "showShelf": "Trova il tuo prossimo spettacolo",
     "aurora": "Aurora: verde acqua intenso e lime",
@@ -604,7 +605,9 @@
     "availabilityUnknown": "Impossibile controllare alcune librerie. Prova ad aggiornare.",
     "noAvailable": "Nessun titolo corrispondente trovato nelle biblioteche controllate.",
     "sourceInfo": "Tendenze settimanali e vincitori selezionati · TMDb",
-    "configure": "Impostazioni di rilevamento"
+    "configure": "Impostazioni di rilevamento",
+    "filterOwned": "Nelle mie librerie",
+    "statusRetry": "Impossibile controllare Seerr · Riprova"
   },
   "app": {
     "title": "Luroka"
@@ -1139,7 +1142,11 @@
     "playerScopeLibrary": "Per libreria",
     "playerScopeTitle": "Per serie o film",
     "exportDialogTitle": "Esporta le impostazioni di Luroka",
-    "velvetHourTheme": "L'ora del velluto"
+    "velvetHourTheme": "L'ora del velluto",
+    "backdropBrightness": "Luminosità dello sfondo",
+    "backdropBrightnessDescription": "Regola l'ombreggiatura su Home e sull'immagine del titolo. Il valore predefinito è 100%.",
+    "showEarlyNextEpisode": "Mostra In programma prima della fine di un episodio",
+    "showEarlyNextEpisodeDescription": "Mostra l'episodio successivo durante i titoli di coda o negli ultimi 30 secondi."
   },
   "themeEditor": {
     "builtIn": "Integrato",
@@ -1311,6 +1318,9 @@
     "episodesLeft": "Episodi ${count} rimasti"
   },
   "lurokaThemes": {
+    "patina": "Patina · verde petrolio e rame",
+    "afterimage": "Persistenza · indaco e rosa neon",
+    "letterpress": "Stampa tipografica · carta e inchiostro bordeaux",
     "title": "Luroka tavolozze cinematografiche",
     "coral": "Corallo · Blu notte e tramonto",
     "ocean": "Oceano · blu profondo e ghiaccio",
@@ -1394,7 +1404,15 @@
     "reset": "Ripristina le righe predefinite",
     "resetDescription": "Ripristinare l'ordine delle righe originale e mostrare tutte le righe per questo profilo? Le tue raccolte appuntate verranno conservate.",
     "saveFailed": "Impossibile salvare il layout della tua casa. Per favore riprova.",
-    "emptyHint": "Le righe potrebbero essere nascoste. Apri Personalizza casa per mostrarli di nuovo."
+    "emptyHint": "Le righe potrebbero essere nascoste. Apri Personalizza casa per mostrarli di nuovo.",
+    "upcomingEpisodes": "Prossimi episodi",
+    "upcomingOff": "Disattivato",
+    "upcomingFavorites": "Preferiti",
+    "upcomingWatched": "Visti in precedenza",
+    "upcomingAll": "Tutti i programmi",
+    "upcomingBoth": "Preferiti e già visti",
+    "upcomingHint": "Le prossime date di messa in onda vengono controllate in background solo quando questa riga è abilitata. I risultati sono limitati e potrebbero non essere ancora disponibili sul tuo server.",
+    "airDate": "Data di trasmissione: ${date}"
   },
   "screenTime": {
     "title": "Tempo sullo schermo",
@@ -1449,7 +1467,35 @@
     "sessionNoTitle": "Riproduzione non identificata",
     "emptyTitle": "Niente qui ancora",
     "emptyBody": "Guarda qualcosa e le tue statistiche si accumuleranno qui.",
-    "noDataInPeriod": "Nessuna riproduzione registrata in questo periodo."
+    "noDataInPeriod": "Nessuna riproduzione registrata in questo periodo.",
+    "overview": "Panoramica",
+    "history": "Cronologia",
+    "patternsTab": "Modelli",
+    "gettingStarted": "L'attività è appena iniziata. I modelli di visualizzazione appariranno dopo alcuni giorni di attività.",
+    "monthlyRecap": "Riepilogo mensile",
+    "measurementHint": "Il tempo riflette la riproduzione registrata, non i titoli completati.",
+    "ledgerScope": "L'attività proviene dal registro di riproduzione Luroka locale di questo profilo. La cronologia di visione sul server e la riproduzione in altre app non sono incluse.",
+    "watchedPeriod": "Contenuti guardati in questo periodo",
+    "activeDays": "Giorni di attività",
+    "dailyAverage": "Media giornaliera",
+    "previousPeriod": "Periodo precedente",
+    "insufficientHistory": "Cronologia insufficiente",
+    "drillDown": "Visualizza l'attività per queste date",
+    "searchHistory": "Cerca nella cronologia di visualizzazione",
+    "allKinds": "Tutti",
+    "moviesFilter": "Film",
+    "episodesFilter": "Episodi",
+    "datesFilter": "Date",
+    "clearDates": "Cancella date",
+    "noMatches": "Nessuna visualizzazione corrisponde a questi filtri.",
+    "allHistory": "Visualizza tutta la cronologia",
+    "historyError": "Impossibile caricare la cronologia. Riprova.",
+    "titlesPlayed": "${count} titoli riprodotti · episodi conteggiati separatamente",
+    "monthWatched": "${duration} guardati questo mese",
+    "lifetimeSummary": "Complessivamente: ${total} · Media giornaliera: ${average}",
+    "chartScale": "Scala: 0 – ${duration}",
+    "titlesPlayedLabel": "Titoli riprodotti",
+    "playedHint": "Gli episodi vengono conteggiati separatamente. Il tempo di riproduzione non indica il completamento."
   },
   "search": {
     "hint": "Cerca film, serie TV e musica...",
@@ -1655,7 +1701,8 @@
     "mediaFailedToDelete": "Impossibile eliminare l'elemento multimediale",
     "rate": "Valuta",
     "playFromBeginning": "Riproduci dall'inizio",
-    "playVersion": "Riproduci versione..."
+    "playVersion": "Riproduci versione...",
+    "removeFromNextUp": "Rimuovi da Prossimi contenuti"
   },
   "rateSheet": {
     "title": "Valuta",
@@ -1664,7 +1711,9 @@
     "favorited": "Aggiunto ai preferiti",
     "saved": "Salvato",
     "notAvailable": "Nessuna corrispondenza trovata",
-    "noConnectedServices": "Collega un servizio nelle Impostazioni per assegnare valutazioni anche su quel servizio."
+    "noConnectedServices": "Collega un servizio nelle Impostazioni per assegnare valutazioni anche su quel servizio.",
+    "addFavorite": "Aggiungi ai preferiti",
+    "removeFavorite": "Rimuovi dai preferiti"
   },
   "accessibility": {
     "mediaCardMovie": "${title}, film",
@@ -1873,7 +1922,9 @@
     "streamSelectionUnavailable": "La selezione dei flussi non è disponibile per questa sorgente",
     "streamSelectionFailed": "Impossibile applicare i flussi selezionati",
     "trackSelectionNotRemembered": "Questa scelta di traccia vale solo per la riproduzione corrente.",
-    "serverUnavailableForProfile": "Nessun server disponibile per il profilo attivo"
+    "serverUnavailableForProfile": "Nessun server disponibile per il profilo attivo",
+    "logSupportReference": "Riferimento di assistenza",
+    "copyFullLogId": "Copia l'ID completo del registro"
   },
   "sourceLibraries": {
     "title": "I tuoi server e librerie",
@@ -3596,5 +3647,39 @@
     "redirectDifferentHost": "Il server ha reindirizzato a un host diverso. Inserisci direttamente l'URL finale del server ${product}.",
     "redirectInsecure": "Il server ha reindirizzato da HTTPS a un URL non sicuro",
     "redirectUnsupportedEnterFinal": "Il server ha reindirizzato a un URL non supportato. Inserisci direttamente l'URL finale del server ${product}."
+  },
+  "episodeDetails": {
+    "previous": "Episodio precedente",
+    "next": "Episodio successivo"
+  },
+  "tvEdgeMenu": {
+    "title": "Navigazione TV",
+    "top": "Barra superiore",
+    "both": "Barra superiore + menu laterale",
+    "hint": "Premi Sinistra dal primo elemento di una riga per aprire il menu laterale. Premi Destra o Indietro per tornare indietro.",
+    "browse": "Sfoglia",
+    "more": "Altro",
+    "closeHint": "Premi Destra o Indietro per chiudere",
+    "tryMenu": "Prova la navigazione",
+    "allLibraries": "Tutte le librerie"
+  },
+  "showDetailLayout": {
+    "title": "Mostra il layout dei dettagli",
+    "description": "Scegli come vengono presentati i programmi TV e gli episodi in televisione.",
+    "cinematic": "Cinematografico",
+    "compact": "Elenco episodi compatto",
+    "seasons": "Scegli una stagione",
+    "episodes": "Episodi",
+    "details": "Dettagli",
+    "cast": "Cast",
+    "related": "Altri simili"
+  },
+  "iconStyles": {
+    "title": "Stile delle icone",
+    "description": "Scegli l'aspetto dei controlli dell'app. Le modifiche si applicano a questo profilo.",
+    "current": "Luroka Bold",
+    "outline": "Contorno Material",
+    "lucide": "Lucide",
+    "lucideDescription": "Icone a linee pulite con alternative Material per i simboli non disponibili."
   }
 }

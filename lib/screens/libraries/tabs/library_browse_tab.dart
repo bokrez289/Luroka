@@ -4,6 +4,7 @@ import '../../../media/ids.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import '../../../media/library_first_character.dart';
@@ -63,6 +64,7 @@ import '../../../widgets/focusable_list_tile.dart';
 import '../content_state_builder.dart';
 import '../../../services/storage_service.dart';
 import '../../../services/settings_service.dart';
+import '../../../widgets/tv_edge_menu.dart';
 import '../../../mixins/grid_focus_node_mixin.dart';
 import '../../../mixins/item_updatable.dart';
 import '../../../mixins/watch_state_aware.dart';
@@ -125,6 +127,7 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
         PaginatedItemLoader<MediaItem, LibraryBrowseTab>,
         PaginatedItemUpdatable<LibraryBrowseTab>,
         SkeletonUpgradeScheduler {
+  Timer? _edgeHoldTimer;
   String _toGlobalKey(String ratingKey, {required ServerId serverId}) => buildGlobalKey(serverId, ratingKey);
   final _focusedInfo = ValueNotifier<MediaItem?>(null);
   KidsGroupedLibraryPager? _kidsGroupedPager;
@@ -450,6 +453,7 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
 
   @override
   void dispose() {
+    _edgeHoldTimer?.cancel();
     _focusedInfo.dispose();
     _clearFiltersFocus.dispose();
     _captionFocus.dispose();
@@ -1586,6 +1590,7 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
   }
 
   void _navigateToSidebar() {
+    if (TvEdgeMenuHost.open(context)) return;
     if (widget.onNavigateLibraryMenu case final callback?) {
       callback();
       return;
@@ -2291,21 +2296,32 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
       );
       if (!widget.library.kind.isMusic) return header;
       final groupings = _getGroupingOptions().where((value) => value != browseGroupingFolders).toList();
-      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        SizedBox(height: 52, child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-          child: TabChipStrip(children: [
-            for (final grouping in groupings)
-              Padding(padding: const EdgeInsets.only(right: 6), child: FocusableTabChip(
-                key: ValueKey('music-grouping-$grouping'),
-                label: _getGroupingLabel(grouping),
-                isSelected: _selectedGrouping == grouping,
-                onSelect: () => _handleGroupingSelection(grouping),
-              )),
-          ]),
-        )),
-        Expanded(child: header),
-      ]);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            height: 52,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              child: TabChipStrip(
+                children: [
+                  for (final grouping in groupings)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: FocusableTabChip(
+                        key: ValueKey('music-grouping-$grouping'),
+                        label: _getGroupingLabel(grouping),
+                        isSelected: _selectedGrouping == grouping,
+                        onSelect: () => _handleGroupingSelection(grouping),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(child: header),
+        ],
+      );
     }
     if (!PlatformDetector.isTV()) return bar;
     return Container(
@@ -2643,7 +2659,9 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
     }
 
     VoidCallback? navigateLeft;
-    if (isFirstColumn && (widget.compactTvNavigation || !(PlatformDetector.isTV() && columnCount > 1 && index > 0))) {
+    final edgeShortcut = PlatformDetector.isTV() && SettingsService.instance.read(SettingsService.tvEdgeMenu);
+    if (isFirstColumn &&
+        ((!edgeShortcut && widget.compactTvNavigation) || !(PlatformDetector.isTV() && columnCount > 1 && index > 0))) {
       navigateLeft = _navigateToSidebar;
     } else if (index > 0) {
       navigateLeft = () {
@@ -2678,9 +2696,30 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
       onNavigateUp: navigateUp,
       onNavigateDown: navigateDown,
       onNavigateLeft: navigateLeft,
+      onKeyEvent: edgeShortcut && isFirstColumn && index > 0
+          ? (node, event) {
+              if (event.logicalKey != LogicalKeyboardKey.arrowLeft) return KeyEventResult.ignored;
+              if (event is KeyDownEvent) {
+                _edgeHoldTimer?.cancel();
+                _edgeHoldTimer = Timer(const Duration(milliseconds: 500), () {
+                  _edgeHoldTimer = null;
+                  if (mounted && node.hasFocus) TvEdgeMenuHost.open(context);
+                });
+              } else if (event is KeyUpEvent && _edgeHoldTimer != null) {
+                _edgeHoldTimer!.cancel();
+                _edgeHoldTimer = null;
+                if (node.hasFocus) navigateLeft?.call();
+              }
+              return KeyEventResult.handled;
+            }
+          : null,
       onNavigateRight: navigateRight,
       onBack: widget.onBack,
       onFocusChange: (hasFocus) {
+        if (!hasFocus) {
+          _edgeHoldTimer?.cancel();
+          _edgeHoldTimer = null;
+        }
         trackGridItemFocus(index, hasFocus);
         if (hasFocus) _focusedInfo.value = item;
       },

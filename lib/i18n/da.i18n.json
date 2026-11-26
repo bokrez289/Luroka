@@ -300,6 +300,7 @@
     "notificationProgress": "{progress} · {networkSpeed} · {timeRemaining} tilbage"
   },
   "kidsShelf": {
+    "quietScenery": "Roligt natlandskab",
     "movieShelf": "Film tid",
     "showShelf": "Find dit næste show",
     "aurora": "Aurora - dyb krikand og lime",
@@ -604,7 +605,9 @@
     "availabilityUnknown": "Nogle biblioteker kunne ikke kontrolleres. Prøv at opdatere.",
     "noAvailable": "Ingen matchende titler fundet i de kontrollerede biblioteker.",
     "sourceInfo": "Ugentlige trends & udvalgte prisvindere · TMDb",
-    "configure": "Opdagelsesindstillinger"
+    "configure": "Opdagelsesindstillinger",
+    "filterOwned": "I mine biblioteker",
+    "statusRetry": "Kunne ikke kontrollere Seerr · Prøv igen"
   },
   "app": {
     "title": "Luroka"
@@ -1139,7 +1142,11 @@
     "playerScopeLibrary": "Pr. bibliotek",
     "playerScopeTitle": "Pr. serie eller film",
     "exportDialogTitle": "Eksportér Luroka-indstillinger",
-    "velvetHourTheme": "Fløjls time"
+    "velvetHourTheme": "Fløjls time",
+    "backdropBrightness": "Baggrundens lysstyrke",
+    "backdropBrightnessDescription": "Juster skyggen over baggrundsbilleder på startsiden og titelsider. Standardværdien er 100 %.",
+    "showEarlyNextEpisode": "Vis næste afsnit, før det aktuelle slutter",
+    "showEarlyNextEpisodeDescription": "Vis næste afsnit under rulleteksterne eller i de sidste 30 sekunder."
   },
   "themeEditor": {
     "builtIn": "Indbygget",
@@ -1311,6 +1318,9 @@
     "episodesLeft": "${count} episoder tilbage"
   },
   "lurokaThemes": {
+    "patina": "Patina · dyb blågrøn og kobber",
+    "afterimage": "Efterbillede · indigo og neonrosa",
+    "letterpress": "Bogtryk · papir og vinrødt blæk",
     "title": "Luroka biografpaletter",
     "coral": "Koral · midnatsblå & solnedgang",
     "ocean": "Ocean · dyb blå & is",
@@ -1394,7 +1404,15 @@
     "reset": "Gendan standardrækker",
     "resetDescription": "Vil du gendanne den oprindelige rækkefølge og vise alle rækker for denne profil? Dine fastgjorte samlinger bevares.",
     "saveFailed": "Dit hjemlayout kunne ikke gemmes. Prøv venligst igen.",
-    "emptyHint": "Rækker kan være skjulte. Åbn Tilpas hjem for at vise dem igen."
+    "emptyHint": "Rækker kan være skjulte. Åbn Tilpas hjem for at vise dem igen.",
+    "upcomingEpisodes": "Kommende afsnit",
+    "upcomingFavorites": "Favoritter",
+    "upcomingWatched": "Tidligere set",
+    "upcomingBoth": "Favoritter og tidligere set",
+    "upcomingAll": "Alle serier",
+    "upcomingOff": "Fra",
+    "airDate": "Udsendelsesdato: ${date}",
+    "upcomingHint": "Kommende udsendelsesdatoer kontrolleres kun i baggrunden, mens denne række er aktiveret. Resultaterne er begrænsede og er muligvis endnu ikke tilgængelige på din server."
   },
   "screenTime": {
     "title": "Skærmtid",
@@ -1449,7 +1467,35 @@
     "sessionNoTitle": "Uidentificeret afspilning",
     "emptyTitle": "Intet her endnu",
     "emptyBody": "Se noget, og din statistik vil bygge op her.",
-    "noDataInPeriod": "Der er ikke optaget nogen afspilning i denne periode."
+    "noDataInPeriod": "Der er ikke optaget nogen afspilning i denne periode.",
+    "patternsTab": "Mønstre",
+    "moviesFilter": "Film",
+    "episodesFilter": "Afsnit",
+    "datesFilter": "Datoer",
+    "titlesPlayed": "${count} titler afspillet · afsnit tælles separat",
+    "previousPeriod": "Forrige periode",
+    "lifetimeSummary": "I alt: ${total} · Dagligt gennemsnit: ${average}",
+    "dailyAverage": "Dagligt gennemsnit",
+    "allKinds": "Alle",
+    "titlesPlayedLabel": "Afspillede titler",
+    "ledgerScope": "Aktiviteten stammer fra denne profils lokale Luroka-afspilningslog. Serverens afspilningshistorik og afspilning i andre apps er ikke medregnet.",
+    "chartScale": "Skala: 0 – ${duration}",
+    "gettingStarted": "Aktiviteten er lige begyndt. Visningsmønstre vises efter nogle aktive dage.",
+    "history": "Historik",
+    "insufficientHistory": "Ikke nok historik",
+    "monthlyRecap": "Månedlig oversigt",
+    "noMatches": "Ingen visninger matcher disse filtre.",
+    "activeDays": "Aktive dage",
+    "measurementHint": "Tiden afspejler registreret afspilning, ikke fuldførte titler.",
+    "historyError": "Kunne ikke indlæse historikken. Prøv igen.",
+    "watchedPeriod": "Set i denne periode",
+    "monthWatched": "${duration} set denne måned",
+    "drillDown": "Se aktivitet for disse datoer",
+    "searchHistory": "Søg i visningshistorik",
+    "clearDates": "Ryd datoer",
+    "playedHint": "Afsnit tælles separat. Afspilningstid angiver ikke, om en titel er fuldført.",
+    "allHistory": "Se al historik",
+    "overview": "Oversigt"
   },
   "search": {
     "hint": "Søg film, serier, musik...",
@@ -1655,7 +1701,8 @@
     "mediaFailedToDelete": "Mediet kunne ikke slettes",
     "rate": "Bedøm",
     "playFromBeginning": "Afspil fra begyndelsen",
-    "playVersion": "Afspil version..."
+    "playVersion": "Afspil version...",
+    "removeFromNextUp": "Fjern fra Næste"
   },
   "rateSheet": {
     "title": "Bedøm",
@@ -1664,7 +1711,9 @@
     "favorited": "Føjet til favoritter",
     "saved": "Gemt",
     "notAvailable": "Intet match fundet",
-    "noConnectedServices": "Forbind en tjeneste under Indstillinger for at bedømme via den."
+    "noConnectedServices": "Forbind en tjeneste under Indstillinger for at bedømme via den.",
+    "addFavorite": "Føj til favoritter",
+    "removeFavorite": "Fjern fra favoritter"
   },
   "accessibility": {
     "mediaCardMovie": "${title}, film",
@@ -1873,7 +1922,9 @@
     "streamSelectionUnavailable": "Valg af stream er ikke tilgængeligt for denne kilde",
     "streamSelectionFailed": "Kunne ikke anvende de valgte streams",
     "trackSelectionNotRemembered": "Dette sporvalg gælder kun for den aktuelle afspilning.",
-    "serverUnavailableForProfile": "Ingen server er tilgængelig for den aktive profil"
+    "serverUnavailableForProfile": "Ingen server er tilgængelig for den aktive profil",
+    "logSupportReference": "Supportreference",
+    "copyFullLogId": "Kopiér fuldt log-id"
   },
   "sourceLibraries": {
     "title": "Dine servere og biblioteker",
@@ -3596,5 +3647,39 @@
     "redirectDifferentHost": "Serveren videresendte til en anden vært. Indtast den endelige ${product}-URL direkte.",
     "redirectInsecure": "Serveren videresendte fra HTTPS til en usikker URL",
     "redirectUnsupportedEnterFinal": "Serveren videresendte til en URL, der ikke understøttes. Indtast den endelige ${product}-URL direkte."
+  },
+  "episodeDetails": {
+    "previous": "Forrige afsnit",
+    "next": "Næste afsnit"
+  },
+  "tvEdgeMenu": {
+    "title": "TV-navigation",
+    "top": "Toplinje",
+    "both": "Toplinje og sidemenu",
+    "hint": "Tryk til venstre fra det første element i en række for at åbne sidemenuen. Tryk til højre eller Tilbage for at vende tilbage.",
+    "tryMenu": "Prøv navigation",
+    "allLibraries": "Alle biblioteker",
+    "browse": "Gennemse",
+    "more": "Mere",
+    "closeHint": "Tryk til højre eller Tilbage for at lukke"
+  },
+  "showDetailLayout": {
+    "title": "Layout for seriedetaljer",
+    "description": "Vælg, hvordan serier og afsnit vises på TV.",
+    "compact": "Kompakt afsnitsliste",
+    "cinematic": "Filmisk",
+    "seasons": "Vælg en sæson",
+    "episodes": "Afsnit",
+    "details": "Detaljer",
+    "cast": "Medvirkende",
+    "related": "Lignende titler"
+  },
+  "iconStyles": {
+    "title": "Ikonstil",
+    "description": "Vælg udseendet for appens knapper. Ændringer gælder denne profil.",
+    "current": "Luroka Bold",
+    "lucide": "Lucide",
+    "lucideDescription": "Enkle stregikoner med Material-ikoner som reserve.",
+    "outline": "Material Outline"
   }
 }

@@ -199,6 +199,9 @@ class _FakeLogoSource implements CatalogSource {
 /// grant or revocation through the provider's own refresh path.
 Future<SeerrAccountProvider> _seerrAccount(int Function() permissions) async {
   final mock = MockClient((request) async {
+    if (RegExp(r'/api/v1/(movie|tv)/\d+$').hasMatch(request.url.path)) {
+      return http.Response('{}', 200, headers: {'content-type': 'application/json'});
+    }
     if (request.url.path != '/api/v1/auth/me') return http.Response('unexpected Seerr request', 500);
     return http.Response(
       jsonEncode({'id': 1, 'displayName': 'Alice', 'permissions': permissions()}),
@@ -228,7 +231,7 @@ Future<SeerrAccountProvider> _seerrAccount(int Function() permissions) async {
 /// A real [SeerrCatalogSource]: the Request gate reads the session's
 /// permission bitmask through [SeerrCatalogSource.canRequest]. None of these
 /// tests open the request sheet, so no Seerr HTTP is expected.
-SeerrCatalogSource _seerrSource({int permissions = SeerrPermission.request}) {
+SeerrCatalogSource _seerrSource({int permissions = SeerrPermission.request, String details = '{}'}) {
   final client = SeerrClient(
     SeerrSession(
       baseUrl: 'https://seerr.example.com',
@@ -243,7 +246,7 @@ SeerrCatalogSource _seerrSource({int permissions = SeerrPermission.request}) {
       createdAt: 0,
     ),
     onSessionInvalidated: () {},
-    httpClient: MockClient((request) async => http.Response('unexpected Seerr request', 500)),
+    httpClient: MockClient((request) async => http.Response(details, 200, headers: {'content-type': 'application/json'})),
   );
   final source = SeerrCatalogSource(client);
   addTearDown(() {
@@ -423,10 +426,12 @@ void main() {
   });
 
   testWidgets('unselected copies require Check other sources and offer play once or include library', (tester) async {
-    final storage = await StorageService.getInstance();
+    final storage = (await tester.runAsync(StorageService.getInstance))!;
     final selection = HiddenLibrariesProvider(storageService: storage, profileId: 'alex');
-    await selection.ensureInitialized();
-    await selection.setSelectedSourceLibraries({'server-1:selected'});
+    await tester.runAsync(() async {
+      await selection.ensureInitialized();
+      await selection.setSelectedSourceLibraries({'server-1:selected'});
+    });
     addTearDown(selection.dispose);
     late _OtherSourceMatcher matcher;
     await _pumpDetail(
@@ -648,6 +653,18 @@ void main() {
   });
 
   group('Seerr request action', () {
+    testWidgets('verified local copy hides request even with permission', (tester) async {
+      await _pumpDetail(tester, _FakeCatalogSource(), seerr: _seerrSource(),
+          matches: [_libraryCopy(id: 'local', libraryTitle: 'Movies')]);
+      expect(find.byTooltip(t.seerr.request), findsNothing);
+    });
+
+    testWidgets('available Seerr movie offers library recheck instead of request', (tester) async {
+      await _pumpDetail(tester, _FakeCatalogSource(),
+          seerr: _seerrSource(details: '{"mediaInfo":{"status":5}}'));
+      expect(find.byTooltip('${t.seerr.statusAvailable} · ${t.common.refresh}'), findsOneWidget);
+      expect(find.byTooltip(t.seerr.request), findsNothing);
+    });
     testWidgets('appears once the detail load supplies the tmdb id', (tester) async {
       // #1959: Plex Discover's hub/search/related endpoints ignore
       // includeGuids, so a row item carries no tmdb id until fetchDetail
@@ -694,7 +711,7 @@ void main() {
 
       permissions = SeerrPermission.request;
       await tester.runAsync(account.refreshUser);
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.byTooltip(t.seerr.request), findsOneWidget);
 
       permissions = 0;
@@ -1323,7 +1340,7 @@ void main() {
     // each.
     expect(find.byType(HubSection), findsOneWidget);
     expect(find.text(t.discover.moreLikeThis), findsOneWidget);
-    expect(find.text('A Similar Movie'), findsOneWidget);
+    expect(tester.widget<HubSection>(find.byType(HubSection)).hub.items.single.displayTitle, 'A Similar Movie');
 
     expect(find.text(t.explore.detail.relatedTitles), findsOneWidget);
     expect(find.text(t.explore.relation.sequel), findsOneWidget);
