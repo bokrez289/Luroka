@@ -318,6 +318,15 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
                     if (_loading)
                       const Center(child: CircularProgressIndicator())
                     else ...[
+                      if (_libraries.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Text(
+                            '${t.kids.libraryCount(count: _selected.length)} / ${_libraries.length}',
+                            key: const ValueKey('source-libraries-selection-count'),
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
+                        ),
                       if (_partial)
                         Padding(padding: const EdgeInsets.only(bottom: 12), child: Text(t.sourceLibraries.partial)),
                       if (_error != null) Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
@@ -338,7 +347,7 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
                             });
                             return Row(children: [
                               Expanded(child: FocusableCheckboxListTile(
-                              autofocus: entry.key == groups.keys.first,
+                              autofocus: false,
                               value: selected == 0
                                   ? false
                                   : selected == entry.value.length
@@ -377,6 +386,8 @@ class _SourceLibrariesScreenState extends State<SourceLibrariesScreen> {
                           Padding(
                             padding: const EdgeInsetsDirectional.only(start: 24),
                             child: FocusableCheckboxListTile(
+                              key: ValueKey('source-library-${library.globalKey}'),
+                              autofocus: entry.key == groups.keys.first && library.globalKey == entry.value.first.globalKey,
                               value: _selected.contains(library.globalKey),
                               title: Text(library.title),
                               onChanged: _saving

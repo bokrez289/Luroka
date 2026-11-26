@@ -79,6 +79,7 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
   final _overview = FocusNode(debugLabel: 'favorites_overview');
   final _sortFocus = FocusNode(debugLabel: 'favorites_sort');
   final _viewFocus = FocusNode(debugLabel: 'favorites_view');
+  final _watchedFilterFocus = FocusNode(debugLabel: 'favorites_watched_filter');
   final _refreshFocus = FocusNode(debugLabel: 'favorites_refresh');
   final _animeSettingsFocus = FocusNode(debugLabel: 'favorites_anime_settings');
   final _animeEmptyFocus = FocusNode(debugLabel: 'favorites_anime_empty_settings');
@@ -88,6 +89,8 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
   List<MediaItem> _visible = const [];
   MediaKind? _kind;
   bool _animeOnly = false;
+  bool _hideWatchedShows = false;
+  bool _watchedFilterEdited = false;
   AnimeFavoritesRules _animeRules = AnimeFavoritesRules();
   String? _animeProfileId;
   StudioSort _sort = StudioSort.titleAscending;
@@ -113,7 +116,7 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
   @override
   void initState() {
     super.initState();
-    for (final node in [..._filters, _overview, _sortFocus, _viewFocus, _refreshFocus, _animeSettingsFocus]) {
+    for (final node in [..._filters, _overview, _sortFocus, _viewFocus, _watchedFilterFocus, _refreshFocus, _animeSettingsFocus]) {
       node.addListener(_expandPreviewForControls);
     }
     _preview = HomePreviewController(
@@ -145,6 +148,7 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
           _overview,
           _sortFocus,
           _viewFocus,
+          _watchedFilterFocus,
           _refreshFocus,
           _animeSettingsFocus,
         ].any((node) => node.hasFocus)) {
@@ -158,6 +162,9 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
     setState(() {
       _storage = storage;
       _animeProfileId = storage.getActiveProfileId();
+      if (!_watchedFilterEdited && _animeProfileId != null) {
+        _hideWatchedShows = storage.getFavoritesHideWatched(_animeProfileId!);
+      }
       _animeRules = _animeProfileId == null ? AnimeFavoritesRules() : storage.getAnimeFavoritesRules(_animeProfileId!);
       _sort = storage.getFavoritesSort(kind: _kind);
       _commitItems();
@@ -167,12 +174,27 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
   @override
   void didUpdateWidget(FavoritesCatalogView oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _syncProfile();
     if (!identical(oldWidget.items, widget.items) || !identical(oldWidget.libraries, widget.libraries)) _commitItems();
   }
 
   void setActive(bool active) {
     _active = active;
     _preview.setActive(active);
+    if (active && _syncProfile() && mounted) setState(() {});
+  }
+
+  bool _syncProfile() {
+    final storage = _storage;
+    if (storage == null) return false;
+    final profileId = storage.getActiveProfileId();
+    if (profileId == _animeProfileId) return false;
+    _animeProfileId = profileId;
+    _watchedFilterEdited = false;
+    _hideWatchedShows = profileId == null ? false : storage.getFavoritesHideWatched(profileId);
+    _animeRules = profileId == null ? AnimeFavoritesRules() : storage.getAnimeFavoritesRules(profileId);
+    _commitItems(reset: true);
+    return true;
   }
 
   void focusContent() {
@@ -196,6 +218,13 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
       });
     }
     _visible = widget.items.where((item) {
+      if (_hideWatchedShows && (item.kind == MediaKind.show || item.kind == MediaKind.movie)) {
+        final copies = _copiesFor(item);
+        if (copies.isNotEmpty && copies.every((copy) =>
+            copy.kind == MediaKind.show ? copy.unwatchedCount == 0 : copy.isWatched && !copy.hasActiveProgress)) {
+          return false;
+        }
+      }
       if (_animeOnly) return _animeRules.includesTitle(_copiesFor(item), libraryTitles: libraryTitles);
       return _kind == null || item.kind == _kind;
     }).toList()..sort(_sort.compare);
@@ -324,6 +353,22 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
     if (_scroll.hasClients) _scroll.jumpTo(0);
   }
 
+  void _toggleWatchedShows() {
+    _syncProfile();
+    _watchedFilterEdited = true;
+    setState(() {
+      _hideWatchedShows = !_hideWatchedShows;
+      _commitItems(reset: true);
+    });
+    unawaited(_saveWatchedFilter(_hideWatchedShows));
+  }
+
+  Future<void> _saveWatchedFilter(bool value) async {
+    final storage = _storage ?? await StorageService.getInstance();
+    final profileId = _animeProfileId ?? storage.getActiveProfileId();
+    if (profileId != null) await storage.setFavoritesHideWatched(profileId, value);
+  }
+
   void _focusOverview() {
     if (_collapsed) setState(() => _collapsed = false);
     if (_showPreview && _preview.value != null) {
@@ -425,13 +470,13 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
     final filters = narrow ? Wrap(spacing: 8, runSpacing: 4, children: chips) : TabChipStrip(children: chips);
     final actions = [
       ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: math.min(250.0, width * (narrow ? 0.7 : 0.4))),
+        constraints: BoxConstraints(maxWidth: narrow ? math.max(0.0, width - 160) : math.min(250.0, width * 0.4)),
         child: FocusableButton(
           focusNode: _sortFocus,
           autoScroll: false,
           onPressed: () => unawaited(_chooseSort()),
           onNavigateLeft: _filters[lastFilterIndex].requestFocus,
-          onNavigateRight: _viewFocus.requestFocus,
+          onNavigateRight: _watchedFilterFocus.requestFocus,
           onNavigateUp: PlatformDetector.isTV()
               ? widget.onNavigation
               : narrow
@@ -447,10 +492,25 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
         ),
       ),
       FocusableButton(
+        focusNode: _watchedFilterFocus,
+        autoScroll: false,
+        onPressed: _toggleWatchedShows,
+        onNavigateLeft: _sortFocus.requestFocus,
+        onNavigateRight: _viewFocus.requestFocus,
+        onNavigateDown: () => _focusIndex(0),
+        child: IconButton(
+          key: const ValueKey('favorites_hide_watched_shows'),
+          onPressed: _toggleWatchedShows,
+          tooltip: _hideWatchedShows ? 'Show watched titles' : 'Hide watched titles',
+          isSelected: _hideWatchedShows,
+          icon: const AppIcon(Symbols.visibility_off_rounded, size: 21),
+        ),
+      ),
+      FocusableButton(
         focusNode: _viewFocus,
         autoScroll: false,
         onPressed: _toggleView,
-        onNavigateLeft: _sortFocus.requestFocus,
+        onNavigateLeft: _watchedFilterFocus.requestFocus,
         onNavigateRight: _animeSettingsFocus.requestFocus,
         onNavigateUp: PlatformDetector.isTV()
             ? widget.onNavigation
@@ -495,6 +555,7 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
       _overview,
       _sortFocus,
       _viewFocus,
+      _watchedFilterFocus,
       _refreshFocus,
       _animeSettingsFocus,
       _animeEmptyFocus,
@@ -685,7 +746,9 @@ class FavoritesCatalogViewState extends State<FavoritesCatalogView> with GridFoc
                                 )
                               else if (_visible.isEmpty)
                                 SliverEmptyState(
-                                  message: _animeOnly ? t.animeFavorites.empty : t.messages.noItemsAvailable,
+                                  message: _hideWatchedShows && widget.items.isNotEmpty
+                                      ? 'No titles match. Turn off Hide watched titles to see all favorites.'
+                                      : _animeOnly ? t.animeFavorites.empty : t.messages.noItemsAvailable,
                                   icon: Symbols.favorite_border_rounded,
                                   onAction: _animeOnly ? () => unawaited(_manageAnime()) : null,
                                   actionLabel: _animeOnly ? t.animeFavorites.manage : null,

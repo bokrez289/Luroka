@@ -801,7 +801,8 @@ void main() {
   });
 
   for (final size in [const Size(360, 640), const Size(390, 740)]) {
-    testWidgets('the complete phone hero action panel fits the body viewport at $size', (tester) async {
+    testWidgets('the classic phone hero action panel fits the body viewport at $size', (tester) async {
+      await SettingsService.instance.write(SettingsService.phoneCinematicSpotlight, false);
       await mount(tester, size: size, tv: false);
       final action = find.byKey(ValueKey('mobile_feature_open_${a.globalKey}'));
       final caption = find.byKey(ValueKey('mobile_feature_caption_${a.globalKey}'));

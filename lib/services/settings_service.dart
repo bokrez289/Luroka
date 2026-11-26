@@ -1034,6 +1034,8 @@ class SettingsService extends BaseSharedPreferencesService {
     defaultValue: PhoneSpotlightSize.compact,
   );
   static const phoneCinematicSpotlight = BoolPref('luroka_phone_cinematic_spotlight', defaultValue: true);
+  static const tabletMarquee = BoolPref('luroka_tablet_marquee', defaultValue: false);
+  static const tabletTonightPicks = BoolPref('luroka_tablet_tonight_picks', defaultValue: false);
   static const alwaysKeepSidebarOpen = BoolPref('always_keep_sidebar_open');
 
   /// Sidebar Libraries section expansion. Persisted so a collapsed section
@@ -1048,7 +1050,7 @@ class SettingsService extends BaseSharedPreferencesService {
   static const showSeasonPostersOnTabs = BoolPref('show_season_posters_on_tabs');
   static const hideSpoilers = BoolPref('hide_spoilers');
   static const showNavBarLabels = BoolPref('show_nav_bar_labels', defaultValue: true);
-  static const tvEdgeMenu = BoolPref('tv_edge_navigation_menu', defaultValue: false);
+  static const tvEdgeMenu = BoolPref('tv_edge_navigation_menu', defaultValue: true);
   static const discoverAvailableOnly = BoolPref('discover_available_only', defaultValue: false);
   static const globalShaderPreset = StringPref('global_shader_preset', defaultValue: 'none');
   static const requireProfileSelectionOnOpen = BoolPref('require_profile_selection_on_open');
@@ -1317,6 +1319,8 @@ class SettingsService extends BaseSharedPreferencesService {
     homeSpotlightInterval.key,
     phoneSpotlightSize.key,
     phoneCinematicSpotlight.key,
+    tabletMarquee.key,
+    tabletTonightPicks.key,
     alwaysKeepSidebarOpen.key,
     librariesSectionExpanded.key,
     showUnwatchedCount.key,
@@ -1528,6 +1532,8 @@ class SettingsService extends BaseSharedPreferencesService {
     bool? playThemeMusic,
     bool? showSpotlight,
     bool? cinematicSpotlight,
+    bool? marqueeSpotlight,
+    bool? tonightPicks,
     bool? showEpisodeThumbnails,
     ShowDetailLayout? showLayout,
   }) async {
@@ -1542,6 +1548,8 @@ class SettingsService extends BaseSharedPreferencesService {
       showThemeMusic.key: ?playThemeMusic,
       showHeroSection.key: ?showSpotlight,
       phoneCinematicSpotlight.key: ?cinematicSpotlight,
+      tabletMarquee.key: ?marqueeSpotlight,
+      tabletTonightPicks.key: ?tonightPicks,
       homeEpisodeThumbnails.key: ?showEpisodeThumbnails,
       if (showLayout != null) showDetailLayout.key: showLayout.name,
     };
@@ -2027,6 +2035,8 @@ class SettingsService extends BaseSharedPreferencesService {
     homeSpotlightInterval,
     phoneSpotlightSize,
     phoneCinematicSpotlight,
+    tabletMarquee,
+    tabletTonightPicks,
     alwaysKeepSidebarOpen,
     librariesSectionExpanded,
     showUnwatchedCount,

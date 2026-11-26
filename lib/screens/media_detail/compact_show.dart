@@ -113,11 +113,12 @@ extension _CompactShowPresentation on _MediaDetailScreenState {
                     SizedBox(height: 10 * scale),
                     ConstrainedBox(
                       constraints: BoxConstraints(maxWidth: 600 * scale),
-                      child: Text(
-                        show.summary!,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      child: _CompactShowSummary(
+                        title: show.displayTitle,
+                        summary: show.summary!,
                         style: TextStyle(fontSize: 15 * scale, height: 1.35),
+                        focusNode: _compactSummaryFocus,
+                        onNavigateDown: _focusTvDetailActionRow,
                       ),
                     ),
                   ],
@@ -574,6 +575,63 @@ extension _CompactShowPresentation on _MediaDetailScreenState {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CompactShowSummary extends StatelessWidget {
+  const _CompactShowSummary({
+    required this.title,
+    required this.summary,
+    required this.style,
+    required this.focusNode,
+    required this.onNavigateDown,
+  });
+
+  final String title;
+  final String summary;
+  final TextStyle style;
+  final FocusNode focusNode;
+  final VoidCallback onNavigateDown;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final effectiveStyle = DefaultTextStyle.of(context).style.merge(style);
+        final painter = TextPainter(
+          text: TextSpan(text: summary, style: effectiveStyle),
+          textDirection: Directionality.of(context),
+          textScaler: MediaQuery.textScalerOf(context),
+          maxLines: 2,
+        )..layout(maxWidth: constraints.maxWidth);
+        final truncated = painter.didExceedMaxLines;
+        painter.dispose();
+        final text = Text(summary, maxLines: 2, overflow: TextOverflow.ellipsis, style: style);
+        if (!truncated) return text;
+
+        Future<void> showFullSummary() async {
+          final origin = FocusManager.instance.primaryFocus;
+          await showDialog<void>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(title),
+              content: SingleChildScrollView(child: Text(summary)),
+              actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(t.common.close))],
+            ),
+          );
+          if (context.mounted && origin?.context != null) origin!.requestFocus();
+        }
+
+        return FocusableWrapper(
+          key: const ValueKey('compact_show_summary'),
+          focusNode: focusNode,
+          disableScale: true,
+          onNavigateDown: onNavigateDown,
+          onSelect: () => unawaited(showFullSummary()),
+          child: InkWell(onTap: () => unawaited(showFullSummary()), child: text),
+        );
+      },
     );
   }
 }

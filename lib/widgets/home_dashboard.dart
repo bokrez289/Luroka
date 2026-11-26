@@ -269,6 +269,8 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
     ])..addListener(_rotationPreferenceChanged);
     SettingsService.instance.listenable(SettingsService.phoneSpotlightSize).addListener(_phoneSpotlightSizeChanged);
     SettingsService.instance.listenable(SettingsService.phoneCinematicSpotlight).addListener(_phoneSpotlightSizeChanged);
+    SettingsService.instance.listenable(SettingsService.tabletMarquee).addListener(_phoneSpotlightSizeChanged);
+    SettingsService.instance.listenable(SettingsService.tabletTonightPicks).addListener(_phoneSpotlightSizeChanged);
     _preview = HomePreviewController(
       resolveClient: (item) => widget.resolveClient(item),
       canFetch: () => mounted && _previewActive && (ModalRoute.of(context)?.isCurrent ?? false),
@@ -722,6 +724,8 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
     _rotationPreferences.removeListener(_rotationPreferenceChanged);
     SettingsService.instance.listenable(SettingsService.phoneSpotlightSize).removeListener(_phoneSpotlightSizeChanged);
     SettingsService.instance.listenable(SettingsService.phoneCinematicSpotlight).removeListener(_phoneSpotlightSizeChanged);
+    SettingsService.instance.listenable(SettingsService.tabletMarquee).removeListener(_phoneSpotlightSizeChanged);
+    SettingsService.instance.listenable(SettingsService.tabletTonightPicks).removeListener(_phoneSpotlightSizeChanged);
     WidgetsBinding.instance.removeObserver(this);
     _preview.dispose();
     _browsePreview.dispose();
@@ -1055,7 +1059,11 @@ class HomeDashboardState extends State<HomeDashboard> with WidgetsBindingObserve
                             SizedBox(
                               height: previewHeight,
                               child: MobileHomeCarousel(
-                                key: ValueKey(SettingsService.instanceOrNull?.read(SettingsService.phoneCinematicSpotlight) ?? false),
+                                key: ValueKey((
+                                  SettingsService.instanceOrNull?.read(SettingsService.phoneCinematicSpotlight),
+                                  SettingsService.instanceOrNull?.read(SettingsService.tabletMarquee),
+                                  SettingsService.instanceOrNull?.read(SettingsService.tabletTonightPicks),
+                                )),
                                 items: [for (final feature in features) feature.$1],
                                 label: features.first.$2.title,
                                 labelFor: (item) =>

@@ -147,17 +147,12 @@ val prepareMpvFfmpegDevelopment = tasks.register("prepareMpvFfmpegDevelopment") 
       val includeDir = File(staging, "include")
       val nativeDir = File(staging, "native")
       staging.mkdirs()
-      val localArchive = providers.environmentVariable("LUROKA_FFMPEG_SOURCE_ARCHIVE").orNull
-      if (localArchive != null) {
-        File(localArchive).copyTo(sourceArchive)
-      } else {
-        try {
-          providers.exec {
-            commandLine("curl", "-sfL", mpvFfmpegSourceUrl, "-o", sourceArchive.absolutePath)
-          }.result.get().assertNormalExitValue()
-        } catch (error: Exception) {
-          throw GradleException("Failed to download FFmpeg $mpvFfmpegVersion headers", error)
-        }
+      try {
+        providers.exec {
+          commandLine("curl", "-sfL", mpvFfmpegSourceUrl, "-o", sourceArchive.absolutePath)
+        }.result.get().assertNormalExitValue()
+      } catch (error: Exception) {
+        throw GradleException("Failed to download FFmpeg $mpvFfmpegVersion headers", error)
       }
       verifySha256(sourceArchive, mpvFfmpegSourceSha256, "FFmpeg $mpvFfmpegVersion source")
 

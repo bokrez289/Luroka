@@ -602,7 +602,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
       } catch (error) {
         if (context.mounted) showErrorDialog(context, t.errors.connectionFailed);
       } finally {
-        if (mounted) setStateIfMounted(() => _favoriteMutationInFlight = false);
+        setStateIfMounted(() => _favoriteMutationInFlight = false);
       }
     }
 

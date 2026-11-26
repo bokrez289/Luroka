@@ -578,6 +578,13 @@ class _Translations$kidsShelf$bg extends Translations$kidsShelf$en {
 	@override String get yourShelf => 'Вашият рафт за филми';
 	@override String get all => 'Всичко';
 	@override String get pickSomething => 'какво искаш да гледаш';
+	@override String get atmosphere => 'Атмосфера на началния екран';
+	@override String get atmosphereHint => 'Изберете цветовете на детския начален екран. Къщичката на дървото остава същата.';
+	@override String get sunshine => 'Слънце';
+	@override String get berry => 'Горски плодове';
+	@override String get mint => 'Мента';
+	@override String get sky => 'Небе';
+	@override String get atmospherePreview => 'Преглед на началния екран';
 }
 
 // Path: kidsHome
@@ -785,6 +792,23 @@ class _Translations$kids$bg extends Translations$kids$en {
 	final TranslationsBg _root; // ignore: unused_field
 
 	// Translations
+	@override String get allLibrariesHint => 'Новите библиотеки с филми и сериали също ще бъдат включени. Изключете тази опция, за да изберете конкретни библиотеки.';
+	@override String get appearanceSection => 'Външен вид';
+	@override String get disableParentPin => 'Изключване на родителския PIN';
+	@override String get disableParentPinConfirm => 'Да се изключи ли родителският PIN за всички детски профили? Децата ще могат да преминават към незащитени профили и да заобикалят ограниченията за време пред екрана. PIN кодовете на профилите остават в сила.';
+	@override String get discardAction => 'Отхвърляне на промените';
+	@override String get discardMessage => 'Промените ви не са запазени.';
+	@override String get discardTitle => 'Отхвърляне на промените?';
+	@override String get editorTitle => 'Настройки на детския профил';
+	@override String libraryCount({required Object count}) => 'Избрани библиотеки: ${count}';
+	@override String get moreSection => 'Още';
+	@override String get pinChoice => 'Използване на родителски PIN';
+	@override String get pinChoiceHint => 'Препоръчително. Без родителски PIN децата могат да преминават към незащитени профили и да променят детските настройки. Смяната на профила може да заобиколи ограниченията за време пред екрана.';
+	@override String get pinDifference => 'Родителският PIN защитава детските настройки. PIN кодът на профил защитава отделен профил. Дали се изисква родителски PIN при напускане на детския профил се настройва отделно.';
+	@override String get pinDisabledWarning => 'Без родителски PIN децата могат да напуснат детския профил и да отворят незащитени профили. Чрез смяна на профила могат да заобиколят ограниченията за време пред екрана. Индивидуалните PIN кодове на профилите остават в сила.';
+	@override String get profileSection => 'Профил';
+	@override String get timeLimitNoPinHint => 'Сменете профила, за да управлявате времето пред екрана. Без родителски PIN всеки може да премине към незащитен профил.';
+	@override String get watchSection => 'Какво могат да гледат';
 	@override String get timeLimits => 'Ограничения на времето на екрана';
 	@override String get dailyWatchLimit => 'Ежедневно време за гледане';
 	@override String get dailyWatchLimitHint => 'Ограничава възпроизвеждането на видео на това устройство всеки ден.';
@@ -969,6 +993,72 @@ class _Translations$auth$bg extends Translations$auth$en {
 	final TranslationsBg _root; // ignore: unused_field
 
 	// Translations
+	@override String get plexQrSignIn => 'Вход в Plex с QR код';
+	@override String get setUpWithPhone => 'Настройване с телефон';
+	@override String get loadingRestoredData => 'Зареждане на възстановените профили и връзки…';
+	@override String get loadingRestoredDataFailed => 'Възстановените данни не можаха да се заредят. Опитайте отново или отворете Luroka отново.';
+	@override String get connectTv => 'Свързване на телевизор';
+	@override String get restoreEncryptedBackup => 'Възстановяване на шифровано копие';
+	@override String get restoreCloudBackup => 'Възстановяване на облачно копие';
+	@override String get saveEncryptedBackup => 'Запазване на шифровано копие';
+	@override String get backupSaved => 'Копието е запазено';
+	@override String get createEncryptedBackup => 'Създаване на шифровано копие';
+	@override String get confirmBackupPassword => 'Потвърдете паролата';
+	@override String get enterBackupPassword => 'Въведете парола.';
+	@override String get confirmBackupPasswordError => 'Въведете парола и я потвърдете.';
+	@override String get restoreBackupAction => 'Възстановяване';
+	@override String get backupCreateInstructions => 'Включва профили, данни за вход в сървъри и локални данни за гледане. Пазете паролата; тя е необходима за възстановяване.';
+	@override String get backupRestoreInstructions => 'Въведете паролата или облачния код за възстановяване, използван при създаването на копието. Възстановяването изисква празна база данни с профили.';
+	@override String get backupCreateFailed => 'Шифрованото копие не можа да бъде създадено.';
+	@override String get backupRestoreFailed => 'Копието не можа да бъде възстановено. Проверете паролата и използвайте празна инсталация.';
+	@override String get recoveryCodeStep => 'Стъпка 2 от 3: Запазете кода за възстановяване';
+	@override String get backupNotUploaded => 'Все още не е качено. Завършете стъпка 3 и изчакайте потвърждение, че облачното копие е създадено, преди да го възстановите.';
+	@override String get recoveryCodeSavedContinue => 'Запазих кода — продължи';
+	@override String get recoveryCodeSaveFile => 'Запазване на кода във файл';
+	@override String get recoveryCodeShowQr => 'Покажи QR кода';
+	@override String get recoveryCodeHideQr => 'Скрий QR кода';
+	@override String get recoveryCopied => 'Кодът за възстановяване е копиран. Запазете го на защитено място.';
+	@override String get recoveryCopyFailed => 'Кодът за възстановяване не можа да бъде копиран.';
+	@override String get recoverySaveDialog => 'Запазете кода за възстановяване на защитено място';
+	@override String get recoverySaved => 'Кодът за възстановяване е запазен. Пазете файла на защитено място.';
+	@override String get recoverySaveFailed => 'Кодът за възстановяване не можа да бъде запазен. Опитайте да го копирате.';
+	@override String get cloudRestoreApplyFailed => 'Копието е изтеглено, но не можа да бъде възстановено на това устройство. Опитайте отново или се свържете с поддръжката.';
+	@override String get cloudBackupNotFound => 'Не е намерено облачно копие за този код. На първоначалното устройство завършете стъпка 3 и изчакайте потвърждение за създаване на копието. Проверете дали използвате запазения за него код; копието може да е изтекло или изтрито.';
+	@override String get cloudBackupConnectionFailed => 'Няма връзка с услугата за копия. Проверете интернет връзката и опитайте отново.';
+	@override String get cloudBackupInvalidFormat => 'Кодът за възстановяване или форматът на копието не може да бъде прочетен. Проверете целия код и опитайте отново.';
+	@override String get cloudBackupOpenFailed => 'Копието не може да бъде отворено. Проверете кода за възстановяване и опитайте отново.';
+	@override String get cloudBackupSelectProfiles => 'Изберете профилите за включване. Копието се шифрова преди качване и е достъпно 90 дни.';
+	@override String get cloudBackupIncludeLogins => 'Включване на запазените данни за вход в сървъри и интеграции';
+	@override String get cloudBackupLoginsWarning => 'Включва свързаните Plex акаунти и други запазени данни за вход за повторно свързване. Всеки с кода за възстановяване може да успее да ги използва.';
+	@override String get cloudBackupNoLogins => 'Без запазени данни за вход ще трябва да свържете сървърите отново след възстановяване.';
+	@override String get pairingHttpPhoneTitle => 'Да се използва ли HTTP за този сървър?';
+	@override String get pairingHttpPhoneWarning => 'Данните за вход в сървъра и медийният трафик няма да бъдат шифровани. Хората в мрежата може да ги прочетат. Препоръчва се HTTPS. Прехвърлянето чрез Luroka остава шифровано.';
+	@override String get pairingHttpTvTitle => 'Да се използва ли нешифрован сървър?';
+	@override String get pairingHttpTvWarning => 'Телефонът ви избра HTTP. Хората в тази мрежа може да прочетат токена за достъп на телевизора и медийния трафик. Използвайте само доверена мрежа. Препоръчва се HTTPS.';
+	@override String get pairingUseHttp => 'Използване на HTTP';
+	@override String get pairingTvTitle => 'Свържете Jellyfin или Emby с телефона си';
+	@override String get pairingScanInvitation => 'Сканирайте с телефона си. Поканата изтича след пет минути.';
+	@override String get pairingWaitForPhone => 'Изчакване на връзка с телефона…';
+	@override String get pairingComparePhone => 'Сравнете този код с кода на телефона:';
+	@override String get pairingConfirmOnPhone => 'Ако кодовете съвпадат, потвърдете на телефона.';
+	@override String get pairingAdultOnly => 'Сдвояването е достъпно само от профил на възрастен.';
+	@override String get pairingProfileChanged => 'Достъпът до профила се промени. Сдвояването е отменено.';
+	@override String get pairingServiceUnavailable => 'Услугата за сдвояване не е достъпна. Опитайте отново или въведете сървъра ръчно.';
+	@override String get pairingExpired => 'Сдвояването изтече или беше прекъснато. Започнете отново.';
+	@override String get pairingVerifyFailed => 'Сървърът и акаунтът не можаха да бъдат проверени. Започнете сдвояването отново.';
+	@override String get pairingScanOrPaste => 'Сканирайте кода на телевизора или поставете поканата.';
+	@override String get pairingScanTv => 'Сканиране на кода на телевизора';
+	@override String get pairingTvInvitation => 'Покана за телевизор';
+	@override String pairingCheckTvCode({required Object code}) => 'Проверете дали телевизорът показва същия код: ${code}';
+	@override String get pairingCodesMatch => 'Кодовете съвпадат';
+	@override String get recoveryCodeLabel => 'Код за възстановяване';
+	@override String get recoveryCodeScan => 'Сканиране на кода за възстановяване';
+	@override String get pairingRecoveryInstructions => 'Сканирайте или поставете запазения код за възстановяване. Той ще бъде шифрован за телевизора.';
+	@override String get pairingSendTv => 'Изпращане към телевизора';
+	@override String get pairingServerLoginHint => 'Влезте в сървъра си. Паролата се изпраща на сървъра, а не на Luroka.';
+	@override String get recoveryCodeWarning => 'Този код е необходим, за да възстановите или изтриете копието. Всеки, който го притежава, може да получи достъп до копието. Ако го загубите, Luroka не може да го възстанови.';
+	@override String get recoveryCodePrivateFile => 'Копирайте или запазвайте кода само на защитено място. Запазеният файл с кода не е шифрован.';
+	@override String get recoveryCodePhoneInstructions => 'Запазете кода на защитено място. За да възстановите на телефона, отворете възстановяването на облачно копие в Luroka и изберете сканиране на кода.';
 	@override String get signInWithPlex => 'Вход с Plex';
 	@override String get showQRCode => 'Покажи QR код';
 	@override String get authenticate => 'Удостовери се';
@@ -3865,6 +3955,13 @@ class _Translations$profileSetupGuide$bg extends Translations$profileSetupGuide$
 	final TranslationsBg _root; // ignore: unused_field
 
 	// Translations
+	@override String get tabletSpotlightStyle => 'Стил на акцента за таблет';
+	@override String get spotlightClassic => 'Класически';
+	@override String get spotlightMarquee => 'Афиш';
+	@override String get spotlightTonight => 'Избор за тази вечер';
+	@override String get phoneSpotlight => 'Кино акцент за телефон';
+	@override String get phoneSpotlightCinematic => 'Хоризонтално изображение със заглавие върху него';
+	@override String get phoneSpotlightClassic => 'Класическа плакатна карта';
 	@override String get title => 'Направете вашия профил ваш';
 	@override String get description => 'Изберете как Luroka изглежда и се чувства за този профил на това устройство. Можете да промените всичко по-късно в Настройки.';
 	@override String get appearanceStep => '1 от 2 · Външен вид';
@@ -5243,6 +5340,13 @@ extension on TranslationsBg {
 			'kidsShelf.yourShelf' => 'Вашият рафт за филми',
 			'kidsShelf.all' => 'Всичко',
 			'kidsShelf.pickSomething' => 'какво искаш да гледаш',
+			'kidsShelf.atmosphere' => 'Атмосфера на началния екран',
+			'kidsShelf.atmosphereHint' => 'Изберете цветовете на детския начален екран. Къщичката на дървото остава същата.',
+			'kidsShelf.sunshine' => 'Слънце',
+			'kidsShelf.berry' => 'Горски плодове',
+			'kidsShelf.mint' => 'Мента',
+			'kidsShelf.sky' => 'Небе',
+			'kidsShelf.atmospherePreview' => 'Преглед на началния екран',
 			'kidsHome.everything' => 'за вас',
 			'kidsHome.keepWatching' => 'Продължавайте да гледате',
 			'kidsHome.emptyFilter' => 'Тук още няма нищо. Опитайте за вас или помолете вашия възрастен да добави нещо, което обичате.',
@@ -5387,6 +5491,23 @@ extension on TranslationsBg {
 			'detailComposition.mediaInformation' => 'Информация за медиите',
 			'detailComposition.fullFileInformation' => 'Пълна информация за файла',
 			'detailComposition.castAndCrew' => 'Актьори и екип',
+			'kids.allLibrariesHint' => 'Новите библиотеки с филми и сериали също ще бъдат включени. Изключете тази опция, за да изберете конкретни библиотеки.',
+			'kids.appearanceSection' => 'Външен вид',
+			'kids.disableParentPin' => 'Изключване на родителския PIN',
+			'kids.disableParentPinConfirm' => 'Да се изключи ли родителският PIN за всички детски профили? Децата ще могат да преминават към незащитени профили и да заобикалят ограниченията за време пред екрана. PIN кодовете на профилите остават в сила.',
+			'kids.discardAction' => 'Отхвърляне на промените',
+			'kids.discardMessage' => 'Промените ви не са запазени.',
+			'kids.discardTitle' => 'Отхвърляне на промените?',
+			'kids.editorTitle' => 'Настройки на детския профил',
+			'kids.libraryCount' => ({required Object count}) => 'Избрани библиотеки: ${count}',
+			'kids.moreSection' => 'Още',
+			'kids.pinChoice' => 'Използване на родителски PIN',
+			'kids.pinChoiceHint' => 'Препоръчително. Без родителски PIN децата могат да преминават към незащитени профили и да променят детските настройки. Смяната на профила може да заобиколи ограниченията за време пред екрана.',
+			'kids.pinDifference' => 'Родителският PIN защитава детските настройки. PIN кодът на профил защитава отделен профил. Дали се изисква родителски PIN при напускане на детския профил се настройва отделно.',
+			'kids.pinDisabledWarning' => 'Без родителски PIN децата могат да напуснат детския профил и да отворят незащитени профили. Чрез смяна на профила могат да заобиколят ограниченията за време пред екрана. Индивидуалните PIN кодове на профилите остават в сила.',
+			'kids.profileSection' => 'Профил',
+			'kids.timeLimitNoPinHint' => 'Сменете профила, за да управлявате времето пред екрана. Без родителски PIN всеки може да премине към незащитен профил.',
+			'kids.watchSection' => 'Какво могат да гледат',
 			'kids.timeLimits' => 'Ограничения на времето на екрана',
 			'kids.dailyWatchLimit' => 'Ежедневно време за гледане',
 			'kids.dailyWatchLimitHint' => 'Ограничава възпроизвеждането на видео на това устройство всеки ден.',
@@ -5459,6 +5580,8 @@ extension on TranslationsBg {
 			'kids.freshStories' => 'Нови истории за откриване',
 			'kids.yourMovies' => 'Любими филми',
 			'kids.yourShows' => 'Още един епизод',
+			_ => null,
+		} ?? switch (path) {
 			'kids.emptyHint' => 'Новите приключения ще се появят тук, когато вашият сървър има заглавия с разрешена възрастова класификация.',
 			'kids.title' => 'Luroka за деца',
 			'kids.addProfile' => 'Добавяне на детски профил',
@@ -5483,8 +5606,6 @@ extension on TranslationsBg {
 			'kids.historyReset' => 'Нулиране на изключенията за гледане на деца',
 			'kids.blocked' => 'Това заглавие не е налично в този детски профил.',
 			'kids.switchProfile' => 'Превключване на профил',
-			_ => null,
-		} ?? switch (path) {
 			'kids.manageFromAdult' => 'Превключете към профил за възрастни, за да управлявате настройките.',
 			'kids.noConnections' => 'Свържете сървър към вашия профил за възрастни, преди да добавите профил за деца.',
 			'kids.created' => 'Създаден детски профил',
@@ -5559,6 +5680,72 @@ extension on TranslationsBg {
 			'appIcon.names.strata' => 'Страта',
 			'appIcon.names.facet' => 'Фасет',
 			'appIcon.names.tilde' => 'Тилда',
+			'auth.plexQrSignIn' => 'Вход в Plex с QR код',
+			'auth.setUpWithPhone' => 'Настройване с телефон',
+			'auth.loadingRestoredData' => 'Зареждане на възстановените профили и връзки…',
+			'auth.loadingRestoredDataFailed' => 'Възстановените данни не можаха да се заредят. Опитайте отново или отворете Luroka отново.',
+			'auth.connectTv' => 'Свързване на телевизор',
+			'auth.restoreEncryptedBackup' => 'Възстановяване на шифровано копие',
+			'auth.restoreCloudBackup' => 'Възстановяване на облачно копие',
+			'auth.saveEncryptedBackup' => 'Запазване на шифровано копие',
+			'auth.backupSaved' => 'Копието е запазено',
+			'auth.createEncryptedBackup' => 'Създаване на шифровано копие',
+			'auth.confirmBackupPassword' => 'Потвърдете паролата',
+			'auth.enterBackupPassword' => 'Въведете парола.',
+			'auth.confirmBackupPasswordError' => 'Въведете парола и я потвърдете.',
+			'auth.restoreBackupAction' => 'Възстановяване',
+			'auth.backupCreateInstructions' => 'Включва профили, данни за вход в сървъри и локални данни за гледане. Пазете паролата; тя е необходима за възстановяване.',
+			'auth.backupRestoreInstructions' => 'Въведете паролата или облачния код за възстановяване, използван при създаването на копието. Възстановяването изисква празна база данни с профили.',
+			'auth.backupCreateFailed' => 'Шифрованото копие не можа да бъде създадено.',
+			'auth.backupRestoreFailed' => 'Копието не можа да бъде възстановено. Проверете паролата и използвайте празна инсталация.',
+			'auth.recoveryCodeStep' => 'Стъпка 2 от 3: Запазете кода за възстановяване',
+			'auth.backupNotUploaded' => 'Все още не е качено. Завършете стъпка 3 и изчакайте потвърждение, че облачното копие е създадено, преди да го възстановите.',
+			'auth.recoveryCodeSavedContinue' => 'Запазих кода — продължи',
+			'auth.recoveryCodeSaveFile' => 'Запазване на кода във файл',
+			'auth.recoveryCodeShowQr' => 'Покажи QR кода',
+			'auth.recoveryCodeHideQr' => 'Скрий QR кода',
+			'auth.recoveryCopied' => 'Кодът за възстановяване е копиран. Запазете го на защитено място.',
+			'auth.recoveryCopyFailed' => 'Кодът за възстановяване не можа да бъде копиран.',
+			'auth.recoverySaveDialog' => 'Запазете кода за възстановяване на защитено място',
+			'auth.recoverySaved' => 'Кодът за възстановяване е запазен. Пазете файла на защитено място.',
+			'auth.recoverySaveFailed' => 'Кодът за възстановяване не можа да бъде запазен. Опитайте да го копирате.',
+			'auth.cloudRestoreApplyFailed' => 'Копието е изтеглено, но не можа да бъде възстановено на това устройство. Опитайте отново или се свържете с поддръжката.',
+			'auth.cloudBackupNotFound' => 'Не е намерено облачно копие за този код. На първоначалното устройство завършете стъпка 3 и изчакайте потвърждение за създаване на копието. Проверете дали използвате запазения за него код; копието може да е изтекло или изтрито.',
+			'auth.cloudBackupConnectionFailed' => 'Няма връзка с услугата за копия. Проверете интернет връзката и опитайте отново.',
+			'auth.cloudBackupInvalidFormat' => 'Кодът за възстановяване или форматът на копието не може да бъде прочетен. Проверете целия код и опитайте отново.',
+			'auth.cloudBackupOpenFailed' => 'Копието не може да бъде отворено. Проверете кода за възстановяване и опитайте отново.',
+			'auth.cloudBackupSelectProfiles' => 'Изберете профилите за включване. Копието се шифрова преди качване и е достъпно 90 дни.',
+			'auth.cloudBackupIncludeLogins' => 'Включване на запазените данни за вход в сървъри и интеграции',
+			'auth.cloudBackupLoginsWarning' => 'Включва свързаните Plex акаунти и други запазени данни за вход за повторно свързване. Всеки с кода за възстановяване може да успее да ги използва.',
+			'auth.cloudBackupNoLogins' => 'Без запазени данни за вход ще трябва да свържете сървърите отново след възстановяване.',
+			'auth.pairingHttpPhoneTitle' => 'Да се използва ли HTTP за този сървър?',
+			'auth.pairingHttpPhoneWarning' => 'Данните за вход в сървъра и медийният трафик няма да бъдат шифровани. Хората в мрежата може да ги прочетат. Препоръчва се HTTPS. Прехвърлянето чрез Luroka остава шифровано.',
+			'auth.pairingHttpTvTitle' => 'Да се използва ли нешифрован сървър?',
+			'auth.pairingHttpTvWarning' => 'Телефонът ви избра HTTP. Хората в тази мрежа може да прочетат токена за достъп на телевизора и медийния трафик. Използвайте само доверена мрежа. Препоръчва се HTTPS.',
+			'auth.pairingUseHttp' => 'Използване на HTTP',
+			'auth.pairingTvTitle' => 'Свържете Jellyfin или Emby с телефона си',
+			'auth.pairingScanInvitation' => 'Сканирайте с телефона си. Поканата изтича след пет минути.',
+			'auth.pairingWaitForPhone' => 'Изчакване на връзка с телефона…',
+			'auth.pairingComparePhone' => 'Сравнете този код с кода на телефона:',
+			'auth.pairingConfirmOnPhone' => 'Ако кодовете съвпадат, потвърдете на телефона.',
+			'auth.pairingAdultOnly' => 'Сдвояването е достъпно само от профил на възрастен.',
+			'auth.pairingProfileChanged' => 'Достъпът до профила се промени. Сдвояването е отменено.',
+			'auth.pairingServiceUnavailable' => 'Услугата за сдвояване не е достъпна. Опитайте отново или въведете сървъра ръчно.',
+			'auth.pairingExpired' => 'Сдвояването изтече или беше прекъснато. Започнете отново.',
+			'auth.pairingVerifyFailed' => 'Сървърът и акаунтът не можаха да бъдат проверени. Започнете сдвояването отново.',
+			'auth.pairingScanOrPaste' => 'Сканирайте кода на телевизора или поставете поканата.',
+			'auth.pairingScanTv' => 'Сканиране на кода на телевизора',
+			'auth.pairingTvInvitation' => 'Покана за телевизор',
+			'auth.pairingCheckTvCode' => ({required Object code}) => 'Проверете дали телевизорът показва същия код: ${code}',
+			'auth.pairingCodesMatch' => 'Кодовете съвпадат',
+			'auth.recoveryCodeLabel' => 'Код за възстановяване',
+			'auth.recoveryCodeScan' => 'Сканиране на кода за възстановяване',
+			'auth.pairingRecoveryInstructions' => 'Сканирайте или поставете запазения код за възстановяване. Той ще бъде шифрован за телевизора.',
+			'auth.pairingSendTv' => 'Изпращане към телевизора',
+			'auth.pairingServerLoginHint' => 'Влезте в сървъра си. Паролата се изпраща на сървъра, а не на Luroka.',
+			'auth.recoveryCodeWarning' => 'Този код е необходим, за да възстановите или изтриете копието. Всеки, който го притежава, може да получи достъп до копието. Ако го загубите, Luroka не може да го възстанови.',
+			'auth.recoveryCodePrivateFile' => 'Копирайте или запазвайте кода само на защитено място. Запазеният файл с кода не е шифрован.',
+			'auth.recoveryCodePhoneInstructions' => 'Запазете кода на защитено място. За да възстановите на телефона, отворете възстановяването на облачно копие в Luroka и изберете сканиране на кода.',
 			'auth.signInWithPlex' => 'Вход с Plex',
 			'auth.showQRCode' => 'Покажи QR код',
 			'auth.authenticate' => 'Удостовери се',
@@ -5907,6 +6094,8 @@ extension on TranslationsBg {
 			'settings.maxVolumePercent' => ({required Object percent}) => '${percent}%',
 			'settings.discordRichPresence' => 'Активност в Discord',
 			'settings.discordRichPresenceDescription' => 'Показвай какво гледате в Discord',
+			_ => null,
+		} ?? switch (path) {
 			'settings.services' => 'Услуги',
 			'settings.servicesDescription' => 'Свържи Trakt, MyAnimeList, Seerr и още',
 			'settings.manageLibrariesDescription' => 'Пренареждай и скривай библиотеки',
@@ -5997,8 +6186,6 @@ extension on TranslationsBg {
 			'settings.liveTvDefaultFavoritesDescription' => 'Показвай само любими канали при отваряне на телевизия на живо',
 			'settings.general' => 'Общи',
 			'settings.generalDescription' => 'Език, стартиране и поведение на прозореца',
-			_ => null,
-		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Език и регион',
 			'settings.startup' => 'Стартиране',
 			'settings.display' => 'Дисплей',
@@ -6421,6 +6608,8 @@ extension on TranslationsBg {
 			'fileInfo.pixelAspectRatio' => 'Съотношение на пиксела',
 			'fileInfo.profile' => 'Профил',
 			'fileInfo.level' => 'Ниво',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.bitDepth' => 'Битова дълбочина',
 			'fileInfo.pixelFormat' => 'Формат на пикселите',
 			'fileInfo.colorSpace' => 'Цветово пространство',
@@ -6511,8 +6700,6 @@ extension on TranslationsBg {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Разбърканото възпроизвеждане не е налично офлайн',
 			'mediaMenu.fileInfo' => 'Информация за файла',
 			'mediaMenu.deleteEpisodeFromServer' => 'Изтрий епизода от сървъра',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Изтрий сезона от сървъра',
 			'mediaMenu.deleteShowFromServer' => 'Изтрий сериала от сървъра',
 			'mediaMenu.deleteMovieFromServer' => 'Изтрий филма от сървъра',
@@ -6935,6 +7122,8 @@ extension on TranslationsBg {
 			'accountPreferences.rewatchingInNextUp' => 'Запазвай повторно гледаните сериали в „Следва“',
 			'accountPreferences.rewatchingInNextUpDescription' => 'Когато завършите сериал и го пуснете отново, „Следва“ проследява повторното гледане, вместо да премахва сериала.',
 			'accountPreferences.watchedIndicator' => 'Индикатори за изгледано',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.watchedIndicatorOptions.none' => 'Никога',
 			'accountPreferences.watchedIndicatorOptions.moviesAndShows' => 'Филми и ТВ сериали',
 			'accountPreferences.watchedIndicatorOptions.movies' => 'Само филми',
@@ -7025,8 +7214,6 @@ extension on TranslationsBg {
 			'libraries.filters' => 'Филтри',
 			'libraries.confirmActionMessage' => 'Сигурни ли сте, че искате да извършите това действие?',
 			'libraries.showLibrary' => 'Покажи библиотеката',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Скрий библиотеката',
 			'libraries.libraryOptions' => 'Опции на библиотеката',
 			'libraries.content' => 'съдържание на библиотеката',
@@ -7449,6 +7636,8 @@ extension on TranslationsBg {
 			'collections.deleted' => 'Колекцията е изтрита',
 			'collections.deleteFailed' => 'Неуспешно изтриване на колекция',
 			'collections.deleteFailedWithError' => ({required Object error}) => 'Неуспешно изтриване на колекция: ${error}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.selectCollection' => 'Избери колекция',
 			'collections.collectionName' => 'Име на колекция',
 			'collections.enterCollectionName' => 'Въведете име на колекция',
@@ -7539,8 +7728,6 @@ extension on TranslationsBg {
 			'watchTogether.qrShare' => 'Споделяне на QR код',
 			'watchTogether.qrHint' => 'Сканирайте с приложението Luroka, за да се присъедините към тази стая.',
 			'watchTogether.phasePlaying' => 'Играя',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'На пауза',
 			'watchTogether.phaseWaiting' => 'В очакване на всички',
 			'watchTogether.inviteCopied' => 'Поканата е копирана. Поставете го в съобщение.',
@@ -7963,6 +8150,8 @@ extension on TranslationsBg {
 			'externalPlayer.useExternalPlayer' => 'Използвай външен плеър',
 			'externalPlayer.useExternalPlayerDescription' => 'Отваряй видеата в друго приложение',
 			'externalPlayer.selectPlayer' => 'Избери плейър',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Потребителски плейъри',
 			'externalPlayer.systemDefault' => 'Системен по подразбиране',
 			'externalPlayer.addCustomPlayer' => 'Добави потребителски плейър',
@@ -8053,8 +8242,6 @@ extension on TranslationsBg {
 			'matchScreen.match' => 'Съпостави...',
 			'matchScreen.fixMatch' => 'Поправи съвпадение...',
 			'matchScreen.unmatch' => 'Премахни съвпадение',
-			_ => null,
-		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Да се изчисти ли това съвпадение? Plex ще го третира като несъпоставено, докато не бъде съпоставено отново.',
 			'matchScreen.unmatchSuccess' => 'Съвпадението на елемента е премахнато',
 			'matchScreen.unmatchFailed' => 'Неуспешно премахване на съвпадението на елемента',
@@ -8197,6 +8384,13 @@ extension on TranslationsBg {
 			'profileIntegrations.later' => 'Настройте по-късно',
 			'profileIntegrations.manage' => 'Управление на интеграции',
 			'profileIntegrations.forProfile' => ({required Object name}) => 'Връзки за ${name}',
+			'profileSetupGuide.tabletSpotlightStyle' => 'Стил на акцента за таблет',
+			'profileSetupGuide.spotlightClassic' => 'Класически',
+			'profileSetupGuide.spotlightMarquee' => 'Афиш',
+			'profileSetupGuide.spotlightTonight' => 'Избор за тази вечер',
+			'profileSetupGuide.phoneSpotlight' => 'Кино акцент за телефон',
+			'profileSetupGuide.phoneSpotlightCinematic' => 'Хоризонтално изображение със заглавие върху него',
+			'profileSetupGuide.phoneSpotlightClassic' => 'Класическа плакатна карта',
 			'profileSetupGuide.title' => 'Направете вашия профил ваш',
 			'profileSetupGuide.description' => 'Изберете как Luroka изглежда и се чувства за този профил на това устройство. Можете да промените всичко по-късно в Настройки.',
 			'profileSetupGuide.appearanceStep' => '1 от 2 · Външен вид',

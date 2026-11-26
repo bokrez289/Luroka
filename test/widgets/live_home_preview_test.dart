@@ -157,6 +157,48 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
+  testWidgets('tablet preview compares the same picks and keeps a guide choice unsaved', (tester) async {
+    tester.view.physicalSize = const Size(768, 1024);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    Future<void> preview({bool? draft}) async {
+      await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(platform: TargetPlatform.iOS),
+        home: Scaffold(body: SingleChildScrollView(child: LiveHomePreview(tabletMarquee: draft))),
+      ));
+      await tester.pumpAndSettle();
+    }
+    await preview();
+    // Compare visible titles; the carousel also builds a neighboring page off screen.
+    final companion = find.text('Red Country');
+    expect(find.text('Sea of Sand'), findsWidgets);
+    expect(companion, findsNothing);
+    await preview(draft: true);
+    expect(companion, findsWidgets);
+    expect(SettingsService.instance.read(SettingsService.tabletMarquee), isFalse);
+    await preview();
+    expect(companion, findsNothing);
+    await SettingsService.instance.write(SettingsService.tabletMarquee, true);
+    await tester.pumpAndSettle();
+    expect(companion, findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Tonight’s Picks setup preview uses a draft without saving', (tester) async {
+    tester.view.physicalSize = const Size(768, 1024);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(MaterialApp(
+      theme: ThemeData(platform: TargetPlatform.iOS),
+      home: const Scaffold(body: SingleChildScrollView(child: LiveHomePreview(tabletTonightPicks: true))),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('tonight_picks')), findsWidgets);
+    expect(find.text('Sea of Sand'), findsWidgets);
+    expect(SettingsService.instance.read(SettingsService.tabletTonightPicks), isFalse);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('TV preview uses real Home geometry and loaded titles', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(true);
     addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));

@@ -578,6 +578,13 @@ class _Translations$kidsShelf$hu extends Translations$kidsShelf$en {
 	@override String get yourShelf => 'A filmes polcod';
 	@override String get all => 'Mindent';
 	@override String get pickSomething => 'mit akarsz nézni?';
+	@override String get atmosphere => 'A kezdőlap hangulata';
+	@override String get atmosphereHint => 'Válaszd ki a gyerekek kezdőlapjának színeit. A lombház nem változik.';
+	@override String get sunshine => 'Napsütés';
+	@override String get berry => 'Bogyó';
+	@override String get mint => 'Menta';
+	@override String get sky => 'Égbolt';
+	@override String get atmospherePreview => 'Kezdőlap előnézete';
 }
 
 // Path: kidsHome
@@ -785,6 +792,23 @@ class _Translations$kids$hu extends Translations$kids$en {
 	final TranslationsHu _root; // ignore: unused_field
 
 	// Translations
+	@override String get allLibrariesHint => 'Az új film- és sorozatkönyvtárak is bekerülnek. Kapcsold ki ezt a beállítást, ha konkrét könyvtárakat szeretnél választani.';
+	@override String get appearanceSection => 'Megjelenés';
+	@override String get disableParentPin => 'Szülői PIN kikapcsolása';
+	@override String get disableParentPinConfirm => 'Kikapcsolod a szülői PIN-kódot minden gyerekprofilnál? A gyerekek védetlen profilokra válthatnak, és megkerülhetik a képernyőidő-korlátokat. A profilok PIN-kódjai továbbra is érvényesek.';
+	@override String get discardAction => 'Módosítások elvetése';
+	@override String get discardMessage => 'A módosításaid nincsenek mentve.';
+	@override String get discardTitle => 'Elveted a módosításokat?';
+	@override String get editorTitle => 'Gyerekprofil beállításai';
+	@override String libraryCount({required Object count}) => 'Kiválasztott könyvtárak: ${count}';
+	@override String get moreSection => 'Továbbiak';
+	@override String get pinChoice => 'Szülői PIN használata';
+	@override String get pinChoiceHint => 'Ajánlott. Szülői PIN nélkül a gyerekek védetlen profilokra válthatnak és módosíthatják a gyerekbeállításokat. Profilváltással megkerülhetik a képernyőidő-korlátokat.';
+	@override String get pinDifference => 'A szülői PIN a gyerekbeállításokat védi. A profil PIN-kódja egyetlen profilt véd. Azt, hogy a gyerekprofil elhagyásához szükséges-e a szülői PIN, külön lehet beállítani.';
+	@override String get pinDisabledWarning => 'Szülői PIN nélkül a gyerekek elhagyhatják a gyerekprofilt és hozzáférhetnek a védetlen profilokhoz. Profilváltással megkerülhetik a képernyőidő-korlátokat. Az egyes profilok PIN-kódjai továbbra is érvényesek.';
+	@override String get profileSection => 'Profil';
+	@override String get timeLimitNoPinHint => 'A képernyőidő kezeléséhez válts profilt. Szülői PIN nélkül bárki átválthat védetlen profilra.';
+	@override String get watchSection => 'Mit nézhetnek';
 	@override String get timeLimits => 'Képernyőidő-korlátok';
 	@override String get dailyWatchLimit => 'Napi nézési idő';
 	@override String get dailyWatchLimitHint => 'Naponta korlátozza a videolejátszást ezen az eszközön.';
@@ -969,6 +993,72 @@ class _Translations$auth$hu extends Translations$auth$en {
 	final TranslationsHu _root; // ignore: unused_field
 
 	// Translations
+	@override String get plexQrSignIn => 'Bejelentkezés a Plexbe QR-kóddal';
+	@override String get setUpWithPhone => 'Beállítás telefonnal';
+	@override String get loadingRestoredData => 'A visszaállított profilok és kapcsolatok betöltése…';
+	@override String get loadingRestoredDataFailed => 'A visszaállított adatokat nem sikerült betölteni. Próbáld újra, vagy nyisd meg újra a Lurokát.';
+	@override String get connectTv => 'TV csatlakoztatása';
+	@override String get restoreEncryptedBackup => 'Titkosított biztonsági mentés visszaállítása';
+	@override String get restoreCloudBackup => 'Felhőbeli biztonsági mentés visszaállítása';
+	@override String get saveEncryptedBackup => 'Titkosított biztonsági mentés mentése';
+	@override String get backupSaved => 'Biztonsági mentés elmentve';
+	@override String get createEncryptedBackup => 'Titkosított biztonsági mentés létrehozása';
+	@override String get confirmBackupPassword => 'Jelszó megerősítése';
+	@override String get enterBackupPassword => 'Adj meg egy jelszót.';
+	@override String get confirmBackupPasswordError => 'Adj meg egy jelszót, és erősítsd meg.';
+	@override String get restoreBackupAction => 'Visszaállítás';
+	@override String get backupCreateInstructions => 'Tartalmazza a profilokat, a szerveres bejelentkezéseket és a helyi nézési adatokat. Őrizd meg biztonságosan a jelszót; szükség van rá a visszaállításhoz.';
+	@override String get backupRestoreInstructions => 'Add meg a mentés létrehozásakor használt jelszót vagy felhőbeli helyreállítási kódot. A visszaállításhoz üres profiladatbázis szükséges.';
+	@override String get backupCreateFailed => 'Nem sikerült létrehozni a titkosított biztonsági mentést.';
+	@override String get backupRestoreFailed => 'Nem sikerült visszaállítani a mentést. Ellenőrizd a jelszót, és használj üres telepítést.';
+	@override String get recoveryCodeStep => '2. lépés a 3-ból: Mentsd el a helyreállítási kódot';
+	@override String get backupNotUploaded => 'Még nincs feltöltve. Visszaállítás előtt fejezd be a 3. lépést, és várd meg a felhőmentés létrehozását megerősítő üzenetet.';
+	@override String get recoveryCodeSavedContinue => 'Elmentettem a kódot — tovább';
+	@override String get recoveryCodeSaveFile => 'Kód mentése fájlba';
+	@override String get recoveryCodeShowQr => 'QR-kód megjelenítése';
+	@override String get recoveryCodeHideQr => 'QR-kód elrejtése';
+	@override String get recoveryCopied => 'Helyreállítási kód másolva. Mentsd el egy privát helyre.';
+	@override String get recoveryCopyFailed => 'Nem sikerült másolni a helyreállítási kódot.';
+	@override String get recoverySaveDialog => 'Helyreállítási kód mentése privát helyre';
+	@override String get recoverySaved => 'Helyreállítási kód elmentve. Tartsd a fájlt privát helyen.';
+	@override String get recoverySaveFailed => 'Nem sikerült menteni a helyreállítási kódot. Próbáld meg inkább másolni.';
+	@override String get cloudRestoreApplyFailed => 'A mentés letöltődött, de ezen az eszközön nem sikerült visszaállítani. Próbáld újra, vagy fordulj az ügyfélszolgálathoz.';
+	@override String get cloudBackupNotFound => 'Ehhez a kódhoz nem található felhőmentés. Az eredeti eszközön fejezd be a 3. lépést, és várd meg a mentés létrehozásának megerősítését. Ellenőrizd, hogy a mentéshez tartozó kódot használod-e; a mentés lejárhatott vagy törölhették.';
+	@override String get cloudBackupConnectionFailed => 'Nem sikerült kapcsolódni a mentési szolgáltatáshoz. Ellenőrizd az internetkapcsolatot, és próbáld újra.';
+	@override String get cloudBackupInvalidFormat => 'A helyreállítási kód vagy a mentés formátuma nem olvasható. Ellenőrizd a teljes kódot, és próbáld újra.';
+	@override String get cloudBackupOpenFailed => 'A mentést nem sikerült megnyitni. Ellenőrizd a helyreállítási kódot, és próbáld újra.';
+	@override String get cloudBackupSelectProfiles => 'Válaszd ki a mentésbe kerülő profilokat. A mentés feltöltés előtt titkosítva lesz, és 90 napig érhető el.';
+	@override String get cloudBackupIncludeLogins => 'Mentett szerver- és integrációs bejelentkezések belefoglalása';
+	@override String get cloudBackupLoginsWarning => 'Az újracsatlakozás megkönnyítéséhez tartalmazza a kapcsolt Plex-fiókokat és más mentett bejelentkezéseket. A helyreállítási kód birtokában mások is használhatják ezeket.';
+	@override String get cloudBackupNoLogins => 'Mentett bejelentkezések nélkül a visszaállítás után újra csatlakoztatnod kell a szervereket.';
+	@override String get pairingHttpPhoneTitle => 'HTTP használata ehhez a szerverhez?';
+	@override String get pairingHttpPhoneWarning => 'A szerveres bejelentkezés és a médiaforgalom nem lesz titkosítva. A hálózaton mások olvashatják ezeket. A HTTPS használata ajánlott. A Luroka-átvitel titkosított marad.';
+	@override String get pairingHttpTvTitle => 'Titkosítatlan szervert használsz?';
+	@override String get pairingHttpTvWarning => 'A telefon HTTP-t választott. A hálózaton mások olvashatják a TV hozzáférési tokenjét és a médiaforgalmat. Csak megbízható hálózatot használj. A HTTPS használata ajánlott.';
+	@override String get pairingUseHttp => 'HTTP használata';
+	@override String get pairingTvTitle => 'Jellyfin vagy Emby csatlakoztatása telefonnal';
+	@override String get pairingScanInvitation => 'Olvasd be a telefonnal. A meghívó öt perc múlva lejár.';
+	@override String get pairingWaitForPhone => 'Várakozás a telefon csatlakozására…';
+	@override String get pairingComparePhone => 'Hasonlítsd össze ezt a kódot a telefonodon láthatóval:';
+	@override String get pairingConfirmOnPhone => 'Ha a kódok egyeznek, erősítsd meg a telefonodon.';
+	@override String get pairingAdultOnly => 'A párosítás csak felnőtt profilból érhető el.';
+	@override String get pairingProfileChanged => 'A profilhoz való hozzáférés megváltozott. A párosítás megszakadt.';
+	@override String get pairingServiceUnavailable => 'A párosítási szolgáltatás nem érhető el. Próbáld újra, vagy add meg kézzel a szervert.';
+	@override String get pairingExpired => 'A párosítás lejárt vagy megszakadt. Kezdd újra.';
+	@override String get pairingVerifyFailed => 'A szervert és a fiókot nem sikerült ellenőrizni. Indítsd újra a párosítást.';
+	@override String get pairingScanOrPaste => 'Olvasd be a TV-kódot, vagy illeszd be a meghívót.';
+	@override String get pairingScanTv => 'TV-kód beolvasása';
+	@override String get pairingTvInvitation => 'TV-meghívó';
+	@override String pairingCheckTvCode({required Object code}) => 'Ellenőrizd, hogy a TV ugyanazt a kódot mutatja-e: ${code}';
+	@override String get pairingCodesMatch => 'A kódok egyeznek';
+	@override String get recoveryCodeLabel => 'Helyreállítási kód';
+	@override String get recoveryCodeScan => 'Helyreállítási kód beolvasása';
+	@override String get pairingRecoveryInstructions => 'Olvasd be vagy illeszd be a mentett helyreállítási kódot. A TV számára titkosítva lesz.';
+	@override String get pairingSendTv => 'Küldés a TV-re';
+	@override String get pairingServerLoginHint => 'Jelentkezz be a szerveredre. A jelszavad a szerverre kerül, nem a Lurokához.';
+	@override String get recoveryCodeWarning => 'A kódra szükség van a mentés visszaállításához vagy törléséhez. Bárki hozzáférhet a mentéshez, aki ismeri a kódot. Ha elveszíted, a Luroka nem tudja visszaállítani.';
+	@override String get recoveryCodePrivateFile => 'A kódot csak biztonságos, privát helyre másold vagy mentsd. A mentett kódfájl nincs titkosítva.';
+	@override String get recoveryCodePhoneInstructions => 'Őrizz meg egy privát másolatot a kódból. Telefonon történő visszaállításhoz nyisd meg a Luroka felhőmentés-visszaállítását, és válaszd a helyreállítási kód beolvasását.';
 	@override String get signInWithPlex => 'Bejelentkezés Plexszel';
 	@override String get showQRCode => 'QR-kód megjelenítése';
 	@override String get authenticate => 'Hitelesítés';
@@ -3865,6 +3955,13 @@ class _Translations$profileSetupGuide$hu extends Translations$profileSetupGuide$
 	final TranslationsHu _root; // ignore: unused_field
 
 	// Translations
+	@override String get tabletSpotlightStyle => 'Kiemelés stílusa táblagépen';
+	@override String get spotlightClassic => 'Klasszikus';
+	@override String get spotlightMarquee => 'Marquee';
+	@override String get spotlightTonight => 'Mai esti ajánlatok';
+	@override String get phoneSpotlight => 'Mozis kiemelés telefonon';
+	@override String get phoneSpotlightCinematic => 'Fekvő kép a ráhelyezett címmel';
+	@override String get phoneSpotlightClassic => 'Klasszikus plakátkártya';
 	@override String get title => 'Tedd sajátoddá profilodat';
 	@override String get description => 'Válassza ki, hogy a Luroka hogyan nézzen ki és érezzen ezt a profilt ezen az eszközön. Később mindent módosíthat a Beállításokban.';
 	@override String get appearanceStep => '1 / 2 · Megjelenés';
@@ -5243,6 +5340,13 @@ extension on TranslationsHu {
 			'kidsShelf.yourShelf' => 'A filmes polcod',
 			'kidsShelf.all' => 'Mindent',
 			'kidsShelf.pickSomething' => 'mit akarsz nézni?',
+			'kidsShelf.atmosphere' => 'A kezdőlap hangulata',
+			'kidsShelf.atmosphereHint' => 'Válaszd ki a gyerekek kezdőlapjának színeit. A lombház nem változik.',
+			'kidsShelf.sunshine' => 'Napsütés',
+			'kidsShelf.berry' => 'Bogyó',
+			'kidsShelf.mint' => 'Menta',
+			'kidsShelf.sky' => 'Égbolt',
+			'kidsShelf.atmospherePreview' => 'Kezdőlap előnézete',
 			'kidsHome.everything' => 'Neked',
 			'kidsHome.keepWatching' => 'Nézz tovább',
 			'kidsHome.emptyFilter' => 'Itt még semmi. Próbáld ki Neked, vagy kérd meg a felnőttedet, hogy adjon hozzá valamit, amit szeret.',
@@ -5387,6 +5491,23 @@ extension on TranslationsHu {
 			'detailComposition.mediaInformation' => 'Médiainformációk',
 			'detailComposition.fullFileInformation' => 'Teljes fájlinformáció',
 			'detailComposition.castAndCrew' => 'Szereplők és stáb',
+			'kids.allLibrariesHint' => 'Az új film- és sorozatkönyvtárak is bekerülnek. Kapcsold ki ezt a beállítást, ha konkrét könyvtárakat szeretnél választani.',
+			'kids.appearanceSection' => 'Megjelenés',
+			'kids.disableParentPin' => 'Szülői PIN kikapcsolása',
+			'kids.disableParentPinConfirm' => 'Kikapcsolod a szülői PIN-kódot minden gyerekprofilnál? A gyerekek védetlen profilokra válthatnak, és megkerülhetik a képernyőidő-korlátokat. A profilok PIN-kódjai továbbra is érvényesek.',
+			'kids.discardAction' => 'Módosítások elvetése',
+			'kids.discardMessage' => 'A módosításaid nincsenek mentve.',
+			'kids.discardTitle' => 'Elveted a módosításokat?',
+			'kids.editorTitle' => 'Gyerekprofil beállításai',
+			'kids.libraryCount' => ({required Object count}) => 'Kiválasztott könyvtárak: ${count}',
+			'kids.moreSection' => 'Továbbiak',
+			'kids.pinChoice' => 'Szülői PIN használata',
+			'kids.pinChoiceHint' => 'Ajánlott. Szülői PIN nélkül a gyerekek védetlen profilokra válthatnak és módosíthatják a gyerekbeállításokat. Profilváltással megkerülhetik a képernyőidő-korlátokat.',
+			'kids.pinDifference' => 'A szülői PIN a gyerekbeállításokat védi. A profil PIN-kódja egyetlen profilt véd. Azt, hogy a gyerekprofil elhagyásához szükséges-e a szülői PIN, külön lehet beállítani.',
+			'kids.pinDisabledWarning' => 'Szülői PIN nélkül a gyerekek elhagyhatják a gyerekprofilt és hozzáférhetnek a védetlen profilokhoz. Profilváltással megkerülhetik a képernyőidő-korlátokat. Az egyes profilok PIN-kódjai továbbra is érvényesek.',
+			'kids.profileSection' => 'Profil',
+			'kids.timeLimitNoPinHint' => 'A képernyőidő kezeléséhez válts profilt. Szülői PIN nélkül bárki átválthat védetlen profilra.',
+			'kids.watchSection' => 'Mit nézhetnek',
 			'kids.timeLimits' => 'Képernyőidő-korlátok',
 			'kids.dailyWatchLimit' => 'Napi nézési idő',
 			'kids.dailyWatchLimitHint' => 'Naponta korlátozza a videolejátszást ezen az eszközön.',
@@ -5459,6 +5580,8 @@ extension on TranslationsHu {
 			'kids.freshStories' => 'Új felfedezésre váró történetek',
 			'kids.yourMovies' => 'Filmes idők kedvencei',
 			'kids.yourShows' => 'Még egy epizód',
+			_ => null,
+		} ?? switch (path) {
 			'kids.emptyHint' => 'Új kalandok jelennek meg itt, ha a szervere engedélyezett korosztályozású címekkel rendelkezik.',
 			'kids.title' => 'Luroka gyerekeknek',
 			'kids.addProfile' => 'Gyermekprofil hozzáadása',
@@ -5483,8 +5606,6 @@ extension on TranslationsHu {
 			'kids.historyReset' => 'A gyerekek megtekintési kizárásai visszaállítva',
 			'kids.blocked' => 'Ez a cím nem érhető el ebben a gyerekprofilban.',
 			'kids.switchProfile' => 'Profil váltása',
-			_ => null,
-		} ?? switch (path) {
 			'kids.manageFromAdult' => 'A beállítások kezeléséhez váltson felnőtt profilra.',
 			'kids.noConnections' => 'Csatlakoztasson egy szervert a felnőtt profilhoz, mielőtt hozzáadna egy gyerekprofilt.',
 			'kids.created' => 'Gyermekprofil létrehozva',
@@ -5559,6 +5680,72 @@ extension on TranslationsHu {
 			'appIcon.names.strata' => 'Strata',
 			'appIcon.names.facet' => 'Facet',
 			'appIcon.names.tilde' => 'Tilde',
+			'auth.plexQrSignIn' => 'Bejelentkezés a Plexbe QR-kóddal',
+			'auth.setUpWithPhone' => 'Beállítás telefonnal',
+			'auth.loadingRestoredData' => 'A visszaállított profilok és kapcsolatok betöltése…',
+			'auth.loadingRestoredDataFailed' => 'A visszaállított adatokat nem sikerült betölteni. Próbáld újra, vagy nyisd meg újra a Lurokát.',
+			'auth.connectTv' => 'TV csatlakoztatása',
+			'auth.restoreEncryptedBackup' => 'Titkosított biztonsági mentés visszaállítása',
+			'auth.restoreCloudBackup' => 'Felhőbeli biztonsági mentés visszaállítása',
+			'auth.saveEncryptedBackup' => 'Titkosított biztonsági mentés mentése',
+			'auth.backupSaved' => 'Biztonsági mentés elmentve',
+			'auth.createEncryptedBackup' => 'Titkosított biztonsági mentés létrehozása',
+			'auth.confirmBackupPassword' => 'Jelszó megerősítése',
+			'auth.enterBackupPassword' => 'Adj meg egy jelszót.',
+			'auth.confirmBackupPasswordError' => 'Adj meg egy jelszót, és erősítsd meg.',
+			'auth.restoreBackupAction' => 'Visszaállítás',
+			'auth.backupCreateInstructions' => 'Tartalmazza a profilokat, a szerveres bejelentkezéseket és a helyi nézési adatokat. Őrizd meg biztonságosan a jelszót; szükség van rá a visszaállításhoz.',
+			'auth.backupRestoreInstructions' => 'Add meg a mentés létrehozásakor használt jelszót vagy felhőbeli helyreállítási kódot. A visszaállításhoz üres profiladatbázis szükséges.',
+			'auth.backupCreateFailed' => 'Nem sikerült létrehozni a titkosított biztonsági mentést.',
+			'auth.backupRestoreFailed' => 'Nem sikerült visszaállítani a mentést. Ellenőrizd a jelszót, és használj üres telepítést.',
+			'auth.recoveryCodeStep' => '2. lépés a 3-ból: Mentsd el a helyreállítási kódot',
+			'auth.backupNotUploaded' => 'Még nincs feltöltve. Visszaállítás előtt fejezd be a 3. lépést, és várd meg a felhőmentés létrehozását megerősítő üzenetet.',
+			'auth.recoveryCodeSavedContinue' => 'Elmentettem a kódot — tovább',
+			'auth.recoveryCodeSaveFile' => 'Kód mentése fájlba',
+			'auth.recoveryCodeShowQr' => 'QR-kód megjelenítése',
+			'auth.recoveryCodeHideQr' => 'QR-kód elrejtése',
+			'auth.recoveryCopied' => 'Helyreállítási kód másolva. Mentsd el egy privát helyre.',
+			'auth.recoveryCopyFailed' => 'Nem sikerült másolni a helyreállítási kódot.',
+			'auth.recoverySaveDialog' => 'Helyreállítási kód mentése privát helyre',
+			'auth.recoverySaved' => 'Helyreállítási kód elmentve. Tartsd a fájlt privát helyen.',
+			'auth.recoverySaveFailed' => 'Nem sikerült menteni a helyreállítási kódot. Próbáld meg inkább másolni.',
+			'auth.cloudRestoreApplyFailed' => 'A mentés letöltődött, de ezen az eszközön nem sikerült visszaállítani. Próbáld újra, vagy fordulj az ügyfélszolgálathoz.',
+			'auth.cloudBackupNotFound' => 'Ehhez a kódhoz nem található felhőmentés. Az eredeti eszközön fejezd be a 3. lépést, és várd meg a mentés létrehozásának megerősítését. Ellenőrizd, hogy a mentéshez tartozó kódot használod-e; a mentés lejárhatott vagy törölhették.',
+			'auth.cloudBackupConnectionFailed' => 'Nem sikerült kapcsolódni a mentési szolgáltatáshoz. Ellenőrizd az internetkapcsolatot, és próbáld újra.',
+			'auth.cloudBackupInvalidFormat' => 'A helyreállítási kód vagy a mentés formátuma nem olvasható. Ellenőrizd a teljes kódot, és próbáld újra.',
+			'auth.cloudBackupOpenFailed' => 'A mentést nem sikerült megnyitni. Ellenőrizd a helyreállítási kódot, és próbáld újra.',
+			'auth.cloudBackupSelectProfiles' => 'Válaszd ki a mentésbe kerülő profilokat. A mentés feltöltés előtt titkosítva lesz, és 90 napig érhető el.',
+			'auth.cloudBackupIncludeLogins' => 'Mentett szerver- és integrációs bejelentkezések belefoglalása',
+			'auth.cloudBackupLoginsWarning' => 'Az újracsatlakozás megkönnyítéséhez tartalmazza a kapcsolt Plex-fiókokat és más mentett bejelentkezéseket. A helyreállítási kód birtokában mások is használhatják ezeket.',
+			'auth.cloudBackupNoLogins' => 'Mentett bejelentkezések nélkül a visszaállítás után újra csatlakoztatnod kell a szervereket.',
+			'auth.pairingHttpPhoneTitle' => 'HTTP használata ehhez a szerverhez?',
+			'auth.pairingHttpPhoneWarning' => 'A szerveres bejelentkezés és a médiaforgalom nem lesz titkosítva. A hálózaton mások olvashatják ezeket. A HTTPS használata ajánlott. A Luroka-átvitel titkosított marad.',
+			'auth.pairingHttpTvTitle' => 'Titkosítatlan szervert használsz?',
+			'auth.pairingHttpTvWarning' => 'A telefon HTTP-t választott. A hálózaton mások olvashatják a TV hozzáférési tokenjét és a médiaforgalmat. Csak megbízható hálózatot használj. A HTTPS használata ajánlott.',
+			'auth.pairingUseHttp' => 'HTTP használata',
+			'auth.pairingTvTitle' => 'Jellyfin vagy Emby csatlakoztatása telefonnal',
+			'auth.pairingScanInvitation' => 'Olvasd be a telefonnal. A meghívó öt perc múlva lejár.',
+			'auth.pairingWaitForPhone' => 'Várakozás a telefon csatlakozására…',
+			'auth.pairingComparePhone' => 'Hasonlítsd össze ezt a kódot a telefonodon láthatóval:',
+			'auth.pairingConfirmOnPhone' => 'Ha a kódok egyeznek, erősítsd meg a telefonodon.',
+			'auth.pairingAdultOnly' => 'A párosítás csak felnőtt profilból érhető el.',
+			'auth.pairingProfileChanged' => 'A profilhoz való hozzáférés megváltozott. A párosítás megszakadt.',
+			'auth.pairingServiceUnavailable' => 'A párosítási szolgáltatás nem érhető el. Próbáld újra, vagy add meg kézzel a szervert.',
+			'auth.pairingExpired' => 'A párosítás lejárt vagy megszakadt. Kezdd újra.',
+			'auth.pairingVerifyFailed' => 'A szervert és a fiókot nem sikerült ellenőrizni. Indítsd újra a párosítást.',
+			'auth.pairingScanOrPaste' => 'Olvasd be a TV-kódot, vagy illeszd be a meghívót.',
+			'auth.pairingScanTv' => 'TV-kód beolvasása',
+			'auth.pairingTvInvitation' => 'TV-meghívó',
+			'auth.pairingCheckTvCode' => ({required Object code}) => 'Ellenőrizd, hogy a TV ugyanazt a kódot mutatja-e: ${code}',
+			'auth.pairingCodesMatch' => 'A kódok egyeznek',
+			'auth.recoveryCodeLabel' => 'Helyreállítási kód',
+			'auth.recoveryCodeScan' => 'Helyreállítási kód beolvasása',
+			'auth.pairingRecoveryInstructions' => 'Olvasd be vagy illeszd be a mentett helyreállítási kódot. A TV számára titkosítva lesz.',
+			'auth.pairingSendTv' => 'Küldés a TV-re',
+			'auth.pairingServerLoginHint' => 'Jelentkezz be a szerveredre. A jelszavad a szerverre kerül, nem a Lurokához.',
+			'auth.recoveryCodeWarning' => 'A kódra szükség van a mentés visszaállításához vagy törléséhez. Bárki hozzáférhet a mentéshez, aki ismeri a kódot. Ha elveszíted, a Luroka nem tudja visszaállítani.',
+			'auth.recoveryCodePrivateFile' => 'A kódot csak biztonságos, privát helyre másold vagy mentsd. A mentett kódfájl nincs titkosítva.',
+			'auth.recoveryCodePhoneInstructions' => 'Őrizz meg egy privát másolatot a kódból. Telefonon történő visszaállításhoz nyisd meg a Luroka felhőmentés-visszaállítását, és válaszd a helyreállítási kód beolvasását.',
 			'auth.signInWithPlex' => 'Bejelentkezés Plexszel',
 			'auth.showQRCode' => 'QR-kód megjelenítése',
 			'auth.authenticate' => 'Hitelesítés',
@@ -5907,6 +6094,8 @@ extension on TranslationsHu {
 			'settings.maxVolumePercent' => ({required Object percent}) => '${percent}%',
 			'settings.discordRichPresence' => 'Discord-aktivitás',
 			'settings.discordRichPresenceDescription' => 'Megjeleníti a Discordon, hogy éppen mit nézel',
+			_ => null,
+		} ?? switch (path) {
 			'settings.services' => 'Szolgáltatások',
 			'settings.servicesDescription' => 'Trakt, MyAnimeList, Seerr és egyéb szolgáltatások csatlakoztatása',
 			'settings.manageLibrariesDescription' => 'Könyvtárak sorrendjének módosítása és elrejtése',
@@ -5997,8 +6186,6 @@ extension on TranslationsHu {
 			'settings.liveTvDefaultFavoritesDescription' => 'Csak a kedvenc csatornák megjelenítése az Élő TV megnyitásakor',
 			'settings.general' => 'Általános',
 			'settings.generalDescription' => 'Nyelv, indítás és ablakviselkedés',
-			_ => null,
-		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Nyelv és régió',
 			'settings.startup' => 'Indítás',
 			'settings.display' => 'Kijelző',
@@ -6421,6 +6608,8 @@ extension on TranslationsHu {
 			'fileInfo.pixelAspectRatio' => 'Pixel képarány',
 			'fileInfo.profile' => 'Profil',
 			'fileInfo.level' => 'Szint',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.bitDepth' => 'Bitmélység',
 			'fileInfo.pixelFormat' => 'Pixelformátum',
 			'fileInfo.colorSpace' => 'Színtér',
@@ -6511,8 +6700,6 @@ extension on TranslationsHu {
 			'mediaMenu.shuffleNotAvailableOffline' => 'A véletlenszerű lejátszás nem érhető el offline',
 			'mediaMenu.fileInfo' => 'Fájlinformáció',
 			'mediaMenu.deleteEpisodeFromServer' => 'Epizód törlése a szerverről',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Évad törlése a szerverről',
 			'mediaMenu.deleteShowFromServer' => 'Sorozat törlése a szerverről',
 			'mediaMenu.deleteMovieFromServer' => 'Film törlése a szerverről',
@@ -6935,6 +7122,8 @@ extension on TranslationsHu {
 			'accountPreferences.rewatchingInNextUp' => 'Újranézett sorozatok megtartása a Következikben',
 			'accountPreferences.rewatchingInNextUpDescription' => 'Ha befejezel egy sorozatot, és újra elkezded, a Következik az újranézést követi, ahelyett hogy eldobná a sorozatot.',
 			'accountPreferences.watchedIndicator' => 'Megtekintett jelzések',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.watchedIndicatorOptions.none' => 'Soha',
 			'accountPreferences.watchedIndicatorOptions.moviesAndShows' => 'Filmek és TV-sorozatok',
 			'accountPreferences.watchedIndicatorOptions.movies' => 'Csak filmek',
@@ -7025,8 +7214,6 @@ extension on TranslationsHu {
 			'libraries.filters' => 'Szűrők',
 			'libraries.confirmActionMessage' => 'Biztosan végre szeretnéd hajtani ezt a műveletet?',
 			'libraries.showLibrary' => 'Könyvtár megjelenítése',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Könyvtár elrejtése',
 			'libraries.libraryOptions' => 'Könyvtár beállításai',
 			'libraries.content' => 'könyvtár tartalma',
@@ -7449,6 +7636,8 @@ extension on TranslationsHu {
 			'collections.deleted' => 'Gyűjtemény törölve',
 			'collections.deleteFailed' => 'Nem sikerült a gyűjtemény törlése',
 			'collections.deleteFailedWithError' => ({required Object error}) => 'Nem sikerült a gyűjtemény törlése: ${error}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.selectCollection' => 'Gyűjtemény kiválasztása',
 			'collections.collectionName' => 'Gyűjtemény neve',
 			'collections.enterCollectionName' => 'Add meg a gyűjtemény nevét',
@@ -7539,8 +7728,6 @@ extension on TranslationsHu {
 			'watchTogether.qrShare' => 'QR-kód megosztása',
 			'watchTogether.qrHint' => 'Olvassa be a Luroka alkalmazással, hogy csatlakozzon ehhez a szobához.',
 			'watchTogether.phasePlaying' => 'Játék',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Szüneteltetve',
 			'watchTogether.phaseWaiting' => 'Mindenkit várok',
 			'watchTogether.inviteCopied' => 'Meghívó másolva. Illessze be egy üzenetbe.',
@@ -7963,6 +8150,8 @@ extension on TranslationsHu {
 			'externalPlayer.useExternalPlayer' => 'Külső lejátszó használata',
 			'externalPlayer.useExternalPlayerDescription' => 'Videók megnyitása egy másik alkalmazásban',
 			'externalPlayer.selectPlayer' => 'Lejátszó kiválasztása',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Egyéni lejátszók',
 			'externalPlayer.systemDefault' => 'Rendszer alapértelmezése',
 			'externalPlayer.addCustomPlayer' => 'Egyéni lejátszó hozzáadása',
@@ -8053,8 +8242,6 @@ extension on TranslationsHu {
 			'matchScreen.match' => 'Párosítás...',
 			'matchScreen.fixMatch' => 'Párosítás javítása...',
 			'matchScreen.unmatch' => 'Párosítás megszüntetése',
-			_ => null,
-		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Törlöd ezt a párosítást? A Plex párosítatlanként kezeli az újrapárosításig.',
 			'matchScreen.unmatchSuccess' => 'Párosítás megszüntetve',
 			'matchScreen.unmatchFailed' => 'Nem sikerült a párosítás megszüntetése',
@@ -8197,6 +8384,13 @@ extension on TranslationsHu {
 			'profileIntegrations.later' => 'Állítsa be később',
 			'profileIntegrations.manage' => 'Integrációk kezelése',
 			'profileIntegrations.forProfile' => ({required Object name}) => '${name} csatlakozások',
+			'profileSetupGuide.tabletSpotlightStyle' => 'Kiemelés stílusa táblagépen',
+			'profileSetupGuide.spotlightClassic' => 'Klasszikus',
+			'profileSetupGuide.spotlightMarquee' => 'Marquee',
+			'profileSetupGuide.spotlightTonight' => 'Mai esti ajánlatok',
+			'profileSetupGuide.phoneSpotlight' => 'Mozis kiemelés telefonon',
+			'profileSetupGuide.phoneSpotlightCinematic' => 'Fekvő kép a ráhelyezett címmel',
+			'profileSetupGuide.phoneSpotlightClassic' => 'Klasszikus plakátkártya',
 			'profileSetupGuide.title' => 'Tedd sajátoddá profilodat',
 			'profileSetupGuide.description' => 'Válassza ki, hogy a Luroka hogyan nézzen ki és érezzen ezt a profilt ezen az eszközön. Később mindent módosíthat a Beállításokban.',
 			'profileSetupGuide.appearanceStep' => '1 / 2 · Megjelenés',

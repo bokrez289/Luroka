@@ -98,8 +98,8 @@ Future<void> expectStartupSurvivesHdrRefusal(
   final eventCalls = <MethodCall>[];
 
   await withMockPlayerChannels(
-    methodChannelName: 'com.luroka/mpv_player',
-    eventChannelName: 'com.luroka/mpv_player/events',
+    methodChannelName: 'com.plezy/mpv_player',
+    eventChannelName: 'com.plezy/mpv_player/events',
     methodHandler: _refusingPlane(calls, refusal),
     eventHandler: (call) async {
       eventCalls.add(call);
@@ -160,8 +160,8 @@ Future<void> expectRefusedToneMappingRestoresStoredMode(WidgetTester tester, Pla
   final eventCalls = <MethodCall>[];
 
   await withMockPlayerChannels(
-    methodChannelName: 'com.luroka/mpv_player',
-    eventChannelName: 'com.luroka/mpv_player/events',
+    methodChannelName: 'com.plezy/mpv_player',
+    eventChannelName: 'com.plezy/mpv_player/events',
     methodHandler: _refusingPlane(calls, refusal, property: 'hdr-tone-mapping'),
     eventHandler: (call) async {
       eventCalls.add(call);
@@ -226,8 +226,8 @@ Future<void> expectCustomConfigCannotOverrideHdrPreferences(WidgetTester tester)
   final eventCalls = <MethodCall>[];
 
   await withMockPlayerChannels(
-    methodChannelName: 'com.luroka/mpv_player',
-    eventChannelName: 'com.luroka/mpv_player/events',
+    methodChannelName: 'com.plezy/mpv_player',
+    eventChannelName: 'com.plezy/mpv_player/events',
     // A plane that accepts everything: the hazard here is ordering, not refusal.
     methodHandler: (call) async {
       calls.add(call);
@@ -299,8 +299,8 @@ Future<void> expectCustomConfigCannotOverrideEmbeddedVo(WidgetTester tester) asy
   final eventCalls = <MethodCall>[];
 
   await withMockPlayerChannels(
-    methodChannelName: 'com.luroka/mpv_player',
-    eventChannelName: 'com.luroka/mpv_player/events',
+    methodChannelName: 'com.plezy/mpv_player',
+    eventChannelName: 'com.plezy/mpv_player/events',
     methodHandler: (call) async {
       calls.add(call);
       return call.method == 'initialize' ? true : null;
@@ -358,8 +358,8 @@ Future<void> expectQuotedCustomConfigValuesReachWireUnquoted(WidgetTester tester
   final eventCalls = <MethodCall>[];
 
   await withMockPlayerChannels(
-    methodChannelName: 'com.luroka/mpv_player',
-    eventChannelName: 'com.luroka/mpv_player/events',
+    methodChannelName: 'com.plezy/mpv_player',
+    eventChannelName: 'com.plezy/mpv_player/events',
     methodHandler: (call) async {
       calls.add(call);
       return call.method == 'initialize' ? true : null;
@@ -412,8 +412,8 @@ Future<void> expectSubtitleStyleRefusalDoesNotAbortStartup(WidgetTester tester) 
   final eventCalls = <MethodCall>[];
 
   await withMockPlayerChannels(
-    methodChannelName: 'com.luroka/mpv_player',
-    eventChannelName: 'com.luroka/mpv_player/events',
+    methodChannelName: 'com.plezy/mpv_player',
+    eventChannelName: 'com.plezy/mpv_player/events',
     methodHandler: (call) async {
       calls.add(call);
       if (call.method == 'setProperty' && (call.arguments as Map)['name'] == 'sub-color') {
@@ -466,8 +466,8 @@ Future<void> expectUnknownSubtitlePropertyRefusalDoesNotAbortStartup(WidgetTeste
   final eventCalls = <MethodCall>[];
 
   await withMockPlayerChannels(
-    methodChannelName: 'com.luroka/mpv_player',
-    eventChannelName: 'com.luroka/mpv_player/events',
+    methodChannelName: 'com.plezy/mpv_player',
+    eventChannelName: 'com.plezy/mpv_player/events',
     methodHandler: _refusingPlane(calls, refusal, property: 'sub-ass-video-aspect-override'),
     eventHandler: (call) async {
       eventCalls.add(call);
@@ -510,8 +510,8 @@ Future<void> expectSanitizedSubtitleColorsOnTheWire(WidgetTester tester) async {
   final eventCalls = <MethodCall>[];
 
   await withMockPlayerChannels(
-    methodChannelName: 'com.luroka/mpv_player',
-    eventChannelName: 'com.luroka/mpv_player/events',
+    methodChannelName: 'com.plezy/mpv_player',
+    eventChannelName: 'com.plezy/mpv_player/events',
     methodHandler: (call) async {
       calls.add(call);
       return call.method == 'initialize' ? true : null;
@@ -557,8 +557,8 @@ Future<void> expectStartupAbortsOnHdrRefusal(WidgetTester tester, PlatformExcept
   final seededHdrEnabled = SettingsService.instance.read(SettingsService.enableHDR);
 
   await withMockPlayerChannels(
-    methodChannelName: 'com.luroka/mpv_player',
-    eventChannelName: 'com.luroka/mpv_player/events',
+    methodChannelName: 'com.plezy/mpv_player',
+    eventChannelName: 'com.plezy/mpv_player/events',
     methodHandler: _refusingPlane(calls, refusal),
     testBody: () async {
       await _mountPlayerScreen(tester, 'Non-Linux HDR refusal video');

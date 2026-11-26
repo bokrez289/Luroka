@@ -4,10 +4,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:luroka/widgets/tv_edge_menu.dart';
 import 'package:luroka/services/settings_service.dart';
 import 'package:luroka/i18n/strings.g.dart';
+import '../test_helpers/prefs.dart';
 
 void main() {
-  test('existing profiles default to the top bar', () {
-    expect(SettingsService.tvEdgeMenu.defaultValue, isFalse);
+  test('TV profiles default to top bar and sidebar', () {
+    expect(SettingsService.tvEdgeMenu.defaultValue, isTrue);
+  });
+
+  test('an explicit top-bar-only choice remains disabled', () async {
+    resetSharedPreferencesForTest();
+    final settings = await SettingsService.getInstance();
+    expect(settings.read(SettingsService.tvEdgeMenu), isTrue);
+    await settings.write(SettingsService.tvEdgeMenu, false);
+    expect(settings.read(SettingsService.tvEdgeMenu), isFalse);
   });
 
   testWidgets('library entry opens focused; Right dismisses without choosing another library', (tester) async {
@@ -91,6 +100,8 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('All libraries'), findsNothing);
+    expect(find.text('Home'), findsNothing);
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'tv_edge_library:a');
     expect(find.text('Libraries'), findsOneWidget);
     expect(find.text('Movies'), findsOneWidget);
     expect(find.text('Anime'), findsOneWidget);

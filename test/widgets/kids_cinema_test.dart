@@ -8,6 +8,7 @@ import 'package:luroka/focus/input_mode_tracker.dart';
 import 'package:luroka/i18n/strings.g.dart';
 import 'package:luroka/media/media_hub.dart';
 import 'package:luroka/media/media_kind.dart';
+import 'package:luroka/models/kids_atmosphere.dart';
 import 'package:luroka/services/kids_profile_service.dart';
 import 'package:luroka/theme/mono_theme.dart';
 import 'package:luroka/utils/platform_detector.dart';
@@ -86,6 +87,140 @@ void main() {
     expect(selected, 'm');
     expect(played, isFalse);
   });
+  for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+    testWidgets('phone treehouse keeps one profile action and a compact progress shelf on $platform', (tester) async {
+      TvDetectionService.debugSetAppleTVOverride(false);
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final movie = testMediaItem(id: 'm', title: 'Friendly', serverId: 'srv', artPath: '/art')
+          .copyWith(contentRating: 'G', viewOffsetMs: 1000, durationMs: 10000);
+      var profilesOpened = false;
+      String? selected;
+      await tester.pumpWidget(MaterialApp(
+        theme: monoTheme(MonoPalette.lurokaKids).copyWith(platform: platform),
+        home: KidsMovieShelf(
+          rows: [MediaHub(id: 'm', title: 'Movies', type: 'movie', items: [movie])],
+          onDeck: [movie], name: 'Emma',
+          toolbar: IconButton(key: const ValueKey('profile-action'), onPressed: () => profilesOpened = true,
+            tooltip: 'Profiles', icon: const Icon(Icons.person)),
+          showToolbar: true,
+          resolveClient: (_) => null, onPlay: (_) {}, onResume: (_) {},
+          onDetails: (item) => selected = item.id, onSidebar: () {}, onToolbar: () {},
+        ),
+      ));
+      await tester.pumpAndSettle();
+      final header = find.byKey(const ValueKey('kids-illustrated-header'));
+      expect(tester.getSize(header).height, lessThanOrEqualTo(180));
+      expect(find.byKey(const ValueKey('kids-phone-treehouse-art')), findsOneWidget);
+      expect(find.byType(KidsAvatar), findsNothing);
+      expect(find.text(t.common.resume), findsNothing);
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('profile-action')));
+      expect(profilesOpened, isTrue);
+      await tester.tap(find.byKey(const ValueKey('resume:srv:m')));
+      expect(selected, 'm');
+      expect(tester.takeException(), isNull);
+    });
+  }
+  for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+    for (final size in [const Size(768, 1024), const Size(1024, 768)]) {
+      testWidgets('tablet treehouse uses a larger orientation-aware scene on $platform $size', (tester) async {
+        TvDetectionService.debugSetAppleTVOverride(false);
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final movie = testMediaItem(id: 'm', title: 'Friendly', serverId: 'srv', artPath: '/art')
+            .copyWith(contentRating: 'G', viewOffsetMs: 1000, durationMs: 10000);
+        final forbidden = movie.copyWith(id: 'x', title: 'Forbidden', contentRating: 'R');
+        String? selected;
+        await tester.pumpWidget(MaterialApp(
+          theme: monoTheme(MonoPalette.lurokaKids).copyWith(platform: platform),
+          home: KidsMovieShelf(
+            rows: [MediaHub(id: 'm', title: 'Movies', type: 'mixed', items: [movie, forbidden])],
+            onDeck: [movie, forbidden], name: 'Emma', toolbar: const SizedBox(), showToolbar: false,
+            resolveClient: (_) => null, onPlay: (_) {}, onResume: (_) {},
+            onDetails: (item) => selected = item.id, onSidebar: () {}, onToolbar: () {},
+          ),
+        ));
+        await tester.pumpAndSettle();
+        final hero = find.byKey(const ValueKey('kids-illustrated-header'));
+        expect(tester.getSize(hero).height, greaterThan(250));
+        final artwork = tester.widget<Image>(find.byKey(const ValueKey('kids-tablet-treehouse-art')));
+        final asset = artwork.image as AssetImage;
+        expect(asset.assetName, size.width > size.height
+            ? 'assets/branding/kids-world-tv.webp' : 'assets/branding/kids-world-phone.webp');
+        expect(artwork.fit, BoxFit.cover);
+        expect(find.text('Forbidden'), findsNothing);
+        expect(find.text(t.common.resume), findsNothing);
+        expect(find.byType(LinearProgressIndicator), findsOneWidget);
+        final card = find.byKey(const ValueKey('resume:srv:m'));
+        await tester.ensureVisible(card);
+        await tester.tap(card);
+        await tester.pump();
+        expect(selected, 'm');
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+  testWidgets('tablet treehouse respects quiet scenery and enlarged text', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(false);
+    tester.view.physicalSize = const Size(768, 1024);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await kids.setChild('child', parentId: 'adult', maxAge: 7, quietScenery: true);
+    final movie = testMediaItem(id: 'safe', title: 'A very long and friendly film title', serverId: 'srv')
+        .copyWith(contentRating: 'G');
+    await tester.pumpWidget(MaterialApp(
+      theme: monoTheme(MonoPalette.lurokaKids).copyWith(platform: TargetPlatform.iOS),
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.6)),
+        child: child!,
+      ),
+      home: KidsMovieShelf(
+        rows: [MediaHub(id: 'm', title: 'Movies', type: 'movie', items: [movie])],
+        onDeck: [], name: 'Emma', toolbar: const SizedBox(), showToolbar: false,
+        resolveClient: (_) => null, onPlay: (_) {}, onResume: (_) {}, onDetails: (_) {},
+        onSidebar: () {}, onToolbar: () {},
+      ),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('kids-tablet-treehouse-art')), findsNothing);
+    expect(find.text(t.kids.welcome(name: 'Emma')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+  for (final tv in [false, true]) {
+    testWidgets('active child atmosphere updates Home without changing content on ${tv ? 'TV' : 'tablet'}', (tester) async {
+      TvDetectionService.debugSetAppleTVOverride(tv);
+      tester.view.physicalSize = tv ? const Size(1280, 720) : const Size(768, 1024);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final movie = testMediaItem(id: 'safe', title: 'Friendly', serverId: 'srv')
+          .copyWith(contentRating: 'G');
+      final forbidden = movie.copyWith(id: 'adult', title: 'Forbidden', contentRating: 'R');
+      await tester.pumpWidget(MaterialApp(
+        theme: monoTheme(MonoPalette.lurokaKids).copyWith(platform: TargetPlatform.iOS),
+        home: KidsMovieShelf(
+          rows: [MediaHub(id: 'h', title: 'Movies', type: 'movie', items: [movie, forbidden])],
+          onDeck: [], name: 'Emma', toolbar: const SizedBox(), showToolbar: false,
+          resolveClient: (_) => null, onPlay: (_) {}, onResume: (_) {}, onDetails: (_) {},
+          onSidebar: () {}, onToolbar: () {},
+        ),
+      ));
+      await tester.pumpAndSettle();
+      for (final palette in KidsAtmosphere.values) {
+        await kids.setChild('child', parentId: 'adult', maxAge: 7, atmosphere: palette);
+        await tester.pumpAndSettle();
+        final material = tester.widget<Material>(
+          find.descendant(of: find.byType(KidsMovieShelf), matching: find.byType(Material)).first,
+        );
+        expect(material.color, palette.background);
+        expect(find.text('Forbidden'), findsNothing);
+        expect(find.text('Friendly'), findsWidgets);
+        expect(tester.takeException(), isNull);
+      }
+    });
+  }
   testWidgets('kids Home groups matching copies without asking the child to pick a library', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(false);
     final first = testMediaItem(

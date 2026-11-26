@@ -102,8 +102,8 @@ void main() {
   ) async {
     final fakePlayer = _SwitchPlayer();
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       testBody: () async {
         final key = await _pushScreen(tester, db: db, fakePlayer: fakePlayer);
 
@@ -167,8 +167,8 @@ void main() {
       await SettingsService.instance.write(SettingsService.defaultQualityPreset, TranscodeQualityPreset.p720_2mbps);
       final fakePlayer = _SwitchPlayer();
       await withMockPlayerChannels(
-        methodChannelName: 'com.luroka/mpv_player',
-        eventChannelName: 'com.luroka/mpv_player/events',
+        methodChannelName: 'com.plezy/mpv_player',
+        eventChannelName: 'com.plezy/mpv_player/events',
         testBody: () async {
           final key = await _pushScreen(tester, db: db, fakePlayer: fakePlayer, selectedQualityPreset: null);
 
@@ -184,8 +184,8 @@ void main() {
     testWidgets('yields to a quality picked in the player for the rest of the session', (tester) async {
       final fakePlayer = _SwitchPlayer();
       await withMockPlayerChannels(
-        methodChannelName: 'com.luroka/mpv_player',
-        eventChannelName: 'com.luroka/mpv_player/events',
+        methodChannelName: 'com.plezy/mpv_player',
+        eventChannelName: 'com.plezy/mpv_player/events',
         testBody: () async {
           final key = await _pushScreen(tester, db: db, fakePlayer: fakePlayer, selectedQualityPreset: null);
 

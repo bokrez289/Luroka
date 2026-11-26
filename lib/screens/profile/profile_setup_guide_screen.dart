@@ -65,6 +65,8 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
   late bool _showSpotlight;
   late HomeSpotlightSource _spotlight;
   late bool _cinematic, _initialCinematic;
+  late bool _marquee, _initialMarquee;
+  late bool _tonightPicks, _initialTonightPicks;
   late bool _split;
   late bool _episodeThumbnails;
   late ShowDetailLayout _showLayout;
@@ -127,6 +129,8 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
     );
     _spotlight = _initialSpotlight = _home.layout.spotlightSource;
     _cinematic = _initialCinematic = _settings.readForProfile(widget.profileId, settings.SettingsService.phoneCinematicSpotlight);
+    _marquee = _initialMarquee = _settings.readForProfile(widget.profileId, settings.SettingsService.tabletMarquee);
+    _tonightPicks = _initialTonightPicks = _settings.readForProfile(widget.profileId, settings.SettingsService.tabletTonightPicks);
     _split = _initialSplit = _home.layout.splitContinueWatching;
     _episodeThumbnails = _initialEpisodeThumbnails = _settings.readForProfile(
       widget.profileId,
@@ -174,6 +178,8 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
           playThemeMusic: _themeMusic != _initialThemeMusic ? _themeMusic : null,
           showSpotlight: _showSpotlight != _initialShowSpotlight ? _showSpotlight : null,
           cinematicSpotlight: _cinematic != _initialCinematic ? _cinematic : null,
+          marqueeSpotlight: _marquee != _initialMarquee ? _marquee : null,
+          tonightPicks: _tonightPicks != _initialTonightPicks ? _tonightPicks : null,
           showEpisodeThumbnails: _episodeThumbnails != _initialEpisodeThumbnails ? _episodeThumbnails : null,
           showLayout: _showLayout != _initialShowLayout ? _showLayout : null,
         );
@@ -557,10 +563,24 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
           onChanged: _busy ? null : (value) => setState(() => _showSpotlight = value),
         ),
         Text(t.profileSetupGuide.spotlightHeading, style: Theme.of(context).textTheme.titleMedium),
+        if (_showSpotlight && PlatformDetector.isMobile(context) && MediaQuery.sizeOf(context).shortestSide >= 600)
+          SegmentedButton<String>(
+            segments: [
+              ButtonSegment(value: 'classic', label: Text(t.profileSetupGuide.spotlightClassic)),
+              ButtonSegment(value: 'marquee', label: Text(t.profileSetupGuide.spotlightMarquee)),
+              ButtonSegment(value: 'picks', label: Text(t.profileSetupGuide.spotlightTonight)),
+            ],
+            selected: {_tonightPicks ? 'picks' : _marquee ? 'marquee' : 'classic'},
+            onSelectionChanged: _busy ? null : (values) => setState(() {
+              _marquee = values.single == 'marquee';
+              _tonightPicks = values.single == 'picks';
+              _previewShowLayout = false;
+            }),
+          ),
         if (_showSpotlight && PlatformDetector.isMobile(context) && MediaQuery.sizeOf(context).shortestSide < 600)
           FocusableSwitchListTile(
-            title: const Text('Cinematic phone spotlight'),
-            subtitle: Text(_cinematic ? 'Landscape artwork with the title overlaid' : 'Classic poster card'),
+            title: Text(t.profileSetupGuide.phoneSpotlight),
+            subtitle: Text(_cinematic ? t.profileSetupGuide.phoneSpotlightCinematic : t.profileSetupGuide.phoneSpotlightClassic),
             value: _cinematic,
             onChanged: _busy ? null : (value) => setState(() {
               _cinematic = value;
@@ -682,6 +702,8 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
                     layout: _studioDraft.copyWith(spotlightSource: _spotlight, splitContinueWatching: _split),
                     showSpotlight: _showSpotlight,
                     phoneCinematic: _cinematic,
+                    tabletMarquee: _marquee,
+                    tabletTonightPicks: _tonightPicks,
                     posterDetails: _posterDetails,
                     episodeThumbnails: _episodeThumbnails,
                   ), if (_previewEdgeMenu) Positioned.fill(child: IgnorePointer(child: _sampleMenu(() {})))]),
@@ -694,10 +716,12 @@ class _ProfileSetupGuideScreenState extends State<ProfileSetupGuideScreen> {
   }
 
   Widget _sampleMenu(VoidCallback close) => TvEdgeMenu(
-    current: 'home', libraryLabel: t.navigation.libraries, libraryEntries: const [],
+    current: 'library:movies', libraryLabel: t.navigation.libraries, libraryEntries: [
+      (id: 'library:movies', label: t.discover.movie, icon: Icons.movie),
+      (id: 'library:shows', label: t.discover.tvShow, icon: Icons.tv),
+    ],
     entries: [
-      (id: 'home', label: t.common.home, icon: Icons.home),
-      (id: 'search', label: t.common.search, icon: Icons.search),
+      (id: 'libraries', label: t.navigation.libraries, icon: Icons.video_library_outlined),
       (id: 'studios', label: t.studios.title, icon: Icons.movie_filter_outlined),
     ], onClose: close, onChoose: (_) => close(), autofocus: false,
   );

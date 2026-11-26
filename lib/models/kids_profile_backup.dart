@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import 'kids_avatar.dart';
+import 'kids_atmosphere.dart';
 
 /// Portable child settings. Server credentials and parent PINs never belong in
 /// this format. Restore is reviewed as a new profile under the current parent.
@@ -13,6 +14,7 @@ class KidsProfileBackup {
     required this.maxAge,
     required this.theme,
     this.quietScenery,
+    this.atmosphere = KidsAtmosphere.sunshine,
     required this.avatar,
     required Set<String>? libraries,
     required this.animationOnly,
@@ -31,6 +33,7 @@ class KidsProfileBackup {
   final int maxAge;
   final bool theme;
   final bool? quietScenery;
+  final KidsAtmosphere atmosphere;
   final KidsAvatarKind avatar;
   final Set<String>? libraries;
   final bool animationOnly;
@@ -48,6 +51,7 @@ class KidsProfileBackup {
       'maxAge': maxAge,
       'theme': theme,
       if (quietScenery != null) 'quietScenery': quietScenery,
+      'atmosphere': atmosphere.name,
       'avatar': avatar.name,
       'libraries': libraries?.toList(),
       'animationOnly': animationOnly,
@@ -84,6 +88,7 @@ class KidsProfileBackup {
         !const [0, 7, 12, 16].contains(age) ||
         profile['theme'] is! bool ||
         (profile['quietScenery'] != null && profile['quietScenery'] is! bool) ||
+        (profile['atmosphere'] != null && profile['atmosphere'] is! String) ||
         profile['animationOnly'] is! bool ||
         profile['allowUnrated'] is! bool ||
         !KidsAvatarKind.values.any((value) => value.name == avatar) ||
@@ -109,6 +114,7 @@ class KidsProfileBackup {
       maxAge: age,
       theme: profile['theme'] as bool,
       quietScenery: profile['quietScenery'] as bool?,
+      atmosphere: KidsAtmosphere.fromId(profile['atmosphere'] as String?),
       avatar: KidsAvatarKind.fromId(avatar as String),
       libraries: profile['libraries'] == null ? null : strings(profile['libraries'], 2000).toSet(),
       animationOnly: profile['animationOnly'] as bool,

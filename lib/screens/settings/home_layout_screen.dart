@@ -14,6 +14,7 @@ import '../../widgets/app_icon.dart';
 import '../../widgets/app_menu.dart';
 import '../../widgets/focusable_list_tile.dart';
 import '../../widgets/settings_page.dart';
+import '../../widgets/tablet_spotlight_style_selector.dart';
 import '../../widgets/settings_section.dart';
 import '../../widgets/setting_tile.dart';
 import '../../widgets/mobile_settings_preview.dart';
@@ -336,6 +337,8 @@ class _HomeLayoutScreenState extends State<HomeLayoutScreen> {
                   title: 'Cinematic phone spotlight',
                   subtitle: 'Use landscape artwork instead of classic poster cards',
                 ),
+              if (PlatformDetector.isMobile(context) && MediaQuery.sizeOf(context).shortestSide >= 600)
+                const TabletSpotlightStyleSelector(),
               SettingSwitchTile(
                 pref: SettingsService.showHeroSection,
                 icon: Symbols.view_carousel_rounded,

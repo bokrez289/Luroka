@@ -21,12 +21,16 @@ class KidsShelfSpotlight extends StatelessWidget {
     required this.resume,
     required this.inset,
     required this.quiet,
+    this.background = ink,
+    this.accent,
   });
 
   final MediaItem item;
   final MediaServerClient? client;
   final bool spoiler, resume, quiet;
   final double inset;
+  final Color background;
+  final Color? accent;
   static const ink = Color(0xff071529);
   static const artFraction = .75;
   static String? backdrop(MediaItem item, bool spoiler) =>
@@ -34,7 +38,8 @@ class KidsShelfSpotlight extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = quiet ? const Color(0xff89ecd3) : const Color(0xffffdc55);
+    final accent = this.accent ?? (quiet ? const Color(0xff89ecd3) : const Color(0xffffdc55));
+    final ink = background;
     final path = backdrop(item, spoiler);
     final title = item.grandparentTitle ?? item.displayTitle;
     final summary = spoiler ? '' : item.summary?.trim() ?? '';
@@ -72,21 +77,21 @@ class KidsShelfSpotlight extends StatelessWidget {
                         errorWidget: (_, _, _) => fallback(),
                       ),
               ),
-              const DecoratedBox(
+              DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [ink, ink, Color(0xe3071529), Color(0x36071529), Color(0x00071529)],
-                    stops: [0, .25, .39, .65, 1],
+                    colors: [ink, ink, ink.withValues(alpha: .89), ink.withValues(alpha: .21), ink.withValues(alpha: 0)],
+                    stops: const [0, .25, .39, .65, 1],
                   ),
                 ),
               ),
-              const DecoratedBox(
+              DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Color(0x00071529), Color(0x00071529), ink],
-                    stops: [0, .67, 1],
+                    colors: [ink.withValues(alpha: 0), ink.withValues(alpha: 0), ink],
+                    stops: const [0, .67, 1],
                   ),
                 ),
               ),

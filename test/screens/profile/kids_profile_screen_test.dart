@@ -24,6 +24,8 @@ import 'package:luroka/media/media_library.dart';
 import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_kind.dart';
 import 'package:luroka/models/kids_profile_backup.dart';
+import 'package:luroka/models/kids_atmosphere.dart';
+import 'package:luroka/widgets/kids/kids_atmosphere_picker.dart';
 import 'package:luroka/screens/profile/kids_profile_backup_actions.dart';
 import 'package:luroka/theme/mono_theme.dart';
 import 'package:luroka/utils/platform_detector.dart';
@@ -93,6 +95,60 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.widget<SwitchListTile>(choice).value, isFalse);
     expect(find.text(t.kids.pinChoiceHint), findsOneWidget);
+  });
+
+  testWidgets('creating a child previews atmosphere changes without saving a profile', (tester) async {
+    await kids.initialize();
+    await tester.pumpWidget(TranslationProvider(child: const MaterialApp(home: KidsProfileScreen())));
+    await tester.pumpAndSettle();
+    final picker = find.byType(KidsAtmospherePicker);
+    await tester.ensureVisible(picker);
+    expect(tester.widget<KidsAtmospherePicker>(picker).value, KidsAtmosphere.sunshine);
+    await tester.ensureVisible(find.byKey(const ValueKey('kids-atmosphere-berry')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('kids-atmosphere-berry')));
+    await tester.pumpAndSettle();
+    expect(tester.widget<KidsAtmospherePicker>(picker).value, KidsAtmosphere.berry);
+    expect(kids.hasKids, isFalse);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('editing a child shows their saved atmosphere and previews a draft', (tester) async {
+    await kids.initialize();
+    await kids.setParentPin('1234');
+    await kids.setChild('child', parentId: 'adult', maxAge: 7, atmosphere: KidsAtmosphere.mint);
+    final child = Profile.local(id: 'child', displayName: 'Emma', createdAt: DateTime(2026));
+    await tester.pumpWidget(MaterialApp(home: KidsProfileScreen(profile: child)));
+    await tester.pumpAndSettle();
+    await openSection(tester, 'appearance');
+    final picker = find.byType(KidsAtmospherePicker);
+    await tester.ensureVisible(picker);
+    expect(tester.widget<KidsAtmospherePicker>(picker).value, KidsAtmosphere.mint);
+    await tester.ensureVisible(find.byKey(const ValueKey('kids-atmosphere-sky')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('kids-atmosphere-sky')));
+    await tester.pumpAndSettle();
+    expect(tester.widget<KidsAtmospherePicker>(picker).value, KidsAtmosphere.sky);
+    expect(kids.atmosphereFor('child'), KidsAtmosphere.mint);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('child settings changes only its own atmosphere', (tester) async {
+    await kids.initialize();
+    await kids.setParentPin('1234');
+    await kids.setChild('child', parentId: 'adult', maxAge: 7, allowedLibraries: {'srv:kids'});
+    kids.selectProfile('child');
+    await tester.pumpWidget(TranslationProvider(child: const MaterialApp(home: KidsSettingsScreen())));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('kids-atmosphere-berry')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('kids-atmosphere-berry')));
+    await tester.pumpAndSettle();
+    expect(kids.atmosphereFor('child'), KidsAtmosphere.berry);
+    expect(kids.librariesFor('child'), {'srv:kids'});
+    expect(find.text(t.kids.switchProfile), findsOneWidget);
+    expect(find.text(t.kids.allowedLibraries), findsNothing);
+    expect(tester.takeException(), isNull);
   });
 
   for (final tv in [false, true]) {
@@ -238,6 +294,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'Emma');
     await tester.pump();
+    await tester.ensureVisible(find.byKey(const ValueKey('kids-atmosphere-berry')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('kids-atmosphere-berry')));
+    await tester.pumpAndSettle();
     await openSection(tester, 'advanced');
     await tester.ensureVisible(find.byKey(const ValueKey('kids-choose-different-connection')));
     await tester.pumpAndSettle();
@@ -306,6 +366,7 @@ void main() {
     expect(kids.isKids(child.id), isTrue);
     expect(kids.parentFor(child.id), parent.id);
     expect(kids.ageFor(child.id), 7);
+    expect(kids.atmosphereFor(child.id), KidsAtmosphere.berry);
     expect(kids.librariesFor(child.id), {'srv-1:kids-library'});
     expect(kids.animationOnlyFor(child.id), isTrue);
     expect(kids.allowUnratedFor(child.id), isTrue);
@@ -369,6 +430,7 @@ void main() {
     await tester.pumpAndSettle();
     final backup = KidsProfileBackup.decode(clipboard!);
     expect(backup.name, 'Emma');
+    expect(backup.atmosphere, KidsAtmosphere.berry);
     expect(backup.libraries, {'srv-1:kids-library'});
     expect(backup.viewingExclusions, ['srv-1:watched-series']);
     expect(clipboard, isNot(contains(emby.accessToken)));
@@ -397,6 +459,7 @@ void main() {
     final restored = (await profiles.list()).singleWhere((profile) => profile.displayName == 'Emma');
     expect(restored.id, isNot(child.id));
     expect(kids.librariesFor(restored.id), {'srv-1:kids-library'});
+    expect(kids.atmosphereFor(restored.id), KidsAtmosphere.berry);
     expect(kids.animationOnlyFor(restored.id), isTrue);
     expect(kids.allowUnratedFor(restored.id), isTrue);
     expect(kids.dailyWatchMinutesFor(restored.id), 90);

@@ -578,6 +578,13 @@ class _Translations$kidsShelf$da extends Translations$kidsShelf$en {
 	@override String get yourShelf => 'Din filmhylde';
 	@override String get all => 'Alting';
 	@override String get pickSomething => 'Hvad vil du se?';
+	@override String get atmosphere => 'Stemning på startsiden';
+	@override String get atmosphereHint => 'Vælg farverne på børnenes startside. Træhuset forbliver det samme.';
+	@override String get sunshine => 'Solskin';
+	@override String get berry => 'Bær';
+	@override String get mint => 'Mynte';
+	@override String get sky => 'Himmel';
+	@override String get atmospherePreview => 'Forhåndsvisning af startsiden';
 }
 
 // Path: kidsHome
@@ -785,6 +792,23 @@ class _Translations$kids$da extends Translations$kids$en {
 	final TranslationsDa _root; // ignore: unused_field
 
 	// Translations
+	@override String get allLibrariesHint => 'Nye film- og seriebiblioteker medtages også. Slå dette fra for at vælge bestemte biblioteker.';
+	@override String get appearanceSection => 'Udseende';
+	@override String get disableParentPin => 'Slå forældre-PIN fra';
+	@override String get disableParentPinConfirm => 'Slå forældre-PIN fra for alle børneprofiler? Børn kan skifte til ubeskyttede profiler og omgå skærmtidsgrænser. Profil-PIN-koder gælder stadig.';
+	@override String get discardAction => 'Kassér ændringer';
+	@override String get discardMessage => 'Dine ændringer er ikke gemt.';
+	@override String get discardTitle => 'Kassér ændringer?';
+	@override String get editorTitle => 'Indstillinger for børneprofil';
+	@override String libraryCount({required Object count}) => 'Valgte biblioteker: ${count}';
+	@override String get moreSection => 'Mere';
+	@override String get pinChoice => 'Brug en forældre-PIN';
+	@override String get pinChoiceHint => 'Anbefales. Uden en forældre-PIN kan børn skifte til ubeskyttede profiler og ændre børneindstillinger. Skærmtidsgrænser kan omgås ved at skifte profil.';
+	@override String get pinDifference => 'En forældre-PIN beskytter børneindstillinger. En profil-PIN beskytter en enkelt profil. Om forældre-PIN kræves for at forlade børneprofilen, indstilles separat.';
+	@override String get pinDisabledWarning => 'Uden en forældre-PIN kan børn forlade børneprofilen og åbne ubeskyttede profiler. Skærmtidsgrænser kan omgås ved at skifte profil. Individuelle profil-PIN-koder gælder stadig.';
+	@override String get profileSection => 'Profil';
+	@override String get timeLimitNoPinHint => 'Skift profil for at administrere skærmtid. Uden en forældre-PIN kan alle skifte til en ubeskyttet profil.';
+	@override String get watchSection => 'Hvad de må se';
 	@override String get timeLimits => 'Skærmtidsgrænser';
 	@override String get dailyWatchLimit => 'Daglig visningstid';
 	@override String get dailyWatchLimitHint => 'Begrænser videoafspilning på denne enhed hver dag.';
@@ -969,6 +993,72 @@ class _Translations$auth$da extends Translations$auth$en {
 	final TranslationsDa _root; // ignore: unused_field
 
 	// Translations
+	@override String get plexQrSignIn => 'Log ind på Plex med QR-kode';
+	@override String get setUpWithPhone => 'Konfigurer med telefon';
+	@override String get loadingRestoredData => 'Indlæser dine gendannede profiler og forbindelser…';
+	@override String get loadingRestoredDataFailed => 'De gendannede data kunne ikke indlæses. Prøv igen, eller åbn Luroka igen.';
+	@override String get connectTv => 'Tilslut et TV';
+	@override String get restoreEncryptedBackup => 'Gendan krypteret sikkerhedskopi';
+	@override String get restoreCloudBackup => 'Gendan sikkerhedskopi fra skyen';
+	@override String get saveEncryptedBackup => 'Gem krypteret sikkerhedskopi';
+	@override String get backupSaved => 'Sikkerhedskopi gemt';
+	@override String get createEncryptedBackup => 'Opret krypteret sikkerhedskopi';
+	@override String get confirmBackupPassword => 'Bekræft adgangskode';
+	@override String get enterBackupPassword => 'Indtast en adgangskode.';
+	@override String get confirmBackupPasswordError => 'Indtast en adgangskode, og bekræft den.';
+	@override String get restoreBackupAction => 'Gendan';
+	@override String get backupCreateInstructions => 'Indeholder profiler, serverlogin og lokale seerdata. Opbevar adgangskoden sikkert; den kræves ved gendannelse.';
+	@override String get backupRestoreInstructions => 'Indtast adgangskoden eller skyens gendannelseskode, som blev brugt til sikkerhedskopien. Gendannelse kræver en tom profildatabase.';
+	@override String get backupCreateFailed => 'Den krypterede sikkerhedskopi kunne ikke oprettes.';
+	@override String get backupRestoreFailed => 'Sikkerhedskopien kunne ikke gendannes. Kontrollér adgangskoden, og brug en tom installation.';
+	@override String get recoveryCodeStep => 'Trin 2 af 3: Gem din gendannelseskode';
+	@override String get backupNotUploaded => 'Ikke uploadet endnu. Gennemfør trin 3, og vent på bekræftelsen af, at skysikkerhedskopien er oprettet, før du gendanner.';
+	@override String get recoveryCodeSavedContinue => 'Jeg har gemt koden — fortsæt';
+	@override String get recoveryCodeSaveFile => 'Gem kode i en fil';
+	@override String get recoveryCodeShowQr => 'Vis QR-kode';
+	@override String get recoveryCodeHideQr => 'Skjul QR-kode';
+	@override String get recoveryCopied => 'Gendannelseskoden er kopieret. Gem den et privat sted.';
+	@override String get recoveryCopyFailed => 'Gendannelseskoden kunne ikke kopieres.';
+	@override String get recoverySaveDialog => 'Gem gendannelseskoden privat';
+	@override String get recoverySaved => 'Gendannelseskoden er gemt. Opbevar filen privat.';
+	@override String get recoverySaveFailed => 'Gendannelseskoden kunne ikke gemmes. Prøv at kopiere den i stedet.';
+	@override String get cloudRestoreApplyFailed => 'Sikkerhedskopien blev hentet, men kunne ikke gendannes på denne enhed. Prøv igen, eller kontakt support.';
+	@override String get cloudBackupNotFound => 'Ingen skysikkerhedskopi blev fundet for denne kode. Fuldfør trin 3 på den oprindelige enhed, og vent på bekræftelsen af, at kopien er oprettet. Kontrollér, at du bruger koden til denne kopi; den kan også være udløbet eller slettet.';
+	@override String get cloudBackupConnectionFailed => 'Kunne ikke oprette forbindelse til sikkerhedskopitjenesten. Kontrollér internetforbindelsen, og prøv igen.';
+	@override String get cloudBackupInvalidFormat => 'Gendannelseskoden eller sikkerhedskopiens format kunne ikke læses. Kontrollér hele koden, og prøv igen.';
+	@override String get cloudBackupOpenFailed => 'Sikkerhedskopien kunne ikke åbnes. Kontrollér gendannelseskoden, og prøv igen.';
+	@override String get cloudBackupSelectProfiles => 'Vælg de profiler, der skal medtages. Sikkerhedskopien krypteres før upload og er tilgængelig i 90 dage.';
+	@override String get cloudBackupIncludeLogins => 'Medtag gemte server- og integrationslogin';
+	@override String get cloudBackupLoginsWarning => 'Medtager tilknyttede Plex-konti og andre gemte login for at gøre gentilslutning lettere. Alle med gendannelseskoden kan muligvis bruge dem.';
+	@override String get cloudBackupNoLogins => 'Uden gemte login skal du tilslutte serverne igen efter gendannelse.';
+	@override String get pairingHttpPhoneTitle => 'Brug HTTP til denne server?';
+	@override String get pairingHttpPhoneWarning => 'Dit serverlogin og din medietrafik bliver ikke krypteret. Andre på netværket kan muligvis læse dem. HTTPS anbefales. Luroka-overførslen forbliver krypteret.';
+	@override String get pairingHttpTvTitle => 'Brug en ukrypteret server?';
+	@override String get pairingHttpTvWarning => 'Din telefon valgte HTTP. Andre på netværket kan muligvis læse dit TV\'s adgangstoken og medietrafik. Brug kun et netværk, du stoler på. HTTPS anbefales.';
+	@override String get pairingUseHttp => 'Brug HTTP';
+	@override String get pairingTvTitle => 'Tilslut Jellyfin eller Emby med din telefon';
+	@override String get pairingScanInvitation => 'Scan med din telefon. Invitationen udløber om fem minutter.';
+	@override String get pairingWaitForPhone => 'Venter på, at din telefon opretter forbindelse…';
+	@override String get pairingComparePhone => 'Sammenlign denne kode med din telefon:';
+	@override String get pairingConfirmOnPhone => 'Hvis koderne stemmer overens, skal du bekræfte på telefonen.';
+	@override String get pairingAdultOnly => 'Parring er kun tilgængelig fra en voksenprofil.';
+	@override String get pairingProfileChanged => 'Profiladgangen blev ændret. Parringen blev annulleret.';
+	@override String get pairingServiceUnavailable => 'Parringstjenesten er ikke tilgængelig. Prøv igen, eller indtast serveren manuelt.';
+	@override String get pairingExpired => 'Parringen udløb eller blev afbrudt. Start igen.';
+	@override String get pairingVerifyFailed => 'Serveren og kontoen kunne ikke bekræftes. Start parringen igen.';
+	@override String get pairingScanOrPaste => 'Scan TV-koden, eller indsæt invitationen.';
+	@override String get pairingScanTv => 'Scan TV-kode';
+	@override String get pairingTvInvitation => 'TV-invitation';
+	@override String pairingCheckTvCode({required Object code}) => 'Kontrollér, at dit TV viser den samme kode: ${code}';
+	@override String get pairingCodesMatch => 'Koderne stemmer';
+	@override String get recoveryCodeLabel => 'Gendannelseskode';
+	@override String get recoveryCodeScan => 'Scan gendannelseskode';
+	@override String get pairingRecoveryInstructions => 'Scan eller indsæt din gemte gendannelseskode. Den krypteres til dit TV.';
+	@override String get pairingSendTv => 'Send til TV';
+	@override String get pairingServerLoginHint => 'Log ind på din server. Din adgangskode sendes til serveren, ikke til Luroka.';
+	@override String get recoveryCodeWarning => 'Du skal bruge koden til at gendanne eller slette sikkerhedskopien. Alle med koden kan få adgang til kopien. Mister du den, kan Luroka ikke genskabe den.';
+	@override String get recoveryCodePrivateFile => 'Kopiér eller gem kun koden et privat sted. En gemt kodefil er ikke krypteret.';
+	@override String get recoveryCodePhoneInstructions => 'Opbevar en privat kopi af koden. For at gendanne på din telefon skal du åbne gendannelse af skysikkerhedskopi i Luroka og vælge at scanne gendannelseskoden.';
 	@override String get signInWithPlex => 'Log ind med Plex';
 	@override String get showQRCode => 'Vis QR-kode';
 	@override String get authenticate => 'Godkend';
@@ -3865,6 +3955,13 @@ class _Translations$profileSetupGuide$da extends Translations$profileSetupGuide$
 	final TranslationsDa _root; // ignore: unused_field
 
 	// Translations
+	@override String get tabletSpotlightStyle => 'Spotlight-stil på tablet';
+	@override String get spotlightClassic => 'Klassisk';
+	@override String get spotlightMarquee => 'Marquee';
+	@override String get spotlightTonight => 'Aftenens valg';
+	@override String get phoneSpotlight => 'Filmisk spotlight på telefon';
+	@override String get phoneSpotlightCinematic => 'Vandret billede med titlen ovenpå';
+	@override String get phoneSpotlightClassic => 'Klassisk plakatkort';
 	@override String get title => 'Gør din profil til din';
 	@override String get description => 'Vælg, hvordan Luroka ser ud og føles for denne profil på denne enhed. Du kan ændre alt senere i Indstillinger.';
 	@override String get appearanceStep => '1 af 2 · Udseende';
@@ -5243,6 +5340,13 @@ extension on TranslationsDa {
 			'kidsShelf.yourShelf' => 'Din filmhylde',
 			'kidsShelf.all' => 'Alting',
 			'kidsShelf.pickSomething' => 'Hvad vil du se?',
+			'kidsShelf.atmosphere' => 'Stemning på startsiden',
+			'kidsShelf.atmosphereHint' => 'Vælg farverne på børnenes startside. Træhuset forbliver det samme.',
+			'kidsShelf.sunshine' => 'Solskin',
+			'kidsShelf.berry' => 'Bær',
+			'kidsShelf.mint' => 'Mynte',
+			'kidsShelf.sky' => 'Himmel',
+			'kidsShelf.atmospherePreview' => 'Forhåndsvisning af startsiden',
 			'kidsHome.everything' => 'For dig',
 			'kidsHome.keepWatching' => 'Bliv ved med at se',
 			'kidsHome.emptyFilter' => 'Intet her endnu. Prøv for dig, eller bed din voksne om at tilføje noget, du elsker.',
@@ -5387,6 +5491,23 @@ extension on TranslationsDa {
 			'detailComposition.mediaInformation' => 'Medieinformation',
 			'detailComposition.fullFileInformation' => 'Fuld filinformation',
 			'detailComposition.castAndCrew' => 'Medvirkende',
+			'kids.allLibrariesHint' => 'Nye film- og seriebiblioteker medtages også. Slå dette fra for at vælge bestemte biblioteker.',
+			'kids.appearanceSection' => 'Udseende',
+			'kids.disableParentPin' => 'Slå forældre-PIN fra',
+			'kids.disableParentPinConfirm' => 'Slå forældre-PIN fra for alle børneprofiler? Børn kan skifte til ubeskyttede profiler og omgå skærmtidsgrænser. Profil-PIN-koder gælder stadig.',
+			'kids.discardAction' => 'Kassér ændringer',
+			'kids.discardMessage' => 'Dine ændringer er ikke gemt.',
+			'kids.discardTitle' => 'Kassér ændringer?',
+			'kids.editorTitle' => 'Indstillinger for børneprofil',
+			'kids.libraryCount' => ({required Object count}) => 'Valgte biblioteker: ${count}',
+			'kids.moreSection' => 'Mere',
+			'kids.pinChoice' => 'Brug en forældre-PIN',
+			'kids.pinChoiceHint' => 'Anbefales. Uden en forældre-PIN kan børn skifte til ubeskyttede profiler og ændre børneindstillinger. Skærmtidsgrænser kan omgås ved at skifte profil.',
+			'kids.pinDifference' => 'En forældre-PIN beskytter børneindstillinger. En profil-PIN beskytter en enkelt profil. Om forældre-PIN kræves for at forlade børneprofilen, indstilles separat.',
+			'kids.pinDisabledWarning' => 'Uden en forældre-PIN kan børn forlade børneprofilen og åbne ubeskyttede profiler. Skærmtidsgrænser kan omgås ved at skifte profil. Individuelle profil-PIN-koder gælder stadig.',
+			'kids.profileSection' => 'Profil',
+			'kids.timeLimitNoPinHint' => 'Skift profil for at administrere skærmtid. Uden en forældre-PIN kan alle skifte til en ubeskyttet profil.',
+			'kids.watchSection' => 'Hvad de må se',
 			'kids.timeLimits' => 'Skærmtidsgrænser',
 			'kids.dailyWatchLimit' => 'Daglig visningstid',
 			'kids.dailyWatchLimitHint' => 'Begrænser videoafspilning på denne enhed hver dag.',
@@ -5459,6 +5580,8 @@ extension on TranslationsDa {
 			'kids.freshStories' => 'Nye historier at opdage',
 			'kids.yourMovies' => 'Favoritter i filmtiden',
 			'kids.yourShows' => 'Endnu en episode',
+			_ => null,
+		} ?? switch (path) {
 			'kids.emptyHint' => 'Nye eventyr vil dukke op her, når din server har titler med en tilladt aldersklassifikation.',
 			'kids.title' => 'Luroka for børn',
 			'kids.addProfile' => 'Tilføj børneprofil',
@@ -5483,8 +5606,6 @@ extension on TranslationsDa {
 			'kids.historyReset' => 'Børns visningsekskluderinger blev nulstillet',
 			'kids.blocked' => 'Denne titel er ikke tilgængelig i denne børneprofil.',
 			'kids.switchProfile' => 'Skift profil',
-			_ => null,
-		} ?? switch (path) {
 			'kids.manageFromAdult' => 'Skift til en voksenprofil for at administrere indstillinger.',
 			'kids.noConnections' => 'Tilslut en server til din voksenprofil, før du tilføjer en børneprofil.',
 			'kids.created' => 'Børneprofil oprettet',
@@ -5559,6 +5680,72 @@ extension on TranslationsDa {
 			'appIcon.names.strata' => 'Strata',
 			'appIcon.names.facet' => 'Facet',
 			'appIcon.names.tilde' => 'Tilde',
+			'auth.plexQrSignIn' => 'Log ind på Plex med QR-kode',
+			'auth.setUpWithPhone' => 'Konfigurer med telefon',
+			'auth.loadingRestoredData' => 'Indlæser dine gendannede profiler og forbindelser…',
+			'auth.loadingRestoredDataFailed' => 'De gendannede data kunne ikke indlæses. Prøv igen, eller åbn Luroka igen.',
+			'auth.connectTv' => 'Tilslut et TV',
+			'auth.restoreEncryptedBackup' => 'Gendan krypteret sikkerhedskopi',
+			'auth.restoreCloudBackup' => 'Gendan sikkerhedskopi fra skyen',
+			'auth.saveEncryptedBackup' => 'Gem krypteret sikkerhedskopi',
+			'auth.backupSaved' => 'Sikkerhedskopi gemt',
+			'auth.createEncryptedBackup' => 'Opret krypteret sikkerhedskopi',
+			'auth.confirmBackupPassword' => 'Bekræft adgangskode',
+			'auth.enterBackupPassword' => 'Indtast en adgangskode.',
+			'auth.confirmBackupPasswordError' => 'Indtast en adgangskode, og bekræft den.',
+			'auth.restoreBackupAction' => 'Gendan',
+			'auth.backupCreateInstructions' => 'Indeholder profiler, serverlogin og lokale seerdata. Opbevar adgangskoden sikkert; den kræves ved gendannelse.',
+			'auth.backupRestoreInstructions' => 'Indtast adgangskoden eller skyens gendannelseskode, som blev brugt til sikkerhedskopien. Gendannelse kræver en tom profildatabase.',
+			'auth.backupCreateFailed' => 'Den krypterede sikkerhedskopi kunne ikke oprettes.',
+			'auth.backupRestoreFailed' => 'Sikkerhedskopien kunne ikke gendannes. Kontrollér adgangskoden, og brug en tom installation.',
+			'auth.recoveryCodeStep' => 'Trin 2 af 3: Gem din gendannelseskode',
+			'auth.backupNotUploaded' => 'Ikke uploadet endnu. Gennemfør trin 3, og vent på bekræftelsen af, at skysikkerhedskopien er oprettet, før du gendanner.',
+			'auth.recoveryCodeSavedContinue' => 'Jeg har gemt koden — fortsæt',
+			'auth.recoveryCodeSaveFile' => 'Gem kode i en fil',
+			'auth.recoveryCodeShowQr' => 'Vis QR-kode',
+			'auth.recoveryCodeHideQr' => 'Skjul QR-kode',
+			'auth.recoveryCopied' => 'Gendannelseskoden er kopieret. Gem den et privat sted.',
+			'auth.recoveryCopyFailed' => 'Gendannelseskoden kunne ikke kopieres.',
+			'auth.recoverySaveDialog' => 'Gem gendannelseskoden privat',
+			'auth.recoverySaved' => 'Gendannelseskoden er gemt. Opbevar filen privat.',
+			'auth.recoverySaveFailed' => 'Gendannelseskoden kunne ikke gemmes. Prøv at kopiere den i stedet.',
+			'auth.cloudRestoreApplyFailed' => 'Sikkerhedskopien blev hentet, men kunne ikke gendannes på denne enhed. Prøv igen, eller kontakt support.',
+			'auth.cloudBackupNotFound' => 'Ingen skysikkerhedskopi blev fundet for denne kode. Fuldfør trin 3 på den oprindelige enhed, og vent på bekræftelsen af, at kopien er oprettet. Kontrollér, at du bruger koden til denne kopi; den kan også være udløbet eller slettet.',
+			'auth.cloudBackupConnectionFailed' => 'Kunne ikke oprette forbindelse til sikkerhedskopitjenesten. Kontrollér internetforbindelsen, og prøv igen.',
+			'auth.cloudBackupInvalidFormat' => 'Gendannelseskoden eller sikkerhedskopiens format kunne ikke læses. Kontrollér hele koden, og prøv igen.',
+			'auth.cloudBackupOpenFailed' => 'Sikkerhedskopien kunne ikke åbnes. Kontrollér gendannelseskoden, og prøv igen.',
+			'auth.cloudBackupSelectProfiles' => 'Vælg de profiler, der skal medtages. Sikkerhedskopien krypteres før upload og er tilgængelig i 90 dage.',
+			'auth.cloudBackupIncludeLogins' => 'Medtag gemte server- og integrationslogin',
+			'auth.cloudBackupLoginsWarning' => 'Medtager tilknyttede Plex-konti og andre gemte login for at gøre gentilslutning lettere. Alle med gendannelseskoden kan muligvis bruge dem.',
+			'auth.cloudBackupNoLogins' => 'Uden gemte login skal du tilslutte serverne igen efter gendannelse.',
+			'auth.pairingHttpPhoneTitle' => 'Brug HTTP til denne server?',
+			'auth.pairingHttpPhoneWarning' => 'Dit serverlogin og din medietrafik bliver ikke krypteret. Andre på netværket kan muligvis læse dem. HTTPS anbefales. Luroka-overførslen forbliver krypteret.',
+			'auth.pairingHttpTvTitle' => 'Brug en ukrypteret server?',
+			'auth.pairingHttpTvWarning' => 'Din telefon valgte HTTP. Andre på netværket kan muligvis læse dit TV\'s adgangstoken og medietrafik. Brug kun et netværk, du stoler på. HTTPS anbefales.',
+			'auth.pairingUseHttp' => 'Brug HTTP',
+			'auth.pairingTvTitle' => 'Tilslut Jellyfin eller Emby med din telefon',
+			'auth.pairingScanInvitation' => 'Scan med din telefon. Invitationen udløber om fem minutter.',
+			'auth.pairingWaitForPhone' => 'Venter på, at din telefon opretter forbindelse…',
+			'auth.pairingComparePhone' => 'Sammenlign denne kode med din telefon:',
+			'auth.pairingConfirmOnPhone' => 'Hvis koderne stemmer overens, skal du bekræfte på telefonen.',
+			'auth.pairingAdultOnly' => 'Parring er kun tilgængelig fra en voksenprofil.',
+			'auth.pairingProfileChanged' => 'Profiladgangen blev ændret. Parringen blev annulleret.',
+			'auth.pairingServiceUnavailable' => 'Parringstjenesten er ikke tilgængelig. Prøv igen, eller indtast serveren manuelt.',
+			'auth.pairingExpired' => 'Parringen udløb eller blev afbrudt. Start igen.',
+			'auth.pairingVerifyFailed' => 'Serveren og kontoen kunne ikke bekræftes. Start parringen igen.',
+			'auth.pairingScanOrPaste' => 'Scan TV-koden, eller indsæt invitationen.',
+			'auth.pairingScanTv' => 'Scan TV-kode',
+			'auth.pairingTvInvitation' => 'TV-invitation',
+			'auth.pairingCheckTvCode' => ({required Object code}) => 'Kontrollér, at dit TV viser den samme kode: ${code}',
+			'auth.pairingCodesMatch' => 'Koderne stemmer',
+			'auth.recoveryCodeLabel' => 'Gendannelseskode',
+			'auth.recoveryCodeScan' => 'Scan gendannelseskode',
+			'auth.pairingRecoveryInstructions' => 'Scan eller indsæt din gemte gendannelseskode. Den krypteres til dit TV.',
+			'auth.pairingSendTv' => 'Send til TV',
+			'auth.pairingServerLoginHint' => 'Log ind på din server. Din adgangskode sendes til serveren, ikke til Luroka.',
+			'auth.recoveryCodeWarning' => 'Du skal bruge koden til at gendanne eller slette sikkerhedskopien. Alle med koden kan få adgang til kopien. Mister du den, kan Luroka ikke genskabe den.',
+			'auth.recoveryCodePrivateFile' => 'Kopiér eller gem kun koden et privat sted. En gemt kodefil er ikke krypteret.',
+			'auth.recoveryCodePhoneInstructions' => 'Opbevar en privat kopi af koden. For at gendanne på din telefon skal du åbne gendannelse af skysikkerhedskopi i Luroka og vælge at scanne gendannelseskoden.',
 			'auth.signInWithPlex' => 'Log ind med Plex',
 			'auth.showQRCode' => 'Vis QR-kode',
 			'auth.authenticate' => 'Godkend',
@@ -5907,6 +6094,8 @@ extension on TranslationsDa {
 			'settings.maxVolumePercent' => ({required Object percent}) => '${percent}%',
 			'settings.discordRichPresence' => 'Discord-aktivitetsstatus',
 			'settings.discordRichPresenceDescription' => 'Vis på Discord, hvad du ser',
+			_ => null,
+		} ?? switch (path) {
 			'settings.services' => 'Tjenester',
 			'settings.servicesDescription' => 'Forbind Trakt, MyAnimeList, Seerr og mere',
 			'settings.manageLibrariesDescription' => 'Omarranger og skjul biblioteker',
@@ -5997,8 +6186,6 @@ extension on TranslationsDa {
 			'settings.liveTvDefaultFavoritesDescription' => 'Vis kun favoritkanaler ved åbning af Live TV',
 			'settings.general' => 'Generelt',
 			'settings.generalDescription' => 'Sprog, opstart og vinduesadfærd',
-			_ => null,
-		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Sprog og region',
 			'settings.startup' => 'Opstart',
 			'settings.display' => 'Skærm',
@@ -6421,6 +6608,8 @@ extension on TranslationsDa {
 			'fileInfo.pixelAspectRatio' => 'Pixel-billedformat',
 			'fileInfo.profile' => 'Profil',
 			'fileInfo.level' => 'Niveau',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.bitDepth' => 'Bitdybde',
 			'fileInfo.pixelFormat' => 'Pixelformat',
 			'fileInfo.colorSpace' => 'Farverum',
@@ -6511,8 +6700,6 @@ extension on TranslationsDa {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Tilfældig afspilning er ikke tilgængelig offline',
 			'mediaMenu.fileInfo' => 'Filinfo',
 			'mediaMenu.deleteEpisodeFromServer' => 'Slet episode fra serveren',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Slet sæson fra serveren',
 			'mediaMenu.deleteShowFromServer' => 'Slet TV-serie fra serveren',
 			'mediaMenu.deleteMovieFromServer' => 'Slet film fra serveren',
@@ -6935,6 +7122,8 @@ extension on TranslationsDa {
 			'accountPreferences.rewatchingInNextUp' => 'Behold gensete serier i Næste afsnit',
 			'accountPreferences.rewatchingInNextUpDescription' => 'Når du er færdig med en serie og ser den igen, følger Næste afsnit med i gensynet i stedet for at fjerne serien.',
 			'accountPreferences.watchedIndicator' => 'Set-indikatorer',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.watchedIndicatorOptions.none' => 'Aldrig',
 			'accountPreferences.watchedIndicatorOptions.moviesAndShows' => 'Film og TV-serier',
 			'accountPreferences.watchedIndicatorOptions.movies' => 'Kun film',
@@ -7025,8 +7214,6 @@ extension on TranslationsDa {
 			'libraries.filters' => 'Filtre',
 			'libraries.confirmActionMessage' => 'Er du sikker på, at du vil udføre denne handling?',
 			'libraries.showLibrary' => 'Vis bibliotek',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Skjul bibliotek',
 			'libraries.libraryOptions' => 'Biblioteksindstillinger',
 			'libraries.content' => 'biblioteksindhold',
@@ -7449,6 +7636,8 @@ extension on TranslationsDa {
 			'collections.deleted' => 'Samling slettet',
 			'collections.deleteFailed' => 'Kunne ikke slette samling',
 			'collections.deleteFailedWithError' => ({required Object error}) => 'Kunne ikke slette samling: ${error}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.selectCollection' => 'Vælg samling',
 			'collections.collectionName' => 'Samlingsnavn',
 			'collections.enterCollectionName' => 'Indtast samlingsnavn',
@@ -7539,8 +7728,6 @@ extension on TranslationsDa {
 			'watchTogether.qrShare' => 'Del QR-kode',
 			'watchTogether.qrHint' => 'Scan med Luroka-appen for at deltage i dette rum.',
 			'watchTogether.phasePlaying' => 'Spiller',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Pause',
 			'watchTogether.phaseWaiting' => 'Venter på alle',
 			'watchTogether.inviteCopied' => 'Invitationen er kopieret. Indsæt det i en besked.',
@@ -7963,6 +8150,8 @@ extension on TranslationsDa {
 			'externalPlayer.useExternalPlayer' => 'Brug ekstern afspiller',
 			'externalPlayer.useExternalPlayerDescription' => 'Åbn videoer i en anden app',
 			'externalPlayer.selectPlayer' => 'Vælg afspiller',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Brugerdefinerede afspillere',
 			'externalPlayer.systemDefault' => 'Systemstandard',
 			'externalPlayer.addCustomPlayer' => 'Tilføj brugerdefineret afspiller',
@@ -8053,8 +8242,6 @@ extension on TranslationsDa {
 			'matchScreen.match' => 'Match...',
 			'matchScreen.fixMatch' => 'Ret match...',
 			'matchScreen.unmatch' => 'Fjern match',
-			_ => null,
-		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Ryd dette match? Plex behandler det som umatchet, indtil det matches igen.',
 			'matchScreen.unmatchSuccess' => 'Match fjernet',
 			'matchScreen.unmatchFailed' => 'Kunne ikke fjerne match',
@@ -8197,6 +8384,13 @@ extension on TranslationsDa {
 			'profileIntegrations.later' => 'Konfigurer senere',
 			'profileIntegrations.manage' => 'Administrer integrationer',
 			'profileIntegrations.forProfile' => ({required Object name}) => 'Tilslutninger til ${name}',
+			'profileSetupGuide.tabletSpotlightStyle' => 'Spotlight-stil på tablet',
+			'profileSetupGuide.spotlightClassic' => 'Klassisk',
+			'profileSetupGuide.spotlightMarquee' => 'Marquee',
+			'profileSetupGuide.spotlightTonight' => 'Aftenens valg',
+			'profileSetupGuide.phoneSpotlight' => 'Filmisk spotlight på telefon',
+			'profileSetupGuide.phoneSpotlightCinematic' => 'Vandret billede med titlen ovenpå',
+			'profileSetupGuide.phoneSpotlightClassic' => 'Klassisk plakatkort',
 			'profileSetupGuide.title' => 'Gør din profil til din',
 			'profileSetupGuide.description' => 'Vælg, hvordan Luroka ser ud og føles for denne profil på denne enhed. Du kan ændre alt senere i Indstillinger.',
 			'profileSetupGuide.appearanceStep' => '1 af 2 · Udseende',

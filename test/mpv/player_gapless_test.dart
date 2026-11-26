@@ -30,8 +30,8 @@ void main() {
 
   Future<void> run(_AudioCoreMock core, Future<void> Function(PlayerNative player, List<String> transitions) body) {
     return withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_audio_player',
-      eventChannelName: 'com.luroka/mpv_audio_player/events',
+      methodChannelName: 'com.plezy/mpv_audio_player',
+      eventChannelName: 'com.plezy/mpv_audio_player/events',
       methodHandler: core.handle,
       testBody: () async {
         final player = PlayerNative.audio();

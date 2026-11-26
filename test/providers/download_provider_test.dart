@@ -23,6 +23,7 @@ import 'package:luroka/services/download_manager_service.dart';
 import 'package:luroka/services/api_cache.dart';
 import 'package:luroka/services/multi_server_manager.dart';
 import 'package:luroka/services/download_storage_service.dart';
+import 'package:luroka/services/kids_profile_service.dart';
 import 'package:luroka/services/jellyfin_api_cache.dart';
 import 'package:luroka/services/plex_api_cache.dart';
 import 'package:luroka/services/offline_mode_source.dart';
@@ -34,6 +35,7 @@ import 'package:luroka/utils/active_client_scope.dart';
 import '../test_helpers/download_fixtures.dart';
 import '../test_helpers/media_items.dart';
 import '../test_helpers/saf_fakes.dart';
+import '../test_helpers/prefs.dart';
 
 /// Implements only [fetchPlayableDescendants], the surface [collectEpisodes]
 /// uses. Every other call reaches [noSuchMethod] and throws.
@@ -371,6 +373,48 @@ void main() {
   });
 
   group('DownloadProvider — initial state', () {
+    test('kids navigation requires an owned download with allowed metadata', () async {
+      resetSharedPreferencesForTest();
+      final kids = KidsProfileService.instance;
+      kids.resetForTesting();
+      addTearDown(kids.resetForTesting);
+      await kids.initialize();
+      await kids.setParentPin('1234');
+      await kids.setChild('child', parentId: 'adult', maxAge: 7);
+      kids.selectProfile('child');
+      final p = DownloadProvider.forTesting(downloadManager: downloadManager, database: db);
+      await p.ensureInitialized();
+      final safe = testMediaItem(id: 'safe', title: 'Safe', serverId: 'srv').copyWith(contentRating: 'G');
+      final adult = testMediaItem(id: 'adult', title: 'Adult', serverId: 'srv').copyWith(contentRating: 'R');
+      p.debugSeedState(
+        downloads: {
+          'srv:safe': const DownloadProgress(globalKey: 'srv:safe', status: DownloadStatus.completed),
+          'srv:adult': const DownloadProgress(globalKey: 'srv:adult', status: DownloadStatus.completed),
+        },
+        metadata: {'srv:safe': safe, 'srv:adult': adult},
+        ownedDownloadKeys: {'srv:adult'},
+      );
+      expect(p.hasAccessibleKidsDownloads, isFalse);
+      p.debugSeedState(ownedDownloadKeys: {'srv:safe', 'srv:adult'});
+      expect(p.hasAccessibleKidsDownloads, isTrue);
+      p.dispose();
+    });
+    test('navigation availability respects ownership, status, and queue preparation', () async {
+      final p = DownloadProvider.forTesting(downloadManager: downloadManager, database: db);
+      await p.ensureInitialized();
+      expect(p.hasVisibleDownloads, isFalse);
+      p.debugSeedState(downloads: {
+        'srv:other': const DownloadProgress(globalKey: 'srv:other', status: DownloadStatus.completed),
+      }, ownedDownloadKeys: {});
+      expect(p.hasVisibleDownloads, isFalse);
+      p.debugSeedState(downloads: {
+        'srv:cancelled': const DownloadProgress(globalKey: 'srv:cancelled', status: DownloadStatus.cancelled),
+      }, ownedDownloadKeys: {'srv:cancelled'});
+      expect(p.hasVisibleDownloads, isFalse);
+      p.debugSeedState(queueing: {'srv:pending'});
+      expect(p.hasVisibleDownloads, isTrue);
+      p.dispose();
+    });
     test('starts with empty downloads/metadata maps and no sync rules', () async {
       final p = DownloadProvider.forTesting(downloadManager: downloadManager, database: db);
       await p.ensureInitialized();

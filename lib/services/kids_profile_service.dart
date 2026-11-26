@@ -9,6 +9,7 @@ import '../media/media_kind.dart';
 import '../media/media_library.dart';
 import '../profiles/profile.dart';
 import '../models/kids_avatar.dart';
+import '../models/kids_atmosphere.dart';
 import 'base_shared_preferences_service.dart';
 
 /// Device-local parental controls. Connections and server watch state remain
@@ -64,6 +65,17 @@ class KidsProfileService extends ChangeNotifier {
   bool get useKidsTheme => isActiveKids && themeFor(_activeId!);
   bool get isOlderKids => isActiveKids && ageFor(_activeId!) >= 12;
   bool quietSceneryFor(String id) => ((_children[id] as Map?)?['quietScenery'] as bool?) ?? ageFor(id) >= 12;
+  KidsAtmosphere atmosphereFor(String id) =>
+      KidsAtmosphere.fromId((_children[id] as Map?)?['atmosphere'] as String?);
+
+  /// Children may change only their own cosmetic appearance, never policy.
+  Future<void> setActiveAtmosphere(KidsAtmosphere value) async {
+    final id = _activeId;
+    if (id == null || !isKids(id)) throw StateError('An active kids profile is required');
+    final child = Map<String, dynamic>.from(_children[id] as Map);
+    _data['children'] = {..._children, id: {...child, 'atmosphere': value.name}};
+    await _save();
+  }
   Set<String>? librariesFor(String id) => ((_children[id] as Map?)?['libraries'] as List?)?.cast<String>().toSet();
   bool animationOnlyFor(String id) => ((_children[id] as Map?)?['animationOnly'] as bool?) ?? false;
   bool allowUnratedFor(String id) => ((_children[id] as Map?)?['allowUnrated'] as bool?) ?? false;
@@ -199,6 +211,7 @@ class KidsProfileService extends ChangeNotifier {
     required int maxAge,
     bool theme = true,
     bool? quietScenery,
+    KidsAtmosphere? atmosphere,
     KidsAvatarKind? avatar,
     Set<String>? allowedLibraries,
     bool? restrictLibraries,
@@ -227,6 +240,7 @@ class KidsProfileService extends ChangeNotifier {
         'maxAge': maxAge,
         'theme': theme,
         'quietScenery': quietScenery ?? (_children.containsKey(id) ? quietSceneryFor(id) : maxAge >= 12),
+        'atmosphere': (atmosphere ?? atmosphereFor(id)).name,
         'avatar': (avatar ?? avatarFor(id)).name,
         'libraries': restrictLibraries == false ? null : allowedLibraries?.toList() ?? librariesFor(id)?.toList(),
         'animationOnly': animationOnly ?? animationOnlyFor(id),

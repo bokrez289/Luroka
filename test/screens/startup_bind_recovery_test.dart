@@ -135,6 +135,15 @@ void main() {
   });
 
   group('main screen bottom navigation tabs', () {
+    test('tablet shows downloads only when available or currently open', () {
+      List<NavigationTabId> tabs(bool available, NavigationTabId current) => _ids(mainScreenBottomNavigationTabs(
+        visibleTabs: allNavigationTabs, isMobile: true, isTablet: true,
+        hasDownloads: available, isOffline: false, currentTab: current,
+      ));
+      expect(tabs(false, NavigationTabId.discover), isNot(contains(NavigationTabId.downloads)));
+      expect(tabs(true, NavigationTabId.discover), contains(NavigationTabId.downloads));
+      expect(tabs(false, NavigationTabId.downloads), contains(NavigationTabId.downloads));
+    });
     test('mobile online hides Settings when another tab is active', () {
       final tabs = mainScreenBottomNavigationTabs(
         visibleTabs: allNavigationTabs,

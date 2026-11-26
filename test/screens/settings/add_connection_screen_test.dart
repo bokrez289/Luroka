@@ -5,6 +5,7 @@ import 'package:luroka/focus/input_mode_tracker.dart';
 import 'package:luroka/media/media_backend.dart';
 import 'package:luroka/media/media_browser_dialect.dart';
 import 'package:luroka/profiles/profile.dart';
+import 'package:luroka/profiles/profile_connection.dart';
 import 'package:luroka/profiles/active_profile_provider.dart';
 import 'package:luroka/providers/multi_server_provider.dart';
 import 'package:luroka/screens/settings/source_libraries_screen.dart';
@@ -25,6 +26,8 @@ class _Active extends ChangeNotifier implements ActiveProfileProvider {
   int generation = 0;
   @override
   String? get activeId => profile.id;
+  @override
+  Map<String, List<ProfileConnection>> get connectionsByProfile => const {};
   @override
   int get identityMutationGeneration => generation;
   @override

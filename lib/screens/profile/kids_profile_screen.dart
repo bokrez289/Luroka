@@ -22,6 +22,8 @@ import 'parent_access.dart';
 import 'pin_entry_dialog.dart';
 import 'profile_name_field.dart';
 import '../../models/kids_avatar.dart';
+import '../../models/kids_atmosphere.dart';
+import '../../widgets/kids/kids_atmosphere_picker.dart';
 import '../../widgets/kids/kids_avatar_chooser.dart';
 import '../../widgets/kids/kids_avatar.dart';
 import '../../models/kids_profile_backup.dart';
@@ -50,6 +52,7 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
   int _age = 7;
   bool _theme = true;
   bool? _quietScenery;
+  KidsAtmosphere _atmosphere = KidsAtmosphere.sunshine;
   KidsAvatarKind _avatar = KidsAvatarKind.explorer;
   bool _saving = false;
   bool _useParentPin = true;
@@ -71,6 +74,7 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
     _age,
     _theme,
     _quietScenery,
+    _atmosphere,
     _avatar,
     _chooseDifferentConnection,
     _useParentPin,
@@ -94,6 +98,7 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
       _age = _service.ageFor(profile.id);
       _theme = _service.themeFor(profile.id);
       _quietScenery = _service.quietSceneryFor(profile.id);
+      _atmosphere = _service.atmosphereFor(profile.id);
       _avatar = _service.avatarFor(profile.id);
       final libraries = _service.librariesFor(profile.id);
       _allLibraries = libraries == null;
@@ -110,6 +115,7 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
       _age = backup.maxAge;
       _theme = backup.theme;
       _quietScenery = backup.quietScenery;
+      _atmosphere = backup.atmosphere;
       _avatar = backup.avatar;
       _allLibraries = backup.libraries == null;
       _libraries = {...?backup.libraries};
@@ -186,6 +192,7 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
           maxAge: _age,
           theme: _theme,
           quietScenery: _quietScenery,
+          atmosphere: _atmosphere,
           avatar: _avatar,
           restrictLibraries: !_allLibraries,
           allowedLibraries: _allLibraries ? null : _libraries,
@@ -214,6 +221,7 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
           maxAge: _age,
           theme: _theme,
           quietScenery: _quietScenery,
+          atmosphere: _atmosphere,
           avatar: _avatar,
           restrictLibraries: !_allLibraries,
           allowedLibraries: _allLibraries ? null : _libraries,
@@ -588,6 +596,14 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
                               value: _quietScenery ?? _age >= 12,
                               onChanged: _saving ? null : (v) => setState(() => _quietScenery = v),
                             ),
+                          if (_theme) ...[
+                            const SizedBox(height: 16),
+                            KidsAtmospherePicker(
+                              value: _atmosphere,
+                              quiet: _quietScenery ?? _age >= 12,
+                              onChanged: _saving ? null : (value) => setState(() => _atmosphere = value),
+                            ),
+                          ],
                           const SizedBox(height: 16),
                         ],
                       ),
@@ -655,6 +671,7 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
     clipBehavior: Clip.antiAlias,
     child: ExpansionTile(
       key: PageStorageKey('kids-section-$id'),
+      initiallyExpanded: id == 'appearance' && widget.profile == null,
       leading: icon,
       title: Text(title),
       subtitle: Text(summary),

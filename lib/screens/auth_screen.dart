@@ -393,19 +393,19 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget _buildAuthBody() {
     if (_backupRestored) {
       return _loadingRestore
-          ? const Column(
+          ? Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Loading your restored profiles and connections…', textAlign: TextAlign.center),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(t.auth.loadingRestoredData, textAlign: TextAlign.center),
               ],
             )
           : Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Could not load the restored data. Try again or reopen Luroka.'),
-                TextButton(onPressed: _loadRestoredBackup, child: const Text('Try again')),
+                Text(t.auth.loadingRestoredDataFailed),
+                TextButton(onPressed: _loadRestoredBackup, child: Text(t.common.retry)),
               ],
             );
     }
@@ -457,10 +457,9 @@ class _AuthScreenState extends State<AuthScreen> {
               ? startQrAfterRecovery
               : startBrowserAfterRecovery,
         ),
-        const SizedBox(height: 4),
         if (!isTV || !isAppleTV)
           Align(
-            alignment: Alignment.center,
+            alignment: AlignmentDirectional.centerStart,
             child: TextButton.icon(
               onPressed: busy
                   ? null
@@ -468,10 +467,10 @@ class _AuthScreenState extends State<AuthScreen> {
                   ? startBrowserAfterRecovery
                   : startQrAfterRecovery,
               icon: Icon(isTV ? Symbols.open_in_browser_rounded : Symbols.qr_code_rounded, size: 18),
-              label: Text(isTV ? t.auth.useBrowser : t.auth.showQRCode),
+              label: Text(isTV ? t.auth.useBrowser : t.auth.plexQrSignIn),
             ),
           ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         _serviceChoice(
           backend: MediaBackend.jellyfin,
           label: t.auth.connectToMediaBrowser(product: jellyfinDialect.productName),
@@ -483,38 +482,46 @@ class _AuthScreenState extends State<AuthScreen> {
           label: t.auth.connectToMediaBrowser(product: embyDialect.productName),
           onPressed: busy ? null : connectToEmby,
         ),
-        if (serverPairingEnabled && !isTV)
-          TextButton.icon(
-            onPressed: busy
-                ? null
-                : () => Navigator.of(
-                    context,
-                  ).push<void>(MaterialPageRoute(builder: (_) => const PhoneServerPairingScreen())),
-            icon: const Icon(Icons.tv_rounded),
-            label: const Text('Connect a TV'),
-          ),
         const SizedBox(height: 12),
-        TextButton.icon(
-          onPressed: busy
-              ? null
-              : () async {
-                  final restored = await restoreFullBackup(context);
-                  if (mounted && restored) await _loadRestoredBackup();
-                },
-          icon: const Icon(Icons.restore_rounded),
-          label: const Text('Restore encrypted backup'),
+        const Divider(),
+        Text(t.common.options, style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: 4),
+        Wrap(
+          spacing: 8,
+          children: [
+            if (serverPairingEnabled && !isTV)
+              TextButton.icon(
+                onPressed: busy
+                    ? null
+                    : () => Navigator.of(
+                        context,
+                      ).push<void>(MaterialPageRoute(builder: (_) => const PhoneServerPairingScreen())),
+                icon: const Icon(Icons.tv_rounded),
+                label: Text(t.auth.connectTv),
+              ),
+            TextButton.icon(
+              onPressed: busy
+                  ? null
+                  : () async {
+                      final restored = await restoreFullBackup(context);
+                      if (mounted && restored) await _loadRestoredBackup();
+                    },
+              icon: const Icon(Icons.restore_rounded),
+              label: Text(t.auth.restoreEncryptedBackup),
+            ),
+            if (cloudBackupEnabled)
+              TextButton.icon(
+                onPressed: busy
+                    ? null
+                    : () async {
+                        final restored = await showCloudBackupRestore(context);
+                        if (mounted && restored) await _loadRestoredBackup();
+                      },
+                icon: const Icon(Icons.cloud_download_outlined),
+                label: Text(t.auth.restoreCloudBackup),
+              ),
+          ],
         ),
-        if (cloudBackupEnabled)
-          TextButton.icon(
-            onPressed: busy
-                ? null
-                : () async {
-                    final restored = await showCloudBackupRestore(context);
-                    if (mounted && restored) await _loadRestoredBackup();
-                  },
-            icon: const Icon(Icons.cloud_download_outlined),
-            label: const Text('Restore cloud backup'),
-          ),
         if (kDebugMode && !isTV) ...[
           const SizedBox(height: 12),
           FocusableButton(
@@ -569,7 +576,7 @@ class _AuthScreenState extends State<AuthScreen> {
         child: InkWell(
           onTap: onPressed,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: PlatformDetector.isTV() ? 16 : 10),
             child: Row(
               children: [
                 Container(

@@ -58,6 +58,7 @@ class NavigationTab {
     bool hasLiveTv = false,
     bool hasExplore = false,
     bool hasFavorites = false,
+    bool hasKidsDownloads = false,
   }) {
     if (KidsProfileService.instance.isActiveKids) {
       return kidsNavigationTabs
@@ -65,7 +66,7 @@ class NavigationTab {
             (tab) =>
                 (!isOffline || !tab.onlineOnly) &&
                 (tab.id != NavigationTabId.downloads || !PlatformDetector.isAppleTV()) &&
-                (isOffline || tab.id != NavigationTabId.downloads),
+                (isOffline || hasKidsDownloads || tab.id != NavigationTabId.downloads),
           )
           .toList();
     }

@@ -580,6 +580,13 @@ class _Translations$kidsShelf$hr extends Translations$kidsShelf$en {
 	@override String get yourShelf => 'Vaša polica za filmove';
 	@override String get all => 'Sve';
 	@override String get pickSomething => 'Što želite gledati?';
+	@override String get atmosphere => 'Ugođaj početne stranice';
+	@override String get atmosphereHint => 'Odaberite boje dječje početne stranice. Kućica na stablu ostaje ista.';
+	@override String get sunshine => 'Sunce';
+	@override String get berry => 'Bobice';
+	@override String get mint => 'Menta';
+	@override String get sky => 'Nebo';
+	@override String get atmospherePreview => 'Pregled početne stranice';
 }
 
 // Path: kidsHome
@@ -787,6 +794,23 @@ class _Translations$kids$hr extends Translations$kids$en {
 	final TranslationsHr _root; // ignore: unused_field
 
 	// Translations
+	@override String get allLibrariesHint => 'Uključit će se i nove zbirke filmova i serija. Isključite ovu opciju za odabir određenih zbirki.';
+	@override String get appearanceSection => 'Izgled';
+	@override String get disableParentPin => 'Isključi roditeljski PIN';
+	@override String get disableParentPinConfirm => 'Isključiti roditeljski PIN za sve dječje profile? Djeca će moći prijeći na nezaštićene profile i zaobići ograničenja vremena pred ekranom. PIN-ovi profila i dalje vrijede.';
+	@override String get discardAction => 'Odbaci promjene';
+	@override String get discardMessage => 'Vaše promjene nisu spremljene.';
+	@override String get discardTitle => 'Odbaciti promjene?';
+	@override String get editorTitle => 'Postavke dječjeg profila';
+	@override String libraryCount({required Object count}) => 'Odabrane zbirke: ${count}';
+	@override String get moreSection => 'Više';
+	@override String get pinChoice => 'Koristi roditeljski PIN';
+	@override String get pinChoiceHint => 'Preporučeno. Bez roditeljskog PIN-a djeca mogu prijeći na nezaštićene profile i mijenjati dječje postavke. Promjenom profila mogu zaobići ograničenja vremena pred ekranom.';
+	@override String get pinDifference => 'Roditeljski PIN štiti dječje postavke. PIN profila štiti pojedinačni profil. Zahtjev za roditeljski PIN pri izlasku iz dječjeg profila postavlja se zasebno.';
+	@override String get pinDisabledWarning => 'Bez roditeljskog PIN-a djeca mogu napustiti dječji profil i pristupiti nezaštićenim profilima. Promjenom profila mogu zaobići ograničenja vremena pred ekranom. Pojedinačni PIN-ovi profila i dalje vrijede.';
+	@override String get profileSection => 'Profil';
+	@override String get timeLimitNoPinHint => 'Promijenite profil za upravljanje vremenom pred ekranom. Bez roditeljskog PIN-a svatko može prijeći na nezaštićeni profil.';
+	@override String get watchSection => 'Što mogu gledati';
 	@override String get timeLimits => 'Ograničenja vremena gledanja';
 	@override String get dailyWatchLimit => 'Dnevno vrijeme gledanja';
 	@override String get dailyWatchLimitHint => 'Ograničava dnevnu reprodukciju videa na ovom uređaju.';
@@ -971,6 +995,72 @@ class _Translations$auth$hr extends Translations$auth$en {
 	final TranslationsHr _root; // ignore: unused_field
 
 	// Translations
+	@override String get plexQrSignIn => 'Prijava u Plex QR kodom';
+	@override String get setUpWithPhone => 'Postavi telefonom';
+	@override String get loadingRestoredData => 'Učitavanje obnovljenih profila i veza…';
+	@override String get loadingRestoredDataFailed => 'Obnovljene podatke nije moguće učitati. Pokušajte ponovno ili ponovno otvorite Luroku.';
+	@override String get connectTv => 'Poveži televizor';
+	@override String get restoreEncryptedBackup => 'Vrati šifriranu sigurnosnu kopiju';
+	@override String get restoreCloudBackup => 'Vrati sigurnosnu kopiju iz oblaka';
+	@override String get saveEncryptedBackup => 'Spremi šifriranu sigurnosnu kopiju';
+	@override String get backupSaved => 'Sigurnosna kopija spremljena';
+	@override String get createEncryptedBackup => 'Izradi šifriranu sigurnosnu kopiju';
+	@override String get confirmBackupPassword => 'Potvrdite lozinku';
+	@override String get enterBackupPassword => 'Unesite lozinku.';
+	@override String get confirmBackupPasswordError => 'Unesite lozinku i potvrdite je.';
+	@override String get restoreBackupAction => 'Vrati';
+	@override String get backupCreateInstructions => 'Uključuje profile, podatke za prijavu na poslužitelje i lokalne podatke o gledanju. Čuvajte lozinku na sigurnom; potrebna je za vraćanje.';
+	@override String get backupRestoreInstructions => 'Unesite lozinku ili kôd za oporavak iz oblaka korišten pri izradi kopije. Za vraćanje je potrebna prazna baza profila.';
+	@override String get backupCreateFailed => 'Nije moguće izraditi šifriranu sigurnosnu kopiju.';
+	@override String get backupRestoreFailed => 'Nije moguće vratiti sigurnosnu kopiju. Provjerite lozinku i koristite praznu instalaciju.';
+	@override String get recoveryCodeStep => 'Korak 2 od 3: Spremite kôd za oporavak';
+	@override String get backupNotUploaded => 'Još nije preneseno. Dovršite korak 3 i pričekajte potvrdu da je kopija u oblaku izrađena prije vraćanja.';
+	@override String get recoveryCodeSavedContinue => 'Spremio sam kôd — nastavi';
+	@override String get recoveryCodeSaveFile => 'Spremi kôd u datoteku';
+	@override String get recoveryCodeShowQr => 'Prikaži QR kôd';
+	@override String get recoveryCodeHideQr => 'Sakrij QR kôd';
+	@override String get recoveryCopied => 'Kôd za oporavak kopiran je. Spremite ga na privatno mjesto.';
+	@override String get recoveryCopyFailed => 'Nije moguće kopirati kôd za oporavak.';
+	@override String get recoverySaveDialog => 'Spremite kôd za oporavak na privatno mjesto';
+	@override String get recoverySaved => 'Kôd za oporavak spremljen je. Datoteku držite privatnom.';
+	@override String get recoverySaveFailed => 'Nije moguće spremiti kôd za oporavak. Umjesto toga pokušajte ga kopirati.';
+	@override String get cloudRestoreApplyFailed => 'Kopija je preuzeta, ali se nije mogla vratiti na ovaj uređaj. Pokušajte ponovno ili se obratite podršci.';
+	@override String get cloudBackupNotFound => 'Za ovaj kôd nije pronađena kopija u oblaku. Na izvornom uređaju dovršite korak 3 i pričekajte potvrdu o izradi kopije. Provjerite koristite li kôd spremljen za tu kopiju; možda je istekla ili je izbrisana.';
+	@override String get cloudBackupConnectionFailed => 'Nije moguće povezati se s uslugom za kopije. Provjerite internetsku vezu i pokušajte ponovno.';
+	@override String get cloudBackupInvalidFormat => 'Kôd za oporavak ili format kopije nije moguće pročitati. Provjerite cijeli kôd i pokušajte ponovno.';
+	@override String get cloudBackupOpenFailed => 'Kopiju nije moguće otvoriti. Provjerite kôd za oporavak i pokušajte ponovno.';
+	@override String get cloudBackupSelectProfiles => 'Odaberite profile koje želite uključiti. Kopija se šifrira prije prijenosa i dostupna je 90 dana.';
+	@override String get cloudBackupIncludeLogins => 'Uključi spremljene prijave za poslužitelje i integracije';
+	@override String get cloudBackupLoginsWarning => 'Uključuje povezane Plex račune i druge spremljene prijave radi lakšeg ponovnog povezivanja. Svatko s kodom za oporavak možda ih može koristiti.';
+	@override String get cloudBackupNoLogins => 'Bez spremljenih prijava morat ćete ponovno povezati poslužitelje nakon vraćanja.';
+	@override String get pairingHttpPhoneTitle => 'Koristiti HTTP za ovaj poslužitelj?';
+	@override String get pairingHttpPhoneWarning => 'Vaši podaci za prijavu na poslužitelj i medijski promet neće biti šifrirani. Osobe na mreži možda ih mogu pročitati. Preporučuje se HTTPS. Luroka prijenos ostaje šifriran.';
+	@override String get pairingHttpTvTitle => 'Koristiti nešifrirani poslužitelj?';
+	@override String get pairingHttpTvWarning => 'Telefon je odabrao HTTP. Osobe na ovoj mreži možda mogu pročitati pristupni token televizora i medijski promet. Koristite samo mrežu kojoj vjerujete. Preporučuje se HTTPS.';
+	@override String get pairingUseHttp => 'Koristi HTTP';
+	@override String get pairingTvTitle => 'Povežite Jellyfin ili Emby telefonom';
+	@override String get pairingScanInvitation => 'Skenirajte telefonom. Pozivnica istječe za pet minuta.';
+	@override String get pairingWaitForPhone => 'Čeka se povezivanje telefona…';
+	@override String get pairingComparePhone => 'Usporedite ovaj kôd s kodom na telefonu:';
+	@override String get pairingConfirmOnPhone => 'Ako se kodovi podudaraju, potvrdite na telefonu.';
+	@override String get pairingAdultOnly => 'Uparivanje je dostupno samo s profila za odrasle.';
+	@override String get pairingProfileChanged => 'Pristup profilu promijenio se. Uparivanje je otkazano.';
+	@override String get pairingServiceUnavailable => 'Usluga uparivanja nije dostupna. Pokušajte ponovno ili ručno unesite poslužitelj.';
+	@override String get pairingExpired => 'Uparivanje je isteklo ili prekinuto. Započnite ponovno.';
+	@override String get pairingVerifyFailed => 'Nije moguće provjeriti poslužitelj i račun. Ponovno pokrenite uparivanje.';
+	@override String get pairingScanOrPaste => 'Skenirajte kôd televizora ili zalijepite pozivnicu.';
+	@override String get pairingScanTv => 'Skeniraj kôd televizora';
+	@override String get pairingTvInvitation => 'Pozivnica televizora';
+	@override String pairingCheckTvCode({required Object code}) => 'Provjerite prikazuje li televizor isti kôd: ${code}';
+	@override String get pairingCodesMatch => 'Kodovi se podudaraju';
+	@override String get recoveryCodeLabel => 'Kôd za oporavak';
+	@override String get recoveryCodeScan => 'Skeniraj kôd za oporavak';
+	@override String get pairingRecoveryInstructions => 'Skenirajte ili zalijepite spremljeni kôd za oporavak. Bit će šifriran za vaš televizor.';
+	@override String get pairingSendTv => 'Pošalji na televizor';
+	@override String get pairingServerLoginHint => 'Prijavite se na svoj poslužitelj. Lozinka se šalje tom poslužitelju, a ne Luroki.';
+	@override String get recoveryCodeWarning => 'Ovaj kôd potreban je za vraćanje ili brisanje sigurnosne kopije. Svatko tko ga ima može pristupiti kopiji. Ako ga izgubite, Luroka ga ne može vratiti.';
+	@override String get recoveryCodePrivateFile => 'Kôd kopirajte ili spremite samo na privatno mjesto. Spremljena datoteka s kodom nije šifrirana.';
+	@override String get recoveryCodePhoneInstructions => 'Sačuvajte privatnu kopiju koda. Za vraćanje na telefonu otvorite vraćanje sigurnosne kopije iz oblaka u Luroki i odaberite skeniranje koda za oporavak.';
 	@override String get signInWithPlex => 'Prijavite se pomoću Plex';
 	@override String get showQRCode => 'Prikaži QR kod';
 	@override String get authenticate => 'Provjeri autentičnost';
@@ -3911,6 +4001,13 @@ class _Translations$profileSetupGuide$hr extends Translations$profileSetupGuide$
 	final TranslationsHr _root; // ignore: unused_field
 
 	// Translations
+	@override String get tabletSpotlightStyle => 'Stil istaknutog sadržaja na tabletu';
+	@override String get spotlightClassic => 'Klasično';
+	@override String get spotlightMarquee => 'Marquee';
+	@override String get spotlightTonight => 'Večerašnji odabir';
+	@override String get phoneSpotlight => 'Filmski istaknuti sadržaj na telefonu';
+	@override String get phoneSpotlightCinematic => 'Vodoravna slika s naslovom preko nje';
+	@override String get phoneSpotlightClassic => 'Klasična kartica s plakatom';
 	@override String get title => 'Prilagodite svoj profil';
 	@override String get description => 'Odaberite kako će Luroka izgledati na ovom profilu i uređaju. Sve kasnije možete promijeniti u Postavkama.';
 	@override String get appearanceStep => '1 od 2 · Izgled';
@@ -5258,6 +5355,13 @@ extension on TranslationsHr {
 			'kidsShelf.yourShelf' => 'Vaša polica za filmove',
 			'kidsShelf.all' => 'Sve',
 			'kidsShelf.pickSomething' => 'Što želite gledati?',
+			'kidsShelf.atmosphere' => 'Ugođaj početne stranice',
+			'kidsShelf.atmosphereHint' => 'Odaberite boje dječje početne stranice. Kućica na stablu ostaje ista.',
+			'kidsShelf.sunshine' => 'Sunce',
+			'kidsShelf.berry' => 'Bobice',
+			'kidsShelf.mint' => 'Menta',
+			'kidsShelf.sky' => 'Nebo',
+			'kidsShelf.atmospherePreview' => 'Pregled početne stranice',
 			'kidsHome.everything' => 'Za tebe',
 			'kidsHome.keepWatching' => 'Nastavi gledati',
 			'kidsHome.emptyFilter' => 'Ovdje još nema ničega. Pogledaj odjeljak Za tebe ili zamoli odraslu osobu da doda nešto što voliš.',
@@ -5402,6 +5506,23 @@ extension on TranslationsHr {
 			'detailComposition.mediaInformation' => 'Informacije o medijima',
 			'detailComposition.fullFileInformation' => 'Potpune informacije o datoteci',
 			'detailComposition.castAndCrew' => 'Glumci i ekipa',
+			'kids.allLibrariesHint' => 'Uključit će se i nove zbirke filmova i serija. Isključite ovu opciju za odabir određenih zbirki.',
+			'kids.appearanceSection' => 'Izgled',
+			'kids.disableParentPin' => 'Isključi roditeljski PIN',
+			'kids.disableParentPinConfirm' => 'Isključiti roditeljski PIN za sve dječje profile? Djeca će moći prijeći na nezaštićene profile i zaobići ograničenja vremena pred ekranom. PIN-ovi profila i dalje vrijede.',
+			'kids.discardAction' => 'Odbaci promjene',
+			'kids.discardMessage' => 'Vaše promjene nisu spremljene.',
+			'kids.discardTitle' => 'Odbaciti promjene?',
+			'kids.editorTitle' => 'Postavke dječjeg profila',
+			'kids.libraryCount' => ({required Object count}) => 'Odabrane zbirke: ${count}',
+			'kids.moreSection' => 'Više',
+			'kids.pinChoice' => 'Koristi roditeljski PIN',
+			'kids.pinChoiceHint' => 'Preporučeno. Bez roditeljskog PIN-a djeca mogu prijeći na nezaštićene profile i mijenjati dječje postavke. Promjenom profila mogu zaobići ograničenja vremena pred ekranom.',
+			'kids.pinDifference' => 'Roditeljski PIN štiti dječje postavke. PIN profila štiti pojedinačni profil. Zahtjev za roditeljski PIN pri izlasku iz dječjeg profila postavlja se zasebno.',
+			'kids.pinDisabledWarning' => 'Bez roditeljskog PIN-a djeca mogu napustiti dječji profil i pristupiti nezaštićenim profilima. Promjenom profila mogu zaobići ograničenja vremena pred ekranom. Pojedinačni PIN-ovi profila i dalje vrijede.',
+			'kids.profileSection' => 'Profil',
+			'kids.timeLimitNoPinHint' => 'Promijenite profil za upravljanje vremenom pred ekranom. Bez roditeljskog PIN-a svatko može prijeći na nezaštićeni profil.',
+			'kids.watchSection' => 'Što mogu gledati',
 			'kids.timeLimits' => 'Ograničenja vremena gledanja',
 			'kids.dailyWatchLimit' => 'Dnevno vrijeme gledanja',
 			'kids.dailyWatchLimitHint' => 'Ograničava dnevnu reprodukciju videa na ovom uređaju.',
@@ -5474,6 +5595,8 @@ extension on TranslationsHr {
 			'kids.freshStories' => 'Nove priče za otkrivanje',
 			'kids.yourMovies' => 'Omiljeni filmovi',
 			'kids.yourShows' => 'Još jedna epizoda',
+			_ => null,
+		} ?? switch (path) {
 			'kids.emptyHint' => 'Nove avanture pojavit će se ovdje kada vaš poslužitelj bude imao naslove s dopuštenom dobnom klasifikacijom.',
 			'kids.title' => 'Luroka za djecu',
 			'kids.addProfile' => 'Dodajte dječji profil',
@@ -5498,8 +5621,6 @@ extension on TranslationsHr {
 			'kids.historyReset' => 'Isključenja gledanja za djecu poništena',
 			'kids.blocked' => 'Ovaj naslov nije dostupan u ovom dječjem profilu.',
 			'kids.switchProfile' => 'Promijeni profil',
-			_ => null,
-		} ?? switch (path) {
 			'kids.manageFromAdult' => 'Prijeđite na profil za odrasle za upravljanje postavkama.',
 			'kids.noConnections' => 'Povežite poslužitelj sa svojim profilom za odrasle prije dodavanja profila za djecu.',
 			'kids.created' => 'Izrađen profil djece',
@@ -5574,6 +5695,72 @@ extension on TranslationsHr {
 			'appIcon.names.strata' => 'slojevi',
 			'appIcon.names.facet' => 'Faseta',
 			'appIcon.names.tilde' => 'Tilda',
+			'auth.plexQrSignIn' => 'Prijava u Plex QR kodom',
+			'auth.setUpWithPhone' => 'Postavi telefonom',
+			'auth.loadingRestoredData' => 'Učitavanje obnovljenih profila i veza…',
+			'auth.loadingRestoredDataFailed' => 'Obnovljene podatke nije moguće učitati. Pokušajte ponovno ili ponovno otvorite Luroku.',
+			'auth.connectTv' => 'Poveži televizor',
+			'auth.restoreEncryptedBackup' => 'Vrati šifriranu sigurnosnu kopiju',
+			'auth.restoreCloudBackup' => 'Vrati sigurnosnu kopiju iz oblaka',
+			'auth.saveEncryptedBackup' => 'Spremi šifriranu sigurnosnu kopiju',
+			'auth.backupSaved' => 'Sigurnosna kopija spremljena',
+			'auth.createEncryptedBackup' => 'Izradi šifriranu sigurnosnu kopiju',
+			'auth.confirmBackupPassword' => 'Potvrdite lozinku',
+			'auth.enterBackupPassword' => 'Unesite lozinku.',
+			'auth.confirmBackupPasswordError' => 'Unesite lozinku i potvrdite je.',
+			'auth.restoreBackupAction' => 'Vrati',
+			'auth.backupCreateInstructions' => 'Uključuje profile, podatke za prijavu na poslužitelje i lokalne podatke o gledanju. Čuvajte lozinku na sigurnom; potrebna je za vraćanje.',
+			'auth.backupRestoreInstructions' => 'Unesite lozinku ili kôd za oporavak iz oblaka korišten pri izradi kopije. Za vraćanje je potrebna prazna baza profila.',
+			'auth.backupCreateFailed' => 'Nije moguće izraditi šifriranu sigurnosnu kopiju.',
+			'auth.backupRestoreFailed' => 'Nije moguće vratiti sigurnosnu kopiju. Provjerite lozinku i koristite praznu instalaciju.',
+			'auth.recoveryCodeStep' => 'Korak 2 od 3: Spremite kôd za oporavak',
+			'auth.backupNotUploaded' => 'Još nije preneseno. Dovršite korak 3 i pričekajte potvrdu da je kopija u oblaku izrađena prije vraćanja.',
+			'auth.recoveryCodeSavedContinue' => 'Spremio sam kôd — nastavi',
+			'auth.recoveryCodeSaveFile' => 'Spremi kôd u datoteku',
+			'auth.recoveryCodeShowQr' => 'Prikaži QR kôd',
+			'auth.recoveryCodeHideQr' => 'Sakrij QR kôd',
+			'auth.recoveryCopied' => 'Kôd za oporavak kopiran je. Spremite ga na privatno mjesto.',
+			'auth.recoveryCopyFailed' => 'Nije moguće kopirati kôd za oporavak.',
+			'auth.recoverySaveDialog' => 'Spremite kôd za oporavak na privatno mjesto',
+			'auth.recoverySaved' => 'Kôd za oporavak spremljen je. Datoteku držite privatnom.',
+			'auth.recoverySaveFailed' => 'Nije moguće spremiti kôd za oporavak. Umjesto toga pokušajte ga kopirati.',
+			'auth.cloudRestoreApplyFailed' => 'Kopija je preuzeta, ali se nije mogla vratiti na ovaj uređaj. Pokušajte ponovno ili se obratite podršci.',
+			'auth.cloudBackupNotFound' => 'Za ovaj kôd nije pronađena kopija u oblaku. Na izvornom uređaju dovršite korak 3 i pričekajte potvrdu o izradi kopije. Provjerite koristite li kôd spremljen za tu kopiju; možda je istekla ili je izbrisana.',
+			'auth.cloudBackupConnectionFailed' => 'Nije moguće povezati se s uslugom za kopije. Provjerite internetsku vezu i pokušajte ponovno.',
+			'auth.cloudBackupInvalidFormat' => 'Kôd za oporavak ili format kopije nije moguće pročitati. Provjerite cijeli kôd i pokušajte ponovno.',
+			'auth.cloudBackupOpenFailed' => 'Kopiju nije moguće otvoriti. Provjerite kôd za oporavak i pokušajte ponovno.',
+			'auth.cloudBackupSelectProfiles' => 'Odaberite profile koje želite uključiti. Kopija se šifrira prije prijenosa i dostupna je 90 dana.',
+			'auth.cloudBackupIncludeLogins' => 'Uključi spremljene prijave za poslužitelje i integracije',
+			'auth.cloudBackupLoginsWarning' => 'Uključuje povezane Plex račune i druge spremljene prijave radi lakšeg ponovnog povezivanja. Svatko s kodom za oporavak možda ih može koristiti.',
+			'auth.cloudBackupNoLogins' => 'Bez spremljenih prijava morat ćete ponovno povezati poslužitelje nakon vraćanja.',
+			'auth.pairingHttpPhoneTitle' => 'Koristiti HTTP za ovaj poslužitelj?',
+			'auth.pairingHttpPhoneWarning' => 'Vaši podaci za prijavu na poslužitelj i medijski promet neće biti šifrirani. Osobe na mreži možda ih mogu pročitati. Preporučuje se HTTPS. Luroka prijenos ostaje šifriran.',
+			'auth.pairingHttpTvTitle' => 'Koristiti nešifrirani poslužitelj?',
+			'auth.pairingHttpTvWarning' => 'Telefon je odabrao HTTP. Osobe na ovoj mreži možda mogu pročitati pristupni token televizora i medijski promet. Koristite samo mrežu kojoj vjerujete. Preporučuje se HTTPS.',
+			'auth.pairingUseHttp' => 'Koristi HTTP',
+			'auth.pairingTvTitle' => 'Povežite Jellyfin ili Emby telefonom',
+			'auth.pairingScanInvitation' => 'Skenirajte telefonom. Pozivnica istječe za pet minuta.',
+			'auth.pairingWaitForPhone' => 'Čeka se povezivanje telefona…',
+			'auth.pairingComparePhone' => 'Usporedite ovaj kôd s kodom na telefonu:',
+			'auth.pairingConfirmOnPhone' => 'Ako se kodovi podudaraju, potvrdite na telefonu.',
+			'auth.pairingAdultOnly' => 'Uparivanje je dostupno samo s profila za odrasle.',
+			'auth.pairingProfileChanged' => 'Pristup profilu promijenio se. Uparivanje je otkazano.',
+			'auth.pairingServiceUnavailable' => 'Usluga uparivanja nije dostupna. Pokušajte ponovno ili ručno unesite poslužitelj.',
+			'auth.pairingExpired' => 'Uparivanje je isteklo ili prekinuto. Započnite ponovno.',
+			'auth.pairingVerifyFailed' => 'Nije moguće provjeriti poslužitelj i račun. Ponovno pokrenite uparivanje.',
+			'auth.pairingScanOrPaste' => 'Skenirajte kôd televizora ili zalijepite pozivnicu.',
+			'auth.pairingScanTv' => 'Skeniraj kôd televizora',
+			'auth.pairingTvInvitation' => 'Pozivnica televizora',
+			'auth.pairingCheckTvCode' => ({required Object code}) => 'Provjerite prikazuje li televizor isti kôd: ${code}',
+			'auth.pairingCodesMatch' => 'Kodovi se podudaraju',
+			'auth.recoveryCodeLabel' => 'Kôd za oporavak',
+			'auth.recoveryCodeScan' => 'Skeniraj kôd za oporavak',
+			'auth.pairingRecoveryInstructions' => 'Skenirajte ili zalijepite spremljeni kôd za oporavak. Bit će šifriran za vaš televizor.',
+			'auth.pairingSendTv' => 'Pošalji na televizor',
+			'auth.pairingServerLoginHint' => 'Prijavite se na svoj poslužitelj. Lozinka se šalje tom poslužitelju, a ne Luroki.',
+			'auth.recoveryCodeWarning' => 'Ovaj kôd potreban je za vraćanje ili brisanje sigurnosne kopije. Svatko tko ga ima može pristupiti kopiji. Ako ga izgubite, Luroka ga ne može vratiti.',
+			'auth.recoveryCodePrivateFile' => 'Kôd kopirajte ili spremite samo na privatno mjesto. Spremljena datoteka s kodom nije šifrirana.',
+			'auth.recoveryCodePhoneInstructions' => 'Sačuvajte privatnu kopiju koda. Za vraćanje na telefonu otvorite vraćanje sigurnosne kopije iz oblaka u Luroki i odaberite skeniranje koda za oporavak.',
 			'auth.signInWithPlex' => 'Prijavite se pomoću Plex',
 			'auth.showQRCode' => 'Prikaži QR kod',
 			'auth.authenticate' => 'Provjeri autentičnost',
@@ -5922,6 +6109,8 @@ extension on TranslationsHr {
 			'settings.maxVolumePercent' => ({required Object percent}) => '${percent}%',
 			'settings.discordRichPresence' => 'Status aktivnosti na Discordu',
 			'settings.discordRichPresenceDescription' => 'Prikažite što gledate na Discordu',
+			_ => null,
+		} ?? switch (path) {
 			'settings.services' => 'Integracije',
 			'settings.servicesDescription' => 'Povežite Trakt, MyAnimeList, Seerr i više',
 			'settings.manageLibrariesDescription' => 'Promijeni redoslijed i sakrij biblioteke.',
@@ -6012,8 +6201,6 @@ extension on TranslationsHr {
 			'settings.liveTvDefaultFavoritesDescription' => 'Prikaži samo omiljene kanale kada otvorite TV uživo',
 			'settings.general' => 'Općenito',
 			'settings.generalDescription' => 'Jezik, pokretanje i ponašanje prozora',
-			_ => null,
-		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Jezik i regija',
 			'settings.startup' => 'Pokretanje',
 			'settings.display' => 'Zaslon',
@@ -6436,6 +6623,8 @@ extension on TranslationsHr {
 			'fileInfo.pixelAspectRatio' => 'Omjer slike piksela',
 			'fileInfo.profile' => 'Profil',
 			'fileInfo.level' => 'Razina',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.bitDepth' => 'Bitna dubina',
 			'fileInfo.pixelFormat' => 'Format piksela',
 			'fileInfo.colorSpace' => 'Prostor boja',
@@ -6526,8 +6715,6 @@ extension on TranslationsHr {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Nasumična reprodukcija nije dostupna izvan mreže',
 			'mediaMenu.fileInfo' => 'Podaci o datoteci',
 			'mediaMenu.deleteEpisodeFromServer' => 'Izbriši epizodu s poslužitelja',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Izbriši sezonu s poslužitelja',
 			'mediaMenu.deleteShowFromServer' => 'Izbriši seriju s poslužitelja',
 			'mediaMenu.deleteMovieFromServer' => 'Izbriši film s poslužitelja',
@@ -6950,6 +7137,8 @@ extension on TranslationsHr {
 			'accountPreferences.rewatchingInNextUp' => 'Zadržite ponovno gledane emisije u Next Up',
 			'accountPreferences.rewatchingInNextUpDescription' => 'Nakon što završite emisiju, pokrenite je ponovno i Next Up slijedi ponovno gledanje umjesto da odustane od emisije.',
 			'accountPreferences.watchedIndicator' => 'Gledani indikatori',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.watchedIndicatorOptions.none' => 'nikada',
 			'accountPreferences.watchedIndicatorOptions.moviesAndShows' => 'Filmovi i TV emisije',
 			'accountPreferences.watchedIndicatorOptions.movies' => 'Samo filmovi',
@@ -7040,8 +7229,6 @@ extension on TranslationsHr {
 			'libraries.filters' => 'Filteri',
 			'libraries.confirmActionMessage' => 'Jeste li sigurni da želite izvršiti ovu radnju?',
 			'libraries.showLibrary' => 'Prikaži biblioteku',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Sakrij biblioteku',
 			'libraries.libraryOptions' => 'Mogućnosti biblioteke',
 			'libraries.content' => 'sadržaj biblioteke',
@@ -7464,6 +7651,8 @@ extension on TranslationsHr {
 			'collections.deleted' => 'Zbirka izbrisana',
 			'collections.deleteFailed' => 'Brisanje zbirke nije uspjelo',
 			'collections.deleteFailedWithError' => ({required Object error}) => 'Brisanje zbirke nije uspjelo: ${error}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.selectCollection' => 'Odaberite zbirku',
 			'collections.collectionName' => 'Naziv zbirke',
 			'collections.enterCollectionName' => 'Unesite naziv zbirke',
@@ -7554,8 +7743,6 @@ extension on TranslationsHr {
 			'watchTogether.qrShare' => 'Podijeli QR kod',
 			'watchTogether.qrHint' => 'Skenirajte pomoću aplikacije Luroka da biste se pridružili ovoj sobi.',
 			'watchTogether.phasePlaying' => 'Reprodukcija u tijeku',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Pauzirano',
 			'watchTogether.phaseWaiting' => 'Čeka ostale',
 			'watchTogether.inviteCopied' => 'Pozivnica je kopirana. Zalijepite je u poruku.',
@@ -7978,6 +8165,8 @@ extension on TranslationsHr {
 			'performanceOverlay.speed' => 'Brzina',
 			'performanceOverlay.player' => 'Reproduktor',
 			'performanceOverlay.memory' => 'Memorija',
+			_ => null,
+		} ?? switch (path) {
 			'performanceOverlay.uiFps' => 'UI FPS',
 			'performanceOverlay.fps' => 'FPS',
 			'performanceOverlay.decoderAndroidHw' => 'Android HW',
@@ -8068,8 +8257,6 @@ extension on TranslationsHr {
 			'metadataEdit.preferredSubtitleLanguage' => 'Željeni jezik titlova',
 			'metadataEdit.subtitleMode' => 'Način automatskog odabira titlova',
 			'metadataEdit.manuallySelected' => 'Ručno odabrano',
-			_ => null,
-		} ?? switch (path) {
 			'metadataEdit.shownWithForeignAudio' => 'Prikaži uz zvuk na stranom jeziku',
 			'metadataEdit.alwaysEnabled' => 'Uvijek uključeno',
 			'metadataEdit.tags' => 'Oznake',
@@ -8227,6 +8414,13 @@ extension on TranslationsHr {
 			'profileIntegrations.later' => 'Postavi kasnije',
 			'profileIntegrations.manage' => 'Upravljaj integracijama',
 			'profileIntegrations.forProfile' => ({required Object name}) => 'Veze za profil ${name}',
+			'profileSetupGuide.tabletSpotlightStyle' => 'Stil istaknutog sadržaja na tabletu',
+			'profileSetupGuide.spotlightClassic' => 'Klasično',
+			'profileSetupGuide.spotlightMarquee' => 'Marquee',
+			'profileSetupGuide.spotlightTonight' => 'Večerašnji odabir',
+			'profileSetupGuide.phoneSpotlight' => 'Filmski istaknuti sadržaj na telefonu',
+			'profileSetupGuide.phoneSpotlightCinematic' => 'Vodoravna slika s naslovom preko nje',
+			'profileSetupGuide.phoneSpotlightClassic' => 'Klasična kartica s plakatom',
 			'profileSetupGuide.title' => 'Prilagodite svoj profil',
 			'profileSetupGuide.description' => 'Odaberite kako će Luroka izgledati na ovom profilu i uređaju. Sve kasnije možete promijeniti u Postavkama.',
 			'profileSetupGuide.appearanceStep' => '1 od 2 · Izgled',

@@ -354,8 +354,8 @@ void main() {
     await tester.ensureVisible(find.text('Hide QR code'));
     await tester.tap(find.text('Hide QR code'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Copy code'));
-    await tester.tap(find.text('Copy code'));
+    await tester.ensureVisible(find.text('Copy Code'));
+    await tester.tap(find.text('Copy Code'));
     await tester.pumpAndSettle();
     expect(copied, startsWith('lrb1-'));
     await tester.tap(find.text('Save code to file'));

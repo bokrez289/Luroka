@@ -653,11 +653,11 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     // intermediate rebuild can see a mismatched controller/key pair.
     _updateVisibleTabs(visibleLibraryTabs(selectedLibrary));
     final savedTabIndex = savedType == null ? -1 : _visibleTabs.indexOf(savedType);
-    final overviewIndex = _visibleTabs.indexOf(LibraryTabType.recommended);
+    final browseIndex = _visibleTabs.indexOf(LibraryTabType.browse);
     final targetTabIndex = savedTabIndex >= 0
         ? savedTabIndex
-        : overviewIndex >= 0
-        ? overviewIndex
+        : browseIndex >= 0
+        ? browseIndex
         : 0;
     if (targetTabIndex != tabController.index) {
       _isRestoringTab = true;

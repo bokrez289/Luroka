@@ -685,6 +685,19 @@ class DownloadProvider extends ChangeNotifier with DisposableChangeNotifierMixin
   Map<String, DownloadProgress> get downloads =>
       Map.unmodifiable(Map.fromEntries(_downloads.entries.where(_ownsProgressEntry)));
 
+  /// Whether this profile has downloads worth showing in navigation.
+  bool get hasVisibleDownloads => _queueing.isNotEmpty || _downloads.entries.any((entry) =>
+      _ownsProgressEntry(entry) && entry.value.status != DownloadStatus.cancelled);
+
+  /// Only advertise child downloads when owned metadata passes parental policy.
+  bool get hasAccessibleKidsDownloads {
+    final allowed = metadata;
+    return _downloads.entries.any((entry) =>
+        _ownsProgressEntry(entry) &&
+        entry.value.status != DownloadStatus.cancelled &&
+        allowed.containsKey(entry.key));
+  }
+
   /// Whether the active profile owns a failed download.
   bool get hasFailedDownloads => _downloads.entries.any(_isOwnedFailure);
 
@@ -800,10 +813,10 @@ class DownloadProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     );
   }
 
-  Map<String, MediaItem> get metadata => {
+  Map<String, MediaItem> get metadata => Map.unmodifiable({
     for (final entry in _metadataStore.resolvedItems.entries)
       if (KidsProfileService.instance.allows(entry.value)) entry.key: entry.value,
-  };
+  });
 
   /// Get unique TV shows that have downloaded episodes
   /// Returns stored show metadata, or synthesizes from episode metadata as fallback

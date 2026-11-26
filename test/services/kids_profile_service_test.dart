@@ -7,6 +7,7 @@ import 'package:luroka/navigation/navigation_tabs.dart';
 import 'package:luroka/services/kids_profile_service.dart';
 import 'package:luroka/services/base_shared_preferences_service.dart';
 import 'package:luroka/models/kids_avatar.dart';
+import 'package:luroka/models/kids_atmosphere.dart';
 
 import '../test_helpers/prefs.dart';
 
@@ -206,6 +207,29 @@ void main() {
     expect(service.avatarFor('child'), KidsAvatarKind.panda);
   });
 
+  test('atmosphere is per child, survives unrelated edits and reloads', () async {
+    expect(service.atmosphereFor('child'), KidsAtmosphere.sunshine);
+    await service.setChild('child', parentId: 'adult', maxAge: 7, atmosphere: KidsAtmosphere.berry);
+    await service.setChild('other', parentId: 'adult', maxAge: 7, atmosphere: KidsAtmosphere.mint);
+    await service.setChild('child', parentId: 'adult', maxAge: 12);
+    service.resetForTesting();
+    await service.initialize();
+    expect(service.atmosphereFor('child'), KidsAtmosphere.berry);
+    expect(service.atmosphereFor('other'), KidsAtmosphere.mint);
+    expect(service.atmosphereFor('missing'), KidsAtmosphere.sunshine);
+  });
+  test('child can only update own cosmetic choice without changing restrictions', () async {
+    await service.setChild('child', parentId: 'adult', maxAge: 7, allowedLibraries: {'srv:kids'}, animationOnly: true);
+    await service.setActiveAtmosphere(KidsAtmosphere.berry);
+    expect(service.atmosphereFor('child'), KidsAtmosphere.berry);
+    expect(service.librariesFor('child'), {'srv:kids'});
+    expect(service.animationOnlyFor('child'), isTrue);
+    expect(service.ageFor('child'), 7);
+    service.selectProfile('adult');
+    await expectLater(service.setActiveAtmosphere(KidsAtmosphere.sky), throwsStateError);
+    expect(service.atmosphereFor('child'), KidsAtmosphere.berry);
+  });
+
   test('kids have direct Movies and Shows destinations and a reachable profile picker', () {
     final tabs = NavigationTab.getVisibleTabs(isOffline: false, hasLiveTv: true, hasExplore: true, hasFavorites: true);
     expect(tabs.map((tab) => tab.id), [
@@ -220,6 +244,10 @@ void main() {
       NavigationTabId.discover,
     );
     expect(NavigationTab.getVisibleTabs(isOffline: true).last.id, NavigationTabId.settings);
+    expect(
+      NavigationTab.getVisibleTabs(isOffline: false, hasKidsDownloads: true).map((tab) => tab.id),
+      contains(NavigationTabId.downloads),
+    );
   });
 
   test('ratings restrict children and unknown/unrated classifications fail closed', () {

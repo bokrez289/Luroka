@@ -9,6 +9,7 @@ import '../services/native_window_service.dart';
 import '../services/settings_binding_owner.dart';
 import '../services/settings_service.dart' as settings;
 import '../services/kids_profile_service.dart';
+import '../models/kids_atmosphere.dart';
 import '../services/supporter/supporter_service.dart';
 import '../theme/mono_theme.dart';
 import '../utils/app_logger.dart';
@@ -76,12 +77,21 @@ class ThemeProvider extends ChangeNotifier with DisposableChangeNotifierMixin, W
     _customPalette = service.read(settings.SettingsService.customThemePalette);
   }
 
-  ThemeChoice _resolve() => KidsProfileService.instance.useKidsTheme
-      ? (
-          mode: settings.ThemeMode.lurokaOcean,
-          palette: KidsProfileService.instance.isOlderKids ? MonoPalette.lurokaKidsOlder : MonoPalette.lurokaKids,
-        )
-      : resolve(_storedMode, _customPalette, unlocked: _supporter.isUnlocked);
+  ThemeChoice _resolve() {
+    final kids = KidsProfileService.instance;
+    if (!kids.useKidsTheme) return resolve(_storedMode, _customPalette, unlocked: _supporter.isUnlocked);
+    final base = kids.isOlderKids ? MonoPalette.lurokaKidsOlder : MonoPalette.lurokaKids;
+    final atmosphere = kids.atmosphereFor(kids.activeId!);
+    if (atmosphere == KidsAtmosphere.sunshine) return (mode: settings.ThemeMode.lurokaOcean, palette: base);
+    return (mode: settings.ThemeMode.lurokaOcean, palette: MonoPalette(
+      bg: atmosphere.background,
+      surface: Color.alphaBlend(atmosphere.accent.withValues(alpha: .07), atmosphere.background),
+      outline: atmosphere.accent.withValues(alpha: .42),
+      text: base.text,
+      textMuted: base.textMuted,
+      accent: atmosphere.accent,
+    ));
+  }
 
   /// Re-resolves after the stored choice or the Supporter entitlement changed.
   /// The stored choice is never rewritten: losing the entitlement only changes

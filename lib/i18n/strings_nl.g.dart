@@ -578,6 +578,13 @@ class _Translations$kidsShelf$nl extends Translations$kidsShelf$en {
 	@override String get yourShelf => 'Je filmplank';
 	@override String get all => 'Alles';
 	@override String get pickSomething => 'Wat wil je bekijken?';
+	@override String get atmosphere => 'Sfeer van het startscherm';
+	@override String get atmosphereHint => 'Kies de kleuren van het startscherm voor kinderen. De boomhut blijft hetzelfde.';
+	@override String get sunshine => 'Zonneschijn';
+	@override String get berry => 'Bes';
+	@override String get mint => 'Munt';
+	@override String get sky => 'Lucht';
+	@override String get atmospherePreview => 'Voorbeeld van het startscherm';
 }
 
 // Path: kidsHome
@@ -785,6 +792,23 @@ class _Translations$kids$nl extends Translations$kids$en {
 	final TranslationsNl _root; // ignore: unused_field
 
 	// Translations
+	@override String get allLibrariesHint => 'Nieuwe film- en seriebibliotheken worden ook opgenomen. Schakel dit uit om specifieke bibliotheken te kiezen.';
+	@override String get appearanceSection => 'Uiterlijk';
+	@override String get disableParentPin => 'Ouderpincode uitschakelen';
+	@override String get disableParentPinConfirm => 'De ouderpincode voor alle kinderprofielen uitschakelen? Kinderen kunnen dan naar onbeveiligde profielen wisselen en schermtijdlimieten omzeilen. Profielpincodes blijven gelden.';
+	@override String get discardAction => 'Wijzigingen verwerpen';
+	@override String get discardMessage => 'Je wijzigingen zijn niet opgeslagen.';
+	@override String get discardTitle => 'Wijzigingen verwerpen?';
+	@override String get editorTitle => 'Instellingen kinderprofiel';
+	@override String libraryCount({required Object count}) => 'Geselecteerde bibliotheken: ${count}';
+	@override String get moreSection => 'Meer';
+	@override String get pinChoice => 'Een ouderpincode gebruiken';
+	@override String get pinChoiceHint => 'Aanbevolen. Zonder ouderpincode kunnen kinderen naar onbeveiligde profielen wisselen en kinderinstellingen wijzigen. Ze kunnen schermtijdlimieten omzeilen door van profiel te wisselen.';
+	@override String get pinDifference => 'Een ouderpincode beschermt de kinderinstellingen. Een profielpincode beschermt één profiel. Of de ouderpincode nodig is om het kinderprofiel te verlaten, stel je afzonderlijk in.';
+	@override String get pinDisabledWarning => 'Zonder ouderpincode kunnen kinderen het kinderprofiel verlaten en onbeveiligde profielen openen. Ze kunnen schermtijdlimieten omzeilen door van profiel te wisselen. Afzonderlijke profielpincodes blijven gelden.';
+	@override String get profileSection => 'Profiel';
+	@override String get timeLimitNoPinHint => 'Wissel van profiel om schermtijd te beheren. Zonder ouderpincode kan iedereen naar een onbeveiligd profiel wisselen.';
+	@override String get watchSection => 'Wat ze mogen kijken';
 	@override String get timeLimits => 'Schermtijdlimieten';
 	@override String get dailyWatchLimit => 'Dagelijkse kijktijd';
 	@override String get dailyWatchLimitHint => 'Beperkt het afspelen van video\'s elke dag op dit apparaat.';
@@ -969,6 +993,72 @@ class _Translations$auth$nl extends Translations$auth$en {
 	final TranslationsNl _root; // ignore: unused_field
 
 	// Translations
+	@override String get plexQrSignIn => 'Bij Plex aanmelden met een QR-code';
+	@override String get setUpWithPhone => 'Instellen met telefoon';
+	@override String get loadingRestoredData => 'Je herstelde profielen en verbindingen worden geladen…';
+	@override String get loadingRestoredDataFailed => 'De herstelde gegevens konden niet worden geladen. Probeer het opnieuw of open Luroka opnieuw.';
+	@override String get connectTv => 'Een tv verbinden';
+	@override String get restoreEncryptedBackup => 'Versleutelde back-up herstellen';
+	@override String get restoreCloudBackup => 'Cloudback-up herstellen';
+	@override String get saveEncryptedBackup => 'Versleutelde back-up opslaan';
+	@override String get backupSaved => 'Back-up opgeslagen';
+	@override String get createEncryptedBackup => 'Versleutelde back-up maken';
+	@override String get confirmBackupPassword => 'Wachtwoord bevestigen';
+	@override String get enterBackupPassword => 'Voer een wachtwoord in.';
+	@override String get confirmBackupPasswordError => 'Voer een wachtwoord in en bevestig het.';
+	@override String get restoreBackupAction => 'Herstellen';
+	@override String get backupCreateInstructions => 'Bevat profielen, serveraanmeldingen en lokale kijkgegevens. Bewaar het wachtwoord veilig; je hebt het nodig om te herstellen.';
+	@override String get backupRestoreInstructions => 'Voer het wachtwoord of de cloudherstelcode in waarmee deze back-up is gemaakt. Herstellen vereist een lege profieldatabase.';
+	@override String get backupCreateFailed => 'De versleutelde back-up kon niet worden gemaakt.';
+	@override String get backupRestoreFailed => 'De back-up kon niet worden hersteld. Controleer het wachtwoord en gebruik een lege installatie.';
+	@override String get recoveryCodeStep => 'Stap 2 van 3: Bewaar je herstelcode';
+	@override String get backupNotUploaded => 'Nog niet geüpload. Voltooi stap 3 en wacht op de bevestiging dat de cloudback-up is gemaakt voordat je deze herstelt.';
+	@override String get recoveryCodeSavedContinue => 'Ik heb mijn code opgeslagen — doorgaan';
+	@override String get recoveryCodeSaveFile => 'Code opslaan in bestand';
+	@override String get recoveryCodeShowQr => 'QR-code tonen';
+	@override String get recoveryCodeHideQr => 'QR-code verbergen';
+	@override String get recoveryCopied => 'Herstelcode gekopieerd. Bewaar deze op een privéplek.';
+	@override String get recoveryCopyFailed => 'De herstelcode kon niet worden gekopieerd.';
+	@override String get recoverySaveDialog => 'Herstelcode privé opslaan';
+	@override String get recoverySaved => 'Herstelcode opgeslagen. Houd het bestand privé.';
+	@override String get recoverySaveFailed => 'De herstelcode kon niet worden opgeslagen. Probeer deze te kopiëren.';
+	@override String get cloudRestoreApplyFailed => 'De back-up is gedownload, maar kon niet op dit apparaat worden hersteld. Probeer het opnieuw of neem contact op met ondersteuning.';
+	@override String get cloudBackupNotFound => 'Er is geen cloudback-up gevonden voor deze code. Voltooi stap 3 op het oorspronkelijke apparaat en wacht op de bevestiging dat de back-up is gemaakt. Controleer of je de code voor die back-up gebruikt; de back-up kan ook zijn verlopen of verwijderd.';
+	@override String get cloudBackupConnectionFailed => 'Er kon geen verbinding met de back-updienst worden gemaakt. Controleer je internetverbinding en probeer het opnieuw.';
+	@override String get cloudBackupInvalidFormat => 'De herstelcode of het back-upformaat kon niet worden gelezen. Controleer de volledige code en probeer het opnieuw.';
+	@override String get cloudBackupOpenFailed => 'De back-up kon niet worden geopend. Controleer je herstelcode en probeer het opnieuw.';
+	@override String get cloudBackupSelectProfiles => 'Selecteer de profielen die je wilt opnemen. De back-up wordt vóór het uploaden versleuteld en is 90 dagen beschikbaar.';
+	@override String get cloudBackupIncludeLogins => 'Opgeslagen aanmeldingen voor servers en integraties opnemen';
+	@override String get cloudBackupLoginsWarning => 'Bevat gekoppelde Plex-accounts en andere opgeslagen aanmeldingen om opnieuw verbinden te vergemakkelijken. Iedereen met de herstelcode kan deze mogelijk gebruiken.';
+	@override String get cloudBackupNoLogins => 'Zonder opgeslagen aanmeldingen moet je servers na het herstellen opnieuw verbinden.';
+	@override String get pairingHttpPhoneTitle => 'HTTP gebruiken voor deze server?';
+	@override String get pairingHttpPhoneWarning => 'Je serveraanmelding en mediaverkeer worden niet versleuteld. Mensen op het netwerk kunnen ze mogelijk lezen. HTTPS wordt aanbevolen. De Luroka-overdracht blijft versleuteld.';
+	@override String get pairingHttpTvTitle => 'Een onversleutelde server gebruiken?';
+	@override String get pairingHttpTvWarning => 'Je telefoon heeft HTTP gekozen. Mensen op dit netwerk kunnen mogelijk het toegangstoken van je tv en het mediaverkeer lezen. Gebruik alleen een vertrouwd netwerk. HTTPS wordt aanbevolen.';
+	@override String get pairingUseHttp => 'HTTP gebruiken';
+	@override String get pairingTvTitle => 'Jellyfin of Emby verbinden met je telefoon';
+	@override String get pairingScanInvitation => 'Scan met je telefoon. De uitnodiging verloopt over vijf minuten.';
+	@override String get pairingWaitForPhone => 'Wachten tot je telefoon verbinding maakt…';
+	@override String get pairingComparePhone => 'Vergelijk deze code met die op je telefoon:';
+	@override String get pairingConfirmOnPhone => 'Bevestig op je telefoon als de codes overeenkomen.';
+	@override String get pairingAdultOnly => 'Koppelen is alleen beschikbaar vanuit een volwassenenprofiel.';
+	@override String get pairingProfileChanged => 'De profieltoegang is gewijzigd. Het koppelen is geannuleerd.';
+	@override String get pairingServiceUnavailable => 'De koppeldienst is niet beschikbaar. Probeer het opnieuw of voer de server handmatig in.';
+	@override String get pairingExpired => 'Het koppelen is verlopen of onderbroken. Begin opnieuw.';
+	@override String get pairingVerifyFailed => 'De server en het account konden niet worden gecontroleerd. Begin opnieuw met koppelen.';
+	@override String get pairingScanOrPaste => 'Scan de tv-code of plak de uitnodiging.';
+	@override String get pairingScanTv => 'Tv-code scannen';
+	@override String get pairingTvInvitation => 'Tv-uitnodiging';
+	@override String pairingCheckTvCode({required Object code}) => 'Controleer of je tv dezelfde code toont: ${code}';
+	@override String get pairingCodesMatch => 'Codes komen overeen';
+	@override String get recoveryCodeLabel => 'Herstelcode';
+	@override String get recoveryCodeScan => 'Herstelcode scannen';
+	@override String get pairingRecoveryInstructions => 'Scan of plak je opgeslagen herstelcode. Deze wordt versleuteld voor je tv.';
+	@override String get pairingSendTv => 'Naar tv verzenden';
+	@override String get pairingServerLoginHint => 'Meld je aan bij je server. Je wachtwoord wordt naar die server gestuurd, niet naar Luroka.';
+	@override String get recoveryCodeWarning => 'Je hebt deze code nodig om je back-up te herstellen of te verwijderen. Iedereen met de code heeft toegang tot de back-up. Als je de code verliest, kan Luroka deze niet herstellen.';
+	@override String get recoveryCodePrivateFile => 'Kopieer of bewaar de code alleen op een privéplek. Een opgeslagen codebestand is niet versleuteld.';
+	@override String get recoveryCodePhoneInstructions => 'Bewaar een privékopie van deze code. Om op je telefoon te herstellen, open je cloudback-up herstellen in Luroka en kies je voor het scannen van de herstelcode.';
 	@override String get signInWithPlex => 'Inloggen met Plex';
 	@override String get showQRCode => 'Toon QR-code';
 	@override String get authenticate => 'Authenticeren';
@@ -3865,6 +3955,13 @@ class _Translations$profileSetupGuide$nl extends Translations$profileSetupGuide$
 	final TranslationsNl _root; // ignore: unused_field
 
 	// Translations
+	@override String get tabletSpotlightStyle => 'Spotlightstijl op tablet';
+	@override String get spotlightClassic => 'Klassiek';
+	@override String get spotlightMarquee => 'Marquee';
+	@override String get spotlightTonight => 'Tips voor vanavond';
+	@override String get phoneSpotlight => 'Filmische Spotlight op telefoon';
+	@override String get phoneSpotlightCinematic => 'Liggende afbeelding met de titel eroverheen';
+	@override String get phoneSpotlightClassic => 'Klassieke posterkaart';
 	@override String get title => 'Maak uw profiel van u';
 	@override String get description => 'Kies hoe Luroka eruitziet en aanvoelt voor dit profiel op dit apparaat. Je kunt alles later wijzigen in Instellingen.';
 	@override String get appearanceStep => '1 van 2 · Uiterlijk';
@@ -5243,6 +5340,13 @@ extension on TranslationsNl {
 			'kidsShelf.yourShelf' => 'Je filmplank',
 			'kidsShelf.all' => 'Alles',
 			'kidsShelf.pickSomething' => 'Wat wil je bekijken?',
+			'kidsShelf.atmosphere' => 'Sfeer van het startscherm',
+			'kidsShelf.atmosphereHint' => 'Kies de kleuren van het startscherm voor kinderen. De boomhut blijft hetzelfde.',
+			'kidsShelf.sunshine' => 'Zonneschijn',
+			'kidsShelf.berry' => 'Bes',
+			'kidsShelf.mint' => 'Munt',
+			'kidsShelf.sky' => 'Lucht',
+			'kidsShelf.atmospherePreview' => 'Voorbeeld van het startscherm',
 			'kidsHome.everything' => 'Voor jou',
 			'kidsHome.keepWatching' => 'Blijf kijken',
 			'kidsHome.emptyFilter' => 'Hier nog niets. Probeer het voor jou, of vraag je volwassene om iets toe te voegen waar je van houdt.',
@@ -5387,6 +5491,23 @@ extension on TranslationsNl {
 			'detailComposition.mediaInformation' => 'Media-informatie',
 			'detailComposition.fullFileInformation' => 'Volledige bestandsinformatie',
 			'detailComposition.castAndCrew' => 'Cast en crew',
+			'kids.allLibrariesHint' => 'Nieuwe film- en seriebibliotheken worden ook opgenomen. Schakel dit uit om specifieke bibliotheken te kiezen.',
+			'kids.appearanceSection' => 'Uiterlijk',
+			'kids.disableParentPin' => 'Ouderpincode uitschakelen',
+			'kids.disableParentPinConfirm' => 'De ouderpincode voor alle kinderprofielen uitschakelen? Kinderen kunnen dan naar onbeveiligde profielen wisselen en schermtijdlimieten omzeilen. Profielpincodes blijven gelden.',
+			'kids.discardAction' => 'Wijzigingen verwerpen',
+			'kids.discardMessage' => 'Je wijzigingen zijn niet opgeslagen.',
+			'kids.discardTitle' => 'Wijzigingen verwerpen?',
+			'kids.editorTitle' => 'Instellingen kinderprofiel',
+			'kids.libraryCount' => ({required Object count}) => 'Geselecteerde bibliotheken: ${count}',
+			'kids.moreSection' => 'Meer',
+			'kids.pinChoice' => 'Een ouderpincode gebruiken',
+			'kids.pinChoiceHint' => 'Aanbevolen. Zonder ouderpincode kunnen kinderen naar onbeveiligde profielen wisselen en kinderinstellingen wijzigen. Ze kunnen schermtijdlimieten omzeilen door van profiel te wisselen.',
+			'kids.pinDifference' => 'Een ouderpincode beschermt de kinderinstellingen. Een profielpincode beschermt één profiel. Of de ouderpincode nodig is om het kinderprofiel te verlaten, stel je afzonderlijk in.',
+			'kids.pinDisabledWarning' => 'Zonder ouderpincode kunnen kinderen het kinderprofiel verlaten en onbeveiligde profielen openen. Ze kunnen schermtijdlimieten omzeilen door van profiel te wisselen. Afzonderlijke profielpincodes blijven gelden.',
+			'kids.profileSection' => 'Profiel',
+			'kids.timeLimitNoPinHint' => 'Wissel van profiel om schermtijd te beheren. Zonder ouderpincode kan iedereen naar een onbeveiligd profiel wisselen.',
+			'kids.watchSection' => 'Wat ze mogen kijken',
 			'kids.timeLimits' => 'Schermtijdlimieten',
 			'kids.dailyWatchLimit' => 'Dagelijkse kijktijd',
 			'kids.dailyWatchLimitHint' => 'Beperkt het afspelen van video\'s elke dag op dit apparaat.',
@@ -5459,6 +5580,8 @@ extension on TranslationsNl {
 			'kids.freshStories' => 'Nieuwe verhalen om te ontdekken',
 			'kids.yourMovies' => 'Favorieten tijdens de film',
 			'kids.yourShows' => 'Nog één aflevering',
+			_ => null,
+		} ?? switch (path) {
 			'kids.emptyHint' => 'Nieuwe avonturen verschijnen hier wanneer uw server titels heeft met een toegestane leeftijdsclassificatie.',
 			'kids.title' => 'Luroka voor kinderen',
 			'kids.addProfile' => 'Kinderprofiel toevoegen',
@@ -5483,8 +5606,6 @@ extension on TranslationsNl {
 			'kids.historyReset' => 'Kijkuitsluitingen voor kinderen gereset',
 			'kids.blocked' => 'Deze titel is niet beschikbaar in dit kinderprofiel.',
 			'kids.switchProfile' => 'Profiel wisselen',
-			_ => null,
-		} ?? switch (path) {
 			'kids.manageFromAdult' => 'Schakel over naar een volwassen profiel om de instellingen te beheren.',
 			'kids.noConnections' => 'Verbind een server met uw volwassenprofiel voordat u een kinderprofiel toevoegt.',
 			'kids.created' => 'Kinderprofiel aangemaakt',
@@ -5559,6 +5680,72 @@ extension on TranslationsNl {
 			'appIcon.names.strata' => 'Straten',
 			'appIcon.names.facet' => 'Facet',
 			'appIcon.names.tilde' => 'Tilde',
+			'auth.plexQrSignIn' => 'Bij Plex aanmelden met een QR-code',
+			'auth.setUpWithPhone' => 'Instellen met telefoon',
+			'auth.loadingRestoredData' => 'Je herstelde profielen en verbindingen worden geladen…',
+			'auth.loadingRestoredDataFailed' => 'De herstelde gegevens konden niet worden geladen. Probeer het opnieuw of open Luroka opnieuw.',
+			'auth.connectTv' => 'Een tv verbinden',
+			'auth.restoreEncryptedBackup' => 'Versleutelde back-up herstellen',
+			'auth.restoreCloudBackup' => 'Cloudback-up herstellen',
+			'auth.saveEncryptedBackup' => 'Versleutelde back-up opslaan',
+			'auth.backupSaved' => 'Back-up opgeslagen',
+			'auth.createEncryptedBackup' => 'Versleutelde back-up maken',
+			'auth.confirmBackupPassword' => 'Wachtwoord bevestigen',
+			'auth.enterBackupPassword' => 'Voer een wachtwoord in.',
+			'auth.confirmBackupPasswordError' => 'Voer een wachtwoord in en bevestig het.',
+			'auth.restoreBackupAction' => 'Herstellen',
+			'auth.backupCreateInstructions' => 'Bevat profielen, serveraanmeldingen en lokale kijkgegevens. Bewaar het wachtwoord veilig; je hebt het nodig om te herstellen.',
+			'auth.backupRestoreInstructions' => 'Voer het wachtwoord of de cloudherstelcode in waarmee deze back-up is gemaakt. Herstellen vereist een lege profieldatabase.',
+			'auth.backupCreateFailed' => 'De versleutelde back-up kon niet worden gemaakt.',
+			'auth.backupRestoreFailed' => 'De back-up kon niet worden hersteld. Controleer het wachtwoord en gebruik een lege installatie.',
+			'auth.recoveryCodeStep' => 'Stap 2 van 3: Bewaar je herstelcode',
+			'auth.backupNotUploaded' => 'Nog niet geüpload. Voltooi stap 3 en wacht op de bevestiging dat de cloudback-up is gemaakt voordat je deze herstelt.',
+			'auth.recoveryCodeSavedContinue' => 'Ik heb mijn code opgeslagen — doorgaan',
+			'auth.recoveryCodeSaveFile' => 'Code opslaan in bestand',
+			'auth.recoveryCodeShowQr' => 'QR-code tonen',
+			'auth.recoveryCodeHideQr' => 'QR-code verbergen',
+			'auth.recoveryCopied' => 'Herstelcode gekopieerd. Bewaar deze op een privéplek.',
+			'auth.recoveryCopyFailed' => 'De herstelcode kon niet worden gekopieerd.',
+			'auth.recoverySaveDialog' => 'Herstelcode privé opslaan',
+			'auth.recoverySaved' => 'Herstelcode opgeslagen. Houd het bestand privé.',
+			'auth.recoverySaveFailed' => 'De herstelcode kon niet worden opgeslagen. Probeer deze te kopiëren.',
+			'auth.cloudRestoreApplyFailed' => 'De back-up is gedownload, maar kon niet op dit apparaat worden hersteld. Probeer het opnieuw of neem contact op met ondersteuning.',
+			'auth.cloudBackupNotFound' => 'Er is geen cloudback-up gevonden voor deze code. Voltooi stap 3 op het oorspronkelijke apparaat en wacht op de bevestiging dat de back-up is gemaakt. Controleer of je de code voor die back-up gebruikt; de back-up kan ook zijn verlopen of verwijderd.',
+			'auth.cloudBackupConnectionFailed' => 'Er kon geen verbinding met de back-updienst worden gemaakt. Controleer je internetverbinding en probeer het opnieuw.',
+			'auth.cloudBackupInvalidFormat' => 'De herstelcode of het back-upformaat kon niet worden gelezen. Controleer de volledige code en probeer het opnieuw.',
+			'auth.cloudBackupOpenFailed' => 'De back-up kon niet worden geopend. Controleer je herstelcode en probeer het opnieuw.',
+			'auth.cloudBackupSelectProfiles' => 'Selecteer de profielen die je wilt opnemen. De back-up wordt vóór het uploaden versleuteld en is 90 dagen beschikbaar.',
+			'auth.cloudBackupIncludeLogins' => 'Opgeslagen aanmeldingen voor servers en integraties opnemen',
+			'auth.cloudBackupLoginsWarning' => 'Bevat gekoppelde Plex-accounts en andere opgeslagen aanmeldingen om opnieuw verbinden te vergemakkelijken. Iedereen met de herstelcode kan deze mogelijk gebruiken.',
+			'auth.cloudBackupNoLogins' => 'Zonder opgeslagen aanmeldingen moet je servers na het herstellen opnieuw verbinden.',
+			'auth.pairingHttpPhoneTitle' => 'HTTP gebruiken voor deze server?',
+			'auth.pairingHttpPhoneWarning' => 'Je serveraanmelding en mediaverkeer worden niet versleuteld. Mensen op het netwerk kunnen ze mogelijk lezen. HTTPS wordt aanbevolen. De Luroka-overdracht blijft versleuteld.',
+			'auth.pairingHttpTvTitle' => 'Een onversleutelde server gebruiken?',
+			'auth.pairingHttpTvWarning' => 'Je telefoon heeft HTTP gekozen. Mensen op dit netwerk kunnen mogelijk het toegangstoken van je tv en het mediaverkeer lezen. Gebruik alleen een vertrouwd netwerk. HTTPS wordt aanbevolen.',
+			'auth.pairingUseHttp' => 'HTTP gebruiken',
+			'auth.pairingTvTitle' => 'Jellyfin of Emby verbinden met je telefoon',
+			'auth.pairingScanInvitation' => 'Scan met je telefoon. De uitnodiging verloopt over vijf minuten.',
+			'auth.pairingWaitForPhone' => 'Wachten tot je telefoon verbinding maakt…',
+			'auth.pairingComparePhone' => 'Vergelijk deze code met die op je telefoon:',
+			'auth.pairingConfirmOnPhone' => 'Bevestig op je telefoon als de codes overeenkomen.',
+			'auth.pairingAdultOnly' => 'Koppelen is alleen beschikbaar vanuit een volwassenenprofiel.',
+			'auth.pairingProfileChanged' => 'De profieltoegang is gewijzigd. Het koppelen is geannuleerd.',
+			'auth.pairingServiceUnavailable' => 'De koppeldienst is niet beschikbaar. Probeer het opnieuw of voer de server handmatig in.',
+			'auth.pairingExpired' => 'Het koppelen is verlopen of onderbroken. Begin opnieuw.',
+			'auth.pairingVerifyFailed' => 'De server en het account konden niet worden gecontroleerd. Begin opnieuw met koppelen.',
+			'auth.pairingScanOrPaste' => 'Scan de tv-code of plak de uitnodiging.',
+			'auth.pairingScanTv' => 'Tv-code scannen',
+			'auth.pairingTvInvitation' => 'Tv-uitnodiging',
+			'auth.pairingCheckTvCode' => ({required Object code}) => 'Controleer of je tv dezelfde code toont: ${code}',
+			'auth.pairingCodesMatch' => 'Codes komen overeen',
+			'auth.recoveryCodeLabel' => 'Herstelcode',
+			'auth.recoveryCodeScan' => 'Herstelcode scannen',
+			'auth.pairingRecoveryInstructions' => 'Scan of plak je opgeslagen herstelcode. Deze wordt versleuteld voor je tv.',
+			'auth.pairingSendTv' => 'Naar tv verzenden',
+			'auth.pairingServerLoginHint' => 'Meld je aan bij je server. Je wachtwoord wordt naar die server gestuurd, niet naar Luroka.',
+			'auth.recoveryCodeWarning' => 'Je hebt deze code nodig om je back-up te herstellen of te verwijderen. Iedereen met de code heeft toegang tot de back-up. Als je de code verliest, kan Luroka deze niet herstellen.',
+			'auth.recoveryCodePrivateFile' => 'Kopieer of bewaar de code alleen op een privéplek. Een opgeslagen codebestand is niet versleuteld.',
+			'auth.recoveryCodePhoneInstructions' => 'Bewaar een privékopie van deze code. Om op je telefoon te herstellen, open je cloudback-up herstellen in Luroka en kies je voor het scannen van de herstelcode.',
 			'auth.signInWithPlex' => 'Inloggen met Plex',
 			'auth.showQRCode' => 'Toon QR-code',
 			'auth.authenticate' => 'Authenticeren',
@@ -5907,6 +6094,8 @@ extension on TranslationsNl {
 			'settings.maxVolumePercent' => ({required Object percent}) => '${percent}%',
 			'settings.discordRichPresence' => 'Discord-activiteit',
 			'settings.discordRichPresenceDescription' => 'Toon op Discord wat je aan het kijken bent',
+			_ => null,
+		} ?? switch (path) {
 			'settings.services' => 'Diensten',
 			'settings.servicesDescription' => 'Koppel Trakt, MyAnimeList, Seerr en meer',
 			'settings.manageLibrariesDescription' => 'Bibliotheken herordenen en verbergen',
@@ -5997,8 +6186,6 @@ extension on TranslationsNl {
 			'settings.liveTvDefaultFavoritesDescription' => 'Toon alleen favoriete zenders bij het openen van Live TV',
 			'settings.general' => 'Algemeen',
 			'settings.generalDescription' => 'Taal, opstart- en venstergedrag',
-			_ => null,
-		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Taal en regio',
 			'settings.startup' => 'Opstarten',
 			'settings.display' => 'Weergave',
@@ -6421,6 +6608,8 @@ extension on TranslationsNl {
 			'fileInfo.pixelAspectRatio' => 'Pixel-aspectratio',
 			'fileInfo.profile' => 'Profiel',
 			'fileInfo.level' => 'Niveau',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.bitDepth' => 'Bitdiepte',
 			'fileInfo.pixelFormat' => 'Pixelformaat',
 			'fileInfo.colorSpace' => 'Kleurruimte',
@@ -6511,8 +6700,6 @@ extension on TranslationsNl {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Willekeurig afspelen is offline niet beschikbaar',
 			'mediaMenu.fileInfo' => 'Bestandsinformatie',
 			'mediaMenu.deleteEpisodeFromServer' => 'Aflevering verwijderen van server',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Seizoen verwijderen van server',
 			'mediaMenu.deleteShowFromServer' => 'Serie verwijderen van server',
 			'mediaMenu.deleteMovieFromServer' => 'Film verwijderen van server',
@@ -6935,6 +7122,8 @@ extension on TranslationsNl {
 			'accountPreferences.rewatchingInNextUp' => 'Opnieuw bekeken series in \'Volgende\' houden',
 			'accountPreferences.rewatchingInNextUpDescription' => 'Als je een serie afrondt en opnieuw start, blijft \'Volgende\' de herkijk volgen in plaats van de serie te laten vallen.',
 			'accountPreferences.watchedIndicator' => 'Bekeken-indicatoren',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.watchedIndicatorOptions.none' => 'Nooit',
 			'accountPreferences.watchedIndicatorOptions.moviesAndShows' => 'Films en tv-series',
 			'accountPreferences.watchedIndicatorOptions.movies' => 'Alleen films',
@@ -7025,8 +7214,6 @@ extension on TranslationsNl {
 			'libraries.filters' => 'Filters',
 			'libraries.confirmActionMessage' => 'Weet je zeker dat je deze actie wilt uitvoeren?',
 			'libraries.showLibrary' => 'Bibliotheek tonen',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Bibliotheek verbergen',
 			'libraries.libraryOptions' => 'Bibliotheekopties',
 			'libraries.content' => 'bibliotheekinhoud',
@@ -7449,6 +7636,8 @@ extension on TranslationsNl {
 			'collections.deleted' => 'Collectie verwijderd',
 			'collections.deleteFailed' => 'Collectie verwijderen mislukt',
 			'collections.deleteFailedWithError' => ({required Object error}) => 'Collectie verwijderen mislukt: ${error}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.selectCollection' => 'Collectie selecteren',
 			'collections.collectionName' => 'Collectienaam',
 			'collections.enterCollectionName' => 'Voer een collectienaam in',
@@ -7539,8 +7728,6 @@ extension on TranslationsNl {
 			'watchTogether.qrShare' => 'Deel QR-code',
 			'watchTogether.qrHint' => 'Scan met de Luroka-app om deel te nemen aan deze kamer.',
 			'watchTogether.phasePlaying' => 'Spelen',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Gepauzeerd',
 			'watchTogether.phaseWaiting' => 'Wachten op iedereen',
 			'watchTogether.inviteCopied' => 'Uitnodiging gekopieerd. Plak het in een bericht.',
@@ -7963,6 +8150,8 @@ extension on TranslationsNl {
 			'externalPlayer.useExternalPlayer' => 'Externe speler gebruiken',
 			'externalPlayer.useExternalPlayerDescription' => 'Open video\'s in een andere app',
 			'externalPlayer.selectPlayer' => 'Speler selecteren',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Aangepaste spelers',
 			'externalPlayer.systemDefault' => 'Systeemstandaard',
 			'externalPlayer.addCustomPlayer' => 'Aangepaste speler toevoegen',
@@ -8053,8 +8242,6 @@ extension on TranslationsNl {
 			'matchScreen.match' => 'Koppelen...',
 			'matchScreen.fixMatch' => 'Koppeling herstellen...',
 			'matchScreen.unmatch' => 'Ontkoppelen',
-			_ => null,
-		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Deze koppeling wissen? Plex behandelt het item als niet-gekoppeld totdat het opnieuw wordt gekoppeld.',
 			'matchScreen.unmatchSuccess' => 'Item ontkoppeld',
 			'matchScreen.unmatchFailed' => 'Kon item niet ontkoppelen',
@@ -8197,6 +8384,13 @@ extension on TranslationsNl {
 			'profileIntegrations.later' => 'Later instellen',
 			'profileIntegrations.manage' => 'Beheer integraties',
 			'profileIntegrations.forProfile' => ({required Object name}) => 'Aansluitingen voor ${name}',
+			'profileSetupGuide.tabletSpotlightStyle' => 'Spotlightstijl op tablet',
+			'profileSetupGuide.spotlightClassic' => 'Klassiek',
+			'profileSetupGuide.spotlightMarquee' => 'Marquee',
+			'profileSetupGuide.spotlightTonight' => 'Tips voor vanavond',
+			'profileSetupGuide.phoneSpotlight' => 'Filmische Spotlight op telefoon',
+			'profileSetupGuide.phoneSpotlightCinematic' => 'Liggende afbeelding met de titel eroverheen',
+			'profileSetupGuide.phoneSpotlightClassic' => 'Klassieke posterkaart',
 			'profileSetupGuide.title' => 'Maak uw profiel van u',
 			'profileSetupGuide.description' => 'Kies hoe Luroka eruitziet en aanvoelt voor dit profiel op dit apparaat. Je kunt alles later wijzigen in Instellingen.',
 			'profileSetupGuide.appearanceStep' => '1 van 2 · Uiterlijk',

@@ -578,6 +578,13 @@ class _Translations$kidsShelf$sv extends Translations$kidsShelf$en {
 	@override String get yourShelf => 'Din filmhylla';
 	@override String get all => 'Allt';
 	@override String get pickSomething => 'Vad vill du se?';
+	@override String get atmosphere => 'Stämning på hemskärmen';
+	@override String get atmosphereHint => 'Välj färgerna på barnens hemskärm. Trädkojan förblir densamma.';
+	@override String get sunshine => 'Solsken';
+	@override String get berry => 'Bär';
+	@override String get mint => 'Mynta';
+	@override String get sky => 'Himmel';
+	@override String get atmospherePreview => 'Förhandsvisning av hemskärmen';
 }
 
 // Path: kidsHome
@@ -785,6 +792,23 @@ class _Translations$kids$sv extends Translations$kids$en {
 	final TranslationsSv _root; // ignore: unused_field
 
 	// Translations
+	@override String get allLibrariesHint => 'Nya film- och seriebibliotek inkluderas också. Stäng av detta för att välja specifika bibliotek.';
+	@override String get appearanceSection => 'Utseende';
+	@override String get disableParentPin => 'Stäng av föräldra-PIN';
+	@override String get disableParentPinConfirm => 'Stäng av föräldra-PIN för alla barnprofiler? Barn kan byta till oskyddade profiler och kringgå skärmtidsgränser. Profilernas PIN-koder gäller fortfarande.';
+	@override String get discardAction => 'Kasta ändringar';
+	@override String get discardMessage => 'Dina ändringar har inte sparats.';
+	@override String get discardTitle => 'Kasta ändringar?';
+	@override String get editorTitle => 'Inställningar för barnprofil';
+	@override String libraryCount({required Object count}) => 'Valda bibliotek: ${count}';
+	@override String get moreSection => 'Mer';
+	@override String get pinChoice => 'Använd föräldra-PIN';
+	@override String get pinChoiceHint => 'Rekommenderas. Utan föräldra-PIN kan barn byta till oskyddade profiler och ändra barninställningar. Skärmtidsgränser kan kringgås genom att byta profil.';
+	@override String get pinDifference => 'En föräldra-PIN skyddar barninställningar. En profil-PIN skyddar en enskild profil. Om föräldra-PIN krävs för att lämna barnprofilen ställs in separat.';
+	@override String get pinDisabledWarning => 'Utan föräldra-PIN kan barn lämna barnprofilen och öppna oskyddade profiler. Skärmtidsgränser kan kringgås genom att byta profil. Enskilda profil-PIN-koder gäller fortfarande.';
+	@override String get profileSection => 'Profil';
+	@override String get timeLimitNoPinHint => 'Byt profil för att hantera skärmtid. Utan föräldra-PIN kan vem som helst byta till en oskyddad profil.';
+	@override String get watchSection => 'Vad de får titta på';
 	@override String get timeLimits => 'Skärmens tidsgränser';
 	@override String get dailyWatchLimit => 'Daglig visningstid';
 	@override String get dailyWatchLimitHint => 'Begränsar videouppspelning på den här enheten varje dag.';
@@ -969,6 +993,72 @@ class _Translations$auth$sv extends Translations$auth$en {
 	final TranslationsSv _root; // ignore: unused_field
 
 	// Translations
+	@override String get plexQrSignIn => 'Logga in på Plex med QR-kod';
+	@override String get setUpWithPhone => 'Konfigurera med telefonen';
+	@override String get loadingRestoredData => 'Läser in dina återställda profiler och anslutningar…';
+	@override String get loadingRestoredDataFailed => 'Det gick inte att läsa in återställda data. Försök igen eller öppna Luroka på nytt.';
+	@override String get connectTv => 'Anslut en TV';
+	@override String get restoreEncryptedBackup => 'Återställ krypterad säkerhetskopia';
+	@override String get restoreCloudBackup => 'Återställ säkerhetskopia från molnet';
+	@override String get saveEncryptedBackup => 'Spara krypterad säkerhetskopia';
+	@override String get backupSaved => 'Säkerhetskopia sparad';
+	@override String get createEncryptedBackup => 'Skapa krypterad säkerhetskopia';
+	@override String get confirmBackupPassword => 'Bekräfta lösenord';
+	@override String get enterBackupPassword => 'Ange ett lösenord.';
+	@override String get confirmBackupPasswordError => 'Ange ett lösenord och bekräfta det.';
+	@override String get restoreBackupAction => 'Återställ';
+	@override String get backupCreateInstructions => 'Innehåller profiler, serverinloggningar och lokala visningsdata. Förvara lösenordet säkert; det behövs för återställning.';
+	@override String get backupRestoreInstructions => 'Ange lösenordet eller molnets återställningskod som användes för att skapa säkerhetskopian. Återställning kräver en tom profildatabas.';
+	@override String get backupCreateFailed => 'Det gick inte att skapa den krypterade säkerhetskopian.';
+	@override String get backupRestoreFailed => 'Det gick inte att återställa säkerhetskopian. Kontrollera lösenordet och använd en tom installation.';
+	@override String get recoveryCodeStep => 'Steg 2 av 3: Spara din återställningskod';
+	@override String get backupNotUploaded => 'Inte uppladdad ännu. Slutför steg 3 och vänta på bekräftelsen att molnsäkerhetskopian har skapats innan du återställer.';
+	@override String get recoveryCodeSavedContinue => 'Jag har sparat koden — fortsätt';
+	@override String get recoveryCodeSaveFile => 'Spara koden i en fil';
+	@override String get recoveryCodeShowQr => 'Visa QR-kod';
+	@override String get recoveryCodeHideQr => 'Dölj QR-kod';
+	@override String get recoveryCopied => 'Återställningskoden har kopierats. Spara den på en privat plats.';
+	@override String get recoveryCopyFailed => 'Det gick inte att kopiera återställningskoden.';
+	@override String get recoverySaveDialog => 'Spara återställningskoden privat';
+	@override String get recoverySaved => 'Återställningskoden har sparats. Förvara filen privat.';
+	@override String get recoverySaveFailed => 'Det gick inte att spara återställningskoden. Försök kopiera den i stället.';
+	@override String get cloudRestoreApplyFailed => 'Säkerhetskopian hämtades men kunde inte återställas på den här enheten. Försök igen eller kontakta supporten.';
+	@override String get cloudBackupNotFound => 'Ingen molnsäkerhetskopia hittades för den här koden. Slutför steg 3 på den ursprungliga enheten och vänta på bekräftelsen att kopian har skapats. Kontrollera att du använder koden som sparades för kopian; den kan också ha gått ut eller raderats.';
+	@override String get cloudBackupConnectionFailed => 'Det gick inte att ansluta till säkerhetskopieringstjänsten. Kontrollera internetanslutningen och försök igen.';
+	@override String get cloudBackupInvalidFormat => 'Återställningskoden eller säkerhetskopians format kunde inte läsas. Kontrollera hela koden och försök igen.';
+	@override String get cloudBackupOpenFailed => 'Säkerhetskopian kunde inte öppnas. Kontrollera återställningskoden och försök igen.';
+	@override String get cloudBackupSelectProfiles => 'Välj vilka profiler som ska ingå. Säkerhetskopian krypteras före uppladdning och är tillgänglig i 90 dagar.';
+	@override String get cloudBackupIncludeLogins => 'Inkludera sparade server- och integrationsinloggningar';
+	@override String get cloudBackupLoginsWarning => 'Inkluderar länkade Plex-konton och andra sparade inloggningar för enklare återanslutning. Alla med återställningskoden kan eventuellt använda dem.';
+	@override String get cloudBackupNoLogins => 'Utan sparade inloggningar måste du ansluta servrarna igen efter återställningen.';
+	@override String get pairingHttpPhoneTitle => 'Använd HTTP för den här servern?';
+	@override String get pairingHttpPhoneWarning => 'Din serverinloggning och medietrafik krypteras inte. Andra i nätverket kan eventuellt läsa dem. HTTPS rekommenderas. Luroka-överföringen förblir krypterad.';
+	@override String get pairingHttpTvTitle => 'Använd en okrypterad server?';
+	@override String get pairingHttpTvWarning => 'Telefonen valde HTTP. Andra i nätverket kan eventuellt läsa TV:ns åtkomsttoken och medietrafik. Använd bara ett nätverk du litar på. HTTPS rekommenderas.';
+	@override String get pairingUseHttp => 'Använd HTTP';
+	@override String get pairingTvTitle => 'Anslut Jellyfin eller Emby med telefonen';
+	@override String get pairingScanInvitation => 'Skanna med telefonen. Inbjudan går ut om fem minuter.';
+	@override String get pairingWaitForPhone => 'Väntar på att telefonen ska ansluta…';
+	@override String get pairingComparePhone => 'Jämför den här koden med den på telefonen:';
+	@override String get pairingConfirmOnPhone => 'Om koderna stämmer överens, bekräfta på telefonen.';
+	@override String get pairingAdultOnly => 'Parkoppling är endast tillgänglig från en vuxenprofil.';
+	@override String get pairingProfileChanged => 'Profilåtkomsten ändrades. Parkopplingen avbröts.';
+	@override String get pairingServiceUnavailable => 'Parkopplingstjänsten är inte tillgänglig. Försök igen eller ange servern manuellt.';
+	@override String get pairingExpired => 'Parkopplingen gick ut eller avbröts. Börja om.';
+	@override String get pairingVerifyFailed => 'Det gick inte att verifiera servern och kontot. Starta parkopplingen igen.';
+	@override String get pairingScanOrPaste => 'Skanna TV-koden eller klistra in inbjudan.';
+	@override String get pairingScanTv => 'Skanna TV-kod';
+	@override String get pairingTvInvitation => 'TV-inbjudan';
+	@override String pairingCheckTvCode({required Object code}) => 'Kontrollera att TV:n visar samma kod: ${code}';
+	@override String get pairingCodesMatch => 'Koderna stämmer';
+	@override String get recoveryCodeLabel => 'Återställningskod';
+	@override String get recoveryCodeScan => 'Skanna återställningskod';
+	@override String get pairingRecoveryInstructions => 'Skanna eller klistra in din sparade återställningskod. Den krypteras för din TV.';
+	@override String get pairingSendTv => 'Skicka till TV';
+	@override String get pairingServerLoginHint => 'Logga in på din server. Ditt lösenord skickas till servern, inte till Luroka.';
+	@override String get recoveryCodeWarning => 'Du behöver koden för att återställa eller radera säkerhetskopian. Alla som har koden kan komma åt kopian. Om du förlorar den kan Luroka inte återskapa den.';
+	@override String get recoveryCodePrivateFile => 'Kopiera eller spara koden endast på en privat plats. En sparad kodfil är inte krypterad.';
+	@override String get recoveryCodePhoneInstructions => 'Spara en privat kopia av koden. För att återställa på telefonen öppnar du återställning av molnsäkerhetskopia i Luroka och väljer att skanna återställningskoden.';
 	@override String get signInWithPlex => 'Logga in med Plex';
 	@override String get showQRCode => 'Visa QR-kod';
 	@override String get authenticate => 'Verifiera';
@@ -3865,6 +3955,13 @@ class _Translations$profileSetupGuide$sv extends Translations$profileSetupGuide$
 	final TranslationsSv _root; // ignore: unused_field
 
 	// Translations
+	@override String get tabletSpotlightStyle => 'Spotlight-stil på surfplatta';
+	@override String get spotlightClassic => 'Klassisk';
+	@override String get spotlightMarquee => 'Marquee';
+	@override String get spotlightTonight => 'Kvällens tips';
+	@override String get phoneSpotlight => 'Filmisk spotlight på telefon';
+	@override String get phoneSpotlightCinematic => 'Liggande bild med titeln ovanpå';
+	@override String get phoneSpotlightClassic => 'Klassiskt affischkort';
 	@override String get title => 'Gör din profil till din';
 	@override String get description => 'Välj hur Luroka ser ut och känns för den här profilen på den här enheten. Du kan ändra allt senare i Inställningar.';
 	@override String get appearanceStep => '1 av 2 · Utseende';
@@ -5243,6 +5340,13 @@ extension on TranslationsSv {
 			'kidsShelf.yourShelf' => 'Din filmhylla',
 			'kidsShelf.all' => 'Allt',
 			'kidsShelf.pickSomething' => 'Vad vill du se?',
+			'kidsShelf.atmosphere' => 'Stämning på hemskärmen',
+			'kidsShelf.atmosphereHint' => 'Välj färgerna på barnens hemskärm. Trädkojan förblir densamma.',
+			'kidsShelf.sunshine' => 'Solsken',
+			'kidsShelf.berry' => 'Bär',
+			'kidsShelf.mint' => 'Mynta',
+			'kidsShelf.sky' => 'Himmel',
+			'kidsShelf.atmospherePreview' => 'Förhandsvisning av hemskärmen',
 			'kidsHome.everything' => 'För dig',
 			'kidsHome.keepWatching' => 'Fortsätt titta',
 			'kidsHome.emptyFilter' => 'Inget här ännu. Prova för dig, eller be din vuxna att lägga till något du älskar.',
@@ -5387,6 +5491,23 @@ extension on TranslationsSv {
 			'detailComposition.mediaInformation' => 'Medieinformation',
 			'detailComposition.fullFileInformation' => 'Fullständig filinformation',
 			'detailComposition.castAndCrew' => 'Cast & Crew',
+			'kids.allLibrariesHint' => 'Nya film- och seriebibliotek inkluderas också. Stäng av detta för att välja specifika bibliotek.',
+			'kids.appearanceSection' => 'Utseende',
+			'kids.disableParentPin' => 'Stäng av föräldra-PIN',
+			'kids.disableParentPinConfirm' => 'Stäng av föräldra-PIN för alla barnprofiler? Barn kan byta till oskyddade profiler och kringgå skärmtidsgränser. Profilernas PIN-koder gäller fortfarande.',
+			'kids.discardAction' => 'Kasta ändringar',
+			'kids.discardMessage' => 'Dina ändringar har inte sparats.',
+			'kids.discardTitle' => 'Kasta ändringar?',
+			'kids.editorTitle' => 'Inställningar för barnprofil',
+			'kids.libraryCount' => ({required Object count}) => 'Valda bibliotek: ${count}',
+			'kids.moreSection' => 'Mer',
+			'kids.pinChoice' => 'Använd föräldra-PIN',
+			'kids.pinChoiceHint' => 'Rekommenderas. Utan föräldra-PIN kan barn byta till oskyddade profiler och ändra barninställningar. Skärmtidsgränser kan kringgås genom att byta profil.',
+			'kids.pinDifference' => 'En föräldra-PIN skyddar barninställningar. En profil-PIN skyddar en enskild profil. Om föräldra-PIN krävs för att lämna barnprofilen ställs in separat.',
+			'kids.pinDisabledWarning' => 'Utan föräldra-PIN kan barn lämna barnprofilen och öppna oskyddade profiler. Skärmtidsgränser kan kringgås genom att byta profil. Enskilda profil-PIN-koder gäller fortfarande.',
+			'kids.profileSection' => 'Profil',
+			'kids.timeLimitNoPinHint' => 'Byt profil för att hantera skärmtid. Utan föräldra-PIN kan vem som helst byta till en oskyddad profil.',
+			'kids.watchSection' => 'Vad de får titta på',
 			'kids.timeLimits' => 'Skärmens tidsgränser',
 			'kids.dailyWatchLimit' => 'Daglig visningstid',
 			'kids.dailyWatchLimitHint' => 'Begränsar videouppspelning på den här enheten varje dag.',
@@ -5459,6 +5580,8 @@ extension on TranslationsSv {
 			'kids.freshStories' => 'Nya berättelser att upptäcka',
 			'kids.yourMovies' => 'Favoriter vid filmtid',
 			'kids.yourShows' => 'Ännu ett avsnitt',
+			_ => null,
+		} ?? switch (path) {
 			'kids.emptyHint' => 'Nya äventyr kommer att dyka upp här när din server har titlar med en tillåten åldersklassificering.',
 			'kids.title' => 'Luroka för barn',
 			'kids.addProfile' => 'Lägg till barnprofil',
@@ -5483,8 +5606,6 @@ extension on TranslationsSv {
 			'kids.historyReset' => 'Barns visningsuteslutningar har återställts',
 			'kids.blocked' => 'Den här titeln är inte tillgänglig i den här barnprofilen.',
 			'kids.switchProfile' => 'Byt profil',
-			_ => null,
-		} ?? switch (path) {
 			'kids.manageFromAdult' => 'Byt till en vuxenprofil för att hantera inställningar.',
 			'kids.noConnections' => 'Anslut en server till din vuxenprofil innan du lägger till en barnprofil.',
 			'kids.created' => 'Barnprofil skapad',
@@ -5559,6 +5680,72 @@ extension on TranslationsSv {
 			'appIcon.names.strata' => 'Strata',
 			'appIcon.names.facet' => 'Fasett',
 			'appIcon.names.tilde' => 'Tilde',
+			'auth.plexQrSignIn' => 'Logga in på Plex med QR-kod',
+			'auth.setUpWithPhone' => 'Konfigurera med telefonen',
+			'auth.loadingRestoredData' => 'Läser in dina återställda profiler och anslutningar…',
+			'auth.loadingRestoredDataFailed' => 'Det gick inte att läsa in återställda data. Försök igen eller öppna Luroka på nytt.',
+			'auth.connectTv' => 'Anslut en TV',
+			'auth.restoreEncryptedBackup' => 'Återställ krypterad säkerhetskopia',
+			'auth.restoreCloudBackup' => 'Återställ säkerhetskopia från molnet',
+			'auth.saveEncryptedBackup' => 'Spara krypterad säkerhetskopia',
+			'auth.backupSaved' => 'Säkerhetskopia sparad',
+			'auth.createEncryptedBackup' => 'Skapa krypterad säkerhetskopia',
+			'auth.confirmBackupPassword' => 'Bekräfta lösenord',
+			'auth.enterBackupPassword' => 'Ange ett lösenord.',
+			'auth.confirmBackupPasswordError' => 'Ange ett lösenord och bekräfta det.',
+			'auth.restoreBackupAction' => 'Återställ',
+			'auth.backupCreateInstructions' => 'Innehåller profiler, serverinloggningar och lokala visningsdata. Förvara lösenordet säkert; det behövs för återställning.',
+			'auth.backupRestoreInstructions' => 'Ange lösenordet eller molnets återställningskod som användes för att skapa säkerhetskopian. Återställning kräver en tom profildatabas.',
+			'auth.backupCreateFailed' => 'Det gick inte att skapa den krypterade säkerhetskopian.',
+			'auth.backupRestoreFailed' => 'Det gick inte att återställa säkerhetskopian. Kontrollera lösenordet och använd en tom installation.',
+			'auth.recoveryCodeStep' => 'Steg 2 av 3: Spara din återställningskod',
+			'auth.backupNotUploaded' => 'Inte uppladdad ännu. Slutför steg 3 och vänta på bekräftelsen att molnsäkerhetskopian har skapats innan du återställer.',
+			'auth.recoveryCodeSavedContinue' => 'Jag har sparat koden — fortsätt',
+			'auth.recoveryCodeSaveFile' => 'Spara koden i en fil',
+			'auth.recoveryCodeShowQr' => 'Visa QR-kod',
+			'auth.recoveryCodeHideQr' => 'Dölj QR-kod',
+			'auth.recoveryCopied' => 'Återställningskoden har kopierats. Spara den på en privat plats.',
+			'auth.recoveryCopyFailed' => 'Det gick inte att kopiera återställningskoden.',
+			'auth.recoverySaveDialog' => 'Spara återställningskoden privat',
+			'auth.recoverySaved' => 'Återställningskoden har sparats. Förvara filen privat.',
+			'auth.recoverySaveFailed' => 'Det gick inte att spara återställningskoden. Försök kopiera den i stället.',
+			'auth.cloudRestoreApplyFailed' => 'Säkerhetskopian hämtades men kunde inte återställas på den här enheten. Försök igen eller kontakta supporten.',
+			'auth.cloudBackupNotFound' => 'Ingen molnsäkerhetskopia hittades för den här koden. Slutför steg 3 på den ursprungliga enheten och vänta på bekräftelsen att kopian har skapats. Kontrollera att du använder koden som sparades för kopian; den kan också ha gått ut eller raderats.',
+			'auth.cloudBackupConnectionFailed' => 'Det gick inte att ansluta till säkerhetskopieringstjänsten. Kontrollera internetanslutningen och försök igen.',
+			'auth.cloudBackupInvalidFormat' => 'Återställningskoden eller säkerhetskopians format kunde inte läsas. Kontrollera hela koden och försök igen.',
+			'auth.cloudBackupOpenFailed' => 'Säkerhetskopian kunde inte öppnas. Kontrollera återställningskoden och försök igen.',
+			'auth.cloudBackupSelectProfiles' => 'Välj vilka profiler som ska ingå. Säkerhetskopian krypteras före uppladdning och är tillgänglig i 90 dagar.',
+			'auth.cloudBackupIncludeLogins' => 'Inkludera sparade server- och integrationsinloggningar',
+			'auth.cloudBackupLoginsWarning' => 'Inkluderar länkade Plex-konton och andra sparade inloggningar för enklare återanslutning. Alla med återställningskoden kan eventuellt använda dem.',
+			'auth.cloudBackupNoLogins' => 'Utan sparade inloggningar måste du ansluta servrarna igen efter återställningen.',
+			'auth.pairingHttpPhoneTitle' => 'Använd HTTP för den här servern?',
+			'auth.pairingHttpPhoneWarning' => 'Din serverinloggning och medietrafik krypteras inte. Andra i nätverket kan eventuellt läsa dem. HTTPS rekommenderas. Luroka-överföringen förblir krypterad.',
+			'auth.pairingHttpTvTitle' => 'Använd en okrypterad server?',
+			'auth.pairingHttpTvWarning' => 'Telefonen valde HTTP. Andra i nätverket kan eventuellt läsa TV:ns åtkomsttoken och medietrafik. Använd bara ett nätverk du litar på. HTTPS rekommenderas.',
+			'auth.pairingUseHttp' => 'Använd HTTP',
+			'auth.pairingTvTitle' => 'Anslut Jellyfin eller Emby med telefonen',
+			'auth.pairingScanInvitation' => 'Skanna med telefonen. Inbjudan går ut om fem minuter.',
+			'auth.pairingWaitForPhone' => 'Väntar på att telefonen ska ansluta…',
+			'auth.pairingComparePhone' => 'Jämför den här koden med den på telefonen:',
+			'auth.pairingConfirmOnPhone' => 'Om koderna stämmer överens, bekräfta på telefonen.',
+			'auth.pairingAdultOnly' => 'Parkoppling är endast tillgänglig från en vuxenprofil.',
+			'auth.pairingProfileChanged' => 'Profilåtkomsten ändrades. Parkopplingen avbröts.',
+			'auth.pairingServiceUnavailable' => 'Parkopplingstjänsten är inte tillgänglig. Försök igen eller ange servern manuellt.',
+			'auth.pairingExpired' => 'Parkopplingen gick ut eller avbröts. Börja om.',
+			'auth.pairingVerifyFailed' => 'Det gick inte att verifiera servern och kontot. Starta parkopplingen igen.',
+			'auth.pairingScanOrPaste' => 'Skanna TV-koden eller klistra in inbjudan.',
+			'auth.pairingScanTv' => 'Skanna TV-kod',
+			'auth.pairingTvInvitation' => 'TV-inbjudan',
+			'auth.pairingCheckTvCode' => ({required Object code}) => 'Kontrollera att TV:n visar samma kod: ${code}',
+			'auth.pairingCodesMatch' => 'Koderna stämmer',
+			'auth.recoveryCodeLabel' => 'Återställningskod',
+			'auth.recoveryCodeScan' => 'Skanna återställningskod',
+			'auth.pairingRecoveryInstructions' => 'Skanna eller klistra in din sparade återställningskod. Den krypteras för din TV.',
+			'auth.pairingSendTv' => 'Skicka till TV',
+			'auth.pairingServerLoginHint' => 'Logga in på din server. Ditt lösenord skickas till servern, inte till Luroka.',
+			'auth.recoveryCodeWarning' => 'Du behöver koden för att återställa eller radera säkerhetskopian. Alla som har koden kan komma åt kopian. Om du förlorar den kan Luroka inte återskapa den.',
+			'auth.recoveryCodePrivateFile' => 'Kopiera eller spara koden endast på en privat plats. En sparad kodfil är inte krypterad.',
+			'auth.recoveryCodePhoneInstructions' => 'Spara en privat kopia av koden. För att återställa på telefonen öppnar du återställning av molnsäkerhetskopia i Luroka och väljer att skanna återställningskoden.',
 			'auth.signInWithPlex' => 'Logga in med Plex',
 			'auth.showQRCode' => 'Visa QR-kod',
 			'auth.authenticate' => 'Verifiera',
@@ -5907,6 +6094,8 @@ extension on TranslationsSv {
 			'settings.maxVolumePercent' => ({required Object percent}) => '${percent} %',
 			'settings.discordRichPresence' => 'Discord-aktivitet',
 			'settings.discordRichPresenceDescription' => 'Visa vad du tittar på i Discord',
+			_ => null,
+		} ?? switch (path) {
 			'settings.services' => 'Tjänster',
 			'settings.servicesDescription' => 'Anslut Trakt, MyAnimeList, Seerr med mera',
 			'settings.manageLibrariesDescription' => 'Ordna om och dölj bibliotek',
@@ -5997,8 +6186,6 @@ extension on TranslationsSv {
 			'settings.liveTvDefaultFavoritesDescription' => 'Visa endast favoritkanaler när Live-TV öppnas',
 			'settings.general' => 'Allmänt',
 			'settings.generalDescription' => 'Språk, start och fönsterbeteende',
-			_ => null,
-		} ?? switch (path) {
 			'settings.languageAndRegion' => 'Språk och region',
 			'settings.startup' => 'Start',
 			'settings.display' => 'Skärm',
@@ -6421,6 +6608,8 @@ extension on TranslationsSv {
 			'fileInfo.pixelAspectRatio' => 'Pixelförhållande',
 			'fileInfo.profile' => 'Profil',
 			'fileInfo.level' => 'Nivå',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.bitDepth' => 'Bitdjup',
 			'fileInfo.pixelFormat' => 'Pixelformat',
 			'fileInfo.colorSpace' => 'Färgrymd',
@@ -6511,8 +6700,6 @@ extension on TranslationsSv {
 			'mediaMenu.shuffleNotAvailableOffline' => 'Blandad uppspelning är inte tillgänglig offline',
 			'mediaMenu.fileInfo' => 'Filinformation',
 			'mediaMenu.deleteEpisodeFromServer' => 'Ta bort avsnitt från servern',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => 'Ta bort säsong från servern',
 			'mediaMenu.deleteShowFromServer' => 'Ta bort serie från servern',
 			'mediaMenu.deleteMovieFromServer' => 'Ta bort film från servern',
@@ -6935,6 +7122,8 @@ extension on TranslationsSv {
 			'accountPreferences.rewatchingInNextUp' => 'Behåll omtittade serier i Nästa',
 			'accountPreferences.rewatchingInNextUpDescription' => 'När du har sett klart en serie och börjar om följer Nästa med i omtittningen i stället för att släppa serien.',
 			'accountPreferences.watchedIndicator' => 'Seddmarkeringar',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.watchedIndicatorOptions.none' => 'Aldrig',
 			'accountPreferences.watchedIndicatorOptions.moviesAndShows' => 'Filmer och TV-serier',
 			'accountPreferences.watchedIndicatorOptions.movies' => 'Endast filmer',
@@ -7025,8 +7214,6 @@ extension on TranslationsSv {
 			'libraries.filters' => 'Filter',
 			'libraries.confirmActionMessage' => 'Är du säker på att du vill utföra denna åtgärd?',
 			'libraries.showLibrary' => 'Visa bibliotek',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.hideLibrary' => 'Dölj bibliotek',
 			'libraries.libraryOptions' => 'Biblioteksalternativ',
 			'libraries.content' => 'bibliotekets innehåll',
@@ -7449,6 +7636,8 @@ extension on TranslationsSv {
 			'collections.deleted' => 'Samling borttagen',
 			'collections.deleteFailed' => 'Det gick inte att ta bort samlingen',
 			'collections.deleteFailedWithError' => ({required Object error}) => 'Det gick inte att ta bort samlingen: ${error}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.selectCollection' => 'Välj samling',
 			'collections.collectionName' => 'Samlingsnamn',
 			'collections.enterCollectionName' => 'Ange samlingsnamn',
@@ -7539,8 +7728,6 @@ extension on TranslationsSv {
 			'watchTogether.qrShare' => 'Dela QR-kod',
 			'watchTogether.qrHint' => 'Skanna med Luroka-appen för att gå med i det här rummet.',
 			'watchTogether.phasePlaying' => 'Spelar',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.phasePaused' => 'Pausad',
 			'watchTogether.phaseWaiting' => 'Väntar på alla',
 			'watchTogether.inviteCopied' => 'Inbjudan har kopierats. Klistra in det i ett meddelande.',
@@ -7963,6 +8150,8 @@ extension on TranslationsSv {
 			'externalPlayer.useExternalPlayer' => 'Använd extern spelare',
 			'externalPlayer.useExternalPlayerDescription' => 'Öppna videor i en annan app',
 			'externalPlayer.selectPlayer' => 'Välj spelare',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Anpassade spelare',
 			'externalPlayer.systemDefault' => 'Systemstandard',
 			'externalPlayer.addCustomPlayer' => 'Lägg till anpassad spelare',
@@ -8053,8 +8242,6 @@ extension on TranslationsSv {
 			'matchScreen.match' => 'Matcha...',
 			'matchScreen.fixMatch' => 'Rätta matchning...',
 			'matchScreen.unmatch' => 'Ta bort matchning',
-			_ => null,
-		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => 'Rensa denna matchning? Plex behandlar den som omatchad tills den matchas igen.',
 			'matchScreen.unmatchSuccess' => 'Matchning borttagen',
 			'matchScreen.unmatchFailed' => 'Det gick inte att ta bort matchningen',
@@ -8197,6 +8384,13 @@ extension on TranslationsSv {
 			'profileIntegrations.later' => 'Ställ in senare',
 			'profileIntegrations.manage' => 'Hantera integrationer',
 			'profileIntegrations.forProfile' => ({required Object name}) => 'Anslutningar för ${name}',
+			'profileSetupGuide.tabletSpotlightStyle' => 'Spotlight-stil på surfplatta',
+			'profileSetupGuide.spotlightClassic' => 'Klassisk',
+			'profileSetupGuide.spotlightMarquee' => 'Marquee',
+			'profileSetupGuide.spotlightTonight' => 'Kvällens tips',
+			'profileSetupGuide.phoneSpotlight' => 'Filmisk spotlight på telefon',
+			'profileSetupGuide.phoneSpotlightCinematic' => 'Liggande bild med titeln ovanpå',
+			'profileSetupGuide.phoneSpotlightClassic' => 'Klassiskt affischkort',
 			'profileSetupGuide.title' => 'Gör din profil till din',
 			'profileSetupGuide.description' => 'Välj hur Luroka ser ut och känns för den här profilen på den här enheten. Du kan ändra allt senare i Inställningar.',
 			'profileSetupGuide.appearanceStep' => '1 av 2 · Utseende',

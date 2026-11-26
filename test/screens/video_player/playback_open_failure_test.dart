@@ -119,8 +119,8 @@ void main() {
     var stops = 0;
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.luroka/mpv_player',
-      eventChannelName: 'com.luroka/mpv_player/events',
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
       methodHandler: (call) async {
         if (call.method == 'initialize') return true;
         if (call.method != 'command') return null;

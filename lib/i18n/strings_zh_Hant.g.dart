@@ -579,6 +579,13 @@ class _Translations$kidsShelf$zh_Hant extends Translations$kidsShelf$zh {
 	@override String get yourShelf => '你的電影架';
 	@override String get all => '一切';
 	@override String get pickSomething => '你想看什麼？';
+	@override String get atmosphere => '首頁氛圍';
+	@override String get atmosphereHint => '選擇兒童首頁的顏色。樹屋會保持不變。';
+	@override String get sunshine => '陽光';
+	@override String get berry => '莓果';
+	@override String get mint => '薄荷';
+	@override String get sky => '天空';
+	@override String get atmospherePreview => '首頁預覽';
 }
 
 // Path: kidsHome
@@ -786,6 +793,23 @@ class _Translations$kids$zh_Hant extends Translations$kids$zh {
 	final TranslationsZhHant _root; // ignore: unused_field
 
 	// Translations
+	@override String get allLibrariesHint => '新加入的電影和影集媒體庫也會包含在內。關閉此選項可選擇特定媒體庫。';
+	@override String get appearanceSection => '外觀';
+	@override String get disableParentPin => '關閉家長 PIN 碼';
+	@override String get disableParentPinConfirm => '關閉所有兒童設定檔的家長 PIN 碼？兒童可以切換到未受保護的設定檔並繞過螢幕使用時間限制。設定檔 PIN 碼仍然有效。';
+	@override String get discardAction => '捨棄變更';
+	@override String get discardMessage => '你的變更尚未儲存。';
+	@override String get discardTitle => '捨棄變更？';
+	@override String get editorTitle => '兒童設定檔設定';
+	@override String libraryCount({required Object count}) => '已選擇媒體庫：${count}';
+	@override String get moreSection => '更多';
+	@override String get pinChoice => '使用家長 PIN 碼';
+	@override String get pinChoiceHint => '建議使用。沒有家長 PIN 碼時，兒童可以切換到未受保護的設定檔並變更兒童設定，也可以透過切換設定檔繞過螢幕使用時間限制。';
+	@override String get pinDifference => '家長 PIN 碼保護兒童設定，設定檔 PIN 碼保護個別設定檔。離開兒童設定檔是否需要家長 PIN 碼須另外設定。';
+	@override String get pinDisabledWarning => '沒有家長 PIN 碼時，兒童可以離開兒童設定檔並使用未受保護的設定檔，也可以透過切換設定檔繞過螢幕使用時間限制。各設定檔的 PIN 碼仍然有效。';
+	@override String get profileSection => '設定檔';
+	@override String get timeLimitNoPinHint => '切換設定檔以管理螢幕使用時間。沒有家長 PIN 碼時，任何人都可以切換到未受保護的設定檔。';
+	@override String get watchSection => '允許觀看的內容';
 	@override String get timeLimits => '螢幕時間限制';
 	@override String get dailyWatchLimit => '每日觀看時長';
 	@override String get dailyWatchLimitHint => '每天限制該裝置上的影片播放。';
@@ -970,6 +994,72 @@ class _Translations$auth$zh_Hant extends Translations$auth$zh {
 	final TranslationsZhHant _root; // ignore: unused_field
 
 	// Translations
+	@override String get plexQrSignIn => '使用 QR 碼登入 Plex';
+	@override String get setUpWithPhone => '使用手機設定';
+	@override String get loadingRestoredData => '正在載入已還原的設定檔和連線…';
+	@override String get loadingRestoredDataFailed => '無法載入已還原的資料。請重試或重新開啟 Luroka。';
+	@override String get connectTv => '連接電視';
+	@override String get restoreEncryptedBackup => '還原加密備份';
+	@override String get restoreCloudBackup => '還原雲端備份';
+	@override String get saveEncryptedBackup => '儲存加密備份';
+	@override String get backupSaved => '備份已儲存';
+	@override String get createEncryptedBackup => '建立加密備份';
+	@override String get confirmBackupPassword => '確認密碼';
+	@override String get enterBackupPassword => '請輸入密碼。';
+	@override String get confirmBackupPasswordError => '請輸入並確認密碼。';
+	@override String get restoreBackupAction => '還原';
+	@override String get backupCreateInstructions => '包含設定檔、伺服器登入資訊和本機觀看資料。請妥善保管密碼；還原時需要使用。';
+	@override String get backupRestoreInstructions => '請輸入建立此備份時使用的密碼或雲端復原碼。還原需要空的設定檔資料庫。';
+	@override String get backupCreateFailed => '無法建立加密備份。';
+	@override String get backupRestoreFailed => '無法還原備份。請檢查密碼，並使用沒有資料的安裝。';
+	@override String get recoveryCodeStep => '第 2 步，共 3 步：儲存復原碼';
+	@override String get backupNotUploaded => '尚未上傳。還原前請完成第 3 步，並等待雲端備份建立完成的確認。';
+	@override String get recoveryCodeSavedContinue => '我已儲存代碼 — 繼續';
+	@override String get recoveryCodeSaveFile => '將代碼儲存至檔案';
+	@override String get recoveryCodeShowQr => '顯示 QR 碼';
+	@override String get recoveryCodeHideQr => '隱藏 QR 碼';
+	@override String get recoveryCopied => '復原碼已複製。請將它保存在私密的地方。';
+	@override String get recoveryCopyFailed => '無法複製復原碼。';
+	@override String get recoverySaveDialog => '私下儲存復原碼';
+	@override String get recoverySaved => '復原碼已儲存。請妥善保管此檔案。';
+	@override String get recoverySaveFailed => '無法儲存復原碼。請改為嘗試複製。';
+	@override String get cloudRestoreApplyFailed => '備份已下載，但無法在此裝置上還原。請重試或聯絡支援人員。';
+	@override String get cloudBackupNotFound => '找不到此代碼對應的雲端備份。請在原裝置完成第 3 步，並等待備份建立完成的確認。確認您使用的是為該備份儲存的代碼；備份也可能已過期或遭刪除。';
+	@override String get cloudBackupConnectionFailed => '無法連接備份服務。請檢查網際網路連線並重試。';
+	@override String get cloudBackupInvalidFormat => '無法讀取復原碼或備份格式。請檢查完整代碼並重試。';
+	@override String get cloudBackupOpenFailed => '無法開啟備份。請檢查復原碼並重試。';
+	@override String get cloudBackupSelectProfiles => '選擇要包含的設定檔。備份會在上傳前加密，並保留 90 天。';
+	@override String get cloudBackupIncludeLogins => '包含已儲存的伺服器及整合服務登入資訊';
+	@override String get cloudBackupLoginsWarning => '包含已連結的 Plex 帳號和其他已儲存的登入資訊，以便重新連線。任何持有復原碼的人都可能使用這些資訊。';
+	@override String get cloudBackupNoLogins => '若不包含已儲存的登入資訊，還原後需要重新連接伺服器。';
+	@override String get pairingHttpPhoneTitle => '此伺服器要使用 HTTP 嗎？';
+	@override String get pairingHttpPhoneWarning => '您的伺服器登入資訊和媒體流量將不會加密。網路上的其他人可能讀取這些資料。建議使用 HTTPS。Luroka 的傳輸仍會加密。';
+	@override String get pairingHttpTvTitle => '要使用未加密的伺服器嗎？';
+	@override String get pairingHttpTvWarning => '您的手機選擇了 HTTP。此網路上的其他人可能讀取電視的存取權杖和媒體流量。請只使用您信任的網路。建議使用 HTTPS。';
+	@override String get pairingUseHttp => '使用 HTTP';
+	@override String get pairingTvTitle => '使用手機連接 Jellyfin 或 Emby';
+	@override String get pairingScanInvitation => '請用手機掃描。邀請將在五分鐘後過期。';
+	@override String get pairingWaitForPhone => '正在等待手機連線…';
+	@override String get pairingComparePhone => '請將此代碼與手機上的代碼比較：';
+	@override String get pairingConfirmOnPhone => '如果代碼相同，請在手機上確認。';
+	@override String get pairingAdultOnly => '只有成人設定檔可以進行配對。';
+	@override String get pairingProfileChanged => '設定檔的存取權限已變更。配對已取消。';
+	@override String get pairingServiceUnavailable => '配對服務無法使用。請重試或手動輸入伺服器。';
+	@override String get pairingExpired => '配對已過期或中斷。請重新開始。';
+	@override String get pairingVerifyFailed => '無法驗證伺服器和帳號。請重新開始配對。';
+	@override String get pairingScanOrPaste => '掃描電視代碼或貼上邀請。';
+	@override String get pairingScanTv => '掃描電視代碼';
+	@override String get pairingTvInvitation => '電視邀請';
+	@override String pairingCheckTvCode({required Object code}) => '請確認電視顯示相同的代碼：${code}';
+	@override String get pairingCodesMatch => '代碼相同';
+	@override String get recoveryCodeLabel => '復原碼';
+	@override String get recoveryCodeScan => '掃描復原碼';
+	@override String get pairingRecoveryInstructions => '掃描或貼上已儲存的復原碼。代碼會為您的電視加密。';
+	@override String get pairingSendTv => '傳送至電視';
+	@override String get pairingServerLoginHint => '登入您的伺服器。密碼會傳送至該伺服器，而非 Luroka。';
+	@override String get recoveryCodeWarning => '還原或刪除備份需要此代碼。任何持有此代碼的人都能存取備份。如果遺失代碼，Luroka 無法將其找回。';
+	@override String get recoveryCodePrivateFile => '僅在私密的地方複製或儲存代碼。儲存的代碼檔案未經加密。';
+	@override String get recoveryCodePhoneInstructions => '請私下保存此代碼的副本。若要在手機上還原，請開啟 Luroka 的雲端備份還原選項，然後選擇掃描復原碼。';
 	@override String get signInWithPlex => '使用 Plex 登入';
 	@override String get showQRCode => '顯示 QR 碼';
 	@override String get authenticate => '驗證';
@@ -3866,6 +3956,13 @@ class _Translations$profileSetupGuide$zh_Hant extends Translations$profileSetupG
 	final TranslationsZhHant _root; // ignore: unused_field
 
 	// Translations
+	@override String get tabletSpotlightStyle => '平板焦點推薦樣式';
+	@override String get spotlightClassic => '經典';
+	@override String get spotlightMarquee => '影院招牌';
+	@override String get spotlightTonight => '今晚精選';
+	@override String get phoneSpotlight => '手機電影風格焦點推薦';
+	@override String get phoneSpotlightCinematic => '橫向圖片，標題疊加於上';
+	@override String get phoneSpotlightClassic => '經典海報卡片';
 	@override String get title => '打造專屬使用者設定檔';
 	@override String get description => '為此裝置上的使用者設定檔選擇 Luroka 的外觀和使用方式。您可以稍後在設定中變更。';
 	@override String get appearanceStep => '1 / 2 · 外觀';
@@ -5244,6 +5341,13 @@ extension on TranslationsZhHant {
 			'kidsShelf.yourShelf' => '你的電影架',
 			'kidsShelf.all' => '一切',
 			'kidsShelf.pickSomething' => '你想看什麼？',
+			'kidsShelf.atmosphere' => '首頁氛圍',
+			'kidsShelf.atmosphereHint' => '選擇兒童首頁的顏色。樹屋會保持不變。',
+			'kidsShelf.sunshine' => '陽光',
+			'kidsShelf.berry' => '莓果',
+			'kidsShelf.mint' => '薄荷',
+			'kidsShelf.sky' => '天空',
+			'kidsShelf.atmospherePreview' => '首頁預覽',
 			'kidsHome.everything' => '為你',
 			'kidsHome.keepWatching' => '繼續關注',
 			'kidsHome.emptyFilter' => '這裡還什麼都沒有。為你嘗試一下，或讓你的成年人添加一些你喜歡的東西。',
@@ -5388,6 +5492,23 @@ extension on TranslationsZhHant {
 			'detailComposition.mediaInformation' => '媒體資訊',
 			'detailComposition.fullFileInformation' => '完整的文件訊息',
 			'detailComposition.castAndCrew' => '演職人員',
+			'kids.allLibrariesHint' => '新加入的電影和影集媒體庫也會包含在內。關閉此選項可選擇特定媒體庫。',
+			'kids.appearanceSection' => '外觀',
+			'kids.disableParentPin' => '關閉家長 PIN 碼',
+			'kids.disableParentPinConfirm' => '關閉所有兒童設定檔的家長 PIN 碼？兒童可以切換到未受保護的設定檔並繞過螢幕使用時間限制。設定檔 PIN 碼仍然有效。',
+			'kids.discardAction' => '捨棄變更',
+			'kids.discardMessage' => '你的變更尚未儲存。',
+			'kids.discardTitle' => '捨棄變更？',
+			'kids.editorTitle' => '兒童設定檔設定',
+			'kids.libraryCount' => ({required Object count}) => '已選擇媒體庫：${count}',
+			'kids.moreSection' => '更多',
+			'kids.pinChoice' => '使用家長 PIN 碼',
+			'kids.pinChoiceHint' => '建議使用。沒有家長 PIN 碼時，兒童可以切換到未受保護的設定檔並變更兒童設定，也可以透過切換設定檔繞過螢幕使用時間限制。',
+			'kids.pinDifference' => '家長 PIN 碼保護兒童設定，設定檔 PIN 碼保護個別設定檔。離開兒童設定檔是否需要家長 PIN 碼須另外設定。',
+			'kids.pinDisabledWarning' => '沒有家長 PIN 碼時，兒童可以離開兒童設定檔並使用未受保護的設定檔，也可以透過切換設定檔繞過螢幕使用時間限制。各設定檔的 PIN 碼仍然有效。',
+			'kids.profileSection' => '設定檔',
+			'kids.timeLimitNoPinHint' => '切換設定檔以管理螢幕使用時間。沒有家長 PIN 碼時，任何人都可以切換到未受保護的設定檔。',
+			'kids.watchSection' => '允許觀看的內容',
 			'kids.timeLimits' => '螢幕時間限制',
 			'kids.dailyWatchLimit' => '每日觀看時長',
 			'kids.dailyWatchLimitHint' => '每天限制該裝置上的影片播放。',
@@ -5460,6 +5581,8 @@ extension on TranslationsZhHant {
 			'kids.freshStories' => '新故事等待發現',
 			'kids.yourMovies' => '電影時的最愛',
 			'kids.yourShows' => '還有一集',
+			_ => null,
+		} ?? switch (path) {
 			'kids.emptyHint' => '當您的伺服器具有允許年齡分類的遊戲時，新的冒險將會出現在此。',
 			'kids.title' => 'Luroka 兒童版',
 			'kids.addProfile' => '新增孩子個人資料',
@@ -5484,8 +5607,6 @@ extension on TranslationsZhHant {
 			'kids.historyReset' => '兒童觀看排除重置',
 			'kids.blocked' => '此標題在此兒童個人資料中不可用。',
 			'kids.switchProfile' => '切換設定檔',
-			_ => null,
-		} ?? switch (path) {
 			'kids.manageFromAdult' => '切換到成人設定檔以管理設定。',
 			'kids.noConnections' => '在新增兒童個人資料之前，將伺服器連接到您的成人個人資料。',
 			'kids.created' => '兒童檔案已創建',
@@ -5560,6 +5681,72 @@ extension on TranslationsZhHant {
 			'appIcon.names.strata' => '地層',
 			'appIcon.names.facet' => '刻面',
 			'appIcon.names.tilde' => '波形符',
+			'auth.plexQrSignIn' => '使用 QR 碼登入 Plex',
+			'auth.setUpWithPhone' => '使用手機設定',
+			'auth.loadingRestoredData' => '正在載入已還原的設定檔和連線…',
+			'auth.loadingRestoredDataFailed' => '無法載入已還原的資料。請重試或重新開啟 Luroka。',
+			'auth.connectTv' => '連接電視',
+			'auth.restoreEncryptedBackup' => '還原加密備份',
+			'auth.restoreCloudBackup' => '還原雲端備份',
+			'auth.saveEncryptedBackup' => '儲存加密備份',
+			'auth.backupSaved' => '備份已儲存',
+			'auth.createEncryptedBackup' => '建立加密備份',
+			'auth.confirmBackupPassword' => '確認密碼',
+			'auth.enterBackupPassword' => '請輸入密碼。',
+			'auth.confirmBackupPasswordError' => '請輸入並確認密碼。',
+			'auth.restoreBackupAction' => '還原',
+			'auth.backupCreateInstructions' => '包含設定檔、伺服器登入資訊和本機觀看資料。請妥善保管密碼；還原時需要使用。',
+			'auth.backupRestoreInstructions' => '請輸入建立此備份時使用的密碼或雲端復原碼。還原需要空的設定檔資料庫。',
+			'auth.backupCreateFailed' => '無法建立加密備份。',
+			'auth.backupRestoreFailed' => '無法還原備份。請檢查密碼，並使用沒有資料的安裝。',
+			'auth.recoveryCodeStep' => '第 2 步，共 3 步：儲存復原碼',
+			'auth.backupNotUploaded' => '尚未上傳。還原前請完成第 3 步，並等待雲端備份建立完成的確認。',
+			'auth.recoveryCodeSavedContinue' => '我已儲存代碼 — 繼續',
+			'auth.recoveryCodeSaveFile' => '將代碼儲存至檔案',
+			'auth.recoveryCodeShowQr' => '顯示 QR 碼',
+			'auth.recoveryCodeHideQr' => '隱藏 QR 碼',
+			'auth.recoveryCopied' => '復原碼已複製。請將它保存在私密的地方。',
+			'auth.recoveryCopyFailed' => '無法複製復原碼。',
+			'auth.recoverySaveDialog' => '私下儲存復原碼',
+			'auth.recoverySaved' => '復原碼已儲存。請妥善保管此檔案。',
+			'auth.recoverySaveFailed' => '無法儲存復原碼。請改為嘗試複製。',
+			'auth.cloudRestoreApplyFailed' => '備份已下載，但無法在此裝置上還原。請重試或聯絡支援人員。',
+			'auth.cloudBackupNotFound' => '找不到此代碼對應的雲端備份。請在原裝置完成第 3 步，並等待備份建立完成的確認。確認您使用的是為該備份儲存的代碼；備份也可能已過期或遭刪除。',
+			'auth.cloudBackupConnectionFailed' => '無法連接備份服務。請檢查網際網路連線並重試。',
+			'auth.cloudBackupInvalidFormat' => '無法讀取復原碼或備份格式。請檢查完整代碼並重試。',
+			'auth.cloudBackupOpenFailed' => '無法開啟備份。請檢查復原碼並重試。',
+			'auth.cloudBackupSelectProfiles' => '選擇要包含的設定檔。備份會在上傳前加密，並保留 90 天。',
+			'auth.cloudBackupIncludeLogins' => '包含已儲存的伺服器及整合服務登入資訊',
+			'auth.cloudBackupLoginsWarning' => '包含已連結的 Plex 帳號和其他已儲存的登入資訊，以便重新連線。任何持有復原碼的人都可能使用這些資訊。',
+			'auth.cloudBackupNoLogins' => '若不包含已儲存的登入資訊，還原後需要重新連接伺服器。',
+			'auth.pairingHttpPhoneTitle' => '此伺服器要使用 HTTP 嗎？',
+			'auth.pairingHttpPhoneWarning' => '您的伺服器登入資訊和媒體流量將不會加密。網路上的其他人可能讀取這些資料。建議使用 HTTPS。Luroka 的傳輸仍會加密。',
+			'auth.pairingHttpTvTitle' => '要使用未加密的伺服器嗎？',
+			'auth.pairingHttpTvWarning' => '您的手機選擇了 HTTP。此網路上的其他人可能讀取電視的存取權杖和媒體流量。請只使用您信任的網路。建議使用 HTTPS。',
+			'auth.pairingUseHttp' => '使用 HTTP',
+			'auth.pairingTvTitle' => '使用手機連接 Jellyfin 或 Emby',
+			'auth.pairingScanInvitation' => '請用手機掃描。邀請將在五分鐘後過期。',
+			'auth.pairingWaitForPhone' => '正在等待手機連線…',
+			'auth.pairingComparePhone' => '請將此代碼與手機上的代碼比較：',
+			'auth.pairingConfirmOnPhone' => '如果代碼相同，請在手機上確認。',
+			'auth.pairingAdultOnly' => '只有成人設定檔可以進行配對。',
+			'auth.pairingProfileChanged' => '設定檔的存取權限已變更。配對已取消。',
+			'auth.pairingServiceUnavailable' => '配對服務無法使用。請重試或手動輸入伺服器。',
+			'auth.pairingExpired' => '配對已過期或中斷。請重新開始。',
+			'auth.pairingVerifyFailed' => '無法驗證伺服器和帳號。請重新開始配對。',
+			'auth.pairingScanOrPaste' => '掃描電視代碼或貼上邀請。',
+			'auth.pairingScanTv' => '掃描電視代碼',
+			'auth.pairingTvInvitation' => '電視邀請',
+			'auth.pairingCheckTvCode' => ({required Object code}) => '請確認電視顯示相同的代碼：${code}',
+			'auth.pairingCodesMatch' => '代碼相同',
+			'auth.recoveryCodeLabel' => '復原碼',
+			'auth.recoveryCodeScan' => '掃描復原碼',
+			'auth.pairingRecoveryInstructions' => '掃描或貼上已儲存的復原碼。代碼會為您的電視加密。',
+			'auth.pairingSendTv' => '傳送至電視',
+			'auth.pairingServerLoginHint' => '登入您的伺服器。密碼會傳送至該伺服器，而非 Luroka。',
+			'auth.recoveryCodeWarning' => '還原或刪除備份需要此代碼。任何持有此代碼的人都能存取備份。如果遺失代碼，Luroka 無法將其找回。',
+			'auth.recoveryCodePrivateFile' => '僅在私密的地方複製或儲存代碼。儲存的代碼檔案未經加密。',
+			'auth.recoveryCodePhoneInstructions' => '請私下保存此代碼的副本。若要在手機上還原，請開啟 Luroka 的雲端備份還原選項，然後選擇掃描復原碼。',
 			'auth.signInWithPlex' => '使用 Plex 登入',
 			'auth.showQRCode' => '顯示 QR 碼',
 			'auth.authenticate' => '驗證',
@@ -5908,6 +6095,8 @@ extension on TranslationsZhHant {
 			'settings.maxVolumePercent' => ({required Object percent}) => '${percent}%',
 			'settings.discordRichPresence' => 'Discord 狀態整合（Rich Presence）',
 			'settings.discordRichPresenceDescription' => '在 Discord 上顯示您正在觀看的內容',
+			_ => null,
+		} ?? switch (path) {
 			'settings.services' => '外部服務',
 			'settings.servicesDescription' => '連結 Trakt、MyAnimeList、Seerr 等服務',
 			'settings.manageLibrariesDescription' => '重新排序與隱藏媒體庫',
@@ -5998,8 +6187,6 @@ extension on TranslationsZhHant {
 			'settings.liveTvDefaultFavoritesDescription' => '開啟直播電視時僅顯示最愛頻道',
 			'settings.general' => '一般',
 			'settings.generalDescription' => '語言、啟動與視窗行為',
-			_ => null,
-		} ?? switch (path) {
 			'settings.languageAndRegion' => '語言與地區',
 			'settings.startup' => '啟動',
 			'settings.display' => '顯示器',
@@ -6422,6 +6609,8 @@ extension on TranslationsZhHant {
 			'fileInfo.pixelAspectRatio' => '像素寬高比',
 			'fileInfo.profile' => '規格檔（Profile）',
 			'fileInfo.level' => '等級',
+			_ => null,
+		} ?? switch (path) {
 			'fileInfo.bitDepth' => '位元深度',
 			'fileInfo.pixelFormat' => '像素格式',
 			'fileInfo.colorSpace' => '色彩空間',
@@ -6512,8 +6701,6 @@ extension on TranslationsZhHant {
 			'mediaMenu.shuffleNotAvailableOffline' => '離線時無法隨機播放',
 			'mediaMenu.fileInfo' => '檔案資訊',
 			'mediaMenu.deleteEpisodeFromServer' => '從伺服器刪除單集',
-			_ => null,
-		} ?? switch (path) {
 			'mediaMenu.deleteSeasonFromServer' => '從伺服器刪除季',
 			'mediaMenu.deleteShowFromServer' => '從伺服器刪除影集',
 			'mediaMenu.deleteMovieFromServer' => '從伺服器刪除電影',
@@ -6936,6 +7123,8 @@ extension on TranslationsZhHant {
 			'accountPreferences.rewatchingInNextUp' => '在「接下來播放」中保留重看的影集',
 			'accountPreferences.rewatchingInNextUpDescription' => '看完一部影集後再次開始觀看時，「接下來播放」會追蹤重看的進度，而不是將該影集移除。',
 			'accountPreferences.watchedIndicator' => '已觀看指示',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.watchedIndicatorOptions.none' => '從不',
 			'accountPreferences.watchedIndicatorOptions.moviesAndShows' => '電影與影集',
 			'accountPreferences.watchedIndicatorOptions.movies' => '僅電影',
@@ -7026,8 +7215,6 @@ extension on TranslationsZhHant {
 			'libraries.filters' => '篩選器',
 			'libraries.confirmActionMessage' => '確定要執行此操作嗎？',
 			'libraries.showLibrary' => '顯示媒體庫',
-			_ => null,
-		} ?? switch (path) {
 			'libraries.hideLibrary' => '隱藏媒體庫',
 			'libraries.libraryOptions' => '媒體庫選項',
 			'libraries.content' => '媒體庫內容',
@@ -7450,6 +7637,8 @@ extension on TranslationsZhHant {
 			'collections.deleted' => '已刪除收藏集',
 			'collections.deleteFailed' => '刪除收藏集失敗',
 			'collections.deleteFailedWithError' => ({required Object error}) => '刪除收藏集失敗：${error}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.selectCollection' => '選擇收藏集',
 			'collections.collectionName' => '收藏集名稱',
 			'collections.enterCollectionName' => '輸入收藏集名稱',
@@ -7540,8 +7729,6 @@ extension on TranslationsZhHant {
 			'watchTogether.qrShare' => '分享二維碼',
 			'watchTogether.qrHint' => '使用Luroka應用程式掃描即可加入該房間。',
 			'watchTogether.phasePlaying' => '演奏',
-			_ => null,
-		} ?? switch (path) {
 			'watchTogether.phasePaused' => '已暫停',
 			'watchTogether.phaseWaiting' => '等待大家',
 			'watchTogether.inviteCopied' => '邀請已複製。將其貼到訊息中。',
@@ -7964,6 +8151,8 @@ extension on TranslationsZhHant {
 			'externalPlayer.useExternalPlayer' => '使用外部播放器',
 			'externalPlayer.useExternalPlayerDescription' => '在其他應用程式中開啟影片',
 			'externalPlayer.selectPlayer' => '選擇播放器',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.customPlayers' => '自訂播放器',
 			'externalPlayer.systemDefault' => '系統預設',
 			'externalPlayer.addCustomPlayer' => '新增自訂播放器',
@@ -8054,8 +8243,6 @@ extension on TranslationsZhHant {
 			'matchScreen.match' => '配對…',
 			'matchScreen.fixMatch' => '修正配對…',
 			'matchScreen.unmatch' => '取消配對',
-			_ => null,
-		} ?? switch (path) {
 			'matchScreen.unmatchConfirm' => '清除此配對資訊？在重新配對前，Plex 會將其視為未配對媒體。',
 			'matchScreen.unmatchSuccess' => '已取消配對',
 			'matchScreen.unmatchFailed' => '無法取消配對',
@@ -8198,6 +8385,13 @@ extension on TranslationsZhHant {
 			'profileIntegrations.later' => '稍後設定',
 			'profileIntegrations.manage' => '管理集成',
 			'profileIntegrations.forProfile' => ({required Object name}) => '${name} 的連接',
+			'profileSetupGuide.tabletSpotlightStyle' => '平板焦點推薦樣式',
+			'profileSetupGuide.spotlightClassic' => '經典',
+			'profileSetupGuide.spotlightMarquee' => '影院招牌',
+			'profileSetupGuide.spotlightTonight' => '今晚精選',
+			'profileSetupGuide.phoneSpotlight' => '手機電影風格焦點推薦',
+			'profileSetupGuide.phoneSpotlightCinematic' => '橫向圖片，標題疊加於上',
+			'profileSetupGuide.phoneSpotlightClassic' => '經典海報卡片',
 			'profileSetupGuide.title' => '打造專屬使用者設定檔',
 			'profileSetupGuide.description' => '為此裝置上的使用者設定檔選擇 Luroka 的外觀和使用方式。您可以稍後在設定中變更。',
 			'profileSetupGuide.appearanceStep' => '1 / 2 · 外觀',
